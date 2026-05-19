@@ -1,6 +1,6 @@
 @tag('1️⃣ Trust/Endorsed', '2️⃣ Status/Active', '4️⃣ Task/6-Resolved')
 Dataset ecommerce_official {
-  label: 'Ecommerce Official'
+  label: 'Ecommerce Official 2'
   description: ''
   data_source_name: 'demodb'
   models: [

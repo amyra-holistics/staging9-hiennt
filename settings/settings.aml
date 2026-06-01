@@ -5,9 +5,7 @@ ProjectSettings project_settings {
   data_import {
     default_write_schema: "persisted"
   }
-}
-
-//Import: default schema
+}//Import: default schema
   // import_settings {
   //   default_schema: 'public'
   // }

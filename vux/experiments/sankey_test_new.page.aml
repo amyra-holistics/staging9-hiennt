@@ -15,13 +15,13 @@ Dashboard sankey_test_new {
       dataset: ecommerce_dataset
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'name')
+          ref: ref('ecommerce_categories_2', 'name')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'parent_id')
+          ref: ref('ecommerce_categories_2', 'parent_id')
           format {
             type: 'number'
             pattern: 'inherited'

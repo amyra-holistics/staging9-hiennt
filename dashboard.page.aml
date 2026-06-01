@@ -3,7 +3,7 @@ Dashboard dashboard {
   description: ''''''
 
   block filter_block: FilterBlock {
-    label: 'This is a Filter Block'
+    label: 'This is a eeeee Block'
     type: 'text'
     default {
       operator: 'is'
@@ -11,7 +11,7 @@ Dashboard dashboard {
     }
   }
   block v1: VizBlock {
-    label: 'Name and Parent'
+    label: 'Name and eeeeeeParent'
     viz: DataTable {
       dataset: ecommerce_dataset
       theme {

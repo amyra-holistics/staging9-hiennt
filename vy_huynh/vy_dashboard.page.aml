@@ -1,6 +1,6 @@
 Dashboard untitled_4_2 {
-  title: 'vy_dashboard'
-  description: ''
+  title: '123213adasdasd'
+  description: '2312321adasdasd32131'
   owner: 'vy.ht@holistics.io'
   block v_ntre: VizBlock {
     label: 'Date, Category, and Sales'
@@ -75,38 +75,8 @@ Dashboard untitled_4_2 {
       value: []
     }
   }
-  block v_7nhj: VizBlock {
-    label: 'Count of Audio Title by Topic'
-    viz: ColumnChart {
-      dataset: audio_dataset
-      theme {
-
-      }
-      x_axis: VizFieldFull {
-        ref: r(audio_data_csv.topic)
-        format {
-          type: 'text'
-        }
-      }
-      y_axis {
-        series {
-          field: VizFieldFull {
-            ref: r(audio_data_csv.audio_title)
-            aggregation: 'count'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color_palette: 'seq-magma'
-          }
-        }
-      }
-      settings {
-        x_axis_show_null_datetime: false
-      }
-    }
+  block t_1eap: TextBlock {
+    content: @md adadsada;;
   }
   view: CanvasLayout {
     label: 'View 1'
@@ -130,9 +100,8 @@ Dashboard untitled_4_2 {
       position: pos(660, 0, 300, 80)
       layer: 4
     }
-    block v_7nhj {
-      position: pos(660, 100, 620, 420)
-      layer: 1
+    block t_1eap {
+      position: pos(820, 320, 120, 60)
     }
     mobile {
       mode: 'auto'

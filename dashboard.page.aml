@@ -152,7 +152,7 @@ Dashboard dashboard {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month')
+        ref: ref('ecommerce_financial', 'month_')
         format {
           type: 'date'
         }

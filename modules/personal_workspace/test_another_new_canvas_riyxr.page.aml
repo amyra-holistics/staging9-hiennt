@@ -18,13 +18,13 @@ Dashboard test_another_new_canvas_riyxr {
       }
       fields: [
         VizFieldFull {
-          ref: r(ecommerce_categories.name)
+          ref: r(ecommerce_categories_2.name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: r(ecommerce_categories.parent_id)
+          ref: r(ecommerce_categories_2.parent_id)
           format {
             type: 'number'
             pattern: 'inherited'
@@ -45,7 +45,7 @@ Dashboard test_another_new_canvas_riyxr {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: r(ecommerce_financial.month)
+        ref: r(ecommerce_financial.month_)
         format {
           type: 'date'
         }
@@ -132,13 +132,13 @@ Dashboard test_another_new_canvas_riyxr {
       dataset: ecommerce_dataset
       fields: [
         VizFieldFull {
-          ref: r(ecommerce_categories.name)
+          ref: r(ecommerce_categories_2.name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: r(ecommerce_categories.parent_id)
+          ref: r(ecommerce_categories_2.parent_id)
           format {
             type: 'number'
             pattern: 'inherited'
@@ -159,7 +159,7 @@ Dashboard test_another_new_canvas_riyxr {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: r(ecommerce_financial.month)
+        ref: r(ecommerce_financial.month_)
         format {
           type: 'date'
         }

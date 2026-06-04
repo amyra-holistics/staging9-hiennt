@@ -3,7 +3,7 @@ Dashboard dashboard {
   description: ''''''
 
   block filter_block: FilterBlock {
-    label: 'This is a Filter Block'
+    label: 'This is a eeeee Block'
     type: 'text'
     default {
       operator: 'is'
@@ -11,7 +11,7 @@ Dashboard dashboard {
     }
   }
   block v1: VizBlock {
-    label: 'Name and Parent'
+    label: 'Name and eeeeeeParent'
     viz: DataTable {
       dataset: ecommerce_dataset
       theme {
@@ -19,13 +19,13 @@ Dashboard dashboard {
       }
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'name')
+          ref: ref('ecommerce_categories_2', 'name')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'parent_id')
+          ref: ref('ecommerce_categories_2', 'parent_id')
           format {
             type: 'number'
             pattern: 'inherited'
@@ -42,7 +42,7 @@ Dashboard dashboard {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month')
+        ref: ref('ecommerce_financial', 'month_')
         format {
           type: 'date'
         }
@@ -125,13 +125,13 @@ Dashboard dashboard {
       dataset: ecommerce_dataset
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'name')
+          ref: ref('ecommerce_categories_2', 'name')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'parent_id')
+          ref: ref('ecommerce_categories_2', 'parent_id')
           format {
             type: 'number'
             pattern: 'inherited'
@@ -152,7 +152,7 @@ Dashboard dashboard {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month')
+        ref: ref('ecommerce_financial', 'month_')
         format {
           type: 'date'
         }

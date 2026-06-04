@@ -57,7 +57,7 @@ Dashboard rich_text_demo {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: r(ecommerce_financial.month)
+        ref: r(ecommerce_financial.month_)
         transformation: 'datetrunc year'
         format {
           type: 'date'

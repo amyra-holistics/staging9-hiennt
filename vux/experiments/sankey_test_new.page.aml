@@ -15,13 +15,13 @@ Dashboard sankey_test_new {
       dataset: ecommerce_dataset
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'name')
+          ref: ref('ecommerce_categories_2', 'name')
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories', 'parent_id')
+          ref: ref('ecommerce_categories_2', 'parent_id')
           format {
             type: 'number'
             pattern: 'inherited'
@@ -42,7 +42,7 @@ Dashboard sankey_test_new {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month')
+        ref: ref('ecommerce_financial', 'month_')
         format {
           type: 'date'
         }

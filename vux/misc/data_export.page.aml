@@ -18,7 +18,7 @@ Dashboard data_export {
         layer: 1
       }
       block v_aei5 {
-        position: pos(10, 360, 920, 390)
+        position: pos(10, 380, 920, 390)
         layer: 2
       }
       auto_expand_vertically: true

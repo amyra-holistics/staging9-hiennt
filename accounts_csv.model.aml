@@ -1,4 +1,4 @@
-Model accounts_csv {
+Model accounts_csv_ {
   type: 'table'
   label: 'Accounts csv'
   description: ''

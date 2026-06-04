@@ -3,7 +3,7 @@ Dataset ecommerce_dataset {
   description: ''
   data_source_name: 'demodb'
   models: [
-    ecommerce_categories,
+    ecommerce_categories_2,
     ecommerce_cities,
     ecommerce_countries,
     ecommerce_financial,

@@ -1,0 +1,9 @@
+Dataset superstore {
+  label: 'superstore',
+  description: ''
+  data_source_name: 'demodb'
+  models: [
+    superstore_csv
+  ]
+  relationships: []
+}

@@ -1,31 +1,21 @@
-Dashboard dashboard {
+Dashboard thang_personal {
   title: 'Dashboard'
-  description: ''''''
-
-  block filter_block: FilterBlock {
-    label: 'This is a eeeee Block'
-    type: 'text'
-    default {
-      operator: 'is'
-      value: 'default'
-    }
-  }
+  owner: 'thang.lk@holistics.io'
   block v1: VizBlock {
-    label: 'Name and eeeeeeParent'
+    label: 'Name and Parent'
     viz: DataTable {
       dataset: ecommerce_dataset
       theme {
-
       }
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'name')
+          ref: r(ecommerce_categories_2.name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'parent_id')
+          ref: r(ecommerce_categories_2.parent_id)
           format {
             type: 'number'
             pattern: 'inherited'
@@ -34,6 +24,10 @@ Dashboard dashboard {
       ]
       settings {
         show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
     }
   }
@@ -42,15 +36,15 @@ Dashboard dashboard {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month_')
+        ref: r(ecommerce_financial.month_)
         format {
           type: 'date'
         }
       }
       y_axis {
         series {
-          field {
-            ref: ref('ecommerce_financial', 'cost')
+          field: VizFieldFull {
+            ref: r(ecommerce_financial.cost)
             aggregation: 'sum'
             format {
               type: 'number'
@@ -63,8 +57,8 @@ Dashboard dashboard {
           }
         }
         series {
-          field {
-            ref: ref('ecommerce_financial', 'sales')
+          field: VizFieldFull {
+            ref: r(ecommerce_financial.sales)
             aggregation: 'sum'
             format {
               type: 'number'
@@ -84,23 +78,22 @@ Dashboard dashboard {
     viz: DataTable {
       dataset: vinhhh_test_activities
       theme {
-
       }
       fields: [
         VizFieldFull {
-          ref: ref('public_activities', 'trackable_type')
+          ref: r(public_activities.trackable_type)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('public_activities', 'owner_type')
+          ref: r(public_activities.owner_type)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('public_activities', 'key')
+          ref: r(public_activities.key)
           format {
             type: 'text'
           }
@@ -108,15 +101,11 @@ Dashboard dashboard {
       ]
       settings {
         show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
       }
-    }
-  }
-  block f1: FilterBlock {
-    label: 'This is a Filter Block'
-    type: 'text'
-    default {
-      operator: 'is'
-      value: 'default'
     }
   }
   block v4: VizBlock {
@@ -125,13 +114,13 @@ Dashboard dashboard {
       dataset: ecommerce_dataset
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'name')
+          ref: r(ecommerce_categories_2.name)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'parent_id')
+          ref: r(ecommerce_categories_2.parent_id)
           format {
             type: 'number'
             pattern: 'inherited'
@@ -152,7 +141,7 @@ Dashboard dashboard {
     viz: LineChart {
       dataset: ecommerce_dataset
       x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month_')
+        ref: r(ecommerce_financial.month_)
         format {
           type: 'date'
         }
@@ -160,7 +149,7 @@ Dashboard dashboard {
       y_axis {
         series {
           field: VizFieldFull {
-            ref: ref('ecommerce_financial', 'cost')
+            ref: r(ecommerce_financial.cost)
             aggregation: 'sum'
             format {
               type: 'number'
@@ -174,7 +163,7 @@ Dashboard dashboard {
         }
         series {
           field: VizFieldFull {
-            ref: ref('ecommerce_financial', 'sales')
+            ref: r(ecommerce_financial.sales)
             aggregation: 'sum'
             format {
               type: 'number'
@@ -194,23 +183,22 @@ Dashboard dashboard {
     viz: DataTable {
       dataset: vinhhh_test_activities
       theme {
-
       }
       fields: [
         VizFieldFull {
-          ref: ref('public_activities', 'trackable_type')
+          ref: r(public_activities.trackable_type)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('public_activities', 'owner_type')
+          ref: r(public_activities.owner_type)
           format {
             type: 'text'
           }
         },
         VizFieldFull {
-          ref: ref('public_activities', 'key')
+          ref: r(public_activities.key)
           format {
             type: 'text'
           }
@@ -225,58 +213,6 @@ Dashboard dashboard {
       }
     }
   }
-  view: TabLayout {
-    label: 'View 1'
-    tab tab1: CanvasLayout {
-      label: 'Tab 1'
-      width: 650
-      height: 1100
-      block v1 {
-        position: pos(20, 20, 620, 420)
-      }
-      block v2 {
-        position: pos(20, 450, 620, 320)
-      }
-      block v3 {
-        position: pos(10, 870, 330, 220)
-        layer: 1
-      }
-      block filter_block {
-        position: pos(20, 780, 400, 80)
-      }
-      mobile {
-        mode: 'manual'
-        block v1
-        block filter_block
-        block v2
-      }
-    }
-    tab tab2: CanvasLayout {
-      label: 'Tab 2'
-      height: 800
-      grid_size: 20
-      mobile {
-        mode: 'auto'
-      }
-      block f1 {
-        position: pos(20, 20, 400, 80)
-        layer: 1
-      }
-      block v4 {
-        position: pos(440, 20, 620, 420)
-        layer: 2
-      }
-      block v5 {
-        position: pos(20, 460, 620, 320)
-        layer: 3
-      }
-      block v6 {
-        position: pos(20, 120, 330, 220)
-        layer: 4
-      }
-    }
-  }
-  theme: H.themes.classic
   interactions: [
     FilterInteraction {
       from: 'v1'
@@ -345,4 +281,49 @@ Dashboard dashboard {
       ]
     }
   ]
+  view: TabLayout {
+    label: 'View 1'
+    tab tab1: CanvasLayout {
+      label: 'Tab 1'
+      width: 650
+      height: 1100
+      block v1 {
+        position: pos(20, 20, 620, 420)
+      }
+      block v2 {
+        position: pos(20, 450, 620, 320)
+      }
+      block v3 {
+        position: pos(10, 870, 330, 220)
+        layer: 1
+      }
+      mobile {
+        mode: 'manual'
+        block v1
+        block filter_block
+        block v2
+      }
+    }
+    tab tab2: CanvasLayout {
+      label: 'Tab 2'
+      height: 800
+      grid_size: 20
+      block v4 {
+        position: pos(440, 20, 620, 420)
+        layer: 2
+      }
+      block v5 {
+        position: pos(20, 460, 620, 320)
+        layer: 3
+      }
+      block v6 {
+        position: pos(20, 120, 330, 220)
+        layer: 4
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+  theme: H.themes.classic
 }

@@ -1,0 +1,81 @@
+Model accounts_csv_ {
+  type: 'table'
+  label: 'Accounts csv'
+  description: ''
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension created_at {
+    label: 'Created at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension name {
+    label: 'Name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension industry {
+    label: 'Industry'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.industry }};;
+  }
+  dimension company_size_band {
+    label: 'Company size band'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.company_size_band }};;
+  }
+  dimension region {
+    label: 'Region'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.region }};;
+  }
+  dimension country_code {
+    label: 'Country code'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country_code }};;
+  }
+  dimension lifecycle_stage {
+    label: 'Lifecycle stage'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.lifecycle_stage }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'accounts.csv'
+    uploaded_at: '2026-03-06 02:35:31'
+    hash: 'bf509e1e6de6ce3511ecda4568c0ae21f9ea86eacb3ad869ee89c8d6b0646be7'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("created_at", "created_at", "datetime"),
+      H.imports.column_config("name", "name", "text"),
+      H.imports.column_config("industry", "industry", "text"),
+      H.imports.column_config("company_size_band", "company_size_band", "text"),
+      H.imports.column_config("region", "region", "text"),
+      H.imports.column_config("country_code", "country_code", "text"),
+      H.imports.column_config("lifecycle_stage", "lifecycle_stage", "text")
+    ]
+  }
+  owner: 'vu.dq@holistics.io'
+  table_name: '"persisted"."holistics_accounts_csv_cb2d8_202603060235"'
+}

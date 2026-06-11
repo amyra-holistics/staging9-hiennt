@@ -1,0 +1,41 @@
+Model sankey_data_csv {
+  type: 'table'
+  label: 'Sankey data csv'
+  description: ''
+  data_source_name: 'demodb'
+  dimension source {
+    label: 'Source'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.source }};;
+  }
+  dimension target {
+    label: 'Target'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.target }};;
+  }
+  dimension weight {
+    label: 'Weight'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.count_of_id }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'sankey-data.csv'
+    uploaded_at: '2026-03-03 08:48:34'
+    hash: 'f94bfd57a4f0dcaa0647e86ba1ba1d3d4bf986739e3c374676a48454c8380a52'
+    column_configs: [
+      H.imports.column_config("source", "source", "text"),
+      H.imports.column_config("target", "target", "text"),
+      H.imports.column_config("count_of_id", "count_of_id", "number")
+    ]
+  }
+  owner: 'vu.dq@holistics.io'
+  table_name: '"persisted"."holistics_sankey_data_c_0f663_202603030848"'
+}

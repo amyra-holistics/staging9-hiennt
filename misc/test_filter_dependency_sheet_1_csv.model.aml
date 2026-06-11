@@ -1,0 +1,33 @@
+Model test_filter_dependency_sheet_1_csv {
+  type: 'table'
+  label: 'Test filter dependency sheet 1 csv'
+  description: ''
+  data_source_name: 'khai_postgre'
+  dimension category {
+    label: 'Category'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.category }};;
+  }
+  dimension sales {
+    label: 'Sales'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.sales }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'test_filter_dependency_-_sheet1.csv'
+    uploaded_at: '2025-10-30 04:31:03'
+    hash: 'd96f55d500678e6d2949ecffcdb9c816259d5a2464cdb77a4e0fe72aeeeac8b0'
+    column_configs: [
+      H.imports.column_config("category", "category", "text"),
+      H.imports.column_config("sales", "sales", "number")
+    ]
+  }
+  owner: 'vy.ht@holistics.io'
+  table_name: '"public"."holistics_test_filter_d_36f59_202510300431"'
+}

@@ -1,0 +1,82 @@
+Model public_work_items {
+  type: 'table'
+  label: 'Work Items'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension project_id {
+    label: 'Project Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.project_id }};;
+  }
+  dimension sprint_id {
+    label: 'Sprint Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.sprint_id }};;
+  }
+  dimension assignee_id {
+    label: 'Assignee Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.assignee_id }};;
+  }
+  dimension current_stage_id {
+    label: 'Current Stage Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.current_stage_id }};;
+  }
+  dimension title {
+    label: 'Title'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.title }};;
+  }
+  dimension priority {
+    label: 'Priority'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.priority }};;
+  }
+  dimension item_type {
+    label: 'Item Type'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.item_type }};;
+  }
+  dimension story_points {
+    label: 'Story Points'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.story_points }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension started_at {
+    label: 'Started At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.started_at }};;
+  }
+  dimension completed_at {
+    label: 'Completed At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.completed_at }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."work_items"'
+}

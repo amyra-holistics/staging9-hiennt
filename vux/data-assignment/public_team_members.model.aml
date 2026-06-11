@@ -1,0 +1,34 @@
+Model public_team_members {
+  type: 'table'
+  label: 'Team Members'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension email {
+    label: 'Email'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension role {
+    label: 'Role'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.role }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."team_members"'
+}

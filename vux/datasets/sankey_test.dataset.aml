@@ -1,0 +1,9 @@
+Dataset sankey_test {
+  label: 'sankey_test',
+  description: ''
+  data_source_name: 'demodb'
+  models: [
+    sankey_data_csv
+  ]
+  relationships: []
+}

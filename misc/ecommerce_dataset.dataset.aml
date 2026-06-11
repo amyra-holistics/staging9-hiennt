@@ -1,0 +1,23 @@
+Dataset ecommerce_dataset {
+  label: 'Ecommerce Dataset Test'
+  description: ''
+  data_source_name: 'demodb'
+  models: [
+    ecommerce_categories_2,
+    ecommerce_cities,
+    ecommerce_countries,
+    ecommerce_financial,
+    ecommerce_ga_sessions,
+    ecommerce_ga_users
+  ]
+
+  relationships: [
+  ]
+  owner: 'my.nguyen@holistics.io'
+  metric test_metr_count {
+    label: "Test Metr Count"
+    type: "number"
+    description: ""
+    definition: @aql 100/20;;
+  }
+}

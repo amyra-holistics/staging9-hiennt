@@ -1,25 +1,81 @@
 Dashboard dynamic_dashboard {
   title: 'Dynamic Dashboard'
   description: ''''''
-
   block title: TextBlock {
     content: @md # Your title goes here
 <font color="#D2D5DF">(Double click to edit)</font>;;
   }
   block v1: VizBlock {
-    label: 'cities'
+    label: 'edit title'
+    viz: ColumnChart {
+      dataset: d_cities
+      theme {
+      }
+      x_axis: VizFieldFull {
+        ref: r(ecommerce_cities.country_code)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(ecommerce_cities.id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 0
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(ecommerce_cities.name)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color_palette: 'seq-magma'
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: false
+      }
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+  }
+  block v_5irp: VizBlock {
+    label: 'cities copy'
     viz: DataTable {
       dataset: d_cities
+      theme {
+      }
       fields: [
         VizFieldFull {
-          ref: ref('ecommerce_cities', 'id')
+          ref: r(ecommerce_cities.id)
           format {
             type: 'number'
             pattern: 'inherited'
           }
         },
         VizFieldFull {
-          ref: ref('ecommerce_cities', 'name')
+          ref: r(ecommerce_cities.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_cities.country_code)
           format {
             type: 'text'
           }
@@ -30,19 +86,87 @@ Dashboard dynamic_dashboard {
       }
     }
   }
-  view: CanvasLayout {
-    label: 'View 1'
-    height: 840
-    grid_size: 20
-    block title {
-      position: pos(20, 20, 1160, 120)
-    }
-    block v1 {
-      position: pos(20, 160, 400, 300)
-      layer: 1
+  block v_q0n6: VizBlock {
+    label: 'cities copy'
+    viz: PivotTable {
+      dataset: d_cities
+      theme {
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(ecommerce_cities.country_code)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(ecommerce_cities.id)
+          aggregation: 'count'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_cities.name)
+          aggregation: 'count'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_column_total: true
+      }
     }
   }
-
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'original tab'
+      height: 1180
+      grid_size: 20
+      block v1 {
+        position: pos(20, 160, 760, 540)
+        layer: 1
+      }
+      block title {
+        position: pos(20, 20, 1380, 100)
+      }
+      block v_q0n6 {
+        position: pos(640, 720, 760, 440)
+        layer: 1
+      }
+      width: 1420
+    }
+    tab tab_18zf: CanvasLayout {
+      label: 'tab new'
+      width: 1300
+      height: 800
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab tab_mum7: CanvasLayout {
+      label: 'Tab 2'
+      width: 460
+      height: 340
+      grid_size: 20
+      auto_expand_vertically: true
+      block v_5irp {
+        position: pos(40, 20, 400, 300)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
   theme: H.themes.classic
-
+  interactions: []
 }

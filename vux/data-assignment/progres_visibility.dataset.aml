@@ -1,0 +1,37 @@
+Dataset progres_visibility {
+  label: 'progres_visibility'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  models: [
+    public_blocked_events,
+    public_projects,
+    public_sprints,
+    public_stage_transitions,
+    public_stages,
+    public_team_members,
+    public_work_items
+  ]
+
+relationships: [
+  // projects
+  relationship(public_sprints.project_id > public_projects.id, true),
+  relationship(public_work_items.project_id > public_projects.id, true),
+
+  // team_members
+  relationship(public_work_items.assignee_id > public_team_members.id, true),
+  relationship(public_stage_transitions.transitioned_by > public_team_members.id, true),
+
+  // stages
+  relationship(public_work_items.current_stage_id > public_stages.id, true),
+  relationship(public_stage_transitions.from_stage_id > public_stages.id, true),
+  relationship(public_stage_transitions.to_stage_id > public_stages.id, true),
+
+  // sprints
+  relationship(public_work_items.sprint_id > public_sprints.id, true),
+
+  // work_items
+  relationship(public_stage_transitions.work_item_id > public_work_items.id, true),
+  relationship(public_blocked_events.work_item_id > public_work_items.id, true),
+  relationship(public_blocked_events.blocked_by_item_id > public_work_items.id, true)
+]
+}

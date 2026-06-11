@@ -1,116 +1,6 @@
-Dashboard dashboard {
-  title: 'Dashboard'
+Dashboard sankey_test_new {
+  title: 'Sankey Test New'
   description: ''''''
-
-  block filter_block: FilterBlock {
-    label: 'This is a eeeee Block'
-    type: 'text'
-    default {
-      operator: 'is'
-      value: 'default'
-    }
-  }
-  block v1: VizBlock {
-    label: 'Name and eeeeeeParent'
-    viz: DataTable {
-      dataset: ecommerce_dataset
-      theme {
-
-      }
-      fields: [
-        VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'name')
-          format {
-            type: 'text'
-          }
-        },
-        VizFieldFull {
-          ref: ref('ecommerce_categories_2', 'parent_id')
-          format {
-            type: 'number'
-            pattern: 'inherited'
-          }
-        }
-      ]
-      settings {
-        show_row_number: true
-      }
-    }
-  }
-  block v2: VizBlock {
-    label: 'Sum of Cost and Sum of Sales by Month'
-    viz: LineChart {
-      dataset: ecommerce_dataset
-      x_axis: VizFieldFull {
-        ref: ref('ecommerce_financial', 'month_')
-        format {
-          type: 'date'
-        }
-      }
-      y_axis {
-        series {
-          field {
-            ref: ref('ecommerce_financial', 'cost')
-            aggregation: 'sum'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#E27712'
-            color_palette: 'seq-magma'
-          }
-        }
-        series {
-          field {
-            ref: ref('ecommerce_financial', 'sales')
-            aggregation: 'sum'
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#18A59E'
-            color_palette: 'seq-magma'
-          }
-        }
-      }
-    }
-  }
-  block v3: VizBlock {
-    label: 'Untitled Report'
-    viz: DataTable {
-      dataset: vinhhh_test_activities
-      theme {
-
-      }
-      fields: [
-        VizFieldFull {
-          ref: ref('public_activities', 'trackable_type')
-          format {
-            type: 'text'
-          }
-        },
-        VizFieldFull {
-          ref: ref('public_activities', 'owner_type')
-          format {
-            type: 'text'
-          }
-        },
-        VizFieldFull {
-          ref: ref('public_activities', 'key')
-          format {
-            type: 'text'
-          }
-        }
-      ]
-      settings {
-        show_row_number: true
-      }
-    }
-  }
   block f1: FilterBlock {
     label: 'This is a Filter Block'
     type: 'text'
@@ -225,24 +115,83 @@ Dashboard dashboard {
       }
     }
   }
+  block v_rtlz: VizBlock {
+    label: 'Source, Target, and Sum of Weight'
+    viz: CustomChart {
+      dataset: sankey_test
+      custom_chart_id: 21692
+      field source: VizFieldFull {
+        ref: r(sankey_data_csv.source)
+        format {
+          type: 'text'
+        }
+      }
+      field target: VizFieldFull {
+        ref: r(sankey_data_csv.target)
+        format {
+          type: 'text'
+        }
+      }
+      field volume: VizFieldFull {
+        ref: r(sankey_data_csv.weight)
+        aggregation: 'sum'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      setting margin_top: 10
+      setting node_align: 'justify'
+      setting node_width: 15
+      setting margin_left: 10
+      setting margin_right: 10
+      setting node_padding: 10
+      setting margin_bottom: 10
+    }
+  }
+  block v_6xjx: VizBlock {
+    label: 'Source, Target, and Sum of Weight copy'
+    viz: DataTable {
+      dataset: sankey_test
+      fields: [
+        VizFieldFull {
+          ref: r(sankey_data_csv.source)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(sankey_data_csv.target)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(sankey_data_csv.weight)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
   view: TabLayout {
     label: 'View 1'
     tab tab1: CanvasLayout {
       label: 'Tab 1'
-      width: 650
-      height: 1100
-      block v1 {
-        position: pos(20, 20, 620, 420)
+      width: 950
+      height: 680
+      block v_rtlz {
+        position: pos(10, 10, 930, 420)
+        layer: 2
       }
-      block v2 {
-        position: pos(20, 450, 620, 320)
-      }
-      block v3 {
-        position: pos(10, 870, 330, 220)
-        layer: 1
-      }
-      block filter_block {
-        position: pos(20, 780, 400, 80)
+      block v_6xjx {
+        position: pos(10, 430, 930, 240)
+        layer: 2
       }
       mobile {
         mode: 'manual'
@@ -279,46 +228,10 @@ Dashboard dashboard {
   theme: H.themes.classic
   interactions: [
     FilterInteraction {
-      from: 'v1'
-      to: [
-        CustomMapping {
-          block: [
-            'v4',
-            'v5'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v2'
-      to: [
-        CustomMapping {
-          block: [
-            'v4',
-            'v5'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v3'
-      to: [
-        CustomMapping {
-          block: 'v6'
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
       from: 'v4'
       to: [
         CustomMapping {
-          block: [
-            'v1',
-            'v2'
-          ]
+          block: 'v5'
           disabled: true
         }
       ]
@@ -327,19 +240,7 @@ Dashboard dashboard {
       from: 'v5'
       to: [
         CustomMapping {
-          block: [
-            'v1',
-            'v2'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v6'
-      to: [
-        CustomMapping {
-          block: 'v3'
+          block: 'v4'
           disabled: true
         }
       ]

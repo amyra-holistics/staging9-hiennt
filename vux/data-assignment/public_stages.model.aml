@@ -1,0 +1,40 @@
+Model public_stages {
+  type: 'table'
+  label: 'Stages'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension stage_order {
+    label: 'Stage Order'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.stage_order }};;
+  }
+  dimension is_active {
+    label: 'Is Active'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_active }};;
+  }
+  dimension is_done {
+    label: 'Is Done'
+    type: 'truefalse'
+    hidden: false
+    definition: @sql {{ #SOURCE.is_done }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."stages"'
+}

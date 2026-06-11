@@ -1,0 +1,165 @@
+Dashboard data_export {
+  title: 'data_export'
+  description: ''''''
+  view: TabLayout {
+    label: 'View 1'
+    tab tab1: CanvasLayout {
+      label: 'Tab 1'
+      width: 940
+      height: 780
+      mobile {
+        mode: 'manual'
+        block v1
+        block filter_block
+        block v2
+      }
+      block v_kt8s {
+        position: pos(10, 10, 920, 340)
+        layer: 1
+      }
+      block v_aei5 {
+        position: pos(10, 380, 920, 390)
+        layer: 2
+      }
+      auto_expand_vertically: true
+      auto_expand_horizontally: true
+    }
+  }
+  theme: H.themes.classic
+  block v_kt8s: VizBlock {
+    label: 'Product Performance'
+    viz: DataTable {
+      dataset: product_performance
+      fields: [
+        VizFieldFull {
+          ref: r(product_sales_performance_new_csv.product_name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_sales_performance_new_csv.added_to_cart)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_sales_performance_new_csv.purchased)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_sales_performance_new_csv.cart_abandonment)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_sales_performance_new_csv.conversion_rate)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_performance, product_sales_performance_new_csv.start_percent)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_performance, product_sales_performance_new_csv.end_percent)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(product_performance, product_sales_performance_new_csv.bar_width)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  block v_aei5: VizBlock {
+    label: 'User Profile'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          ref: r(user_lookup_csv.user_id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'user_lookup_csv_user_id_1'
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.profile_image_url)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.total_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.lifetime_value)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.avg_order_value)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.member_since)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.last_order_date)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(user_lookup_csv.status)
+          format {
+            type: 'text'
+          }
+        },
+        r(user_lookup_csv.record_sample)
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'user_lookup_csv_user_id_1'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+}

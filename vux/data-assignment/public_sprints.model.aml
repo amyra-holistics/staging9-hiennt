@@ -1,0 +1,40 @@
+Model public_sprints {
+  type: 'table'
+  label: 'Sprints'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension project_id {
+    label: 'Project Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.project_id }};;
+  }
+  dimension name {
+    label: 'Name'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension start_date {
+    label: 'Start Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.start_date }};;
+  }
+  dimension end_date {
+    label: 'End Date'
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.end_date }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."sprints"'
+}

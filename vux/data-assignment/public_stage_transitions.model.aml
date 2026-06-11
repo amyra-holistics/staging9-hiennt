@@ -1,0 +1,46 @@
+Model public_stage_transitions {
+  type: 'table'
+  label: 'Stage Transitions'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension work_item_id {
+    label: 'Work Item Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.work_item_id }};;
+  }
+  dimension from_stage_id {
+    label: 'From Stage Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.from_stage_id }};;
+  }
+  dimension to_stage_id {
+    label: 'To Stage Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.to_stage_id }};;
+  }
+  dimension transitioned_at {
+    label: 'Transitioned At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.transitioned_at }};;
+  }
+  dimension transitioned_by {
+    label: 'Transitioned By'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.transitioned_by }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."stage_transitions"'
+}

@@ -1,0 +1,46 @@
+Model public_blocked_events {
+  type: 'table'
+  label: 'Blocked Events'
+  description: ''
+  data_source_name: 'vux_data_assignment'
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension work_item_id {
+    label: 'Work Item Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.work_item_id }};;
+  }
+  dimension blocked_at {
+    label: 'Blocked At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.blocked_at }};;
+  }
+  dimension unblocked_at {
+    label: 'Unblocked At'
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.unblocked_at }};;
+  }
+  dimension reason {
+    label: 'Reason'
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.reason }};;
+  }
+  dimension blocked_by_item_id {
+    label: 'Blocked By Item Id'
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.blocked_by_item_id }};;
+  }
+
+  owner: 'vu.dq@holistics.io'
+  table_name: '"public"."blocked_events"'
+}

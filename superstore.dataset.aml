@@ -1,9 +1,33 @@
 Dataset superstore {
-  label: 'superstore',
+  label: 'superstore'
   description: ''
   data_source_name: 'demodb'
   models: [
     superstore_csv
   ]
   relationships: []
+  metric count_order {
+    label: "Count Order"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql count(superstore_csv.order_id);;
+    format: "none"
+  }
+  metric revenue {
+    label: "Revenue"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql sum(superstore_csv.sales);;
+    format: "none"
+  }
+  metric count_users {
+    label: "Count Users"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql count(superstore_csv.customer_name);;
+    format: "none"
+  }
 }

@@ -1,6 +1,6 @@
-Dashboard test_another_new_canvas_riyxr {
-  title: 'test another new canvas'
-  owner: 'tan.nguyen@holistics.io'
+Dashboard thang_personal_mrepr {
+  title: 'thang_personal'
+  owner: 'thang.lk@holistics.io'
   block filter_block: FilterBlock {
     label: 'This is a Filter Block'
     type: 'text'
@@ -13,9 +13,6 @@ Dashboard test_another_new_canvas_riyxr {
     label: 'Name and Parent'
     viz: DataTable {
       dataset: ecommerce_dataset
-      theme {
-
-      }
       fields: [
         VizFieldFull {
           ref: r(ecommerce_categories_2.name)
@@ -86,9 +83,6 @@ Dashboard test_another_new_canvas_riyxr {
     label: 'Untitled Report'
     viz: DataTable {
       dataset: vinhhh_test_activities
-      theme {
-
-      }
       fields: [
         VizFieldFull {
           ref: r(public_activities.trackable_type)
@@ -200,9 +194,6 @@ Dashboard test_another_new_canvas_riyxr {
     label: 'Untitled Report'
     viz: DataTable {
       dataset: vinhhh_test_activities
-      theme {
-
-      }
       fields: [
         VizFieldFull {
           ref: r(public_activities.trackable_type)
@@ -352,4 +343,7 @@ Dashboard test_another_new_canvas_riyxr {
     }
   }
   theme: H.themes.classic
+  settings {
+    autorun_on_open: true
+  }
 }

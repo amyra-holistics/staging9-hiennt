@@ -1,0 +1,186 @@
+Dashboard filters_quan {
+  title: 'filter_quan'
+  description: ''''''
+  view: TabLayout {
+    label: 'View 1'
+    tab tab1: CanvasLayout {
+      label: 'Tab 1'
+      width: 650
+      height: 510
+      block f_categories_id {
+        position: pos(10, 10, 300, 110)
+      }
+      block f_categories_id_copy {
+        position: pos(320, 10, 300, 80)
+      }
+      block f_categories_id_copy_copy {
+        position: pos(10, 140, 300, 80)
+      }
+      block f_categories_id_copy_du8c {
+        position: pos(340, 140, 300, 80)
+      }
+      block f_categories_id_copy_iu1r {
+        position: pos(10, 240, 300, 80)
+      }
+      block f_categories_id_copy_copy_xkkd {
+        position: pos(340, 240, 300, 90)
+      }
+      block f_categories_id_copy_copy_gpex {
+        position: pos(340, 340, 300, 90)
+      }
+    }
+  }
+  theme: H.themes.oasis
+  block f_categories_id: FilterBlock {
+    label: 'Categories Id'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_dataset
+      field: r(ecommerce_categories_2.id)
+    }
+    default {
+      operator: 'is'
+      value: '1231'
+    }
+  }
+  block f_categories_id_copy: FilterBlock {
+    label: 'Categories Id copy'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_dataset
+      field: r(ecommerce_categories_2.id)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_categories_id_copy_copy: FilterBlock {
+    label: 'Categories Id'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_dataset
+      field: r(ecommerce_categories_2.id)
+    }
+    default {
+      operator: 'between'
+      value: [
+        '$H_NIL$',
+        '$H_NIL$'
+      ]
+    }
+  }
+  block f_categories_id_copy_du8c: FilterBlock {
+    label: 'Categories Id'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_dataset
+      field: r(ecommerce_categories_2.id)
+    }
+    default {
+      operator: 'not_null'
+      value: []
+    }
+  }
+  block f_categories_id_copy_iu1r: FilterBlock {
+    label: 'Categories Id copy'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_dataset
+      field: r(ecommerce_categories_2.id)
+    }
+    default {
+      operator: 'not_null'
+      value: []
+    }
+  }
+  block f_categories_id_copy_copy_xkkd: FilterBlock {
+    label: 'Categories Id copy'
+    type: 'date'
+    default {
+      operator: 'last'
+      value: '$H_NIL$'
+      modifier: 'day'
+    }
+  }
+  block f_categories_id_copy_copy_gpex: FilterBlock {
+    label: 'Categories Id copy'
+    type: 'date'
+    default {
+      operator: 'last'
+      value: '$H_NIL$'
+      modifier: 'day'
+      options {
+        include_current_period: true
+      }
+    }
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f_categories_id'
+      to: [
+        CustomMapping {
+          block: 'f_categories_id_copy'
+          field: r(ecommerce_cities.id)
+        },
+        CustomMapping {
+          block: [
+            'f_categories_id_copy_copy_xkkd',
+            'f_categories_id_copy_copy_gpex'
+          ]
+          field: r(ecommerce_categories_2.id)
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_categories_id_copy'
+      to: [
+        CustomMapping {
+          block: [
+            'f_categories_id',
+            'f_categories_id_copy_copy',
+            'f_categories_id_copy_du8c',
+            'f_categories_id_copy_iu1r'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_categories_id_copy_copy'
+      to: [
+        CustomMapping {
+          block: [
+            'f_categories_id_copy_du8c',
+            'f_categories_id_copy_iu1r'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_categories_id_copy_du8c'
+      to: [
+        CustomMapping {
+          block: [
+            'f_categories_id_copy_copy',
+            'f_categories_id_copy_iu1r'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_categories_id_copy_iu1r'
+      to: [
+        CustomMapping {
+          block: [
+            'f_categories_id_copy_copy',
+            'f_categories_id_copy_du8c'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
+}

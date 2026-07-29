@@ -1,0 +1,385 @@
+// deploy 2
+PageTheme purple {
+  title: 'Purple title'
+  background {
+    bg_image: 'conic-gradient(from 36deg at 40.16% 61.66%, #7D7BD1 0deg, #D4D4F6 360deg)'
+    bg_size: 'cover'
+  }
+  block {
+    label: FontTheme {
+      font_size: 14
+      font_color: '#3C3B7A'
+    }
+    text {
+      font_size: 12
+      font_color: '#3C3B7A'
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: '#B2B1F2'
+    }
+    background {
+      bg_color: '#F2F2FC'
+    }
+    padding: 12
+    shadow: 'none'
+}
+  viz {
+    table {
+      general {
+      bg_color: 'white';
+        banding_color: 'transparent';
+        hover_color: '#B2B1F2'; 
+        font_size: '12px'; 
+        font_color: '#3C3B7A'; 
+        border_color: '#6B68EA'; 
+        grid_color: '#6B68EA'; 
+      }
+
+      // Header Styles
+      header {
+        bg_color: '#504DD2'; 
+        font_size: '14px'; 
+        font_color: 'white';
+        font_weight: 'bold'; 
+      }
+
+      // Row Header Styles
+      row_header {
+        font_color: '#3C3B7A'; 
+        font_size: '12px'; 
+        font_weight: 'normal'; 
+      }
+
+      // Column Header Styles
+      column_header {
+        bg_color: '#504DD2'; 
+        font_size: '12px'; 
+        font_color: 'white';
+        font_weight: 'normal'; 
+      }
+
+      // Subtitle Styles
+      sub_title {
+        font_size: '12px';
+        font_color: 'white'
+        font_weight: 'light';
+      }
+    }
+  }
+}
+
+
+PageTheme orange {
+  custom_css: @css
+    .dac-canvas-layout {
+    background: radial-gradient(circle, #ffd191 10%, transparent 11%),radial-gradient(circle at bottom left, #ffd191 5%, transparent 6%),radial-gradient(circle at bottom right, #ffd191 5%, transparent 6%),radial-gradient(circle at top left, #ffd191 5%, transparent 6%),radial-gradient(circle at top right, #ffd191 5%, transparent 6%);
+        background-size: 1em 1em;
+        background-color: #ffffff;
+        opacity: 1
+    }
+   ;;
+  
+  canvas {
+    background {
+      bg_image: 'linear-gradient(to top, #F2C58C, #FFFAF3)'
+    }
+    border {
+      border_width: 1
+      border_radius: 2
+      border_color: '#F3DFC4'
+    }
+    shadow: 'none'
+  }
+  block {
+    background {
+      bg_color: '#FDF7EE'
+    }
+    border {
+      border_width: 1
+      border_color: '#E9C999'
+      border_radius: 8
+    }
+    padding: 12
+  }
+  viz {
+    table {
+      general {
+      bg_color: '#FFFAF3';
+        banding_color: '#FFEFD8';
+        hover_color: '#F2B455'; 
+        font_size: '12px'; 
+        font_color: '#7B5604'; 
+        border_color: '#CE780C'; 
+        grid_color: '#CE780C'; 
+      }
+
+      // Header Styles
+      header {
+        bg_color: '#E5951A';
+        font_color: '#513519'
+        font_size: '14px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Row Header Styles
+      row_header {
+        bg_color: '#FFC572';
+        font_size: '12px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Column Header Styles
+      column_header {
+        bg_color: '#E5951A';
+        font_color: '#513519'
+        font_size: '12px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Subtitle Styles
+      sub_title {
+        font_size: '12px';
+        font_weight: 'light';
+      }
+    }
+  }
+}
+
+
+PageTheme sakura {
+  custom_css: @css
+      @import url('https://fonts.googleapis.com/css2?family=Playwrite+GB+S:ital,wght@0,100..400;1,100..400&display=swap');
+  ;;
+  background {
+      bg_image: 'linear-gradient(to top, #FFF5FB, #FAE0EA)'
+    }
+    canvas {
+      border {
+        border_width: 2
+        border_color: "#F6C9E4"
+        border_radius: 12
+      }
+      shadow: 'none'
+    }
+  block {
+    background {
+      bg_color: '#FCF0F8'
+    }
+    border {
+      border_width: 1
+      border_color: '#D38EA9'
+      border_radius: 8
+    }
+    text {
+      font_color: "#A67185"
+    }
+    padding: 12
+  }
+  viz {
+    table {
+      general {
+        bg_color: '#FAE0EA';
+        font_family: 'Playwrite GB S'
+        banding_color: 'white'
+        hover_color: '#F5CEDD'; 
+        font_size: '12px'; 
+        font_color: '#852C50'; 
+        border_color: '#DA7AA1'; 
+        grid_color: '#DA7AA1'; 
+      }
+
+      // Header Styles
+      header {
+        bg_color: '#F8A4C5';
+        font_size: '14px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Row Header Styles
+      row_header {
+        bg_color: '#F8A4C5';
+        font_size: '12px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Column Header Styles
+      column_header {
+        bg_color: 'linear-gradient(to top, #FFF0F6, white)';
+        font_size: '12px'; 
+        font_weight: 'normal'; 
+      }
+
+      // Subtitle Styles
+      sub_title {
+        font_size: '12px';
+        font_weight: 'light';
+      }
+    }
+  }
+}
+
+PageTheme forest {
+  background {
+    bg_color: '#2A3A28'
+  }
+  canvas {
+    background {
+      bg_color: '#4F6C4B'
+    }
+    border {
+      border_width: 2
+      border_color: "#6B7B6B"
+      border_radius: 12
+    }
+    shadow: 'none'
+  }
+  block {
+    background {
+      bg_color: '#304E2B'
+    }
+    border {
+      border_width: 1
+      border_color: '#5A6B5A'
+      border_radius: 8
+    }
+    text {
+      font_color: 'white'
+    }
+    label {
+      font_color: '#E8F0E8'
+    }
+    padding: 12
+  }
+  viz {
+    table {
+      general {
+        bg_color: '#5A6B5A';
+        banding_color: '#6B7B6B'
+        hover_color: '#4A5D4A';
+        font_size: '12px';
+        font_color: '#E8F0E8';
+        border_color: '#4A5D4A';
+        grid_color: '#4A5D4A';
+      }
+      // Header Styles
+      header {
+        bg_color: '#3A4D3A';
+        font_size: '14px';
+        font_weight: 'bold';
+      }
+      // Row Header Styles
+      row_header {
+        bg_color: '#3A4D3A';
+        font_size: '12px';
+        font_weight: 'bold';
+      }
+      // Column Header Styles
+      column_header {
+        bg_color: 'linear-gradient(to top, #4A5D4A, #5A6B5A)';
+        font_size: '12px';
+        font_weight: 'normal';
+      }
+      // Subtitle Styles
+      sub_title {
+        font_size: '12px';
+        font_weight: 'light';
+      }
+    }
+  }
+}
+PageTheme no_block_bg_light {
+    background {
+      bg_image: 'linear-gradient(to top, #FFEAF7, #E0F8FE)'
+    } 
+  viz {
+    // Table Theme
+    table {
+      general {
+      bg_color: 'white';
+        banding_color: '#D4EDFF';
+        hover_color: '#F2B455'; 
+        font_size: '12px'; 
+        font_color: '#2E64B1'; 
+        border_color: '#9ABCD6'; 
+        grid_color: '#9ABCD6'; 
+      }
+
+      // Header styles
+      header {
+        bg_color: '#ACD7F5';
+        font_color: '#2E64B1'
+        font_size: '14px'; 
+        font_weight: 'bold'; 
+      }
+
+      // Pivot sub-header styles
+      sub_header {
+        bg_color: '#D4EDFF';
+        font_size: '12px'; 
+        font_weight: 'bold'; 
+        font_color: '#2E64B1'
+
+      }
+
+      // // Metric Sheet styles
+      sub_title {
+        font_size: '12px';
+        font_weight: 'light';
+      }
+    }
+  }
+}
+
+PageTheme no_block_bg_dark {
+  background {
+      bg_color: "#0B0B15"
+    }
+    canvas {
+      background {
+        bg_color: '#252531'
+      }
+      border {
+        border_width: 1
+        border_radius: 4
+        border_color: "#52526B"
+      }
+    }
+  viz {
+    table {
+    general {
+        bg_color: '#0B0B15';
+        banding_color: '#1A1A2E';
+        hover_color: '#4A4A5E'; 
+        font_color: 'white'; 
+        border_color: '#757586'; 
+        grid_color: '#757586'; 
+      }
+
+      // Header Styles
+      header {
+        bg_color: '#4A4A5E';
+        font_weight: 'bold'; 
+        font_color: '#ffffff'; 
+      }
+
+      row_header {
+        font_weight: 'normal'; 
+        font_color: 'white'; 
+      }
+
+      column_header {
+        bg_color: '#4A4A5E';
+        font_size: '14px'; 
+        font_weight: 'normal'; 
+        font_color: 'white'; 
+      }
+
+      sub_title {
+        font_weight: 'light';
+      }
+    }
+  }
+}
+

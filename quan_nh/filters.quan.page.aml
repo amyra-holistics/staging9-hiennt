@@ -28,6 +28,9 @@ Dashboard filters_quan {
       block f_categories_id_copy_copy_gpex {
         position: pos(340, 340, 300, 90)
       }
+      block v_0bjs {
+        position: pos(20, 370, 320, 220)
+      }
     }
   }
   theme: H.themes.oasis
@@ -112,6 +115,41 @@ Dashboard filters_quan {
       modifier: 'day'
       options {
         include_current_period: true
+      }
+    }
+  }
+  block v_0bjs: VizBlock {
+    label: 'Audio Title, Channel and 2 more'
+    viz: DataTable {
+      dataset: audio_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(audio_data_csv.audio_title)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(audio_data_csv.channel)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(audio_data_csv.speaker)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(audio_data_csv.topic)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
       }
     }
   }

@@ -225,12 +225,45 @@ Dashboard dashboard {
       }
     }
   }
+  block v_uowd: VizBlock {
+    label: 'Name, Status, and Revenue'
+    viz: CustomChart {
+      dataset: ecommerce_official
+      custom_chart: sankey
+      field source: VizFieldFull {
+        ref: r(categories.name)
+        format {
+          type: 'text'
+        }
+      }
+      field target: VizFieldFull {
+        ref: r(orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      field value: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      setting node_align: 'justify'
+      setting node_width: 15
+      setting node_padding: 10
+      setting margin_top: 10
+      setting margin_left: 10
+      setting margin_right: 10
+      setting margin_bottom: 10
+    }
+  }
   view: TabLayout {
     label: 'View 1'
     tab tab1: CanvasLayout {
       label: 'Tab 1'
       width: 650
-      height: 1100
+      height: 1510
       block v1 {
         position: pos(20, 20, 620, 420)
       }
@@ -243,6 +276,9 @@ Dashboard dashboard {
       }
       block filter_block {
         position: pos(20, 780, 400, 80)
+      }
+      block v_uowd {
+        position: pos(10, 1110, 620, 390)
       }
       mobile {
         mode: 'manual'

@@ -262,7 +262,7 @@ Dashboard dashboard {
     label: 'View 1'
     tab tab1: CanvasLayout {
       label: 'Tab 1'
-      width: 650
+      width: 740
       height: 1510
       block v1 {
         position: pos(20, 20, 620, 420)
@@ -278,7 +278,7 @@ Dashboard dashboard {
         position: pos(20, 780, 400, 80)
       }
       block v_uowd {
-        position: pos(10, 1110, 620, 390)
+        position: pos(10, 1100, 710, 390)
       }
       mobile {
         mode: 'manual'

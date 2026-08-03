@@ -229,7 +229,7 @@ Dashboard dashboard {
     label: 'Name, Status, and Revenue'
     viz: CustomChart {
       dataset: ecommerce_official
-      custom_chart: sankey
+      custom_chart: sankey_chart
       field source: VizFieldFull {
         ref: r(categories.name)
         format {
@@ -291,9 +291,6 @@ Dashboard dashboard {
       label: 'Tab 2'
       height: 800
       grid_size: 20
-      mobile {
-        mode: 'auto'
-      }
       block f1 {
         position: pos(20, 20, 400, 80)
         layer: 1
@@ -309,6 +306,9 @@ Dashboard dashboard {
       block v6 {
         position: pos(20, 120, 330, 220)
         layer: 4
+      }
+      mobile {
+        mode: 'auto'
       }
     }
   }

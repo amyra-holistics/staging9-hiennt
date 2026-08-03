@@ -1369,7 +1369,7 @@ Dashboard all_viz_test {
   settings {
     timezone: 'Etc/UTC'
     cache_duration: 1440
-    autorun_on_open: false
+    autorun_on_open: true
   }
   interactions: [
     FilterInteraction {

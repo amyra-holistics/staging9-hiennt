@@ -1,5 +1,5 @@
 Dashboard all_viz_test {
-  theme: H.themes.classic
+  theme: H.themes.midnight
   title: 'All viz test'
   description: ''
   owner: 'hien.nt@holistics.io'
@@ -434,8 +434,6 @@ Dashboard all_viz_test {
       }
     }
   }
-
-
   block t_4zai: TextBlock {
     content: @md # Tables;;
   }
@@ -448,11 +446,9 @@ Dashboard all_viz_test {
 
 ;;
   }
-
   block t_7vcl: TextBlock {
     content: @md # Tables;;
   }
-
   block v_pgpo: VizBlock {
     label: 'Sunburst Chart'
     viz: CustomChart {

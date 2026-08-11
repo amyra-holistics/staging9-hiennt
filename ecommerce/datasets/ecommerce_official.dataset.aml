@@ -1,6 +1,6 @@
 @tag('1️⃣ Trust/Endorsed', '2️⃣ Status/Active', '4️⃣ Task/6-Resolved')
 Dataset ecommerce_official {
-  label: 'Ecommerce Official 2'
+  label: 'Ecommerce Official'
   description: ''
   data_source_name: 'demodb'
   models: [
@@ -15,22 +15,22 @@ Dataset ecommerce_official {
     ,
     user_lookup_csv
   ]
-  // relationships: [
-    // relationship(orders.user_id > users.id, true, 'one_way')
+  relationships: [
+    relationship(orders.user_id > users.id, true, 'one_way')
     ,
-    // relationship(order_items.order_id > orders.id, true, 'one_way')
+    relationship(order_items.order_id > orders.id, true, 'one_way')
     ,
-    // relationship(order_items.product_id > products.id, true, 'one_way')
+    relationship(order_items.product_id > products.id, true, 'one_way')
     ,
-    // relationship(cities.country_code > countries.code, true, 'one_way')
+    relationship(cities.country_code > countries.code, true, 'one_way')
     ,
-    // relationship(users.city_id > cities.id, true, 'one_way')
+    relationship(users.city_id > cities.id, true, 'one_way')
     ,
-    // relationship(merchants.city_id > cities.id, false, 'one_way')
+    relationship(merchants.city_id > cities.id, false, 'one_way')
     ,
-    // relationship(products.merchant_id > merchants.id, true, 'one_way')
+    relationship(products.merchant_id > merchants.id, true, 'one_way')
     ,
-    // relationship(products.category_id > categories.id, true, 'one_way')
+    relationship(products.category_id > categories.id, true, 'one_way')
   ]
   dimension now_dim {
     label: "Now Dim"

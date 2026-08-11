@@ -5,5 +5,5 @@ Dataset sankey_test {
   models: [
     sankey_data_csv
   ]
-  // relationships: []
+  relationships: []
 }

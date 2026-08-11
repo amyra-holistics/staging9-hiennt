@@ -5,7 +5,7 @@ Dataset d_cities {
   models: [
     ecommerce_cities
   ]
-  // relationships: []
+  relationships: []
   owner: 'admin@domain.com'
   metric asdasd {
     label: "Asdasd"

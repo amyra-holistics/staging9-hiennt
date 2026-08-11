@@ -8,7 +8,7 @@ Dataset superstore {
     superstore_bump_chart,
     superstore_percentile_boxplot
   ]
-  // relationships: []
+  relationships: []
   metric count_order {
     label: "Count Order"
     type: "number"

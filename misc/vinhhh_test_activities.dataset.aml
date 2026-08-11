@@ -5,7 +5,7 @@ Dataset vinhhh_test_activities {
   models: [
     public_activities
   ]
-  // relationships: [
+  relationships: [
   ]
   owner: 'vinh.hh@holistics.io'
   metric countownerid {

@@ -5,7 +5,7 @@ Dataset product_performance {
   models: [
     product_sales_performance_new_csv
   ]
-  // relationships: []
+  relationships: []
   dimension start_percent {
     label: "Start Percent"
     type: "number"

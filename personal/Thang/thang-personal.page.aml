@@ -5,6 +5,8 @@ Dashboard thang_personal {
     label: 'Name and Parent'
     viz: DataTable {
       dataset: ecommerce_dataset
+      theme {
+      }
       fields: [
         VizFieldFull {
           ref: r(ecommerce_categories_2.name)
@@ -18,7 +20,6 @@ Dashboard thang_personal {
             type: 'number'
             pattern: 'inherited'
           }
-          uname: 'ecommerce_categories_2_parent_id'
         }
       ]
       settings {
@@ -27,12 +28,6 @@ Dashboard thang_personal {
           enabled: true
           debug_comments: true
         }
-        column_styles: [
-          ColumnStyle {
-            key: 'ecommerce_categories_2_parent_id'
-            width: 280
-          }
-        ]
       }
     }
   }
@@ -330,4 +325,5 @@ Dashboard thang_personal {
       }
     }
   }
+  theme: H.themes.classic
 }

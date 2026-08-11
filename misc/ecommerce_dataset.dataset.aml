@@ -11,7 +11,7 @@ Dataset ecommerce_dataset {
     ecommerce_ga_users
   ]
 
-  relationships: [
+  // relationships: [
   ]
   owner: 'my.nguyen@holistics.io'
   metric test_metr_count {

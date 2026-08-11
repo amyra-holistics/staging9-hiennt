@@ -5,7 +5,7 @@ Dataset audio_dataset {
   models: [
     audio_data_csv
   ]
-  relationships: [
+  // relationships: [
   ]
   owner: 'di.hoang@holistics.io'
 }

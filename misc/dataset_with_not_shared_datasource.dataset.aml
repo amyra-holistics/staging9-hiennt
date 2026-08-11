@@ -5,7 +5,7 @@ Dataset dataset_with_not_shared_datasource {
   models: [
     retail_categories
   ]
-  relationships: [
+  // relationships: [
   ]
   owner: 'huy.vu@holistics.io'
 }

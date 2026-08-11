@@ -5,7 +5,7 @@ Dataset activitites {
   models: [
     public_activities
   ]
-  relationships: [
+  // relationships: [
     { a: 1 }
   ]
   owner: 'bao.lq@holistics.io'

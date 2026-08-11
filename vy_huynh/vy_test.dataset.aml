@@ -5,7 +5,7 @@ Dataset vy_test {
   models: [
     vy_test_filter_dependency_sheet_1_csv
   ]
-  relationships: []
+  // relationships: []
 
   metric percent_of_total {
     label: "Percent Of Total"

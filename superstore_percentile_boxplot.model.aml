@@ -1,0 +1,106 @@
+Model superstore_percentile_boxplot {
+  type: 'query'
+  label: 'Superstore Percentile Boxplot'
+  description: ''
+  data_source_name: 'demodb'
+  dimension row_type {
+    label: 'Row Type'
+    type: 'text'
+    definition: @sql {{ #SOURCE.row_type }};;
+  }
+
+  dimension group_name {
+    label: 'Group'
+    type: 'text'
+    definition: @sql {{ #SOURCE.group_name }};;
+  }
+
+  dimension p5 {
+    label: 'P5'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p5 }};;
+  }
+
+  dimension p25 {
+    label: 'P25'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p25 }};;
+  }
+
+  dimension p50 {
+    label: 'P50'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p50 }};;
+  }
+
+  dimension p75 {
+    label: 'P75'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p75 }};;
+  }
+
+  dimension p90 {
+    label: 'P90'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p90 }};;
+  }
+
+  dimension p95 {
+    label: 'P95'
+    type: 'number'
+    definition: @sql {{ #SOURCE.p95 }};;
+  }
+
+  dimension outlier_val {
+    label: 'Outlier Value'
+    type: 'number'
+    definition: @sql {{ #SOURCE.outlier_val }};;
+  }
+
+  owner: 'hien.nt@holistics.io'
+  query: @sql
+    with summary as (
+          select
+            {{ #superstore_csv.sub_category }} as group_name,
+            percentile_cont(0.05) within group (order by {{ #superstore_csv.sales }}) as p5,
+            percentile_cont(0.25) within group (order by {{ #superstore_csv.sales }}) as p25,
+            percentile_cont(0.50) within group (order by {{ #superstore_csv.sales }}) as p50,
+            percentile_cont(0.75) within group (order by {{ #superstore_csv.sales }}) as p75,
+            percentile_cont(0.90) within group (order by {{ #superstore_csv.sales }}) as p90,
+            percentile_cont(0.95) within group (order by {{ #superstore_csv.sales }}) as p95
+          from {{ #superstore_csv }}
+          group by 1
+        )
+
+        select
+          'summary' as row_type,
+          s.group_name,
+          s.p5,
+          s.p25,
+          s.p50,
+          s.p75,
+          s.p90,
+          s.p95,
+          cast(null as numeric) as outlier_val
+        from summary s
+
+        union all
+
+        select
+          'outlier' as row_type,
+          b.group_name,
+          b.p5,
+          b.p25,
+          b.p50,
+          b.p75,
+          b.p90,
+          b.p95,
+          {{ #x.sales }} as outlier_val
+        from summary b
+        join {{ #superstore_csv as x }}
+          on {{ #x.sub_category }} = b.group_name
+        where {{ #x.sales }} < b.p5 or {{ #x.sales }} > b.p95;;
+  models: [
+    superstore_csv
+  ]
+}

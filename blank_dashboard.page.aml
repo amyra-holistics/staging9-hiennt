@@ -1,0 +1,26 @@
+Dashboard blank_dashboard {
+  title: 'blank_dashboard'
+  description: ''
+  owner: 'hien.nt@holistics.io'
+  block title: TextBlock {
+    content: @md # Your title goes here ;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 80)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: PageThemeByMode {
+    light: H.themes.classic
+    dark: forest
+  }
+}

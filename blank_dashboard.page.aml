@@ -19,7 +19,7 @@ Dashboard blank_dashboard {
       mode: 'auto'
     }
   }
-  theme: PageThemeByMode {
+  theme {
     light: H.themes.classic
     dark: forest
   }

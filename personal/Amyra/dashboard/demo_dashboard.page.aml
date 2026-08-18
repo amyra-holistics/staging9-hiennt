@@ -225,7 +225,7 @@ Dashboard all_viz_test {
           pattern: 'none'
         }
       }
-      setting color_scheme: 'tableau10'
+      setting color_scheme: 'accent'
       setting line_interpolate: 'monotone'
       setting point_size: 100
       settings {

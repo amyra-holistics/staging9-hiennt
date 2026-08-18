@@ -312,7 +312,6 @@ Dashboard dashboard {
       }
     }
   }
-  theme: H.themes.classic
   interactions: [
     FilterInteraction {
       from: 'v1'

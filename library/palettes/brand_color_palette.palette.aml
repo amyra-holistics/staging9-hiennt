@@ -1,0 +1,14 @@
+ColorPalette brand_color_palette {
+  title: "Brand Color Palette"
+
+  categorical {
+    colors: [
+      "#05264C",
+      "#2d608a",
+      "#23a672",
+      "#a0e3f2",
+      "#5298b8",
+      "#55c5c9"
+    ]
+  }
+}

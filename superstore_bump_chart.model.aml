@@ -1,0 +1,79 @@
+Model superstore_bump_chart {
+  type: 'query'
+  label: 'Superstore Bump Chart'
+  description: ''
+  data_source_name: 'demodb'
+  dimension period {
+    label: 'Period'
+    type: 'date'
+    definition: @sql {{ #SOURCE.period }};;
+  }
+
+  dimension category {
+    label: 'Category'
+    type: 'text'
+    definition: @sql {{ #SOURCE.category }};;
+  }
+
+  dimension value {
+    label: 'Value'
+    type: 'number'
+    description: ""
+    hidden: false
+    definition: @sql {{ #SOURCE.value }};;
+    primary_key: false
+    format: "#,###0.00 [\$Test]"
+  }
+
+  dimension rank {
+    label: 'Rank'
+    type: 'number'
+    description: ""
+    hidden: false
+    definition: @sql {{ #SOURCE.rank }};;
+    primary_key: false
+  }
+
+  dimension year {
+    label: 'Year'
+    type: 'number'
+    definition: @sql EXTRACT(YEAR FROM {{ #SOURCE.period }})::int;;
+  }
+
+  dimension month_name {
+    label: 'Month Name'
+    type: 'text'
+    definition: @sql TO_CHAR({{ #SOURCE.period }}, 'Mon YYYY');;
+  }
+  dimension superstore_bump_chart_value_superstore_bump_c {
+    label: "Superstore Bump Chart Value + Superstore Bump Chart Rank"
+    type: "number"
+    description: ""
+    hidden: false
+    definition: @aql superstore_bump_chart.value + superstore_bump_chart.rank;;
+    primary_key: false
+    format: "#,###0.00 [\$thanhhien]"
+  }
+
+  owner: 'hien.nt@holistics.io'
+  query: @sql
+    WITH monthly_sales AS (
+          SELECT
+            DATE_TRUNC('month', "Order Date")::date AS period,
+            "Sub-Category" AS category,
+            SUM("Sales") AS value
+          FROM "persisted_models"."superstore"
+          GROUP BY 1, 2
+        )
+        SELECT
+          period,
+          category,
+          value,
+          DENSE_RANK() OVER (
+            PARTITION BY period
+            ORDER BY value DESC NULLS LAST
+          ) AS rank
+        FROM monthly_sales;;
+  models: [
+  ]
+}

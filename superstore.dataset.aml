@@ -4,6 +4,9 @@ Dataset superstore {
   data_source_name: 'demodb'
   models: [
     superstore_csv
+    ,
+    superstore_bump_chart,
+    superstore_percentile_boxplot
   ]
   relationships: []
   metric count_order {

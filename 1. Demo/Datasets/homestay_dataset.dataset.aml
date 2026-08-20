@@ -18,4 +18,12 @@ Dataset homestay_dataset {
     relationship(homestay_listing_amenities.listing_id > homestay_listings.id, true)
   ]
   owner: 'vu.dq@holistics.io'
+  metric total_listing {
+    label: "Total listing"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql count(homestay_listings.id);;
+    format: "none"
+  }
 }

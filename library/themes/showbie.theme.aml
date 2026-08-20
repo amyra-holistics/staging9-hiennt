@@ -1,0 +1,199 @@
+const showbie_light_theme_tokens = {
+  primary: "oklch(0.38 0.12 252)",
+  secondary: "oklch(0.56 0.18 38)",
+  mode: "light",
+  background: "oklch(0.985 0.006 72)",
+  canvas_bg: "oklch(0.992 0.004 72)",
+  block_bg: "oklch(1 0 0)",
+  text_primary: "oklch(0.24 0.03 252)",
+  text_muted: "oklch(0.42 0.02 220)",
+  text_subtle: "oklch(0.60 0.015 220)",
+  border: "oklch(0.89 0.015 60)",
+  focus_ring: "oklch(0.52 0.12 252)",
+  semantic_success: "oklch(0.52 0.11 165)",
+  semantic_warning: "oklch(0.67 0.16 52)",
+  semantic_danger: "oklch(0.56 0.18 38)",
+  font_body: "Plus Jakarta Sans",
+  font_display: "Plus Jakarta Sans",
+  corner_style: "soft",
+  density: "comfortable",
+  elevation: "flat"
+}
+
+ColorPalette showbie_light_palette {
+  title: "Showbie Light"
+  categorical {
+    colors: [
+      "oklch(0.58 0.13 252)",
+      "oklch(0.63 0.17 38)",
+      "oklch(0.78 0.06 160)",
+      "oklch(0.67 0.12 25)",
+      "oklch(0.62 0.11 212)",
+      "oklch(0.68 0.10 300)",
+      "oklch(0.72 0.11 85)",
+      "oklch(0.60 0.10 12)"
+    ]
+  }
+}
+
+PageTheme showbie_light_theme {
+  title: "Showbie Light"
+  color {
+    data: showbie_light_palette
+  }
+  background {
+    bg_color: showbie_light_theme_tokens("background")
+  }
+  canvas {
+    background {
+      bg_color: showbie_light_theme_tokens("canvas_bg")
+    }
+    border {
+      border_width: 0
+      border_radius: 20
+      border_color: showbie_light_theme_tokens("border")
+      border_style: "none"
+    }
+    shadow: "none"
+    opacity: 1
+  }
+  block {
+    background {
+      bg_color: showbie_light_theme_tokens("block_bg")
+    }
+    border {
+      border_width: 0
+      border_style: "none"
+      border_radius: 20
+      border_color: showbie_light_theme_tokens("border")
+    }
+    shadow: "none"
+    padding: 16
+    opacity: 1
+    label {
+      font_family: showbie_light_theme_tokens("font_display")
+      font_size: 14
+      font_color: showbie_light_theme_tokens("text_primary")
+      font_weight: "semibold"
+      font_style: "normal"
+      letter_spacing: "0"
+    }
+    text {
+      font_family: showbie_light_theme_tokens("font_body")
+      font_size: 13
+      font_color: showbie_light_theme_tokens("text_muted")
+      font_weight: "normal"
+      font_style: "normal"
+    }
+  }
+  viz {
+    table {
+      general {
+        bg_color: showbie_light_theme_tokens("block_bg")
+        font_color: showbie_light_theme_tokens("text_muted")
+        font_family: showbie_light_theme_tokens("font_body")
+        font_size: 13
+        border_color: showbie_light_theme_tokens("border")
+        grid_color: showbie_light_theme_tokens("border")
+        border_width: 1
+        hover_color: "oklch(0.972 0.012 62)"
+        banding_color: "oklch(0.989 0.006 68)"
+        cell_padding: DetailedSpacing { top: 10, right: 16, bottom: 10, left: 16 }
+        borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
+      }
+      header {
+        bg_color: showbie_light_theme_tokens("background")
+        font_color: showbie_light_theme_tokens("text_primary")
+        font_size: 13
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: "oklch(0.989 0.006 68)"
+        font_color: showbie_light_theme_tokens("text_muted")
+        font_size: 13
+        font_weight: "medium"
+      }
+      sub_title {
+        font_color: showbie_light_theme_tokens("text_subtle")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sparkline {
+        line { color: showbie_light_theme_tokens("primary") }
+        column { color: showbie_light_theme_tokens("primary") }
+      }
+    }
+    metric_kpi {
+      alignment: "center"
+      label {
+        font_family: showbie_light_theme_tokens("font_body")
+        font_size: 20
+        font_color: showbie_light_theme_tokens("text_muted")
+      }
+      value {
+        font_family: showbie_light_theme_tokens("font_display")
+        font_size: 48
+        font_color: showbie_light_theme_tokens("text_primary")
+      }
+      progress {
+        indicator { bg_color: showbie_light_theme_tokens("primary") }
+        track { bg_color: showbie_light_theme_tokens("border") }
+      }
+      trend {
+        positive {
+          text { font_color: showbie_light_theme_tokens("semantic_success") font_weight: "medium" }
+          background { bg_color: "oklch(0.94 0.03 165)" }
+        }
+        negative {
+          text { font_color: showbie_light_theme_tokens("semantic_danger") font_weight: "medium" }
+          background { bg_color: "oklch(0.94 0.03 35)" }
+        }
+        neutral {
+          text { font_color: showbie_light_theme_tokens("text_muted") font_weight: "normal" }
+          background { bg_color: "oklch(0.98 0.003 85)" }
+        }
+      }
+    }
+  }
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+    .dac-text-block {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 14px;
+      color: oklch(0.43 0.022 205);
+      line-height: 1.6;
+    }
+    .dac-text-block h1,
+    .dac-text-block h2,
+    .dac-text-block h3,
+    .dac-text-block h4,
+    .dac-text-block h5,
+    .dac-text-block h6 {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      color: oklch(0.24 0.03 252);
+      line-height: 1.3;
+      margin-top: 0;
+      margin-bottom: 0.5em;
+      font-weight: 700;
+    }
+    .dac-text-block p {
+      margin: 0;
+    }
+    .dac-text-block .sl-title {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 40px;
+      line-height: 1.15;
+      font-weight: 700;
+      color: oklch(0.24 0.03 252);
+      margin: 0 0 12px 0;
+    }
+    .dac-text-block .sl-description {
+      max-width: 560px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      color: oklch(0.43 0.022 205);
+      margin: 0;
+    }
+  ;;
+}

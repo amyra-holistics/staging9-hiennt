@@ -6,7 +6,7 @@ Dashboard filters_quan {
     tab tab1: CanvasLayout {
       label: 'Tab 1'
       width: 650
-      height: 510
+      height: 440
       block f_categories_id {
         position: pos(10, 10, 300, 110)
       }
@@ -30,7 +30,7 @@ Dashboard filters_quan {
       }
     }
   }
-  theme: H.themes.oasis
+  theme: showbie_light_theme
   block f_categories_id: FilterBlock {
     label: 'Categories Id'
     type: 'field'

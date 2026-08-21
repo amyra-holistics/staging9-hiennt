@@ -51,58 +51,6 @@ Dashboard all_viz_test {
       }
     }
   }
-  block v_wx22: VizBlock {
-    label: 'Diverging Bar Chart'
-    viz: CustomChart {
-      dataset: superstore
-      calculation target {
-        label: 'Average Profit Across All Sub Categories'
-        formula: @aql superstore_csv | sum(superstore_csv.discount);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation current {
-        label: 'Profit'
-        formula: @aql superstore_csv | sum(superstore_csv.quantity);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation value {
-        label: 'Profit - Average Profit'
-        formula: @aql current - target*30;;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: r(superstore_csv.sub_category)
-        operator: 'is_not'
-        value: 'Binders'
-      }
-      custom_chart: diverging_bar_chart
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'value'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting positive_color: '#2cb67f'
-      setting negative_color: '#e5484d'
-      setting show_tooltip: true
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
   block v_annotated_time_series: VizBlock {
     label: 'Annotated Sales Time Series'
     viz: CustomChart {
@@ -1245,10 +1193,6 @@ Dashboard all_viz_test {
       auto_expand_vertically: true
       mobile {
         mode: 'auto'
-      }
-      block v_wx22 {
-        position: pos(20, 20, 760, 660)
-        layer: 4
       }
       block v_pareto_chart {
         position: pos(800, 20, 760, 660)

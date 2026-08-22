@@ -77,6 +77,12 @@ CustomChartDef radial_tree {
       default_value: true
     }
 
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
+
   }
 
   template: @vg {
@@ -100,6 +106,7 @@ CustomChartDef radial_tree {
       {"name": "labels", "update": "@{options.show_labels.value}"},
       {"name": "layout", "update": "'@{options.layout.value}'"},
       {"name": "links", "update": "'@{options.link_shape.value}'"},
+      {"name": "showTooltip", "update": "@{options.show_tooltip.value}"},
       {
         "name": "hovered",
         "value": null,
@@ -218,7 +225,7 @@ CustomChartDef radial_tree {
             "fill": {"scale": "color", "field": "depth"},
             "size": {"signal": "datum.node_id === hovered ? 200 : 90"},
             "tooltip": {
-              "signal": "{'Label': datum.label, 'Depth': datum.depth, 'Children': length(datum.children || [])}"
+              "signal": "showTooltip ? {'Label': datum.label, 'Depth': datum.depth, 'Children': length(datum.children || [])} : null"
             }
           }
         }

@@ -29,6 +29,12 @@ CustomChartDef sankey_chart {
     }
   }
   options {
+    option show_tooltip {
+      label: "Show tooltip"
+      type: "toggle"
+      default_value: true
+    }
+
     option node_align {
       label: "Node Align"
       type: "select"
@@ -341,7 +347,7 @@ CustomChartDef sankey_chart {
               "value": 0.6
             },
             "tooltip": {
-              "signal": "datum.sourceId + ' → ' + datum.targetId + ': ' + datum.value"
+              "signal": "@{options.show_tooltip.value} ? datum.sourceId + ' → ' + datum.targetId + ': ' + datum.value : null"
             }
           },
           "hover": {

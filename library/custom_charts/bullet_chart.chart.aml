@@ -42,6 +42,12 @@ CustomChartDef bullet_chart {
   }
 
   options {
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
+
     option current_bar_height {
       label: 'Current bar height'
       type: 'number-input'
@@ -109,26 +115,10 @@ CustomChartDef bullet_chart {
         "sort": "ascending"
       },
       "tooltip": [
-        {
-          "field": "category_value",
-          "type": "nominal",
-          "title": "Category"
-        },
-        {
-          "field": "current_value",
-          "type": "quantitative",
-          "title": "Current"
-        },
-        {
-          "field": "pace_value",
-          "type": "quantitative",
-          "title": "Pace"
-        },
-        {
-          "field": "target_value",
-          "type": "quantitative",
-          "title": "Target"
-        }
+        {"field": "category_value", "type": "nominal", "title": "Category"},
+        {"field": "current_value", "type": "quantitative", "title": "Current", "format": @{fields.current.format}, "formatType": "holisticsFormat"},
+        {"field": "pace_value", "type": "quantitative", "title": "Pace", "format": @{fields.pace.format}, "formatType": "holisticsFormat"},
+        {"field": "target_value", "type": "quantitative", "title": "Target", "format": @{fields.target.format}, "formatType": "holisticsFormat"}
       ]
     },
     "layer": [
@@ -143,7 +133,7 @@ CustomChartDef bullet_chart {
             },
             "bind": {"legend": "pointerover"}
           },
-          {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
+          {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}}, 
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
         ],
         "encoding": {
@@ -172,7 +162,7 @@ CustomChartDef bullet_chart {
         ],
         "mark": {
           "type": "bar",
-          "tooltip": true
+          "tooltip": @{options.show_tooltip.value}
         },
         "encoding": {
           "color": {
@@ -182,16 +172,11 @@ CustomChartDef bullet_chart {
             "legend": null
           },
           "opacity": {
-            "condition": {
-              "param": "series_hover",
-              "field": "series_label",
-              "type": "nominal",
-              "scale": {
-              "domain": ["Current", "Pace", "Target"],
-              "range": [1, 0.18, 0.72]
-            },
-              "legend": null
-            },
+            "condition": [
+              {"param": "bar_hover", "empty": false, "value": 0.18},
+              {"test": "length(data('bar_hover_store'))", "value": 0.045},
+              {"param": "series_hover", "value": 0.18}
+            ],
             "value": 0.12
           }
         }
@@ -205,7 +190,7 @@ CustomChartDef bullet_chart {
         "mark": {
           "type": "bar",
           "height": @{options.current_bar_height.value},
-          "tooltip": true
+          "tooltip": @{options.show_tooltip.value}
         },
         "encoding": {
           "color": {
@@ -215,16 +200,11 @@ CustomChartDef bullet_chart {
             "legend": null
           },
           "opacity": {
-            "condition": {
-              "param": "series_hover",
-              "field": "series_label",
-              "type": "nominal",
-              "scale": {
-              "domain": ["Current", "Pace", "Target"],
-              "range": [1, 0.18, 0.72]
-            },
-              "legend": null
-            },
+            "condition": [
+              {"param": "bar_hover", "empty": false, "value": 1},
+              {"test": "length(data('bar_hover_store'))", "value": 0.25},
+              {"param": "series_hover", "value": 1}
+            ],
             "value": 0.12
           }
         }
@@ -239,7 +219,7 @@ CustomChartDef bullet_chart {
           "type": "tick",
           "size": 22,
           "thickness": @{options.target_tick_thickness.value},
-          "tooltip": true
+          "tooltip": @{options.show_tooltip.value}
         },
         "encoding": {
           "color": {
@@ -249,18 +229,23 @@ CustomChartDef bullet_chart {
             "legend": null
           },
           "opacity": {
-            "condition": {
-              "param": "series_hover",
-              "field": "series_label",
-              "type": "nominal",
-              "scale": {
-              "domain": ["Current", "Pace", "Target"],
-              "range": [1, 0.18, 0.72]
-            },
-              "legend": null
-            },
+            "condition": [
+              {"param": "bar_hover", "empty": false, "value": 0.72},
+              {"test": "length(data('bar_hover_store'))", "value": 0.18},
+              {"param": "series_hover", "value": 0.72}
+            ],
             "value": 0.12
           }
+        }
+      },
+      {
+        "mark": "bar",
+        "params": [
+          {"name": "bar_hover", "select": {"type": "point", "fields": ["category_value"], "on": "mouseover", "clear": "mouseout"}}
+        ],
+        "encoding": {
+          "opacity": {"value": 0},
+          "fillOpacity": {"value": 0}
         }
       }
     ],

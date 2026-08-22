@@ -38,15 +38,23 @@ CustomChartDef bubble_chart {
 
   }
 
+  options {
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
+  }
+
   template: @vgl {
     "data": {
       "values": @{values}
     },
     "params": [
       {"name": "normalPointSelection", "select": {"type": "point", "fields": [@{fields.category.name}], "toggle": "true", "clear": "mouseup"}},
-      {"name": "hoverPointSelection", "select": {"type": "point", "fields": [@{fields.category.name}], "on": "mouseover", "clear": "mouseout"}}
+      {"name": "hoverPointSelection", "select": {"type": "point", "fields": [@{fields.x_axis.name}, @{fields.y_axis.name}, @{fields.size.name}, @{fields.category.name}], "on": "mouseover", "clear": "mouseout"}}
     ],
-    "mark": {"type": "circle", "opacity": 0.7},
+    "mark": {"type": "circle", "opacity": 0.7, "tooltip": @{options.show_tooltip.value}},
     "encoding": {
       "x": {
         "field": @{fields.x_axis.name},
@@ -68,12 +76,18 @@ CustomChartDef bubble_chart {
         "type": "nominal",
         "legend": {"orient": "right"}
       },
+
       "tooltip": [
-        {"field": @{fields.category.name}, "type": "nominal"},
-        {"field": @{fields.x_axis.name}, "type": "quantitative", "format": @{fields.x_axis.format}, "formatType": "holisticsFormat"},
-        {"field": @{fields.y_axis.name}, "type": "quantitative", "format": @{fields.y_axis.format}, "formatType": "holisticsFormat"},
-        {"field": @{fields.size.name}, "type": "quantitative", "format": @{fields.size.format}, "formatType": "holisticsFormat"}
-      ]
+        {"field": @{fields.x_axis.name}, "type": "quantitative", "title": @{fields.x_axis.name}, "format": @{fields.x_axis.format}, "formatType": "holisticsFormat"},
+        {"field": @{fields.y_axis.name}, "type": "quantitative", "title": @{fields.y_axis.name}, "format": @{fields.y_axis.format}, "formatType": "holisticsFormat"},
+        {"field": @{fields.size.name}, "type": "quantitative", "title": @{fields.size.name}, "format": @{fields.size.format}, "formatType": "holisticsFormat"},
+        {"field": @{fields.category.name}, "type": "nominal", "title": @{fields.category.name}}
+      ],
+
+      "opacity": {
+        "condition": {"param": "hoverPointSelection", "value": 1},
+        "value": 0.15
+      }
     },
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],

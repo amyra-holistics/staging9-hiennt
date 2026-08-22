@@ -34,6 +34,11 @@ CustomChartDef bar_chart_with_average_line {
       label: 'Show tooltip'
       default_value: true
     }
+    option line_color {
+      type: 'color-picker'
+      label: 'Average line color'
+      default_value: '#E5484D'
+    }
   }
   template: @vgl {
     "data": {"values": @{values}},
@@ -42,17 +47,7 @@ CustomChartDef bar_chart_with_average_line {
         "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
-          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}},
-          {
-            "name": "seriesHoverSelection",
-            "select": {
-              "type": "point",
-              "fields": [@{fields.series.name}],
-              "on": "mouseover",
-              "clear": "mouseout"
-            },
-            "bind": {"legend": "pointerover"}
-          }
+          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
         ],
         "encoding": {
           "x": {
@@ -70,15 +65,32 @@ CustomChartDef bar_chart_with_average_line {
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
           },
           "opacity": {
-            "condition": {"param": "hoverPointSelection", "value": 1},
+            "condition": [
+              {"test": "!length(data('hoverPointSelection_store'))", "value": 1},
+              {"param": "hoverPointSelection", "empty": false, "value": 1}
+            ],
             "value": 0.15
           }
         }
       },
       {
-        "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#E5484D", "size": 2, "opacity": 1, "tooltip": @{options.show_tooltip.value}},
+        "mark": {"type": "rule", "strokeDash": [4, 4], "color": @{options.line_color.value}, "size": 2, "opacity": 1, "tooltip": @{options.show_tooltip.value}},
         "encoding": {
           "y": {"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative"}
+        }
+      },
+      {
+        "transform": [
+          {"joinaggregate": [{"op": "mean", "field": @{fields.value.name}, "as": "average_value"}]},
+          {"window": [{"op": "row_number", "as": "rightmost_position"}], "sort": [{"field": @{fields.dimension.name}, "order": "descending"}]},
+          {"filter": "datum.rightmost_position === 1"},
+          {"calculate": "'Average ' + format(datum.average_value, ',.2f')", "as": "average_label"}
+        ],
+        "mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 10, "dy": -4, "color": @{options.line_color.value}, "fontSize": 11, "fontWeight": 600},
+        "encoding": {
+          "x": {"field": @{fields.dimension.name}, "type": "nominal", "sort": "ascending"},
+          "y": {"field": "average_value", "type": "quantitative"},
+          "text": {"field": "average_label", "type": "nominal"}
         }
       }
     ],

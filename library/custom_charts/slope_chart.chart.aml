@@ -50,6 +50,12 @@ CustomChartDef slope_chart {
       type: 'toggle'
       default_value: true
     }
+
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
   }
 
   template: @vg {
@@ -254,7 +260,7 @@ CustomChartDef slope_chart {
             "strokeWidth": {"signal": "hoveredCat === datum.category ? 3.5 : 2"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.15"},
             "tooltip": {
-              "signal": "{'Category': datum.category, 'From': format(datum.amount, ','), 'To': format(datum.end_amount, ','), 'Change': format(datum.delta, '+,') + (datum.amount !== 0 ? ' (' + format(datum.delta / datum.amount, '+.1%') + ')' : '')}"
+              "signal": "@{options.show_tooltip.value} ? {'Category': datum.category, 'From': format(datum.amount, ','), 'To': format(datum.end_amount, ','), 'Change': format(datum.delta, '+,') + (datum.amount !== 0 ? ' (' + format(datum.delta / datum.amount, '+.1%') + ')' : '')} : null"
             }
           }
         }

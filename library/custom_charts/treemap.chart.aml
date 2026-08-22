@@ -31,6 +31,11 @@ CustomChartDef treemap {
       type: 'number-input'
       default_value: 200
     }
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
     option layout_method {
       label: 'Treemap method'
       type: 'select'
@@ -142,7 +147,7 @@ CustomChartDef treemap {
             "strokeWidth": {"value": 2},
             "fill": {"scale": "color", "value": "default"},
             "tooltip": {
-              "signal": "datum['@{fields.dimension.name}'] + ': ' + datum['@{fields.value.name}'] + ' (' + datum._percentage + ')'"
+              "signal": "@{options.show_tooltip.value} ? datum['@{fields.dimension.name}'] + ': ' + datum['@{fields.value.name}'] + ' (' + datum._percentage + ')' : null"
             }
           },
           "update": {

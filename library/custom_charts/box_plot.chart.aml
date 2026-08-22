@@ -28,6 +28,12 @@ CustomChartDef box_plot {
       label: 'Show outliers'
       default_value: false
     }
+
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
+    }
   }
 
   template: @vgl {
@@ -50,7 +56,8 @@ CustomChartDef box_plot {
           "box": {"cornerRadius": 2},
           "median": {"color": "white", "strokeWidth": 2},
           "rule": {"color": "#9CA3AF", "size": 1.5},
-          "ticks": {"color": "#9CA3AF", "size": 10}
+          "ticks": {"color": "#9CA3AF", "size": 10},
+          "tooltip": @{options.show_tooltip.value}
         },
         "encoding": {
           "y": {
@@ -58,6 +65,13 @@ CustomChartDef box_plot {
             "type": "quantitative",
             "scale": {"zero": false},
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          },
+          "opacity": {
+            "condition": [
+              {"test": "!length(data('box_hover_store'))", "value": 1},
+              {"param": "box_hover", "empty": false, "value": 1}
+            ],
+            "value": 0.15
           }
         }
       },
@@ -75,20 +89,11 @@ CustomChartDef box_plot {
           }
         ],
         "params": [
+          {"name": "box_hover", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}},
           {"name": "normalPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
         ],
-        "mark": {"type": "rule", "size": 32, "opacity": 0, "tooltip": true},
-        "encoding": {
-          "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
-            {"field": "box_max", "type": "quantitative", "title": "Max", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
-            {"field": "box_q3", "type": "quantitative", "title": "Q3", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
-            {"field": "box_median", "type": "quantitative", "title": "Median", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
-            {"field": "box_q1", "type": "quantitative", "title": "Q1", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
-            {"field": "box_min", "type": "quantitative", "title": "Min", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          ]
-        }
+        "mark": {"type": "rule", "size": 32, "opacity": 0, "tooltip": @{options.show_tooltip.value}}
       }
     ],
     "holisticsConfig": {

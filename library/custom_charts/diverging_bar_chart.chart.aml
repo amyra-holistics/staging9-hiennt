@@ -68,6 +68,10 @@ CustomChartDef diverging_bar_chart {
           "value": @{options.positive_color.value}
         },
         "value": @{options.negative_color.value}
+      },
+      "fillOpacity": {
+        "condition": {"param": "hoverPointSelection", "value": 1},
+        "value": 0.15
       }
     },
     "holisticsConfig": {

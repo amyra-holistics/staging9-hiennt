@@ -23,14 +23,20 @@ CustomChartDef pareto_chart {
   options {
     option line_color {
       type: 'color-picker'
-      label: 'Cumulative Line Color'
+      label: 'Cumulative line color'
       default_value: '#e5484d'
+    }
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
     }
     option show_threshold {
       type: 'toggle'
-      label: 'Show 80% threshold line'
+      label: 'Show threshold line'
       default_value: true
     }
+
     option threshold {
       type: 'number-input'
       label: 'Threshold (0 to 1)'
@@ -74,10 +80,10 @@ CustomChartDef pareto_chart {
     },
     "layer": [
       {
-        "mark": {"type": "bar"},
+        "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
         "params": [
-          {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
-          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
+          {"name": "normalPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "toggle": "true", "clear": "mouseup"}},
+          {"name": "hoverPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
         ],
         "encoding": {
           "y": {
@@ -89,12 +95,10 @@ CustomChartDef pareto_chart {
               "formatType": "holisticsFormat"
             }
           },
-          "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
-            {"field": @{fields.value.name}, "type": "quantitative", "title": "Value", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
-            {"field": "item_share", "type": "quantitative", "title": "Share of Total", "format": ".1%"},
-            {"field": "cumulative_percent", "type": "quantitative", "title": "Cumulative", "format": ".1%"}
-          ]
+          "fillOpacity": {
+            "condition": {"param": "hoverPointSelection", "value": 1},
+            "value": 0.15
+          }
         }
       },
       {
@@ -102,8 +106,8 @@ CustomChartDef pareto_chart {
       {
         "mark": {
           "type": "line",
-          "point": {"filled": true, "size": 50, "fill": @{options.line_color.value}},
-          "color": @{options.line_color.value}
+          "color": @{options.line_color.value},
+          "tooltip": @{options.show_tooltip.value}
         },
         "encoding": {
           "y": {
@@ -116,10 +120,16 @@ CustomChartDef pareto_chart {
             },
             "scale": {"domain": [0, 1]}
           },
-          "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
-            {"field": "cumulative_percent", "type": "quantitative", "title": "Cumulative", "format": ".1%"}
-          ]
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "size": 50, "fill": @{options.line_color.value}, "color": @{options.line_color.value}, "tooltip": @{options.show_tooltip.value}},
+        "encoding": {
+          "y": {"field": "cumulative_percent", "type": "quantitative"},
+          "opacity": {
+            "condition": {"param": "hoverPointSelection", "value": 1},
+            "value": 0.15
+          }
         }
       },
       {

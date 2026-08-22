@@ -41,6 +41,11 @@ CustomChartDef gauge_chart {
       type: 'number-input'
       default_value: 0.25
     }
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
   }
   template: @vg {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
@@ -154,7 +159,7 @@ CustomChartDef gauge_chart {
             "innerRadius": {"signal": "innerRadius"},
             "outerRadius": {"signal": "radius"},
             "tooltip": {
-              "signal": "{'@{fields.value.name}': holisticsFormat(datum.metricValue, valueFormat), '@{fields.max_value.name}': holisticsFormat(datum.metricMax, maxFormat), 'Progress': format(datum.ratio, '.0%')}"
+              "signal": "@{options.show_tooltip.value} ? {'@{fields.value.name}': holisticsFormat(datum.metricValue, valueFormat), '@{fields.max_value.name}': holisticsFormat(datum.metricMax, maxFormat), 'Progress': format(datum.ratio, '.0%')} : null"
             }
           }
         }

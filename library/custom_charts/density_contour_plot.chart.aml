@@ -58,6 +58,11 @@ CustomChartDef density_contour_plot {
       type: 'toggle'
       default_value: false
     }
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
   }
   template: @vg
 {
@@ -217,7 +222,7 @@ CustomChartDef density_contour_plot {
               "signal": "@{options.show_points.value} ? (hovered === null ? 0.35 : (hovered === datum.group ? 0.6 : 0.06)) : 0"
             },
             "tooltip": {
-              "signal": "{'Group': datum.group, '@{fields.x_axis.name}': format(datum.x_value, ','), '@{fields.y_axis.name}': format(datum.y_value, ',')}"
+              "signal": "@{options.show_tooltip.value} ? {'Group': datum.group, '@{fields.x_axis.name}': format(datum.x_value, ','), '@{fields.y_axis.name}': format(datum.y_value, ',')} : null"
             }
           }
         }
@@ -255,7 +260,7 @@ CustomChartDef density_contour_plot {
             "strokeWidth": {"value": 1.5},
             "stroke": {"scale": "color", "field": "group"},
             "tooltip": {
-              "signal": "{'Group': datum.group}"
+              "signal": "@{options.show_tooltip.value} ? {'Group': datum.group} : null"
             }
           },
           "update": {

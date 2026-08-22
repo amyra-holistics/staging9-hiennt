@@ -56,6 +56,12 @@ CustomChartDef packed_bubble {
       default_value: true
     }
 
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
+
   }
 
   template: @vg {
@@ -157,7 +163,7 @@ CustomChartDef packed_bubble {
             "stroke": {"value": "white"},
             "strokeWidth": {"value": 1.5},
             "tooltip": {
-              "signal": "{'Category': datum.category, 'Value': format(datum.amount, ',')}"
+              "signal": "@{options.show_tooltip.value} ? {'Category': datum.category, 'Value': format(datum.amount, ',')} : null"
             }
           }
         },

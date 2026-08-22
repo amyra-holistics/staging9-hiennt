@@ -44,6 +44,12 @@ CustomChartDef bump_chart {
       label: 'Point size'
       default_value: 100
     }
+
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
+    }
   }
   template: @vg {
     "$schema": "https://vega.github.io/schema/vega/v5.json",
@@ -192,7 +198,7 @@ CustomChartDef bump_chart {
                 "size": {"value": @{options.point_size.value}},
                 "opacity": {"signal": "hovered === null || hovered === datum.category ? 1 : 0.15"},
                 "tooltip": {
-                  "signal": "datum.category + ' - ' + datum.period + ': rank ' + datum.rank + ' (' + format(datum.amount, ',') + ')'"
+                  "signal": "@{options.show_tooltip.value} ? datum.category + ' - ' + datum.period + ': rank ' + datum.rank + ' (' + format(datum.amount, ',') + ')' : null"
                 }
               }
             }

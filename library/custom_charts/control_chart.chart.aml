@@ -49,7 +49,7 @@ CustomChartDef control_chart {
     }
 
     option show_mr_chart {
-      label: 'Show Moving Range chart'
+      label: 'Show moving range chart'
       type: 'toggle'
       default_value: true
     }
@@ -75,6 +75,8 @@ CustomChartDef control_chart {
         "on": [{ "events": "window:resize", "update": "containerSize()[1] - 64" }]
       },
       {"name": "showMr", "update": "@{options.show_mr_chart.value}"},
+      {"name": "showTooltip", "update": "@{options.show_tooltip.value}"},
+      {"name": "xHoverPeriod", "value": null, "on": [{"events": "@xPoint:mouseover, @mrPoint:mouseover", "update": "datum.period"}, {"events": "@xPoint:mouseout, @mrPoint:mouseout", "update": "null"}]},
       {"name": "plotW", "update": "width - 110"},
       {"name": "xH", "update": "showMr ? (height - 48) * 0.62 : height - 18"},
       {"name": "mrTop", "update": "18 + xH + 30"},
@@ -83,7 +85,7 @@ CustomChartDef control_chart {
         "name": "hoveredPeriod",
         "value": null,
         "on": [
-          {"events": "symbol:mouseover", "update": "datum.period"},
+          {"events": "symbol:mouseover", "update": "showTooltip ? datum.period : null"},
           {"events": "symbol:mouseout", "update": "null"}
         ]
       },
@@ -420,7 +422,7 @@ CustomChartDef control_chart {
                 "y2": {"signal": "xH"},
                 "stroke": {"value": "#9ba1a6"},
                 "strokeDash": {"value": [3, 3]},
-                "opacity": {"signal": "hoveredPeriod === null ? 0 : 0.7"}
+                "opacity": {"signal": "showTooltip && hoveredPeriod !== null ? 0.7 : 0"}
               }
             }
           },
@@ -458,6 +460,7 @@ CustomChartDef control_chart {
                   {"scale": "color", "value": "default"}
                 ],
                 "size": {"signal": "datum.period === hoveredPeriod ? 130 : (datum.severity === 'none' ? 40 : 90)"},
+                "opacity": {"signal": "xHoverPeriod === null || datum.period === xHoverPeriod ? 1 : 0.15"},
                 "stroke": {"value": "white"},
                 "strokeWidth": {"value": 1},
                 "tooltip": {
@@ -563,7 +566,7 @@ CustomChartDef control_chart {
                 "y2": {"signal": "mrH"},
                 "stroke": {"value": "#9ba1a6"},
                 "strokeDash": {"value": [3, 3]},
-                "opacity": {"signal": "showMr && hoveredPeriod !== null ? 0.7 : 0"}
+                "opacity": {"signal": "showMr && showTooltip && hoveredPeriod !== null ? 0.7 : 0"}
               }
             }
           },
@@ -579,7 +582,7 @@ CustomChartDef control_chart {
                 "y": {"scale": "ymr", "field": "mr"},
                 "strokeWidth": {"value": 1.2},
                 "defined": {"signal": "datum.mr != null"},
-                "opacity": {"signal": "showMr ? 1 : 0"}
+                "opacity": {"signal": "showMr ? (xHoverPeriod === null ? 1 : 0.15) : 0"}
               }
             }
           },
@@ -602,7 +605,7 @@ CustomChartDef control_chart {
                   {"scale": "color", "value": "default"}
                 ],
                 "size": {"signal": "datum.period === hoveredPeriod ? 120 : (datum.mr != null && datum.mr > datum.mr_url ? 80 : 30)"},
-                "opacity": {"signal": "showMr && datum.mr != null ? 1 : 0"},
+                "opacity": {"signal": "showMr && datum.mr != null ? (xHoverPeriod === null || datum.period === xHoverPeriod ? 1 : 0.15) : 0"},
                 "tooltip": {
                   "signal": "@{options.show_tooltip.value} && datum.mr != null ? {'Period': datum.period, 'Moving Range': format(datum.mr, ',.4'), 'Avg MR': format(datum.mrbar, ',.4'), 'Upper Range Limit': format(datum.mr_url, ',.4')} : null"
                 }

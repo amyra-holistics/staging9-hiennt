@@ -50,6 +50,12 @@ CustomChartDef ridgeline_chart {
       default_value: false
     }
 
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
+    }
+
   }
 
   template: @vg {
@@ -67,6 +73,7 @@ CustomChartDef ridgeline_chart {
       },
       {"name": "overlap", "update": "@{options.overlap.value}"},
       {"name": "bandwidth", "update": "@{options.bandwidth.value}"},
+      {"name": "showTooltip", "update": "@{options.show_tooltip.value}"},
       {"name": "ext", "update": "length(data('value_extent')) ? data('value_extent')[0] : null"},
       {"name": "iqr", "update": "ext ? ext.q3 - ext.q1 : 0"},
       {"name": "vmin", "update": "ext ? (iqr > 0 ? max(ext.raw_min, ext.q1 - 1.5 * iqr) : ext.raw_min) : 0"},
@@ -247,7 +254,7 @@ CustomChartDef ridgeline_chart {
                 },
                 "stroke": {"value": "white"},
                 "strokeWidth": {"value": 1},
-                "tooltip": {"signal": "datum.category"}
+                "tooltip": {"signal": "showTooltip ? datum.category : null"}
               }
             }
           }

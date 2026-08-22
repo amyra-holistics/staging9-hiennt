@@ -34,12 +34,39 @@ CustomChartDef error_bar {
       ]
       default_value: 'ci'
     }
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
+    }
   }
 
   template: @vgl {
     "data": {
       "values": @{values}
     },
+    "transform": [
+      {"filter": "isValid(datum['@{fields.value.name}'])"},
+      {
+        "aggregate": [
+          {"op": "mean", "field": @{fields.value.name}, "as": "center"},
+          {"op": "count", "field": @{fields.value.name}, "as": "n"},
+          {"op": "stdev", "field": @{fields.value.name}, "as": "stdev"},
+          {"op": "ci0", "field": @{fields.value.name}, "as": "ci_lower"},
+          {"op": "ci1", "field": @{fields.value.name}, "as": "ci_upper"},
+          {"op": "q1", "field": @{fields.value.name}, "as": "iqr_lower"},
+          {"op": "q3", "field": @{fields.value.name}, "as": "iqr_upper"}
+        ],
+        "groupby": [@{fields.dimension.name}]
+      },
+      {"calculate": "datum.stdev / sqrt(datum.n)", "as": "stderr"},
+      {"calculate": "datum.center - datum.stdev", "as": "stdev_lower"},
+      {"calculate": "datum.center + datum.stdev", "as": "stdev_upper"},
+      {"calculate": "datum.center - datum.stderr", "as": "stderr_lower"},
+      {"calculate": "datum.center + datum.stderr", "as": "stderr_upper"},
+      {"calculate": "'@{options.extent.value}' === 'ci' ? datum.ci_lower : '@{options.extent.value}' === 'stderr' ? datum.stderr_lower : '@{options.extent.value}' === 'stdev' ? datum.stdev_lower : datum.iqr_lower", "as": "lower"},
+      {"calculate": "'@{options.extent.value}' === 'ci' ? datum.ci_upper : '@{options.extent.value}' === 'stderr' ? datum.stderr_upper : '@{options.extent.value}' === 'stdev' ? datum.stdev_upper : datum.iqr_upper", "as": "upper"}
+    ],
     "encoding": {
       "y": {
         "field": @{fields.dimension.name},
@@ -48,45 +75,57 @@ CustomChartDef error_bar {
     },
     "layer": [
       {
-        "params": [
-          {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
-          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
-        ],
-        "mark": {
-          "type": "point",
-          "filled": true,
-          "size": 150
-        },
+        "mark": {"type": "rule", "color": "oklch(0.7 0.01 185)", "strokeWidth": 1.5},
         "encoding": {
-          "x": {
-            "field": @{fields.value.name},
-            "type": "quantitative",
-            "aggregate": "mean",
-            "scale": {"zero": false}
-          },
-          "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
-            {"field": @{fields.value.name}, "type": "quantitative", "aggregate": "mean", "title": "Mean", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          ]
+          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}, "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}},
+          "x2": {"field": "upper"},
+          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
         }
       },
       {
-        "mark": {
-          "type": "errorbar",
-          "extent": @{options.extent.value},
-          "thickness": 1.5,
-          "ticks": {"size": 12}
-        },
+        "mark": {"type": "tick", "color": "oklch(0.7 0.01 185)", "size": 12, "thickness": 1.5},
         "encoding": {
-          "x": {
-            "field": @{fields.value.name},
-            "type": "quantitative",
-            "scale": {"zero": false},
-            "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          },
-          "color": "oklch(0.7 0.01 185)",
+          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
+          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
+        }
+      },
+      {
+        "mark": {"type": "tick", "color": "oklch(0.7 0.01 185)", "size": 12, "thickness": 1.5},
+        "encoding": {
+          "x": {"field": "upper", "type": "quantitative", "scale": {"zero": false}},
+          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "size": 150},
+        "encoding": {
+          "x": {"field": "center", "type": "quantitative", "scale": {"zero": false}},
+          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
+        }
+      },
+      {
+        "params": [
+          {"name": "error_hover", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}},
+          {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
+          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
+        ],
+        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0},
+        "encoding": {
+          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
+          "x2": {"field": "upper"}
+        }
+      },
+      {
+        "transform": [
+          {"filter": "@{options.show_tooltip.value}"}
+        ],
+        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0},
+        "encoding": {
+          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
+          "x2": {"field": "upper"},
           "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": @{fields.dimension.name}},
+            {"field": "center", "type": "quantitative", "title": "Mean", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
           ]
         }
       }

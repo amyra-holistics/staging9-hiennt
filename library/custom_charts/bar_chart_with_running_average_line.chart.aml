@@ -56,7 +56,7 @@ CustomChartDef bar_chart_with_running_average_line {
         "mark": {"type": "bar", "tooltip": @{options.tooltip.value}},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
-          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
+          {"name": "barHoverSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
         ],
         "encoding": {
           "x": {
@@ -67,20 +67,46 @@ CustomChartDef bar_chart_with_running_average_line {
             "field": @{fields.value.name},
             "type": "quantitative",
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          },
+          "opacity": {
+            "condition": [
+              {"test": "!length(data('barHoverSelection_store')) && !length(data('dotHoverSelection_store'))", "value": 1},
+              {"param": "barHoverSelection", "empty": false, "value": 1},
+              {"param": "dotHoverSelection", "empty": false, "value": 1}
+            ],
+            "value": 0.15
           }
         }
       },
       {
-        "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2, "point": {"filled": true, "color": @{options.line_color.value}}},
+        "mark": {"type": "line", "color": @{options.line_color.value}, "strokeWidth": 2},
         "encoding": {
           "x": {"field": @{fields.dimension.name}, "type": "temporal"},
           "y": {"field": "avg", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "color": @{options.line_color.value}, "tooltip": @{options.tooltip.value}},
+        "params": [
+          {"name": "dotHoverSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
+        ],
+        "encoding": {
+          "x": {"field": @{fields.dimension.name}, "type": "temporal"},
+          "y": {"field": "avg", "type": "quantitative"},
+          "opacity": {
+            "condition": [
+              {"test": "!length(data('barHoverSelection_store')) && !length(data('dotHoverSelection_store'))", "value": 1},
+              {"param": "barHoverSelection", "empty": false, "value": 1},
+              {"param": "dotHoverSelection", "empty": false, "value": 1}
+            ],
+            "value": 0.15
+          }
         }
       }
     ],
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],
-      "contextMenuSignals": ["hoverPointSelection"]
+      "contextMenuSignals": ["barHoverSelection", "dotHoverSelection"]
     }
   };;
 }

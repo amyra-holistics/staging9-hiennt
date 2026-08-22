@@ -44,6 +44,11 @@ CustomChartDef chord_diagram {
       type: "number-input"
       default_value: 80
     }
+    option show_tooltip {
+      label: "Show tooltip"
+      type: "toggle"
+      default_value: true
+    }
   }
   template: @vgl
   {
@@ -242,7 +247,7 @@ CustomChartDef chord_diagram {
                 "fill": {"scale": "color", "field": "groupId"},
                 "stroke": {"value": "#fff"},
                 "strokeWidth": {"value": 0.5},
-                "tooltip": {"signal": "datum.groupId + ': ' + datum.groupValue"}
+                "tooltip": {"signal": "@{options.show_tooltip.value} ? datum.groupId + ': ' + datum.groupValue : null"}
               },
               "hover": {
                 "fillOpacity": {"value": 0.8}
@@ -260,7 +265,7 @@ CustomChartDef chord_diagram {
                 "fillOpacity": {"value": 0.67},
                 "stroke": {"value": "#fff"},
                 "strokeWidth": {"value": 0.5},
-                "tooltip": {"signal": "datum.sourceId + ' → ' + datum.targetId + ': ' + datum.chordValue"}
+                "tooltip": {"signal": "@{options.show_tooltip.value} ? datum.sourceId + ' → ' + datum.targetId + ': ' + datum.chordValue : null"}
               },
               "hover": {
                 "fillOpacity": {"value": 0.9}
@@ -284,7 +289,7 @@ CustomChartDef chord_diagram {
                 "angle": {"signal": "datum.groupMidAngle > PI ? (datum.groupMidAngle - PI / 2) * 180 / PI - 180 : (datum.groupMidAngle - PI / 2) * 180 / PI"},
                 "limit": {"signal": "max(labelPadding - 10, 20)"},
                 "ellipsis": {"value": "…"},
-                "tooltip": {"field": "groupId"}
+                "tooltip": {"signal": "@{options.show_tooltip.value} ? datum.groupId : null"}
               }
             }
           }

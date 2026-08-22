@@ -1,5 +1,6 @@
 CustomChartDef gauge_chart {
   label: 'Gauge Chart'
+  icon: 'hicon:chart-gauge-2'
   description: 'To show a single metric as a needle on a gauge against its maximum, making progress easy to read at a glance.'
   fields {
     field value {

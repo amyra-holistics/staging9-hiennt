@@ -1,7 +1,7 @@
 CustomChartDef table_heatmap {
   label: 'Table Heatmap'
   description: 'To reveal patterns across days and months by coloring each cell of a calendar grid by a measure value.'
-  icon: 'hicon:chart-histogram'
+  icon: 'hicon:chart-table-heatmap'
   fields {
     field date {
       label: 'Date'

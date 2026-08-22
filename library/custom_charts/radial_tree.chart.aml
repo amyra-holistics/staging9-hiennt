@@ -1,5 +1,6 @@
 CustomChartDef radial_tree {
   label: 'Radial Tree'
+  icon: 'hicon:chart-radial-tree'
   description: 'To draw a hierarchy of level columns as a radial node-link tree.'
 
   fields {

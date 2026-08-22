@@ -50,19 +50,6 @@ CustomChartDef ridgeline_chart {
       default_value: false
     }
 
-    option color_scheme {
-      label: 'Color scheme'
-      type: 'select'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
-    }
   }
 
   template: @vg {
@@ -181,7 +168,7 @@ CustomChartDef ridgeline_chart {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "source", "field": "category", "sort": true},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "axes": [
@@ -198,7 +185,6 @@ CustomChartDef ridgeline_chart {
               "y": {"scale": "yscale", "field": "value", "band": 1},
               "align": {"value": "right"},
               "baseline": {"value": "bottom"},
-              "fill": {"value": "#374151"},
               "fontWeight": {
                 "signal": "hovered === datum.value ? 600 : 400"
               }

@@ -29,38 +29,56 @@ CustomChartDef bar_chart_with_average_line {
     }
   }
   options {
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
+    }
   }
   template: @vgl {
     "data": {"values": @{values}},
     "layer": [
       {
-        "mark": {"type": "bar", "tooltip": true},
+        "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
-          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
+          {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}},
+          {
+            "name": "seriesHoverSelection",
+            "select": {
+              "type": "point",
+              "fields": [@{fields.series.name}],
+              "on": "mouseover",
+              "clear": "mouseout"
+            },
+            "bind": {"legend": "pointerover"}
+          }
         ],
         "encoding": {
           "x": {
             "field": @{fields.dimension.name},
-            "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false, "labelAngle": -45}
+            "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
+          },
+          "xOffset": {"field": @{fields.series.name}},
+          "color": {
+            "field": @{fields.series.name},
+            "legend": {"title": null, "orient": "bottom"}
           },
           "y": {
             "field": @{fields.value.name},
             "type": "quantitative",
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
           },
-          "xOffset": {"field": @{fields.series.name}},
-          "color": {
-            "field": @{fields.series.name},
-            "legend": {"title": null, "orient": "bottom"}
+          "opacity": {
+            "condition": {"param": "hoverPointSelection", "value": 1},
+            "value": 0.15
           }
         }
       },
       {
-        "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#E5484D", "size": 2, "tooltip": true},
+        "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#E5484D", "size": 2, "opacity": 1, "tooltip": @{options.show_tooltip.value}},
         "encoding": {
-          "y": {"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative"},
-          "tooltip": [{"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative", "title": "Average", "format": @{fields.value.format}, "formatType": "holisticsFormat"}]
+          "y": {"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative"}
         }
       }
     ],

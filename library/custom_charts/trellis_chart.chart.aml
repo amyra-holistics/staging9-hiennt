@@ -66,14 +66,6 @@ CustomChartDef trellis_chart {
       type: "number-input"
       default_value: '25'
     }
-
-    option fill_color {
-      label: 'Fill Color'
-      type: 'color-picker'
-      default_value: '#aaa'
-    }
-
-
   }
 
   template: @vgl {
@@ -137,9 +129,6 @@ CustomChartDef trellis_chart {
                 "labels": @{options.show_y_axis_label.value},
                 "format": "~s"
               }
-            },
-            "color": {
-              "value": @{options.fill_color.value}
             },
             "tooltip": [
               {"field": @{fields.facet.name}, "title": @{fields.facet.name}},

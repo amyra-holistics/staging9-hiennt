@@ -23,11 +23,6 @@ CustomChartDef error_bar {
   }
 
   options {
-    option point_color {
-      type: 'color-picker'
-      label: 'Point Color'
-      default_value: '#255DD4'
-    }
     option extent {
       type: 'select'
       label: 'Error extent'
@@ -53,26 +48,6 @@ CustomChartDef error_bar {
     },
     "layer": [
       {
-        "mark": {
-          "type": "errorbar",
-          "extent": @{options.extent.value},
-          "color": "#9CA3AF",
-          "thickness": 1.5,
-          "ticks": true
-        },
-        "encoding": {
-          "x": {
-            "field": @{fields.value.name},
-            "type": "quantitative",
-            "scale": {"zero": false},
-            "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          },
-          "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
-          ]
-        }
-      },
-      {
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
@@ -80,8 +55,7 @@ CustomChartDef error_bar {
         "mark": {
           "type": "point",
           "filled": true,
-          "size": 80,
-          "color": @{options.point_color.value}
+          "size": 150
         },
         "encoding": {
           "x": {
@@ -93,6 +67,26 @@ CustomChartDef error_bar {
           "tooltip": [
             {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
             {"field": @{fields.value.name}, "type": "quantitative", "aggregate": "mean", "title": "Mean", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          ]
+        }
+      },
+      {
+        "mark": {
+          "type": "errorbar",
+          "extent": @{options.extent.value},
+          "thickness": 1.5,
+          "ticks": {"size": 12}
+        },
+        "encoding": {
+          "x": {
+            "field": @{fields.value.name},
+            "type": "quantitative",
+            "scale": {"zero": false},
+            "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          },
+          "color": "oklch(0.7 0.01 185)",
+          "tooltip": [
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
           ]
         }
       }

@@ -56,19 +56,6 @@ CustomChartDef packed_bubble {
       default_value: true
     }
 
-    option color_scheme {
-      label: 'Color scheme'
-      type: 'select'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
-    }
   }
 
   template: @vg {
@@ -148,7 +135,7 @@ CustomChartDef packed_bubble {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "table", "field": "category", "sort": true},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "marks": [

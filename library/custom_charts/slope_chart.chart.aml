@@ -289,6 +289,7 @@ CustomChartDef slope_chart {
       },
       {
         "type": "text",
+        "style": "guide-label",
         "name": "leftLabel",
         "from": {"data": "left_labels"},
         "encode": {
@@ -301,13 +302,13 @@ CustomChartDef slope_chart {
             "limit": {"signal": "gutter - 14"},
             "fontSize": {"value": 11},
             "fontWeight": {"signal": "hoveredCat === datum.category ? 700 : 400"},
-            "fill": {"value": "#374151"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.25"}
           }
         }
       },
       {
         "type": "text",
+        "style": "guide-label",
         "name": "rightLabel",
         "from": {"data": "right_labels"},
         "encode": {
@@ -322,7 +323,6 @@ CustomChartDef slope_chart {
             "limit": {"signal": "gutter - 14"},
             "fontSize": {"value": 11},
             "fontWeight": {"signal": "hoveredCat === datum.category ? 700 : 400"},
-            "fill": {"value": "#374151"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.25"}
           }
         }

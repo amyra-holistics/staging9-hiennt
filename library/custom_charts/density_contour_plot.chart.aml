@@ -1,28 +1,26 @@
 CustomChartDef density_contour_plot {
   label: 'Density Contour Plot'
   description: 'To show where observations cluster across two numeric metrics, with per-group 2D density contours over a scatter plot.'
-
+  icon: 'hicon:chart-density-contour'
   fields {
     field x_axis {
       label: 'X-axis'
       type: 'dimension'
-      data_type: 'number'
       sort {
         apply_order: 1
         direction: 'asc'
       }
+      data_type: 'number'
     }
-
     field y_axis {
       label: 'Y-axis'
       type: 'dimension'
-      data_type: 'number'
       sort {
         apply_order: 2
         direction: 'asc'
       }
+      data_type: 'number'
     }
-
     field group {
       label: 'Group'
       type: 'dimension'
@@ -32,14 +30,12 @@ CustomChartDef density_contour_plot {
       }
     }
   }
-
   options {
     option bandwidth {
       label: 'Smoothing bandwidth (0 = automatic)'
       type: 'number-input'
       default_value: 0
     }
-
     option contour_levels {
       label: 'Number of contour levels'
       type: 'select'
@@ -52,35 +48,19 @@ CustomChartDef density_contour_plot {
       ]
       default_value: 4
     }
-
     option show_points {
       label: 'Show scatter points'
       type: 'toggle'
       default_value: true
     }
-
     option show_heatmap {
       label: 'Show filled density heatmap'
       type: 'toggle'
       default_value: false
     }
-
-    option color_scheme {
-      label: 'Color scheme'
-      type: 'select'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
-    }
   }
-
-  template: @vg {
+  template: @vg
+{
     "$schema": "https://vega.github.io/schema/vega/v5.json",
     "signals": [
       {
@@ -187,7 +167,7 @@ CustomChartDef density_contour_plot {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "source", "field": "group", "sort": true},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "axes": [
@@ -199,6 +179,7 @@ CustomChartDef density_contour_plot {
         "stroke": "color",
         "title": null,
         "orient": "top",
+        "direction": "horizontal",
         "symbolType": "stroke",
         "encode": {
           "symbols": {
@@ -223,6 +204,8 @@ CustomChartDef density_contour_plot {
       {
         "type": "symbol",
         "name": "pointMark",
+        "zindex": 1,
+        "interactive": @{options.show_points.value},
         "from": {"data": "source"},
         "encode": {
           "update": {
@@ -243,6 +226,7 @@ CustomChartDef density_contour_plot {
         "type": "image",
         "from": {"data": "density"},
         "clip": true,
+        "interactive": false,
         "encode": {
           "update": {
             "x": {"value": 0},
@@ -269,7 +253,10 @@ CustomChartDef density_contour_plot {
         "encode": {
           "enter": {
             "strokeWidth": {"value": 1.5},
-            "stroke": {"scale": "color", "field": "group"}
+            "stroke": {"scale": "color", "field": "group"},
+            "tooltip": {
+              "signal": "{'Group': datum.group}"
+            }
           },
           "update": {
             "strokeOpacity": {
@@ -282,5 +269,6 @@ CustomChartDef density_contour_plot {
         ]
       }
     ]
-  };;
+  }
+;;
 }

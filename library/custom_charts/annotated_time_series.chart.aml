@@ -1,4 +1,4 @@
-CustomChartDef annotated_time_series {
+CustomChartDef annotated_time_series_2 {
   label: 'Annotated Time Series'
   icon: 'hicon:chart-line-2'
   description: 'To plot a metric over time with labeled event markers tied to specific dates.'
@@ -30,11 +30,6 @@ CustomChartDef annotated_time_series {
     }
   }
   options {
-    option line_color {
-      type: 'color-picker'
-      label: 'Line Color'
-      default_value: '#255dd4'
-    }
     option event_color {
       type: 'color-picker'
       label: 'Event Marker Color'
@@ -49,7 +44,7 @@ CustomChartDef annotated_time_series {
         "transform": [
           {"aggregate": [{"op": "sum", "field": @{fields.value.name}, "as": @{fields.value.name}}], "groupby": [@{fields.date.name}]}
         ],
-        "mark": {"type": "line", "tooltip": true, "color": @{options.line_color.value}},
+        "mark": {"type": "line", "tooltip": true},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}

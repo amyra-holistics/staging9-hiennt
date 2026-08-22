@@ -26,11 +26,6 @@ CustomChartDef bar_chart_with_running_average_line {
       label: 'Show tooltip'
       default_value: true
     }
-    option bar_color {
-      type: 'color-picker'
-      label: 'Bar color'
-      default_value: '#255DD4'
-    }
     option line_color {
       type: 'color-picker'
       label: 'Line color'
@@ -58,7 +53,7 @@ CustomChartDef bar_chart_with_running_average_line {
     ],
     "layer": [
       {
-        "mark": {"type": "bar", "tooltip": @{options.tooltip.value}, "color": @{options.bar_color.value}},
+        "mark": {"type": "bar", "tooltip": @{options.tooltip.value}},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
@@ -66,7 +61,6 @@ CustomChartDef bar_chart_with_running_average_line {
         "encoding": {
           "x": {
             "field": @{fields.dimension.name},
-            "type": "temporal",
             "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
           },
           "y": {

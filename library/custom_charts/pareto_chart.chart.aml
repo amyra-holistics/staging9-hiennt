@@ -21,11 +21,6 @@ CustomChartDef pareto_chart {
     }
   }
   options {
-    option bar_color {
-      type: 'color-picker'
-      label: 'Bar Color'
-      default_value: '#255dd4'
-    }
     option line_color {
       type: 'color-picker'
       label: 'Cumulative Line Color'
@@ -74,17 +69,12 @@ CustomChartDef pareto_chart {
       "x": {
         "field": @{fields.dimension.name},
         "type": "nominal",
-        "sort": {"field": @{fields.value.name}, "order": "descending"},
-        "scale": {"paddingInner": 0.25},
-        "axis": {"labelAngle": -45}
+        "sort": {"field": @{fields.value.name}, "order": "descending"}
       }
     },
     "layer": [
       {
-        "mark": {
-          "type": "bar",
-          "color": @{options.bar_color.value}
-        },
+        "mark": {"type": "bar"},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
@@ -96,11 +86,7 @@ CustomChartDef pareto_chart {
             "title": null,
             "axis": {
               "format": @{fields.value.format},
-              "formatType": "holisticsFormat",
-              "grid": true,
-              "gridDash": [8, 3],
-              "gridColor": "#F4F6F8",
-              "gridOpacity": 1
+              "formatType": "holisticsFormat"
             }
           },
           "tooltip": [
@@ -116,7 +102,7 @@ CustomChartDef pareto_chart {
       {
         "mark": {
           "type": "line",
-          "point": {"filled": true, "size": 50, "fill": @{options.line_color.value}, "stroke": "white", "strokeWidth": 1},
+          "point": {"filled": true, "size": 50, "fill": @{options.line_color.value}},
           "color": @{options.line_color.value}
         },
         "encoding": {
@@ -124,10 +110,8 @@ CustomChartDef pareto_chart {
             "field": "cumulative_percent",
             "type": "quantitative",
             "axis": {
-              "format": ".0%",
               "title": "Cumulative %",
               "orient": "right",
-              "titleColor": @{options.line_color.value},
               "grid": false
             },
             "scale": {"domain": [0, 1]}
@@ -157,7 +141,7 @@ CustomChartDef pareto_chart {
           "baseline": "bottom",
           "dx": 6,
           "dy": -5,
-          "fontSize": 10,
+          "fontSize": 12,
           "color": "#9ba1a6",
           "opacity": {"expr": "@{options.show_threshold.value} ? 1 : 0"}
         },

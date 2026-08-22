@@ -23,11 +23,6 @@ CustomChartDef box_plot {
   }
 
   options {
-    option tooltip {
-      type: 'toggle'
-      label: 'Show tooltip'
-      default_value: true
-    }
     option show_outliers {
       type: 'toggle'
       label: 'Show outliers'
@@ -39,7 +34,12 @@ CustomChartDef box_plot {
     "data": {
       "values": @{values}
     },
-
+    "encoding": {
+      "x": {
+        "field": @{fields.dimension.name},
+        "type": "nominal"
+      }
+    },
     "layer": [
       {
         "mark": {
@@ -50,36 +50,47 @@ CustomChartDef box_plot {
           "box": {"cornerRadius": 2},
           "median": {"color": "white", "strokeWidth": 2},
           "rule": {"color": "#9CA3AF", "size": 1.5},
-          "ticks": {"color": "#9CA3AF", "size": 10},
-          "tooltip": @{options.tooltip.value}
+          "ticks": {"color": "#9CA3AF", "size": 10}
         },
         "encoding": {
-          "x": {
-            "field": @{fields.dimension.name},
-            "type": "nominal",
-            "axis": {"labelAngle": -45}
-          },
           "y": {
             "field": @{fields.value.name},
             "type": "quantitative",
             "scale": {"zero": false},
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          },
-          "color": {"value": "#255DD4"}
+          }
         }
       },
       {
+        "transform": [
+          {
+            "aggregate": [
+              {"op": "min", "field": @{fields.value.name}, "as": "box_min"},
+              {"op": "q1", "field": @{fields.value.name}, "as": "box_q1"},
+              {"op": "median", "field": @{fields.value.name}, "as": "box_median"},
+              {"op": "q3", "field": @{fields.value.name}, "as": "box_q3"},
+              {"op": "max", "field": @{fields.value.name}, "as": "box_max"}
+            ],
+            "groupby": [@{fields.dimension.name}]
+          }
+        ],
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
         ],
-        "mark": {"type": "rule", "opacity": 0, "size": 40},
+        "mark": {"type": "rule", "size": 32, "opacity": 0, "tooltip": true},
         "encoding": {
-          "x": {"field": @{fields.dimension.name}, "type": "nominal"}
+          "tooltip": [
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
+            {"field": "box_max", "type": "quantitative", "title": "Max", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+            {"field": "box_q3", "type": "quantitative", "title": "Q3", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+            {"field": "box_median", "type": "quantitative", "title": "Median", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+            {"field": "box_q1", "type": "quantitative", "title": "Q1", "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+            {"field": "box_min", "type": "quantitative", "title": "Min", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          ]
         }
       }
     ],
-
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],
       "contextMenuSignals": ["hoverPointSelection"]

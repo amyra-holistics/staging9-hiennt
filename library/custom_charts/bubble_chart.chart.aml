@@ -51,25 +51,22 @@ CustomChartDef bubble_chart {
       "x": {
         "field": @{fields.x_axis.name},
         "type": "quantitative",
-        "scale": {"zero": false},
         "axis": {"format": @{fields.x_axis.format}, "formatType": "holisticsFormat"}
       },
       "y": {
         "field": @{fields.y_axis.name},
         "type": "quantitative",
-        "scale": {"zero": false},
         "axis": {"format": @{fields.y_axis.format}, "formatType": "holisticsFormat"}
       },
       "size": {
         "field": @{fields.size.name},
         "type": "quantitative",
-        "title": null,
-        "legend": {"orient": "bottom"}
+        "legend": null
       },
       "color": {
         "field": @{fields.category.name},
         "type": "nominal",
-        "legend": {"orient": "right", "title": null}
+        "legend": {"orient": "right"}
       },
       "tooltip": [
         {"field": @{fields.category.name}, "type": "nominal"},

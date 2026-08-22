@@ -29,19 +29,6 @@ CustomChartDef sunburst_chart {
     }
   }
   options {
-    option color_scheme {
-      type: 'select'
-      label: 'Color scheme'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
-    }
     option donut_hole {
       type: 'select'
       label: 'Center hole size'
@@ -181,7 +168,7 @@ CustomChartDef sunburst_chart {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "cats", "field": "category"},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "marks": [
@@ -235,6 +222,7 @@ CustomChartDef sunburst_chart {
       },
       {
         "type": "text",
+        "style": "guide-label",
         "interactive": false,
         "encode": {
           "update": {
@@ -245,7 +233,6 @@ CustomChartDef sunburst_chart {
             "limit": {"signal": "holeR * 1.7"},
             "fontSize": {"value": 13},
             "fontWeight": {"value": 600},
-            "fill": {"value": "#374151"},
             "opacity": {"signal": "holeR > 30 ? 1 : 0"}
           }
         }
@@ -261,13 +248,13 @@ CustomChartDef sunburst_chart {
             "text": {"signal": "format(hovered === null ? grandTotal : hovered.amount, ',')"},
             "fontSize": {"value": 16},
             "fontWeight": {"value": 700},
-            "fill": {"value": "#111827"},
             "opacity": {"signal": "holeR > 30 ? 1 : 0"}
           }
         }
       },
       {
         "type": "text",
+        "style": "guide-label",
         "interactive": false,
         "encode": {
           "update": {
@@ -276,7 +263,6 @@ CustomChartDef sunburst_chart {
             "align": {"value": "center"},
             "text": {"signal": "hovered === null ? '' : format(hovered.share, '.1%') + ' of total'"},
             "fontSize": {"value": 11},
-            "fill": {"value": "#6b7280"},
             "opacity": {"signal": "holeR > 30 ? 1 : 0"}
           }
         }

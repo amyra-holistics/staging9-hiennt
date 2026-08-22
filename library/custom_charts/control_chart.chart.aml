@@ -24,10 +24,28 @@ CustomChartDef control_chart {
   }
 
   options {
-    option line_color {
-      label: 'Line Color'
+    option color_average_line {
+      label: 'Average line color'
       type: 'color-picker'
-      default_value: '#255dd4'
+      default_value: '#e5484d'
+    }
+
+    option color_outside_limits {
+      label: 'Outside limits color (Strong signal)'
+      type: 'color-picker'
+      default_value: '#e5484d'
+    }
+
+    option color_near_limit {
+      label: 'Near limit color (3 of 4)'
+      type: 'color-picker'
+      default_value: '#f97316'
+    }
+
+    option color_one_side_run {
+      label: 'One-side run color (8 in a row)'
+      type: 'color-picker'
+      default_value: '#eab308'
     }
 
     option show_mr_chart {
@@ -176,10 +194,20 @@ CustomChartDef control_chart {
         "padding": 0.5
       },
       {
-        "name": "severityColor",
+        "name": "color",
         "type": "ordinal",
-        "domain": ["none", "weak", "moderate", "strong"],
-        "range": [@{options.line_color.value}, "#eab308", "#f97316", "#e5484d"]
+        "domain": ["default"],
+        "range": "category"
+      },
+      {
+        "name": "signalColor",
+        "type": "ordinal",
+        "domain": ["weak", "moderate", "strong"],
+        "range": [
+          "@{options.color_one_side_run.value}",
+          "@{options.color_near_limit.value}",
+          "@{options.color_outside_limits.value}"
+        ]
       }
     ],
     "axes": [
@@ -207,7 +235,7 @@ CustomChartDef control_chart {
           "update": {
             "x": {"signal": "plotW - 330"},
             "y": {"value": 8},
-            "fill": {"value": "#e5484d"},
+            "fill": {"value": "@{options.color_outside_limits.value}"},
             "size": {"value": 50}
           }
         }
@@ -233,7 +261,7 @@ CustomChartDef control_chart {
           "update": {
             "x": {"signal": "plotW - 225"},
             "y": {"value": 8},
-            "fill": {"value": "#f97316"},
+            "fill": {"value": "@{options.color_near_limit.value}"},
             "size": {"value": 50}
           }
         }
@@ -259,7 +287,7 @@ CustomChartDef control_chart {
           "update": {
             "x": {"signal": "plotW - 95"},
             "y": {"value": 8},
-            "fill": {"value": "#eab308"},
+            "fill": {"value": "@{options.color_one_side_run.value}"},
             "size": {"value": 50}
           }
         }
@@ -332,7 +360,7 @@ CustomChartDef control_chart {
                 "x": {"value": 0},
                 "x2": {"signal": "plotW"},
                 "y": {"scale": "yx", "field": "xbar"},
-                "stroke": {"value": "#e5484d"},
+                "stroke": {"value": "@{options.color_average_line.value}"},
                 "strokeDash": {"value": [6, 4]}
               }
             }
@@ -378,7 +406,7 @@ CustomChartDef control_chart {
                 "baseline": {"value": "middle"},
                 "text": {"signal": "'Average ' + format(datum.xbar, ',.4')"},
                 "fontSize": {"value": 10},
-                "fill": {"value": "#e5484d"}
+                "fill": {"value": "@{options.color_average_line.value}"}
               }
             }
           },
@@ -400,10 +428,12 @@ CustomChartDef control_chart {
             "type": "line",
             "from": {"data": "source"},
             "encode": {
+              "enter": {
+                "stroke": {"scale": "color", "value": "default"}
+              },
               "update": {
                 "x": {"scale": "x", "field": "period"},
                 "y": {"scale": "yx", "field": "amount"},
-                "stroke": {"value": @{options.line_color.value}},
                 "strokeWidth": {"value": 1.5}
               }
             }
@@ -413,10 +443,20 @@ CustomChartDef control_chart {
             "name": "xPoint",
             "from": {"data": "source"},
             "encode": {
+              "enter": {
+                "fill": {"scale": "color", "value": "default"}
+              },
               "update": {
                 "x": {"scale": "x", "field": "period"},
                 "y": {"scale": "yx", "field": "amount"},
-                "fill": {"scale": "severityColor", "field": "severity"},
+                "fill": [
+                  {
+                    "test": "datum.severity !== 'none'",
+                    "scale": "signalColor",
+                    "field": "severity"
+                  },
+                  {"scale": "color", "value": "default"}
+                ],
                 "size": {"signal": "datum.period === hoveredPeriod ? 130 : (datum.severity === 'none' ? 40 : 90)"},
                 "stroke": {"value": "white"},
                 "strokeWidth": {"value": 1},
@@ -491,7 +531,7 @@ CustomChartDef control_chart {
                 "x": {"value": 0},
                 "x2": {"signal": "plotW"},
                 "y": {"scale": "ymr", "field": "mrbar"},
-                "stroke": {"value": "#e5484d"},
+                "stroke": {"value": "@{options.color_average_line.value}"},
                 "strokeDash": {"value": [6, 4]},
                 "opacity": {"signal": "showMr ? 1 : 0"}
               }
@@ -531,10 +571,12 @@ CustomChartDef control_chart {
             "type": "line",
             "from": {"data": "source"},
             "encode": {
+              "enter": {
+                "stroke": {"scale": "color", "value": "default"}
+              },
               "update": {
                 "x": {"scale": "x", "field": "period"},
                 "y": {"scale": "ymr", "field": "mr"},
-                "stroke": {"value": @{options.line_color.value}},
                 "strokeWidth": {"value": 1.2},
                 "defined": {"signal": "datum.mr != null"},
                 "opacity": {"signal": "showMr ? 1 : 0"}
@@ -546,10 +588,19 @@ CustomChartDef control_chart {
             "name": "mrPoint",
             "from": {"data": "source"},
             "encode": {
+              "enter": {
+                "fill": {"scale": "color", "value": "default"}
+              },
               "update": {
                 "x": {"scale": "x", "field": "period"},
                 "y": {"scale": "ymr", "field": "mr"},
-                "fill": {"signal": "datum.mr != null && datum.mr > datum.mr_url ? '#e5484d' : '@{options.line_color.value}'"},
+                "fill": [
+                  {
+                    "test": "datum.mr != null && datum.mr > datum.mr_url",
+                    "value": "@{options.color_outside_limits.value}"
+                  },
+                  {"scale": "color", "value": "default"}
+                ],
                 "size": {"signal": "datum.period === hoveredPeriod ? 120 : (datum.mr != null && datum.mr > datum.mr_url ? 80 : 30)"},
                 "opacity": {"signal": "showMr && datum.mr != null ? 1 : 0"},
                 "tooltip": {

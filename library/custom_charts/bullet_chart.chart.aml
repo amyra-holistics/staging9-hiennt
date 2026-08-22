@@ -42,12 +42,6 @@ CustomChartDef bullet_chart {
   }
 
   options {
-    option show_tooltip {
-      label: 'Show tooltip'
-      type: 'toggle'
-      default_value: true
-    }
-
     option current_bar_height {
       label: 'Current bar height'
       type: 'number-input'
@@ -93,6 +87,10 @@ CustomChartDef bullet_chart {
       {
         "calculate": "indexof(['Target','Pace','Current'], datum.series_label)",
         "as": "series_order"
+      },
+      {
+        "calculate": "'series'",
+        "as": "series_const"
       }
     ],
     "encoding": {
@@ -149,24 +147,21 @@ CustomChartDef bullet_chart {
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
         ],
         "encoding": {
-          "color": {
+          "opacity": {
             "field": "series_label",
             "type": "nominal",
+            "scale": {
+              "domain": ["Current", "Pace", "Target"],
+              "range": [1, 0.18, 0.72]
+            },
             "legend": {
               "orient": "top",
               "symbolType": "square",
               "symbolSize": 80,
-              "labelLimit": 140,
-              "symbolOpacity": 1
-            },
-            "scale": {
-              "domain": ["Target", "Pace", "Current"],
-              "range": ["#9CA3AF", "#E5E7EB", "#4F46E5"]
+              "labelLimit": 140
             }
           },
-          "opacity": {
-            "value": 0
-          }
+          "fillOpacity": {"value": 0}
         }
       },
       {
@@ -177,24 +172,27 @@ CustomChartDef bullet_chart {
         ],
         "mark": {
           "type": "bar",
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {
-            "field": "series_label",
+            "field": "series_const",
             "type": "nominal",
-            "legend": null,
-            "scale": {
-              "domain": ["Target", "Pace", "Current"],
-              "range": ["#9CA3AF", "#E5E7EB", "#4F46E5"]
-            }
+            "scale": {"range": "category"},
+            "legend": null
           },
           "opacity": {
             "condition": {
               "param": "series_hover",
-              "value": 1
+              "field": "series_label",
+              "type": "nominal",
+              "scale": {
+              "domain": ["Current", "Pace", "Target"],
+              "range": [1, 0.18, 0.72]
             },
-            "value": 0.25
+              "legend": null
+            },
+            "value": 0.12
           }
         }
       },
@@ -207,24 +205,27 @@ CustomChartDef bullet_chart {
         "mark": {
           "type": "bar",
           "height": @{options.current_bar_height.value},
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {
-            "field": "series_label",
+            "field": "series_const",
             "type": "nominal",
-            "legend": null,
-            "scale": {
-              "domain": ["Target", "Pace", "Current"],
-              "range": ["#9CA3AF", "#E5E7EB", "#4F46E5"]
-            }
+            "scale": {"range": "category"},
+            "legend": null
           },
           "opacity": {
             "condition": {
               "param": "series_hover",
-              "value": 1
+              "field": "series_label",
+              "type": "nominal",
+              "scale": {
+              "domain": ["Current", "Pace", "Target"],
+              "range": [1, 0.18, 0.72]
             },
-            "value": 0.25
+              "legend": null
+            },
+            "value": 0.12
           }
         }
       },
@@ -238,24 +239,27 @@ CustomChartDef bullet_chart {
           "type": "tick",
           "size": 22,
           "thickness": @{options.target_tick_thickness.value},
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {
-            "field": "series_label",
+            "field": "series_const",
             "type": "nominal",
-            "legend": null,
-            "scale": {
-              "domain": ["Target", "Pace", "Current"],
-              "range": ["#9CA3AF", "#E5E7EB", "#4F46E5"]
-            }
+            "scale": {"range": "category"},
+            "legend": null
           },
           "opacity": {
             "condition": {
               "param": "series_hover",
-              "value": 1
+              "field": "series_label",
+              "type": "nominal",
+              "scale": {
+              "domain": ["Current", "Pace", "Target"],
+              "range": [1, 0.18, 0.72]
             },
-            "value": 0.25
+              "legend": null
+            },
+            "value": 0.12
           }
         }
       }

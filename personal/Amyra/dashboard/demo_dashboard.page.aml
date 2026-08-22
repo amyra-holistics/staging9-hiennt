@@ -1,56 +1,8 @@
 Dashboard all_viz_test {
-  theme: H.themes.midnight
+  theme: purple
   title: 'All viz test'
   description: ''
   owner: 'hien.nt@holistics.io'
-  block v_faceted_sparkline: VizBlock {
-    label: 'Sales Trend by Category'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: faceted_sparkline
-      field date: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        format {
-          type: 'date'
-          pattern: 'inherited'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field facet: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field series: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      setting show_tooltip: true
-      setting facet_columns: 3
-      setting color_scheme: 'category10'
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
   block v_wx22: VizBlock {
     label: 'Diverging Bar Chart'
     viz: CustomChart {
@@ -73,11 +25,6 @@ Dashboard all_viz_test {
         calc_type: 'measure'
         data_type: 'number'
       }
-      filter {
-        field: r(superstore_csv.sub_category)
-        operator: 'is_not'
-        value: 'Binders'
-      }
       custom_chart: diverging_bar_chart
       field dimension: VizFieldFull {
         ref: r(superstore_csv.sub_category)
@@ -95,74 +42,6 @@ Dashboard all_viz_test {
       setting positive_color: '#2cb67f'
       setting negative_color: '#e5484d'
       setting show_tooltip: true
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_annotated_time_series: VizBlock {
-    label: 'Annotated Sales Time Series'
-    viz: CustomChart {
-      dataset: superstore
-      calculation event_label {
-        label: 'Event Label'
-        formula: @aql case(
-          when: superstore_csv.order_date is @(2014-01-01), then: '2014 Start',
-          when: superstore_csv.order_date is @(2014-11-28), then: '2014 Black Friday',
-          when: superstore_csv.order_date is @(2014-12-25), then: '2014 Christmas',
-          when: superstore_csv.order_date is @(2015-01-01), then: '2015 Start',
-          when: superstore_csv.order_date is @(2015-11-27), then: '2015 Black Friday',
-          when: superstore_csv.order_date is @(2015-12-25), then: '2015 Christmas',
-          when: superstore_csv.order_date is @(2016-01-01), then: '2016 Start',
-          when: superstore_csv.order_date is @(2016-11-25), then: '2016 Black Friday',
-          when: superstore_csv.order_date is @(2016-12-25), then: '2016 Christmas',
-          when: superstore_csv.order_date is @(2017-01-01), then: '2017 Start',
-          when: superstore_csv.order_date is @(2017-11-24), then: '2017 Black Friday',
-          when: superstore_csv.order_date is @(2017-12-25), then: '2017 Christmas',
-          else: null
-        ) ;;
-        calc_type: 'dimension'
-        data_type: 'text'
-      }
-      calculation total_sales {
-        label: 'Total Sales'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: r(superstore_csv.order_date)
-        operator: 'after'
-        value: '2016-01-01'
-      }
-      custom_chart: annotated_time_series
-      field date: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        transformation: 'datetrunc day'
-        format {
-          type: 'date'
-          pattern: 'LLL dd, yyyy'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field event_label: VizFieldFull {
-        ref: 'event_label'
-        format {
-          type: 'text'
-        }
-      }
-      setting line_color: '#255DD4'
-      setting event_color: '#e5484d'
       settings {
         aggregate_awareness {
           enabled: true
@@ -225,9 +104,8 @@ Dashboard all_viz_test {
           pattern: 'none'
         }
       }
-      setting color_scheme: 'accent'
       setting line_interpolate: 'monotone'
-      setting point_size: 100
+      setting point_size: 500
       settings {
         aggregate_awareness {
           enabled: true
@@ -304,7 +182,10 @@ Dashboard all_viz_test {
           pattern: 'inherited'
         }
       }
-      setting line_color: '#255dd4'
+      setting color_average_line: '#479980'
+      setting color_outside_limits: '#AF7DED'
+      setting color_near_limit: '#8DD6C3'
+      setting color_one_side_run: '#9FC851'
       setting show_mr_chart: true
       setting show_tooltip: true
       settings {
@@ -580,8 +461,7 @@ Dashboard all_viz_test {
           pattern: 'none'
         }
       }
-      setting tooltip: true
-      setting show_outliers: false
+      setting show_outliers: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -833,9 +713,10 @@ Dashboard all_viz_test {
           pattern: 'inherited'
         }
       }
-      setting fillColor: '#3b60d2'
+      setting needleScale: 0.8
       setting showLabels: true
       setting showTicks: true
+      setting tickGaps: 0.2
       settings {
         aggregate_awareness {
           enabled: true
@@ -872,8 +753,13 @@ Dashboard all_viz_test {
       setting bandwidth: 0
       setting contour_levels: 4
       setting show_points: true
-      setting show_heatmap: false
-      setting color_scheme: 'tableau10'
+      setting show_heatmap: true
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
     }
   }
   block v_ypp5: VizBlock {
@@ -1235,6 +1121,91 @@ Dashboard all_viz_test {
       }
     }
   }
+  block v_au0a: VizBlock {
+    label: 'Day Date, Event label, and Sum of Value'
+    viz: CustomChart {
+      dataset: superstore
+      custom_chart: annotated_time_series
+      field date: VizFieldFull {
+        ref: r(annotated_time_series_csv.date)
+        transformation: 'datetrunc day'
+        format {
+          type: 'date'
+          pattern: 'LLL dd, yyyy'
+        }
+      }
+      field value: VizFieldFull {
+        ref: r(annotated_time_series_csv.value)
+        aggregation: 'sum'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field event_label: VizFieldFull {
+        ref: r(annotated_time_series_csv.event_label)
+        format {
+          type: 'text'
+        }
+      }
+      setting event_color: '#e5484d'
+      setting show_tooltip: false
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_teog: VizBlock {
+    label: 'Sales Trend by Category copy'
+    viz: CustomChart {
+      dataset: superstore
+      calculation sales_value {
+        label: 'Sales Value'
+        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      custom_chart: faceted_sparkline
+      field date: VizFieldFull {
+        ref: r(superstore_csv.order_date)
+        format {
+          type: 'date'
+          pattern: 'inherited'
+        }
+      }
+      field value: VizFieldFull {
+        ref: 'sales_value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      field facet: VizFieldFull {
+        ref: r(superstore_csv.sub_category)
+        format {
+          type: 'text'
+        }
+      }
+      field series: VizFieldFull {
+        ref: r(superstore_csv.sub_category)
+        format {
+          type: 'text'
+        }
+      }
+      setting show_tooltip: true
+      setting facet_columns: 3
+      setting color_scheme: 'category10'
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
   view: TabLayout {
     label: 'View 1'
     tab tab_ryor: CanvasLayout {
@@ -1266,10 +1237,6 @@ Dashboard all_viz_test {
         position: pos(20, 700, 760, 660)
         layer: 4
       }
-      block v_faceted_sparkline {
-        position: pos(800, 1400, 760, 660)
-        layer: 4
-      }
       block v_control_chart {
         position: pos(800, 700, 760, 660)
         layer: 4
@@ -1284,6 +1251,14 @@ Dashboard all_viz_test {
       }
       block v_density_contour {
         position: pos(800, 2060, 760, 660)
+        layer: 4
+      }
+      block v_au0a {
+        position: pos(20, 700, 760, 660)
+        layer: 4
+      }
+      block v_teog {
+        position: pos(800, 1400, 760, 660)
         layer: 4
       }
     }
@@ -1369,49 +1344,10 @@ Dashboard all_viz_test {
   }
   interactions: [
     FilterInteraction {
-      from: 'v_faceted_sparkline'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_annotated_time_series',
-            'v_bump_chart',
-            'v_slope_chart',
-            'v_control_chart',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_trellis',
-            'v_pgpo',
-            'v_76uk',
-            'v_kip8',
-            'v_hkjd',
-            'v_r74g',
-            'v_llp5',
-            'v_4sa9',
-            'v_6y41',
-            'v_oz9r',
-            'v_sa9f',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_tswk',
-            'v_6eft',
-            'v_4ulf',
-            'v_gq1g',
-            'v_wfvk',
-            'v_l07f'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
       from: 'v_wx22'
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1436,44 +1372,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_annotated_time_series'
-      to: [
-        CustomMapping {
-          block: [
-            'v_faceted_sparkline',
-            'v_wx22',
-            'v_bump_chart',
-            'v_slope_chart',
-            'v_control_chart',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_trellis',
-            'v_pgpo',
-            'v_76uk',
-            'v_kip8',
-            'v_hkjd',
-            'v_r74g',
-            'v_llp5',
-            'v_4sa9',
-            'v_6y41',
-            'v_oz9r',
-            'v_sa9f',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_tswk',
-            'v_6eft',
-            'v_4ulf',
-            'v_gq1g',
-            'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1484,9 +1384,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_slope_chart',
             'v_control_chart',
             'v_pareto_chart',
@@ -1510,7 +1408,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1521,9 +1420,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_control_chart',
             'v_pareto_chart',
@@ -1547,7 +1444,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1558,9 +1456,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_pareto_chart',
@@ -1584,7 +1480,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1595,9 +1492,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1621,7 +1516,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1632,9 +1528,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1658,7 +1552,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1669,9 +1564,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1695,7 +1588,8 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1706,9 +1600,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1732,7 +1624,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1743,9 +1637,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1761,7 +1653,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1772,9 +1666,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1790,7 +1682,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1801,9 +1695,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1819,7 +1711,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1830,9 +1724,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1848,7 +1740,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1859,9 +1753,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1877,7 +1769,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1888,9 +1782,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1906,7 +1798,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1917,9 +1811,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1935,7 +1827,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1946,9 +1840,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1964,7 +1856,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -1975,9 +1869,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -1993,7 +1885,9 @@ Dashboard all_viz_test {
             'v_4ulf',
             'v_gq1g',
             'v_wfvk',
-            'v_l07f'
+            'v_l07f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2004,9 +1898,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2022,7 +1914,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2033,9 +1927,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2051,7 +1943,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2062,9 +1956,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2080,7 +1972,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2091,9 +1985,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2109,7 +2001,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2120,9 +2014,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2138,7 +2030,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2149,9 +2043,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2167,7 +2059,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2178,9 +2072,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2196,7 +2088,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2207,9 +2101,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2225,7 +2117,9 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
@@ -2236,9 +2130,7 @@ Dashboard all_viz_test {
       to: [
         CustomMapping {
           block: [
-            'v_faceted_sparkline',
             'v_wx22',
-            'v_annotated_time_series',
             'v_bump_chart',
             'v_slope_chart',
             'v_control_chart',
@@ -2254,10 +2146,85 @@ Dashboard all_viz_test {
             'v_4sa9',
             'v_6y41',
             'v_oz9r',
-            'v_sa9f'
+            'v_sa9f',
+            'v_au0a',
+            'v_teog'
           ]
           disabled: true
         }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_au0a'
+      to: [
+        CustomMapping {
+          block: [
+            'v_pgpo',
+            'v_76uk',
+            'v_kip8',
+            'v_hkjd',
+            'v_r74g',
+            'v_llp5',
+            'v_4sa9',
+            'v_6y41',
+            'v_oz9r',
+            'v_sa9f',
+            'v_ypp5',
+            'v_l240',
+            'v_tlgf',
+            'v_tswk',
+            'v_6eft',
+            'v_4ulf',
+            'v_gq1g',
+            'v_wfvk',
+            'v_l07f',
+            'v_teog'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_teog'
+      to: [
+        CustomMapping {
+          block: [
+            'v_wx22',
+            'v_bump_chart',
+            'v_slope_chart',
+            'v_control_chart',
+            'v_pareto_chart',
+            'v_bar_avg_line',
+            'v_trellis',
+            'v_pgpo',
+            'v_76uk',
+            'v_kip8',
+            'v_hkjd',
+            'v_r74g',
+            'v_llp5',
+            'v_4sa9',
+            'v_6y41',
+            'v_oz9r',
+            'v_sa9f',
+            'v_ypp5',
+            'v_l240',
+            'v_tlgf',
+            'v_tswk',
+            'v_6eft',
+            'v_4ulf',
+            'v_gq1g',
+            'v_wfvk',
+            'v_l07f',
+            'v_au0a'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'v_faceted_sparkline'
+      to: [
+
       ]
     }
   ]

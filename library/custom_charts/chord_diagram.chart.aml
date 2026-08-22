@@ -269,6 +269,7 @@ CustomChartDef chord_diagram {
           },
           {
             "type": "text",
+            "style": "guide-label",
             "name": "groupLabel",
             "from": {"data": "allGroups"},
             "encode": {

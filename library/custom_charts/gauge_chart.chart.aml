@@ -11,7 +11,7 @@ CustomChartDef gauge_chart {
       }
     }
     field max_value {
-      label: 'Max Value'
+      label: 'Max value'
       type: 'measure'
       sort {
         apply_order: 2
@@ -22,22 +22,22 @@ CustomChartDef gauge_chart {
 
   options {
     option needleScale {
-      label: 'Needle Scaling Factor'
+      label: 'Needle scaling factor'
       type: 'number-input'
       default_value: 0.8
     }
     option showLabels {
-      label: 'Show Labels'
+      label: 'Show labels'
       type: 'toggle'
       default_value: true
     }
     option showTicks {
-      label: 'Show Ticks'
+      label: 'Show ticks'
       type: 'toggle'
       default_value: true
     }
     option tickGaps {
-      label: 'Tick Gaps'
+      label: 'Tick gaps'
       type: 'number-input'
       default_value: 0.25
     }

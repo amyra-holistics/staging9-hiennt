@@ -34,13 +34,13 @@ CustomChartDef slope_chart {
 
   options {
     option increase_color {
-      label: 'Increase Color'
+      label: 'Increase color'
       type: 'color-picker'
       default_value: '#2cb67f'
     }
 
     option decrease_color {
-      label: 'Decrease Color'
+      label: 'Decrease color'
       type: 'color-picker'
       default_value: '#e5484d'
     }

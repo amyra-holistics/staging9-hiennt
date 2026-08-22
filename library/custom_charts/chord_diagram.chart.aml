@@ -30,17 +30,17 @@ CustomChartDef chord_diagram {
   }
   options {
     option pad_angle {
-      label: "Pad Angle"
+      label: "Pad angle"
       type: "number-input"
       default_value: 0.05
     }
     option inner_radius_ratio {
-      label: "Inner Radius Ratio"
+      label: "Inner radius ratio"
       type: "number-input"
       default_value: 0.9
     }
     option label_padding {
-      label: "Label Padding"
+      label: "Label padding"
       type: "number-input"
       default_value: 80
     }

@@ -21,7 +21,7 @@ CustomChartDef annotated_time_series {
       }
     }
     field event_label {
-      label: 'Event Label'
+      label: 'Event label'
       type: 'dimension'
       sort {
         apply_order: 3

@@ -46,7 +46,7 @@ CustomChartDef trellis_chart {
     }
 
     option row_sort {
-      label: "Row Sort perference"
+      label: "Row sort preference"
       type: "select"
       options: [
         'ascending',

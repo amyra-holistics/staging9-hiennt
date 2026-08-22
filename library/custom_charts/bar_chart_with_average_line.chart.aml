@@ -1,6 +1,6 @@
 CustomChartDef bar_chart_with_average_line {
   label: 'Bar Chart with Average Line'
-  icon: 'hicon:chart-combination-2'
+  icon: 'hicon:custom-chart/combination'
   description: 'To compare bar values against a horizontal average line across the whole series.'
   fields {
     field dimension {
@@ -29,22 +29,12 @@ CustomChartDef bar_chart_with_average_line {
     }
   }
   options {
-    option show_tooltip {
-      type: 'toggle'
-      label: 'Show tooltip'
-      default_value: true
-    }
-    option line_color {
-      type: 'color-picker'
-      label: 'Average line color'
-      default_value: '#E5484D'
-    }
   }
   template: @vgl {
     "data": {"values": @{values}},
     "layer": [
       {
-        "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
+        "mark": {"type": "bar", "tooltip": true},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
@@ -54,43 +44,23 @@ CustomChartDef bar_chart_with_average_line {
             "field": @{fields.dimension.name},
             "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
           },
-          "xOffset": {"field": @{fields.series.name}},
-          "color": {
-            "field": @{fields.series.name},
-            "legend": {"title": null, "orient": "bottom"}
-          },
           "y": {
             "field": @{fields.value.name},
             "type": "quantitative",
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
           },
-          "opacity": {
-            "condition": [
-              {"test": "!length(data('hoverPointSelection_store'))", "value": 1},
-              {"param": "hoverPointSelection", "empty": false, "value": 1}
-            ],
-            "value": 0.15
+          "xOffset": {"field": @{fields.series.name}},
+          "color": {
+            "field": @{fields.series.name},
+            "legend": {"title": null, "orient": "bottom"}
           }
         }
       },
       {
-        "mark": {"type": "rule", "strokeDash": [4, 4], "color": @{options.line_color.value}, "size": 2, "opacity": 1, "tooltip": @{options.show_tooltip.value}},
+        "mark": {"type": "rule", "strokeDash": [4, 4], "color": "#E5484D", "size": 2, "tooltip": true},
         "encoding": {
-          "y": {"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative"}
-        }
-      },
-      {
-        "transform": [
-          {"joinaggregate": [{"op": "mean", "field": @{fields.value.name}, "as": "average_value"}]},
-          {"window": [{"op": "row_number", "as": "rightmost_position"}], "sort": [{"field": @{fields.dimension.name}, "order": "descending"}]},
-          {"filter": "datum.rightmost_position === 1"},
-          {"calculate": "'Average ' + format(datum.average_value, ',.2f')", "as": "average_label"}
-        ],
-        "mark": {"type": "text", "align": "left", "baseline": "bottom", "dx": 10, "dy": -4, "color": @{options.line_color.value}, "fontSize": 11, "fontWeight": 600},
-        "encoding": {
-          "x": {"field": @{fields.dimension.name}, "type": "nominal", "sort": "ascending"},
-          "y": {"field": "average_value", "type": "quantitative"},
-          "text": {"field": "average_label", "type": "nominal"}
+          "y": {"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative"},
+          "tooltip": [{"aggregate": "mean", "field": @{fields.value.name}, "type": "quantitative", "title": "Average", "format": @{fields.value.format}, "formatType": "holisticsFormat"}]
         }
       }
     ],

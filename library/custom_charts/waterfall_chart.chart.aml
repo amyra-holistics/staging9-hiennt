@@ -45,11 +45,7 @@ CustomChartDef waterfall_chart {
       type: 'number-input'
       default_value: 0.3
     }
-    option show_tooltip {
-      label: 'Show tooltip'
-      type: 'toggle'
-      default_value: true
-    }
+    
     option begin_end_color {
       label: 'Begin - End color'
       type: 'color-picker'
@@ -120,13 +116,13 @@ CustomChartDef waterfall_chart {
     },
     "layer": [
       {
-        "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
+        "mark": {"type": "bar"},
         "params": [
           {
             "name": "waterfall_hover",
             "select": {
               "type": "point",
-              "fields": ["label"],
+              "fields": ["label", "label_sorter"],
               "on": "mouseover",
               "clear": "mouseout"
             }
@@ -151,6 +147,11 @@ CustomChartDef waterfall_chart {
         "encoding": {
           "y": {"field": "previous_sum", "type": "quantitative", "format": @{fields.amount.format}, "formatType": "holisticsFormat"},
           "y2": {"field": "sum"},
+          "tooltip": [
+            {"field": "label", "title": @{fields.label.name}, "format": @{fields.label.format}, "formatType": "holisticsFormat"},
+            {"field": "amount", "title": @{fields.amount.name}, "format": @{options.value_format.value}},
+            {"field": "sum", "title": "Total", "format": @{options.value_format.value}}
+          ],
           "color": {
             "condition": [
               {
@@ -162,13 +163,8 @@ CustomChartDef waterfall_chart {
             "value": @{options.positive.value}
           },
           "fillOpacity": {
-            "condition": [
-              {"test": "!length(data('waterfall_hover_store')) && !length(data('normalPointSelection_store'))", "value": 1},
-              {"param": "waterfall_hover", "empty": false, "value": 1},
-              {"test": "length(data('waterfall_hover_store'))", "value": 0.15},
-              {"param": "normalPointSelection", "empty": false, "value": 1}
-            ],
-            "value": 0.3
+            "condition": {"param": "waterfall_hover", "value": 1},
+            "value": 0.15
           }
         }
       },
@@ -189,9 +185,12 @@ CustomChartDef waterfall_chart {
         },
         "layer": [
           {
-            "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
+            "mark": {"type": "bar"},
             "encoding": {
               "y": {"field": "sum", "type": "quantitative"},
+              "tooltip": [
+                {"field": "sum", "title": "Total", "format": @{options.value_format.value}}
+              ],
               "color": {"value": @{options.begin_end_color.value}}
             }
           },

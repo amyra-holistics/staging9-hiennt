@@ -1,16 +1,15 @@
 CustomChartDef table_heatmap {
   label: 'Table Heatmap'
   description: 'To reveal patterns across days and months by coloring each cell of a calendar grid by a measure value.'
-  icon: 'hicon:chart-table-heatmap'
   fields {
     field date {
       label: 'Date'
       type: 'dimension'
+      data_type: 'date'
       sort {
         apply_order: 1
         direction: 'asc'
       }
-      data_type: 'date'
     }
     field value {
       label: 'Value'
@@ -21,15 +20,7 @@ CustomChartDef table_heatmap {
       }
     }
   }
-  options {
-    option show_tooltip {
-      label: 'Show tooltip'
-      type: 'toggle'
-      default_value: true
-    }
-  }
-  template: @vgl
-{
+  template: @vgl {
     "data": {
       "values": @{values}
     },
@@ -38,8 +29,7 @@ CustomChartDef table_heatmap {
       {"name": "hoverPointSelection", "select": {"type": "point", "encodings": ["x", "y"], "on": "mouseover", "clear": "mouseout"}}
     ],
     "mark": {
-      "type": "rect",
-      "tooltip": @{options.show_tooltip.value}
+      "type": "rect"
     },
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],
@@ -71,7 +61,12 @@ CustomChartDef table_heatmap {
         },
         "aggregate": "max"
       },
+      "tooltip": [
+        {"field": @{fields.date.name}, "type": "temporal", "timeUnit": "month", "title": "Month"},
+        {"field": @{fields.date.name}, "type": "temporal", "timeUnit": "date", "title": "Day"},
+        {"field": @{fields.value.name}, "type": "quantitative", "aggregate": "max", "title": "Value", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
+      ]
     }
   }
-;;
+  ;; 
 }

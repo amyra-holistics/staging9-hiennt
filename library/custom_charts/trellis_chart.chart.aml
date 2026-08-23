@@ -33,12 +33,6 @@ CustomChartDef trellis_chart {
     }
   }
   options {
-    option show_tooltip {
-      label: 'Show tooltip'
-      type: 'toggle'
-      default_value: true
-    }
-
     option show_y_axis_label {
       label: 'Show Y axis label'
       type: 'toggle'
@@ -114,10 +108,7 @@ CustomChartDef trellis_chart {
         {
           "height": @{options.row_height.value},
           "width": @{options.row_width.value},
-          "mark": {
-            "type": "bar",
-            "tooltip": @{options.show_tooltip.value}
-          },
+          "mark": "bar",
           "params": [
             {"name": "bar_hover", "select": {"type": "point", "fields": [@{fields.facet.name}, @{fields.x_axis.name}], "on": "mouseover", "clear": "mouseout"}},
             {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
@@ -140,6 +131,12 @@ CustomChartDef trellis_chart {
                 "format": "~s"
               }
             },
+            "tooltip": [
+              {"field": @{fields.facet.name}, "title": @{fields.facet.name}},
+              {"field": @{fields.x_axis.name}, "title": @{fields.x_axis.name}},
+              {"field": @{fields.value.name}, "type": "quantitative", "title": @{fields.value.name}, "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+              {"field": "meanValue", "type": "quantitative", "title": "Mean for row", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
+            ],
             "opacity": {
               "condition": [
                 {"test": "!length(data('bar_hover_store'))", "value": 1},

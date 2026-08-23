@@ -81,7 +81,7 @@ CustomChartDef faceted_sparkline {
         "name": "cursorX",
         "value": null,
         "on": [
-          {"events": "@hoverRect:mousemove, @sparkline:mousemove", "update": "@{options.show_tooltip.value} ? clamp(x(group()), 0, plotW) : null"},
+          {"events": "@hoverRect:mousemove, @sparkline:mousemove", "update": "clamp(x(group()), 0, plotW)"},
           {"events": "@hoverRect:mouseout", "update": "null"}
         ]
       },

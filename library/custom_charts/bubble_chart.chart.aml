@@ -77,13 +77,6 @@ CustomChartDef bubble_chart {
         "legend": {"orient": "right"}
       },
 
-      "tooltip": [
-        {"field": @{fields.x_axis.name}, "type": "quantitative", "title": @{fields.x_axis.name}, "format": @{fields.x_axis.format}, "formatType": "holisticsFormat"},
-        {"field": @{fields.y_axis.name}, "type": "quantitative", "title": @{fields.y_axis.name}, "format": @{fields.y_axis.format}, "formatType": "holisticsFormat"},
-        {"field": @{fields.size.name}, "type": "quantitative", "title": @{fields.size.name}, "format": @{fields.size.format}, "formatType": "holisticsFormat"},
-        {"field": @{fields.category.name}, "type": "nominal", "title": @{fields.category.name}}
-      ],
-
       "opacity": {
         "condition": {"param": "hoverPointSelection", "value": 1},
         "value": 0.15

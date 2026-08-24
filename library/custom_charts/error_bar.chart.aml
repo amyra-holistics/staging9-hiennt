@@ -109,17 +109,7 @@ CustomChartDef error_bar {
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
         ],
-        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0},
-        "encoding": {
-          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
-          "x2": {"field": "upper"}
-        }
-      },
-      {
-        "transform": [
-          {"filter": "@{options.show_tooltip.value}"}
-        ],
-        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0},
+        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0, "tooltip": @{options.show_tooltip.value}},
         "encoding": {
           "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
           "x2": {"field": "upper"},

@@ -34,11 +34,7 @@ CustomChartDef error_bar {
       ]
       default_value: 'ci'
     }
-    option show_tooltip {
-      type: 'toggle'
-      label: 'Show tooltip'
-      default_value: true
-    }
+    
   }
 
   template: @vgl {
@@ -79,6 +75,9 @@ CustomChartDef error_bar {
         "encoding": {
           "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}, "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}},
           "x2": {"field": "upper"},
+          "tooltip": [
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
+          ],
           "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
         }
       },
@@ -86,6 +85,9 @@ CustomChartDef error_bar {
         "mark": {"type": "tick", "color": "oklch(0.7 0.01 185)", "size": 12, "thickness": 1.5},
         "encoding": {
           "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
+          "tooltip": [
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
+          ],
           "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
         }
       },
@@ -93,13 +95,9 @@ CustomChartDef error_bar {
         "mark": {"type": "tick", "color": "oklch(0.7 0.01 185)", "size": 12, "thickness": 1.5},
         "encoding": {
           "x": {"field": "upper", "type": "quantitative", "scale": {"zero": false}},
-          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
-        }
-      },
-      {
-        "mark": {"type": "point", "filled": true, "size": 150},
-        "encoding": {
-          "x": {"field": "center", "type": "quantitative", "scale": {"zero": false}},
+          "tooltip": [
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"}
+          ],
           "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
         }
       },
@@ -109,14 +107,14 @@ CustomChartDef error_bar {
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
         ],
-        "mark": {"type": "rule", "strokeWidth": 14, "opacity": 0, "tooltip": @{options.show_tooltip.value}},
+        "mark": {"type": "point", "filled": true, "size": 150},
         "encoding": {
-          "x": {"field": "lower", "type": "quantitative", "scale": {"zero": false}},
-          "x2": {"field": "upper"},
+          "x": {"field": "center", "type": "quantitative", "scale": {"zero": false}},
           "tooltip": [
-            {"field": @{fields.dimension.name}, "type": "nominal", "title": @{fields.dimension.name}},
+            {"field": @{fields.dimension.name}, "type": "nominal", "title": "Category"},
             {"field": "center", "type": "quantitative", "title": "Mean", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
-          ]
+          ],
+          "opacity": {"condition": [{"test": "!length(data('error_hover_store'))", "value": 1}, {"param": "error_hover", "empty": false, "value": 1}], "value": 0.15}
         }
       }
     ],

@@ -61,6 +61,7 @@ CustomChartDef bar_chart_with_running_average_line {
         "encoding": {
           "x": {
             "field": @{fields.dimension.name},
+            "type": "temporal",
             "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
           },
           "y": {

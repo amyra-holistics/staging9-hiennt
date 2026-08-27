@@ -1,6 +1,0 @@
-EmbedPortal untitled_2 {
-  objects: [
-    dashboard
-  ]
-  required_permissions: []
-}

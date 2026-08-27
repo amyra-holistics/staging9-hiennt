@@ -26,7 +26,10 @@ Dashboard untitled_3 {
       layer: 3
     }
   }
-  theme: H.themes.charcoal
+  theme: DynamicPageTheme {
+    light: H.themes.metropolitan
+    dark: H.themes.midnight
+  }
   block v1: VizBlock {
     label: 'Audio Detail'
     viz: DataTable {

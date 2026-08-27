@@ -1,0 +1,319 @@
+Skill build_dashboard_v2 {
+  label: 'Build Dashboard'
+  description: '''
+    Build or edit a Holistics dashboard (`page.aml` / a `Dashboard {}` object) — its blocks, layout, controls, and interactions.
+
+    Use when building a dashboard or report page, adding or arranging dashboard blocks, or adding dashboard-level controls.
+
+    Typical phrasings: build a dashboard for X, make a dashboard showing X, add a chart or KPI or table to a dashboard, add a filter or date control, add or edit a title or section header.
+
+    Do not use for answering a data question on its own — a one-off query, chart, or analysis with no dashboard to put it on — or for editing models, datasets, or metric definitions, authoring a reusable custom chart type or theme object, or restyling a dashboard's look without changing its analytical structure.
+  '''
+
+  invocation: 'auto'
+
+  content: @md
+# Building a Dashboard (`page.aml`)
+
+Build or edit a Holistics `page.aml` dashboard.
+
+## What a good input looks like
+
+A dashboard task is fully specified when you can answer all of:
+
+1. **Audience & decision** — who reads this, and what do they decide with it?
+2. **What the reader is doing with it** — monitoring ("is anything off?"), diagnosing ("why did it move?"), comparing ("which of these is doing better?"), planning ("what should we do next?"), or looking something up ("find me the record"). Decide this before anything else: it drives the dashboard's shape more than any other answer.
+3. **Questions, ranked** — the real questions this audience asks, in the order they ask them, in their words. Derive them from the audience, the decision, and what the dataset can actually answer. A monitoring dashboard commonly lands on status → trend → drivers → lookup. That is one pattern, not the definition.
+4. **What each question needs** — the measures and dimensions that answer it, and its comparison context when relevant.
+5. **Time** — the primary date field, grain, and window that matter.
+6. **Interactivity** — what viewers will want to slice or change themselves.
+7. **Structure & look** — conventional single page, conventional tabs, or a custom composition; any explicit presentation requirements.
+
+The user's prompt almost never supplies all of this. Fill the gaps yourself from the user, context, and dataset rather than building less because less was specified.
+
+## What a bare minimum output looks like
+
+The minimum is a **quality bar, not a shape**. A dashboard is organized into sections; which sections, and in what order, comes from the questions you ranked.
+
+* **A section** = the block that answers its question + 0–2 supporting blocks, usually with a short heading. Each section answers one question you actually ranked — if you can't name its question in the reader's words, cut it.
+* **Every ranked question is answered by some block, and no block answers none.** Completeness is measured in questions covered, not blocks placed.
+* **The opening follows what the reader is doing.** Monitoring → a few KPIs across the top. Diagnosing → the thing that moved, large, with its drivers beneath it. Comparing → the comparison itself leading. Planning → the projection or gap to target. Looking something up → the filters and table, and little else.
+* **A KPI row is one opening, not the default.**
+* **The dataset says what can be answered; the questions say what is.** Inspect the dataset to find the real fields and candidate material, then let the ranked questions decide what earns space.
+* **Depth follows the ask.** A broad ask spreads across more sections; a focused ask goes deeper on fewer.
+* **Every block renders real data on real fields.** Add controls only when the reader's job benefits from them. Do not add filters merely to satisfy a dashboard template.
+* **Layout follows the requested experience.** Use CanvasLayout for a conventional single-page dashboard, TabLayout for conventional multi-page dashboards, and HTMLLayout for genuinely custom composition.
+
+When the user is specific ("just one chart of X"), their scope wins.
+
+**Two dashboards for different jobs should not come out the same shape.** If the dashboard could be reused unchanged for any reader and dataset, go back to the reader's questions.
+
+## Workflow
+
+1. **Derive the spec, then the sections.**
+
+   Start from the prompt, then inspect the dataset — predefined metrics first, then date fields, then useful dimensions.
+
+   Name what the reader is doing and rank their questions before choosing blocks.
+
+   Turn those questions into sections using the dataset's actual metrics and dimensions. Ask at most one short round only when an important choice is genuinely undecidable; decide everything else and state only material assumptions.
+
+   **When editing an existing dashboard**, inspect its current `page.aml` first. Understand its blocks, interactions, and layout, then preserve unrelated structure rather than redesigning the whole dashboard.
+
+2. **Propose and confirm.**
+
+   Use this format:
+
+```
+
+## Proposed plan to build
+
+**Output**: Sales performance dashboard for sales leadership, focused on monitoring revenue performance and identifying growth drivers.
+
+**Dataset**: @Dataset:sales
+
+**Questions addressed**
+
+1. Are we on track?
+2. How is performance changing?
+3. What's driving the change?
+4. Which orders need attention?
+
+**Controls**
+
+* Date Range - changes the reporting period
+* Office Country - filters performance by market
+* Compare To - compares KPIs with another period
+
+```mermaid
+---
+config:
+  fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+  htmlLabels: false
+---
+block-beta
+columns 1
+block:frame
+  columns 12
+  b_title["Sales Performance"]:12
+  f_date["Date Range"]:3 f_country["Office Country"]:3 c_pop["Compare To"]:3 space:3
+
+  k_sales["Total Sales · KPI"]:4
+  k_orders["Orders · KPI"]:4
+  k_cust["Customers · KPI"]:4
+
+  h_trend["How is performance changing?"]:12
+  v_trend["Monthly Sales Trend · Line"]:12
+
+  h_drivers["What's driving the change?"]:12
+  v_country["Sales by Country · Bar"]:6
+  v_product["Sales by Product · Bar"]:6
+
+  h_detail["Which orders need attention?"]:12
+  v_detail["Order Detail · Table"]:12
+end
+classDef board fill:none,stroke:#e3e7ed
+classDef sect fill:#ffffff,fill-opacity:0.6,stroke:none
+classDef ctrl fill:#f5f8fa,stroke:#cbd0d7
+classDef viz fill:#d1e5fa,stroke:#1b7ce4
+class frame board
+class b_title,h_trend,h_drivers,h_detail sect
+class f_date,f_country,c_pop ctrl
+class k_sales,k_orders,k_cust,v_trend,v_country,v_product,v_detail viz
+```
+
+````
+
+**Dashboard** is one concise sentence describing what the dashboard is, who it is for, and the primary job it helps them accomplish.
+
+**Questions** are the ranked questions the dashboard must answer.
+
+**Controls** contains only controls with a clear viewer purpose. Omit it if no dashboard-level controls are useful.
+
+Do not add separate Goal, Audience, Sections, Information hierarchy, Presentation strategy, CanvasLayout, TabLayout, or HTMLLayout fields to the user-facing plan.
+
+For Canvas/Tab, **the wireframe is the layout, not a sketch**:
+* Everything sits inside `block:frame … end` with `columns 12`.
+* Spans are ¼ `3` · ⅓ `4` · ½ `6` · full `12`.
+* Every row totals 12; use bare `space:<n>` to pad it.
+* Include one box per declared visible block, in view order.
+* Use `sect` for TextBlocks, `ctrl` for controls, and `viz` for VizBlocks.
+* Label data blocks `<label> · <VizType>`.
+* For tabs, use one diagram per tab headed by `**Tab: <label>**`.
+
+For HTMLLayout, the wireframe is a **composition contract**: show the blocks, grouping, relative prominence, and reading order. Do not treat its 12-column spans as Canvas pixel coordinates.
+
+Get the user's OK before building a new dashboard or substantial redesign:
+
+```
+Build this dashboard?
+[Yes — build it as planned](#opt)
+[<meaningful alternative>](#opt)
+```
+
+Then end the turn. On approval, build. If the user requests a change, revise the plan and reconfirm.
+
+A small, explicit edit to an existing dashboard does not require another approval round when the result is already unambiguous.
+
+3. **Build the dashboard** per Schema.
+
+Author static text yourself. Generate each data visualization and use the returned AML; hand-write a `viz: <Type> { … }` body only as a last resort.
+
+Lay everything out to the confirmed wireframe.
+
+* **Conventional single-page dashboard** → `CanvasLayout`.
+* **Conventional multi-page dashboard** → `TabLayout`, with one coherent CanvasLayout per tab.
+* **Custom composition** → `HTMLLayout`, for experiences such as slides, print-oriented reports, editorial/narrative layouts, asymmetric or nested compositions, or an explicitly custom presentation.
+
+Do not select HTMLLayout merely because the user asks for something polished, executive, modern, or beautiful. Canvas/Tab is the default for ordinary dashboards.
+
+For Canvas/Tab, map spans as `3` = 280 · `4` = 380 · `6` = 580 · `12` = 1180.
+
+For HTMLLayout, keep the same declared analytical blocks and interactions. Render live blocks with `<h-block name="..."/>`. HTML/CSS controls presentation only — never hard-code dataset-derived values into HTML. Do not use JavaScript. Scope CSS beneath a dashboard root class.
+
+4. **Wire controls and interactions.**
+
+Build only the controls the reader's job needs, then wire each to the blocks it should affect.
+
+Do not require a date range or dimension filter merely because this is a dashboard.
+
+Viz blocks may cross-filter each other by default, so explicitly disable behavior that would be unwanted. Do not universally disable filter→filter or cross-tab interactions: hierarchical filters and shared cross-tab scope are valid when intentional.
+
+Add DateDrillBlock or Period Comparison when the ranked questions call for switchable grain or comparison.
+
+5. **Verify against the minimum output.**
+
+Check that:
+* every block answers a ranked question;
+* every ranked question is answered;
+* the opening matches what the reader is doing;
+* every dataset/model/field reference is real;
+* no interactive time window or comparison that belongs to a dashboard control is hard-coded into a chart;
+* every declared visible block is placed in the view;
+* Canvas/Tab matches the approved wireframe;
+* interactions are intentional and complete;
+* code diagnostics contain no errors.
+
+For HTMLLayout also verify:
+* every `<h-block>` references a declared block;
+* every intended live block appears in the HTML;
+* no dataset-derived value is hard-coded;
+* CSS is scoped;
+* no JavaScript is used;
+* charts and tables have enough space to render legibly.
+
+6. **Deliver** with a concise handoff: dataset used, what was built, material assumptions, and any intentional deviation from the approved proposal.
+
+## Schema
+
+A dashboard is a `Dashboard <uname> { … }` object: declare blocks, wire interactions, and place every visible block in the view.
+
+Never invent a dataset, model, field, or metric.
+
+### Block types
+
+* **VizBlock** — the main analytical content block.
+* **TextBlock** — static markdown/HTML/CSS. In Canvas/Tab, use for titles, section headings, explanations, and how-to-read notes.
+* **FilterBlock** — a dashboard-level field or value control.
+* **PopBlock** — period comparison.
+* **DateDrillBlock** — date granularity.
+
+In HTMLLayout, purely presentational titles, headings, explanations, and callouts may live directly in the HTML.
+
+The instant content needs to show a live dataset-derived value, use a live analytical block rather than static text or HTML.
+
+### Field references inside a viz
+
+Use the correct `ref:` form:
+
+* model field / dimension → `r(<model>.<field>)`
+* dataset metric → `r(<dataset>.<metric>)`
+* dataset dimension → `r(<dataset>, <model>.<dimension>)`
+* adhoc calculation defined inside the viz → its bare string name, not `r()`
+
+### CanvasLayout
+
+For a conventional single-page dashboard:
+
+```aml
+view: CanvasLayout {
+width: 1220
+height: <tallest block bottom + 20>
+grid_size: 20
+auto_expand_vertically: true
+
+block <name> {
+ position: pos(<x>, <y>, <width>, <height>)
+ layer: 1
+}
+
+mobile { mode: 'auto' }
+}
+```
+
+Use the confirmed wireframe exactly.
+
+For the standard 1220px canvas:
+* quarter `3` → 280px
+* third `4` → 380px
+* half `6` → 580px
+* full `12` → 1180px
+
+### TabLayout
+
+For a conventional multi-page dashboard:
+
+```aml
+view: TabLayout {
+tab overview: CanvasLayout {
+ label: 'Overview'
+ width: 1220
+ height: <height>
+ grid_size: 20
+ ...
+}
+
+tab detail: CanvasLayout {
+ label: 'Detail'
+ ...
+}
+}
+```
+
+Coordinates restart within each tab. Each tab must be coherent on its own.
+
+### HTMLLayout
+
+For custom composition:
+
+```aml
+view: HTMLLayout {
+content: @html
+ <style>
+   .dashboard-root {
+     /* scoped styles */
+   }
+ </style>
+
+ <div class="dashboard-root">
+   <h-block name="f_date" />
+   <h-block name="v_revenue" />
+ </div>
+
+}
+```
+
+Use HTML/CSS for composition, not data semantics.
+
+## Conventions
+
+* Never invent a layout property. Confirm unfamiliar constructs rather than guessing.
+* Use CanvasLayout by default for conventional single-page dashboards; TabLayout for conventional multi-page dashboards; HTMLLayout only when custom composition is genuinely required.
+* Prefer generated visualization AML over hand-written visualization AML.
+* Prefer dashboard controls over per-chart filters for interactive viewer choices.
+* A chart-level filter is fine when it defines what the chart fundamentally represents rather than a viewer-controlled scope.
+* Use `@md … ` for prose that may span lines or contain fragile punctuation.
+* Write end-user-facing dashboard copy in plain language.
+* Decide the target folder once — the user's requested location, or `dashboards/` by default — and keep it consistent.
+;;
+}

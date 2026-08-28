@@ -1,5 +1,5 @@
 Dashboard thang_personal {
-  title: 'Dashboard'
+  title: 'Ecommerce Overview'
   owner: 'thang.lk@holistics.io'
   block v1: VizBlock {
     label: 'Name and Parent'
@@ -213,112 +213,224 @@ Dashboard thang_personal {
       }
     }
   }
-  interactions: [
-    FilterInteraction {
-      from: 'v1'
-      to: [
-        CustomMapping {
-          block: [
-            'v4',
-            'v5'
-          ]
-          disabled: true
+  block v_top_products: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
         }
       ]
-    },
-    FilterInteraction {
-      from: 'v2'
-      to: [
-        CustomMapping {
-          block: [
-            'v4',
-            'v5'
-          ]
-          disabled: true
+      settings {
+        pagination_size: 10
+        wrap_header_text: true
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 10
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
-      ]
-    },
-    FilterInteraction {
-      from: 'v3'
-      to: [
-        CustomMapping {
-          block: 'v6'
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v4'
-      to: [
-        CustomMapping {
-          block: [
-            'v1',
-            'v2'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v5'
-      to: [
-        CustomMapping {
-          block: [
-            'v1',
-            'v2'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v6'
-      to: [
-        CustomMapping {
-          block: 'v3'
-          disabled: true
-        }
-      ]
+        single_cell_display: 'normal'
+      }
     }
-  ]
+  }
+  block v_top_products_copy_1: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        }
+      ]
+      settings {
+        pagination_size: 10
+        wrap_header_text: true
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 10
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  block v_top_products_copy_2: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        }
+      ]
+      settings {
+        pagination_size: 10
+        wrap_header_text: true
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 10
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  block v_top_products_copy_3: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        }
+      ]
+      settings {
+        pagination_size: 10
+        wrap_header_text: true
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        row_limit: 10
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  block heading_top_products: TextBlock {
+    content: @md ## Top Products by Revenue ;;
+  }
+  block heading_more_products: TextBlock {
+    content: @md ## More Top Product Tables ;;
+  }
+  interactions: []
   view: TabLayout {
-    label: 'View 1'
-    tab tab1: CanvasLayout {
-      label: 'Tab 1'
-      width: 650
-      height: 1100
-      block v1 {
-        position: pos(20, 20, 620, 420)
-      }
-      block v2 {
-        position: pos(20, 450, 620, 320)
-      }
-      block v3 {
-        position: pos(10, 870, 330, 220)
+    label: 'Overview'
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 980
+      grid_size: 20
+      auto_expand_vertically: true
+      block v_top_products {
+        position: pos(20, 140, 280, 320)
         layer: 1
       }
-      mobile {
-        mode: 'manual'
-        block v1
-        block filter_block
-        block v2
+      block heading_top_products {
+        position: pos(20, 20, 1180, 100)
+        layer: 1
       }
-    }
-    tab tab2: CanvasLayout {
-      label: 'Tab 2'
-      height: 800
-      grid_size: 20
-      block v4 {
-        position: pos(440, 20, 620, 420)
-        layer: 2
+      block heading_more_products {
+        position: pos(20, 480, 1180, 100)
+        layer: 1
       }
-      block v5 {
-        position: pos(20, 460, 620, 320)
-        layer: 3
+      block v_top_products_copy_1 {
+        position: pos(320, 140, 280, 320)
+        layer: 1
       }
-      block v6 {
-        position: pos(20, 120, 330, 220)
-        layer: 4
+      block v_top_products_copy_2 {
+        position: pos(620, 140, 280, 320)
+        layer: 1
+      }
+      block v_top_products_copy_3 {
+        position: pos(920, 140, 280, 320)
+        layer: 1
+      }
+      block v_top_products_copy_4 {
+        position: pos(20, 600, 280, 320)
+        layer: 1
+      }
+      block v_top_products_copy_5 {
+        position: pos(320, 600, 280, 320)
+        layer: 1
+      }
+      block v_top_products_copy_6 {
+        position: pos(620, 600, 280, 320)
+        layer: 1
+      }
+      block v_top_products_copy_7 {
+        position: pos(920, 600, 280, 320)
+        layer: 1
       }
       mobile {
         mode: 'auto'

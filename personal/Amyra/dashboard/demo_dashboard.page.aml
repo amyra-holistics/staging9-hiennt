@@ -1249,10 +1249,6 @@ Dashboard all_viz_test {
       mobile {
         mode: 'auto'
       }
-      block v_wx22 {
-        position: pos(20, 20, 760, 660)
-        layer: 4
-      }
       block v_pareto_chart {
         position: pos(800, 20, 760, 660)
         layer: 4

@@ -156,7 +156,7 @@ CustomChartDef bullet_chart {
         ],
         "mark": {
           "type": "bar",
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {
@@ -184,7 +184,7 @@ CustomChartDef bullet_chart {
         "mark": {
           "type": "bar",
           "height": @{options.current_bar_height.value},
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {
@@ -213,7 +213,7 @@ CustomChartDef bullet_chart {
           "type": "tick",
           "size": 22,
           "thickness": @{options.target_tick_thickness.value},
-          "tooltip": @{options.show_tooltip.value}
+          "tooltip": true
         },
         "encoding": {
           "color": {

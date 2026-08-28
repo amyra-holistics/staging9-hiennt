@@ -42,12 +42,6 @@ CustomChartDef bullet_chart {
   }
 
   options {
-    option show_tooltip {
-      label: 'Show tooltip'
-      type: 'toggle'
-      default_value: true
-    }
-
     option current_bar_height {
       label: 'Current bar height'
       type: 'number-input'

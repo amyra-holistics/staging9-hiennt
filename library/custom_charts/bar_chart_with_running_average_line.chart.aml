@@ -1,6 +1,6 @@
 CustomChartDef bar_chart_with_running_average_line {
   label: 'Bar Chart with Running Average Line'
-  icon: 'hicon:custom-chart/combination'
+  icon: 'hicon:chart-combination-2'
   description: 'To overlay a running average line on a bar chart and compare each period against a smoothed trend.'
   fields {
     field dimension {
@@ -47,7 +47,7 @@ CustomChartDef bar_chart_with_running_average_line {
     "transform": [
       {
         "sort": [{"field": @{fields.dimension.name}}],
-        "window": [{"op": "average", "field": @{fields.value.name}, "as": "avg"}],
+        "window": [{"op": "mean", "field": @{fields.value.name}, "as": "avg"}],
         "frame": [@{options.points_before.value}, @{options.points_after.value}]
       }
     ],
@@ -67,20 +67,46 @@ CustomChartDef bar_chart_with_running_average_line {
             "field": @{fields.value.name},
             "type": "quantitative",
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          },
+          "opacity": {
+            "condition": [
+              {"param": "hoverPointSelection", "empty": false, "value": 1},
+              {"param": "runningAverageHover", "empty": false, "value": 1},
+              {"test": "!length(data('hoverPointSelection_store')) && !length(data('runningAverageHover_store'))", "value": 1}
+            ],
+            "value": 0.15
           }
         }
       },
       {
-        "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2, "point": {"filled": true, "color": @{options.line_color.value}}},
+        "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2},
         "encoding": {
           "x": {"field": @{fields.dimension.name}, "type": "temporal"},
           "y": {"field": "avg", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "color": @{options.line_color.value}, "tooltip": @{options.tooltip.value}},
+        "params": [
+          {"name": "runningAverageHover", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
+        ],
+        "encoding": {
+          "x": {"field": @{fields.dimension.name}, "type": "temporal"},
+          "y": {"field": "avg", "type": "quantitative"},
+          "opacity": {
+            "condition": [
+              {"param": "hoverPointSelection", "empty": false, "value": 1},
+              {"param": "runningAverageHover", "empty": false, "value": 1},
+              {"test": "!length(data('hoverPointSelection_store')) && !length(data('runningAverageHover_store'))", "value": 1}
+            ],
+            "value": 0.15
+          }
         }
       }
     ],
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],
-      "contextMenuSignals": ["hoverPointSelection"]
+      "contextMenuSignals": ["hoverPointSelection", "runningAverageHover"]
     }
   };;
 }

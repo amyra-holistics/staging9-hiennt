@@ -47,7 +47,7 @@ CustomChartDef bar_chart_with_running_average_line {
     "transform": [
       {
         "sort": [{"field": @{fields.dimension.name}}],
-        "window": [{"op": "mean", "field": @{fields.value.name}, "as": "avg"}],
+        "window": [{"op": "mean", "field": @{fields.value.name}, "as": "Average"}],
         "frame": [@{options.points_before.value}, @{options.points_after.value}]
       }
     ],
@@ -82,7 +82,7 @@ CustomChartDef bar_chart_with_running_average_line {
         "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2},
         "encoding": {
           "x": {"field": @{fields.dimension.name}, "type": "temporal"},
-          "y": {"field": "avg", "type": "quantitative"}
+          "y": {"field": "Average", "type": "quantitative"}
         }
       },
       {
@@ -92,7 +92,7 @@ CustomChartDef bar_chart_with_running_average_line {
         ],
         "encoding": {
           "x": {"field": @{fields.dimension.name}, "type": "temporal"},
-          "y": {"field": "avg", "type": "quantitative"},
+          "y": {"field": "Average", "type": "quantitative"},
           "opacity": {
             "condition": [
               {"param": "hoverPointSelection", "empty": false, "value": 1},

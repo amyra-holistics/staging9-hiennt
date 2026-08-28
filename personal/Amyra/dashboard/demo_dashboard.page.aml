@@ -442,8 +442,8 @@ Dashboard all_viz_test {
           pattern: 'none'
         }
       }
-      setting max_bins: 0
-      setting show_tooltip: false
+      setting max_bins: 40
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true

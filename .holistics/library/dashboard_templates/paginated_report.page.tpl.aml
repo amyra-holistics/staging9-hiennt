@@ -1,0 +1,848 @@
+@template(
+  title='Paginated Report',
+  description='Holistics-styled paginated report template',
+  thumbnail=''
+)
+Dashboard paginated_report {
+  title: 'Paginated Report Template'
+  description: 'A reusable six-page A4 report template in Holistics brand style: cover, executive summary, performance detail, breakdown, detail table, and notes. Reads as stacked sheets on screen and exports one page per sheet. Replace the placeholder copy and blocks, then complete report metadata and the PDF preflight before sharing.'
+
+  // ---- Viz slots -----------------------------------------------------------
+  block k_kpi_1: TextBlock {
+    content: @md First metric ;;
+  }
+  block k_kpi_2: TextBlock {
+    content: @md Second metric ;;
+  }
+  block k_kpi_3: TextBlock {
+    content: @md Third metric ;;
+  }
+  block k_kpi_4: TextBlock {
+    content: @md Fourth metric ;;
+  }
+  block v_hero: TextBlock {
+    content: @md
+      ### This is the hero chart
+      Swap this block for the visualization that answers the report's main question.
+    ;;
+  }
+  block v_detail: TextBlock {
+    content: @md
+      ### This is a full-width chart
+      Swap this block for a visualization that needs the whole page width — a dense time series or a cohort grid.
+    ;;
+  }
+  block v_break_1: TextBlock {
+    content: @md
+      **First chart**
+
+      This is a half-width chart slot.
+    ;;
+  }
+  block v_break_2: TextBlock {
+    content: @md
+      **Second chart**
+
+      This is a half-width chart slot.
+    ;;
+  }
+  block v_table: TextBlock {
+    content: @md
+      ### This is a table
+      Swap this block for a data table. Keep it to roughly 20 rows — a page cannot scroll.
+    ;;
+  }
+
+  // ---- Copy slots ----------------------------------------------------------
+  block t_cover_copy: TextBlock {
+    content: @md
+      <div class="rpt-eyebrow">This is an eyebrow</div>
+      <h1 class="rpt-title">This is a report title<br><span class="rpt-accent">and a second line.</span></h1>
+      <p class="rpt-lede">Here's an example of body text. One or two sentences on what this report covers and what the reader should do with it.</p>
+    ;;
+  }
+  block t_cover_meta: TextBlock {
+    content: @md
+      <div class="rpt-meta-grid">
+        <div class="rpt-meta-item"><span class="rpt-meta-key">Prepared for</span><span class="rpt-meta-val">This is a name</span></div>
+        <div class="rpt-meta-item"><span class="rpt-meta-key">Prepared by</span><span class="rpt-meta-val">This is a name</span></div>
+        <div class="rpt-meta-item"><span class="rpt-meta-key">Period</span><span class="rpt-meta-val">This is a date range</span></div>
+        <div class="rpt-meta-item"><span class="rpt-meta-key">Issued</span><span class="rpt-meta-val">This is a date</span></div>
+      </div>
+    ;;
+  }
+  block t_summary_copy: TextBlock {
+    content: @md
+      <h2 class="rpt-h2">This is a page title</h2>
+      <p class="rpt-lede">Here's an example of body text. Say what the numbers below show, in one or two sentences.</p>
+    ;;
+  }
+  block t_summary_note_1: TextBlock {
+    content: @md
+      <span class="rpt-note-key">First point</span>
+      <p class="rpt-note-body">This is a short paragraph of commentary. Two or three sentences is usually the right length for a note beside a chart.</p>
+    ;;
+  }
+  block t_summary_note_2: TextBlock {
+    content: @md
+      <span class="rpt-note-key">Second point</span>
+      <p class="rpt-note-body">Add or remove notes as you need. Two columns works well; three gets cramped at this width.</p>
+    ;;
+  }
+  block t_detail_copy: TextBlock {
+    content: @md
+      <h2 class="rpt-h2">This is a page title</h2>
+      <p class="rpt-lede">Here's an example of body text. Use this page when one chart deserves the whole sheet.</p>
+    ;;
+  }
+  block t_detail_note_1: TextBlock {
+    content: @md
+      <span class="rpt-note-key">What it shows</span>
+      <p class="rpt-note-body">This is a short paragraph of commentary explaining what the reader is looking at.</p>
+    ;;
+  }
+  block t_detail_note_2: TextBlock {
+    content: @md
+      <span class="rpt-note-key">Why it matters</span>
+      <p class="rpt-note-body">This is a short paragraph of commentary explaining what follows from it.</p>
+    ;;
+  }
+  block t_detail_note_3: TextBlock {
+    content: @md
+      <span class="rpt-note-key">What to watch</span>
+      <p class="rpt-note-body">This is a short paragraph of commentary on what could change the picture.</p>
+    ;;
+  }
+  block t_break_copy: TextBlock {
+    content: @md
+      <h2 class="rpt-h2">This is a page title</h2>
+      <p class="rpt-lede">Here's an example of body text. Use this page to set two views side by side.</p>
+    ;;
+  }
+  block t_break_caption_1: TextBlock {
+    content: @md
+      <div class="rpt-caption">
+        <span class="rpt-caption-key">First title</span>
+        <p class="rpt-caption-body">This is a caption. One or two lines on what the chart above shows.</p>
+      </div>
+    ;;
+  }
+  block t_break_caption_2: TextBlock {
+    content: @md
+      <div class="rpt-caption">
+        <span class="rpt-caption-key">Second title</span>
+        <p class="rpt-caption-body">This is a caption. Keep both captions to a similar length so the columns stay level.</p>
+      </div>
+    ;;
+  }
+  block t_table_copy: TextBlock {
+    content: @md <h2 class="rpt-h2">This is a page title</h2>
+<p class="rpt-lede">Here's an example of body text. Use this page for the underlying detail behind the charts. Keep this lede short - the table frame below fills whatever space is left on the page, so a long lede here means a shorter table.</p>;;
+  }
+  block t_notes_copy: TextBlock {
+    content: @md
+      <h2 class="rpt-h2">Notes and definitions</h2>
+
+      <div class="rpt-def">
+        <span class="rpt-def-key">First term</span>
+        <p class="rpt-def-body">This is a definition. Say how the metric is calculated and what it excludes.</p>
+      </div>
+      <div class="rpt-def">
+        <span class="rpt-def-key">Second term</span>
+        <p class="rpt-def-body">This is a definition. Add or remove rows as you need.</p>
+      </div>
+      <div class="rpt-def">
+        <span class="rpt-def-key">Method</span>
+        <p class="rpt-def-body">This is a note on how the figures were produced, and over what period.</p>
+      </div>
+      <div class="rpt-def">
+        <span class="rpt-def-key">Caveats</span>
+        <p class="rpt-def-body">This is a note on what the reader should be careful about — known gaps, restatements, or definitions that changed.</p>
+      </div>
+    ;;
+  }
+
+  view: HTMLLayout {
+    content: @html
+
+<div class="rpt">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+    .rpt,
+    .rpt *,
+    .rpt *::before,
+    .rpt *::after { box-sizing: border-box; }
+
+    /* ---- TOKENS — swap this block to reskin. Nothing below holds a hex.
+       Values shared with the theme block at the foot of this file: ink
+       #05264C, muted #5C6E85, accent #259B6C, border #E1E7EE, tint #F5F8FA.
+       Change one here and change its twin there.
+       Names follow the shared core token contract (tokens-and-theming.md) so
+       a reskin pass across the template library can target this file the
+       same way it targets any other. See the TOKEN CONTRACT NOTES in the
+       header comment for the tokens deliberately left out of this format. */
+    .rpt {
+      --t-accent:     #259B6C;
+      --t-accent-lt:  #3FBE88; /* reserved — see TOKEN CONTRACT NOTES above */
+      --t-accent-dk:  #1B7A54;
+      --t-bg:         #FFFFFF;
+      --t-desk:       #EDF1F5; /* format-specific: screen-only canvas behind the sheets */
+      --t-surface:    #F5F8FA;
+      --t-border:     #E1E7EE;
+      --t-rule:       #C9D3DE;
+      --t-ink:        #05264C;
+      --t-ink-dim:    #5C6E85;
+      --t-ink-faint:  #8FA0B4;
+
+      /* Running header/footer text. --t-total counts only non-cover sheets. */
+      --t-report-title:  "This is the report title";
+      --t-report-period: "This is the period";
+      --t-source:        "Source: this is a source line";
+      --t-confidential:  "Internal";
+      --t-total:         "05";
+
+      --t-page-w:        210mm;
+      --t-page-h:        297mm;
+      --t-page-pad:      16mm;
+      --t-radius:        4px;
+      --t-radius-sm:     2px;
+      --t-space-1:       3px;
+      --t-space-2:       4px;
+      --t-space-3:       5px;
+      --t-space-4:       6px;
+      --t-space-5:       8px;
+      --t-space-6:       10px;
+      --t-space-7:       12px;
+      --t-space-8:       14px;
+      --t-space-9:       16px;
+      --t-space-10:      18px;
+      --t-space-11:      24px;
+      --t-space-12:      32px;
+      --t-space-section: 6mm;
+      --t-space-figure:  8mm;
+      --t-space-header:  10mm;
+      --t-pad:           var(--t-space-5); /* generic card padding, see .rpt-figure */
+      --t-font-sans:    Inter, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --t-font-display: var(--t-font-sans); /* Holistics has no distinct display face */
+      --t-font-mono:    'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+      font-family: var(--t-font-sans);
+      color: var(--t-ink);
+      background: var(--t-desk);
+      padding: var(--t-space-11) var(--t-space-9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--t-space-11);
+      counter-reset: rpt-page;
+    }
+
+    /* ---- The sheet */
+    .rpt .rpt-page {
+      width: min(var(--t-page-w), 100%);
+      height: var(--t-page-h);
+      flex-shrink: 0;
+      background: var(--t-bg);
+      border: 1px solid var(--t-border);
+      border-radius: var(--t-radius);
+      box-shadow: 0 6px 22px rgba(5, 38, 76, 0.10);
+      padding: var(--t-page-pad);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    /* The cover is not numbered, so it does not increment the counter. */
+    .rpt .rpt-page:not(.is-cover) { counter-increment: rpt-page; }
+
+    /* ---- Running header */
+    .rpt .rpt-head {
+      display: flex;
+      align-items: baseline;
+      gap: var(--t-space-7);
+      padding-bottom: var(--t-space-4);
+      margin-bottom: var(--t-space-header);
+      border-bottom: 1px solid var(--t-rule);
+      flex-shrink: 0;
+    }
+    .rpt .rpt-head-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--t-ink);
+    }
+    .rpt .rpt-head-title::before { content: var(--t-report-title); }
+    .rpt .rpt-head-section {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--t-ink-faint);
+    }
+    .rpt .rpt-head-period {
+      margin-left: auto;
+      font-family: var(--t-font-mono);
+      font-size: 11px;
+      color: var(--t-ink-dim);
+    }
+    .rpt .rpt-head-period::before { content: var(--t-report-period); }
+
+    /* ---- Running footer */
+    .rpt .rpt-foot {
+      display: flex;
+      align-items: baseline;
+      gap: var(--t-space-7);
+      margin-top: auto;
+      padding-top: var(--t-space-4);
+      border-top: 1px solid var(--t-rule);
+      font-size: 10px;
+      color: var(--t-ink-faint);
+      flex-shrink: 0;
+    }
+    .rpt .rpt-foot-source::before { content: var(--t-source); }
+    .rpt .rpt-foot-conf {
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .rpt .rpt-foot-conf::before { content: var(--t-confidential); }
+    .rpt .rpt-foot-page {
+      margin-left: auto;
+      font-family: var(--t-font-mono);
+      color: var(--t-ink-dim);
+    }
+    .rpt .rpt-foot-page::before {
+      content: counter(rpt-page, decimal-leading-zero) " / " var(--t-total);
+    }
+
+    /* ---- Content zone */
+    .rpt .rpt-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* ---- Type */
+    .rpt .rpt-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: var(--t-space-6);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--t-accent-dk);
+      margin-bottom: var(--t-space-9);
+    }
+    .rpt .rpt-eyebrow::before {
+      content: "";
+      width: var(--t-space-11);
+      height: var(--t-space-1);
+      border-radius: var(--t-radius-sm);
+      background: var(--t-accent);
+      flex-shrink: 0;
+    }
+    .rpt .rpt-title {
+      font-family: var(--t-font-display);
+      font-size: 44px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.12;
+      color: var(--t-ink);
+      overflow-wrap: break-word;
+      margin: 0 0 var(--t-space-10) 0;
+    }
+    .rpt .rpt-h2 {
+      font-family: var(--t-font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      color: var(--t-ink);
+      margin: 0 0 var(--t-space-5) 0;
+    }
+    .rpt .rpt-accent { color: var(--t-accent-dk); }
+    .rpt .rpt-lede {
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--t-ink-dim);
+      max-width: 72ch;
+      margin: 0;
+    }
+
+    /* ---- Cover ----
+       Logo slot (optional): uncomment both this rule and the <img> tag in
+       the cover markup below. There's no durable Holistics logo URL to
+       fabricate here, so point src at your own hosted asset. */
+    /*
+    .rpt .rpt-logo {
+      height: 28px;
+      width: auto;
+      margin-bottom: var(--t-space-11);
+    }
+    */
+    .rpt .rpt-cover {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .rpt .rpt-cover-rule {
+      width: 64px;
+      height: var(--t-space-2);
+      border-radius: var(--t-radius-sm);
+      background: var(--t-accent);
+      margin: var(--t-space-11) 0;
+    }
+    .rpt .rpt-meta-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--t-space-8) var(--t-space-12);
+      max-width: 120mm;
+    }
+    .rpt .rpt-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--t-space-1);
+      padding-top: var(--t-space-5);
+      border-top: 1px solid var(--t-rule);
+    }
+    .rpt .rpt-meta-key {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--t-ink-faint);
+    }
+    .rpt .rpt-meta-val { font-size: 14px; font-weight: 500; color: var(--t-ink); }
+
+    /* ---- KPI row */
+    .rpt .rpt-kpis {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border: 1px solid var(--t-border);
+      border-radius: var(--t-radius);
+      overflow: hidden;
+      margin: var(--t-space-figure) 0 var(--t-space-section);
+      flex-shrink: 0;
+    }
+    .rpt .rpt-kpi {
+      padding: var(--t-space-6) var(--t-space-7);
+      min-height: 24mm;
+      display: flex;
+      background: var(--t-surface);
+      border-right: 1px solid var(--t-border);
+      border-top: 3px solid var(--t-accent);
+    }
+    .rpt .rpt-kpi:last-child { border-right: none; }
+    .rpt .rpt-kpi > * { flex: 1; min-width: 0; }
+    .rpt .rpt-kpi * { background: transparent !important; }
+
+    /* ---- Chart frames. Fixed heights: a page cannot scroll. The is-table
+       variant is the one documented exception — see the header comment. */
+    .rpt .rpt-figure {
+      background: var(--t-bg);
+      border: 1px solid var(--t-border);
+      border-radius: var(--t-radius);
+      padding: var(--t-pad);
+      display: flex;
+      flex-shrink: 0;
+    }
+    .rpt .rpt-figure > * { flex: 1; min-width: 0; }
+    .rpt .rpt-figure * { background: transparent !important; }
+    .rpt .rpt-figure.is-hero   { height: 92mm; }
+    .rpt .rpt-figure.is-tall   { height: 130mm; }
+    .rpt .rpt-figure.is-half   { height: 88mm; }
+    /* Deliberately flex, not a fixed mm value — see "THE ONE RULE THAT
+       MATTERS" in the header comment for why this is safe here specifically.
+       min-height is a floor in case t_table_copy's lede runs long. */
+    .rpt .rpt-figure.is-table  { flex: 1; height: auto; min-height: 60mm; }
+    .rpt .rpt-space-before { margin-top: var(--t-space-figure); }
+
+    .rpt .rpt-split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: var(--t-space-figure);
+      flex-shrink: 0;
+    }
+    .rpt .rpt-split-col { display: flex; flex-direction: column; gap: var(--t-space-6); min-width: 0; }
+
+    /* ---- Commentary */
+    .rpt .rpt-note-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(48mm, 1fr));
+      gap: var(--t-space-section);
+      margin-top: var(--t-space-section);
+    }
+    .rpt .rpt-note { display: flex; flex-direction: column; gap: var(--t-space-3); }
+    .rpt .rpt-note-key {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--t-accent-dk);
+      padding-bottom: var(--t-space-3);
+      border-bottom: 1px solid var(--t-accent);
+    }
+    .rpt .rpt-note-body {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--t-ink-dim);
+      margin: 0;
+    }
+    .rpt .rpt-caption { display: flex; flex-direction: column; gap: var(--t-space-2); }
+    .rpt .rpt-caption-key { font-size: 14px; font-weight: 600; color: var(--t-ink); }
+    .rpt .rpt-caption-body {
+      font-size: 12px;
+      line-height: 1.55;
+      color: var(--t-ink-dim);
+      margin: 0;
+    }
+
+    /* ---- Definitions */
+    .rpt .rpt-def {
+      display: grid;
+      grid-template-columns: 42mm minmax(0, 1fr);
+      gap: var(--t-space-figure);
+      padding: var(--t-space-6) 0;
+      border-top: 1px solid var(--t-rule);
+    }
+    .rpt .rpt-def-key {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--t-ink);
+    }
+    .rpt .rpt-def-body {
+      font-size: 12px;
+      line-height: 1.6;
+      color: var(--t-ink-dim);
+      margin: 0;
+    }
+
+    /* ---- KPI block internals. .h-kpi-metric-kpi is an undocumented
+       Holistics internal class, not part of any public API — it's the only
+       way to theme KPI value typography from outside the block, but it can
+       change without warning between Holistics releases. If KPI values
+       suddenly look unstyled after an app update, check this selector first. */
+    .rpt .rpt-kpi .h-kpi-metric-kpi,
+    .rpt .rpt-kpi .h-kpi-metric-kpi * {
+      font-family: var(--t-font-sans) !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
+
+    /* ---- Print. The padding on .rpt-page supplies the margin, so @page has
+       none and screen and paper agree. See the UNVERIFIED note in the header
+       comment: it's not confirmed that Holistics' PDF export honours this
+       block rather than screenshotting the rendered DOM. */
+    @page { size: A4; margin: 0; }
+
+    @media print {
+      .rpt {
+        background: none;
+        padding: 0;
+        gap: 0;
+        display: block;
+      }
+      .rpt .rpt-page {
+        width: var(--t-page-w);
+        height: var(--t-page-h);
+        margin: 0;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        break-after: page;
+      }
+      /* Without this you get a blank trailing page. */
+      .rpt .rpt-page:last-child { break-after: auto; }
+      .rpt .rpt-kpis,
+      .rpt .rpt-figure,
+      .rpt .rpt-note,
+      .rpt .rpt-def { break-inside: avoid; }
+    }
+  </style>
+
+  <!-- ============ COVER ============ -->
+  <article class="rpt-page is-cover">
+    <div class="rpt-cover">
+      <!-- Logo slot. Uncomment together with the .rpt-logo rule above and
+           point src at the dark-variant logo. -->
+      <!-- <img class="rpt-logo" src="" alt="Holistics" /> -->
+      <h-block name="t_cover_copy" />
+      <div class="rpt-cover-rule"></div>
+      <h-block name="t_cover_meta" />
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+    </footer>
+  </article>
+
+  <!-- ============ PAGE 01 — executive summary ============ -->
+  <article class="rpt-page">
+    <header class="rpt-head">
+      <span class="rpt-head-title"></span>
+      <span class="rpt-head-section">Executive summary</span>
+      <span class="rpt-head-period"></span>
+    </header>
+    <div class="rpt-body">
+      <h-block name="t_summary_copy" />
+      <div class="rpt-kpis">
+        <div class="rpt-kpi"><h-block name="k_kpi_1" /></div>
+        <div class="rpt-kpi"><h-block name="k_kpi_2" /></div>
+        <div class="rpt-kpi"><h-block name="k_kpi_3" /></div>
+        <div class="rpt-kpi"><h-block name="k_kpi_4" /></div>
+      </div>
+      <div class="rpt-figure is-hero"><h-block name="v_hero" /></div>
+      <div class="rpt-note-grid">
+        <div class="rpt-note"><h-block name="t_summary_note_1" /></div>
+        <div class="rpt-note"><h-block name="t_summary_note_2" /></div>
+      </div>
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+      <span class="rpt-foot-page"></span>
+    </footer>
+  </article>
+
+  <!-- ============ PAGE 02 — performance detail ============ -->
+  <article class="rpt-page">
+    <header class="rpt-head">
+      <span class="rpt-head-title"></span>
+      <span class="rpt-head-section">Performance detail</span>
+      <span class="rpt-head-period"></span>
+    </header>
+    <div class="rpt-body">
+      <h-block name="t_detail_copy" />
+      <div class="rpt-figure is-tall rpt-space-before"><h-block name="v_detail" /></div>
+      <div class="rpt-note-grid">
+        <div class="rpt-note"><h-block name="t_detail_note_1" /></div>
+        <div class="rpt-note"><h-block name="t_detail_note_2" /></div>
+        <div class="rpt-note"><h-block name="t_detail_note_3" /></div>
+      </div>
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+      <span class="rpt-foot-page"></span>
+    </footer>
+  </article>
+
+  <!-- ============ PAGE 03 — breakdown ============ -->
+  <article class="rpt-page">
+    <header class="rpt-head">
+      <span class="rpt-head-title"></span>
+      <span class="rpt-head-section">Breakdown</span>
+      <span class="rpt-head-period"></span>
+    </header>
+    <div class="rpt-body">
+      <h-block name="t_break_copy" />
+      <div class="rpt-split rpt-space-before">
+        <div class="rpt-split-col">
+          <div class="rpt-figure is-half"><h-block name="v_break_1" /></div>
+          <h-block name="t_break_caption_1" />
+        </div>
+        <div class="rpt-split-col">
+          <div class="rpt-figure is-half"><h-block name="v_break_2" /></div>
+          <h-block name="t_break_caption_2" />
+        </div>
+      </div>
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+      <span class="rpt-foot-page"></span>
+    </footer>
+  </article>
+
+  <!-- ============ PAGE 04 — detail table ============ -->
+  <article class="rpt-page">
+    <header class="rpt-head">
+      <span class="rpt-head-title"></span>
+      <span class="rpt-head-section">Detail</span>
+      <span class="rpt-head-period"></span>
+    </header>
+    <div class="rpt-body">
+      <h-block name="t_table_copy" />
+      <div class="rpt-figure is-table rpt-space-before"><h-block name="v_table" /></div>
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+      <span class="rpt-foot-page"></span>
+    </footer>
+  </article>
+
+  <!-- ============ PAGE 05 — notes and definitions ============ -->
+  <article class="rpt-page">
+    <header class="rpt-head">
+      <span class="rpt-head-title"></span>
+      <span class="rpt-head-section">Notes</span>
+      <span class="rpt-head-period"></span>
+    </header>
+    <div class="rpt-body">
+      <h-block name="t_notes_copy" />
+    </div>
+    <footer class="rpt-foot">
+      <span class="rpt-foot-source"></span>
+      <span class="rpt-foot-conf"></span>
+      <span class="rpt-foot-page"></span>
+    </footer>
+  </article>
+</div>
+
+    ;;
+  }
+
+  // Values shared with the CSS token block above: ink #05264C, muted #5C6E85,
+  // accent #259B6C, border #E1E7EE, tint #F5F8FA. Change one here and change
+  // its twin there.
+  theme {
+    color {
+      data: holistics_report_palette
+    }
+
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+        border_radius: 4
+        border_color: '#E1E7EE'
+      }
+      shadow: 'none'
+      padding: 0
+      opacity: 1
+      label {
+        font_family: 'Inter'
+        font_size: 12
+        font_color: '#5C6E85'
+        font_weight: 'semibold'
+      }
+      text {
+        font_family: 'Inter'
+        font_size: 12
+        font_color: '#5C6E85'
+        font_weight: 'normal'
+      }
+    }
+
+    viz {
+      table {
+        general {
+          bg_color: '#FFFFFF'
+          hover_color: '#F5F8FA'
+          banding_color: '#FAFBFC'
+          font_size: 12
+          font_color: '#5C6E85'
+          font_family: 'Inter'
+          border_color: '#E1E7EE'
+          border_width: 1
+          grid_color: '#E1E7EE'
+        }
+        header {
+          bg_color: '#F5F8FA'
+          font_size: 12
+          font_color: '#05264C'
+          font_weight: 'semibold'
+        }
+        sub_header {
+          bg_color: '#F5F8FA'
+          font_size: 12
+          font_color: '#5C6E85'
+          font_weight: 'medium'
+        }
+        sub_title {
+          font_size: 11
+          font_color: '#5C6E85'
+          font_weight: 'medium'
+        }
+        sparkline {
+          line {
+            color: '#259B6C'
+          }
+          column {
+            color: '#259B6C'
+          }
+        }
+      }
+      metric_kpi {
+        alignment: 'left'
+        label {
+          font_family: 'Inter'
+          font_size: 12
+          font_color: '#5C6E85'
+        }
+        value {
+          font_family: 'Inter'
+          font_size: 30
+          font_color: '#05264C'
+        }
+        progress {
+          indicator {
+            bg_color: '#259B6C'
+          }
+          track {
+            bg_color: '#E1E7EE'
+          }
+          text {
+            font_color: '#5C6E85'
+          }
+        }
+        trend {
+          positive {
+            text {
+              font_color: '#259B6C'
+            }
+            background {
+              bg_color: '#E1F4EB'
+            }
+          }
+          negative {
+            text {
+              font_color: '#B42318'
+            }
+            background {
+              bg_color: '#FDECEA'
+            }
+          }
+          neutral {
+            text {
+              font_color: '#5C6E85'
+            }
+            background {
+              bg_color: '#F5F8FA'
+            }
+          }
+        }
+      }
+    }
+
+    // Base type for TextBlocks. The .rpt-* classes inside each copy slot are
+    // more specific and win, so these values only apply to unclassed markdown.
+    custom_css: @css
+      .dac-text-block {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        font-size: 12px;
+        color: #5C6E85;
+        line-height: 1.6;
+      }
+      .dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #05264C;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+        font-weight: 600;
+      }
+    ;;
+  }
+}

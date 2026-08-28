@@ -1,3 +1,4 @@
+@tag('1️⃣ Trust/Endorsed')
 Dashboard untitled_3 {
   title: 'Audio Dashboard'
   description: ''
@@ -26,10 +27,7 @@ Dashboard untitled_3 {
       layer: 3
     }
   }
-  theme: DynamicPageTheme {
-    light: H.themes.metropolitan
-    dark: H.themes.midnight
-  }
+  theme: H.themes.midnight
   block v1: VizBlock {
     label: 'Audio Detail'
     viz: DataTable {

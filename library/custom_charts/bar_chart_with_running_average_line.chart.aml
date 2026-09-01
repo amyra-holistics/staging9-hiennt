@@ -26,11 +26,6 @@ CustomChartDef bar_chart_with_running_average_line {
       label: 'Show tooltip'
       default_value: true
     }
-    option bar_color {
-      type: 'color-picker'
-      label: 'Bar color'
-      default_value: '#255DD4'
-    }
     option line_color {
       type: 'color-picker'
       label: 'Line color'
@@ -52,13 +47,13 @@ CustomChartDef bar_chart_with_running_average_line {
     "transform": [
       {
         "sort": [{"field": @{fields.dimension.name}}],
-        "window": [{"op": "average", "field": @{fields.value.name}, "as": "avg"}],
+        "window": [{"op": "mean", "field": @{fields.value.name}, "as": "avg"}],
         "frame": [@{options.points_before.value}, @{options.points_after.value}]
       }
     ],
     "layer": [
       {
-        "mark": {"type": "bar", "tooltip": @{options.tooltip.value}, "color": @{options.bar_color.value}},
+        "mark": {"type": "bar", "tooltip": @{options.tooltip.value}},
         "params": [
           {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
           {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
@@ -66,27 +61,52 @@ CustomChartDef bar_chart_with_running_average_line {
         "encoding": {
           "x": {
             "field": @{fields.dimension.name},
-            "type": "temporal",
             "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
           },
           "y": {
             "field": @{fields.value.name},
             "type": "quantitative",
             "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat"}
+          },
+          "opacity": {
+            "condition": [
+              {"param": "hoverPointSelection", "empty": false, "value": 1},
+              {"param": "runningAverageHover", "empty": false, "value": 1},
+              {"test": "!length(data('hoverPointSelection_store')) && !length(data('runningAverageHover_store'))", "value": 1}
+            ],
+            "value": 0.15
           }
         }
       },
       {
-        "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2, "point": {"filled": true, "color": @{options.line_color.value}}},
+        "mark": {"type": "line", "tooltip": @{options.tooltip.value}, "color": @{options.line_color.value}, "strokeWidth": 2},
         "encoding": {
           "x": {"field": @{fields.dimension.name}, "type": "temporal"},
           "y": {"field": "avg", "type": "quantitative"}
+        }
+      },
+      {
+        "mark": {"type": "point", "filled": true, "color": @{options.line_color.value}, "tooltip": @{options.tooltip.value}},
+        "params": [
+          {"name": "runningAverageHover", "select": {"type": "point", "fields": [@{fields.dimension.name}], "on": "mouseover", "clear": "mouseout"}}
+        ],
+        "encoding": {
+          "x": {"field": @{fields.dimension.name}, "type": "temporal"},
+          "y": {"field": "avg", "type": "quantitative"},
+          "opacity": {
+            "condition": [
+              {"param": "hoverPointSelection", "empty": false, "value": 1},
+              {"param": "runningAverageHover", "empty": false, "value": 1},
+              {"test": "!length(data('hoverPointSelection_store')) && !length(data('runningAverageHover_store'))", "value": 1}
+            ],
+            "value": 0.15
+          }
         }
       }
     ],
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],
-      "contextMenuSignals": ["hoverPointSelection"]
+      "contextMenuSignals": ["hoverPointSelection", "runningAverageHover"]
     }
   };;
 }

@@ -1,6 +1,6 @@
 CustomChartDef bar_chart_with_average_line {
   label: 'Bar Chart with Average Line'
-  icon: 'hicon:chart-combination-2'
+  icon: 'hicon:custom-chart/combination'
   description: 'To compare bar values against a horizontal average line across the whole series.'
   fields {
     field dimension {
@@ -42,7 +42,7 @@ CustomChartDef bar_chart_with_average_line {
         "encoding": {
           "x": {
             "field": @{fields.dimension.name},
-            "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false, "labelAngle": -45}
+            "axis": {"format": @{fields.dimension.format}, "formatType": "holisticsFormat", "grid": false}
           },
           "y": {
             "field": @{fields.value.name},

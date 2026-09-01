@@ -1,6 +1,9 @@
 // deploy 2
 PageTheme purple {
   title: 'Purple title'
+  color {
+    data: purple_pink_palette
+  }
   background {
     bg_image: 'conic-gradient(from 36deg at 40.16% 61.66%, #7D7BD1 0deg, #D4D4F6 360deg)'
     bg_size: 'cover'
@@ -221,6 +224,9 @@ PageTheme sakura {
 }
 
 PageTheme forest {
+  color{
+    data: brand_color_palette
+  }
   background {
     bg_color: '#2A3A28'
   }

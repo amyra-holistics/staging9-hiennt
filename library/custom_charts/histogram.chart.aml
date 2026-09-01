@@ -27,6 +27,12 @@ CustomChartDef histogram {
       label: 'Max bins'
       default_value: 40
     }
+
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
+    }
   }
   template: @vgl {
     "data": {"values": @{values}},
@@ -37,11 +43,15 @@ CustomChartDef histogram {
       {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
       {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
     ],
-    "mark": {"type": "bar", "color": "#255DD4", "tooltip": true},
+    "mark": {"type": "bar", "tooltip": @{options.show_tooltip.value}},
     "encoding": {
       "x": {"field": "bin_start", "type": "quantitative", "bin": {"binned": true}, "axis": {"format": @{fields.value.format}, "formatType": "holisticsFormat", "grid": false}},
       "x2": {"field": "bin_start_end"},
-      "y": {"aggregate": "count", "title": "Count"}
+      "y": {"aggregate": "count", "title": "Count"},
+      "fillOpacity": {
+        "condition": {"param": "hoverPointSelection", "value": 1},
+        "value": 0.15
+      }
     },
     "holisticsConfig": {
       "crossFilterSignals": ["normalPointSelection"],

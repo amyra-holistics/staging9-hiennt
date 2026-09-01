@@ -23,12 +23,12 @@ CustomChartDef diverging_bar_chart {
   options {
     option positive_color {
       type: 'color-picker'
-      label: 'Positive Color'
+      label: 'Positive color'
       default_value: '#2cb67f'
     }
     option negative_color {
       type: 'color-picker'
-      label: 'Negative Color'
+      label: 'Negative color'
       default_value: '#e5484d'
     }
     option show_tooltip {
@@ -68,6 +68,10 @@ CustomChartDef diverging_bar_chart {
           "value": @{options.positive_color.value}
         },
         "value": @{options.negative_color.value}
+      },
+      "fillOpacity": {
+        "condition": {"param": "hoverPointSelection", "value": 1},
+        "value": 0.15
       }
     },
     "holisticsConfig": {

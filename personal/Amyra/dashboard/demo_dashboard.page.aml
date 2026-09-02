@@ -1,5 +1,8 @@
 Dashboard all_viz_test {
-  theme: purple
+  theme: DynamicPageTheme {
+    light: purple
+    dark: purple
+  }
   title: 'All viz test'
   description: ''
   owner: 'hien.nt@holistics.io'

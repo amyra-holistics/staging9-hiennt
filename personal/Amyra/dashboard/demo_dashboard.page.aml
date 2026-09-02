@@ -1,7 +1,7 @@
 Dashboard all_viz_test {
   theme: DynamicPageTheme {
     light: purple
-    dark: purple
+    dark: forest
   }
   title: 'All viz test'
   description: ''

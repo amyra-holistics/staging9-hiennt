@@ -1,11 +1,10 @@
-@tag('1️⃣ Trust/Endorsed')
 Dashboard untitled_3 {
   title: 'Audio Dashboard'
   description: ''
 
   view: CanvasLayout {
     label: 'View 1'
-    height: 840
+    height: 1000
     grid_size: 20
     mobile {
       mode: 'auto'
@@ -23,11 +22,15 @@ Dashboard untitled_3 {
       layer: 3
     }
     block v_5vs2 {
-      position: pos(40, 520, 660, 400)
+      position: pos(40, 520, 500, 400)
+      layer: 3
+    }
+    block ai_9vq5 {
+      position: pos(540, 520, 520, 400)
       layer: 3
     }
   }
-  theme: H.themes.midnight
+  theme: H.themes.vanilla
   block v1: VizBlock {
     label: 'Audio Detail'
     viz: DataTable {
@@ -140,5 +143,9 @@ Dashboard untitled_3 {
         show_row_number: true
       }
     }
+  }
+  block ai_9vq5: AiBlock {
+    label: 'summarize @VizBlock:untitled_3.v_5vs2'
+    prompt: @md summarize @VizBlock:untitled_3.v_5vs2;;
   }
 }

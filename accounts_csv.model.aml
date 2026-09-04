@@ -12,10 +12,12 @@ Model accounts_csv_ {
   }
   dimension created_at {
     label: 'Created at'
+    type: 'date'
     description: ''
-    type: 'datetime'
     hidden: false
     definition: @sql {{ #SOURCE.created_at }};;
+    primary_key: false
+    format: "hello"
   }
   dimension name {
     label: 'Name'

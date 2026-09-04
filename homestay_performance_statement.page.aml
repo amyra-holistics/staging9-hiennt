@@ -1,0 +1,776 @@
+const _homestay_performance_tokens = {
+  canvas: '#F3F0EE',
+  surface: '#FCFBFA',
+  ink: '#141413',
+  muted: '#706D68',
+  rule: '#E6E0DB',
+  accent: '#F37338',
+  radius_small: '20px',
+  radius_medium: '40px',
+  radius_pill: '999px',
+  font: 'Sofia Sans, Arial, sans-serif'
+}
+
+ColorPalette homestay_performance_statement_palette {
+  title: 'Performance Statement Palette'
+  categorical {
+    colors: [
+      '#F37338',
+      '#1B6F78',
+      '#7B5EA7',
+      '#356859',
+      '#A44A3F',
+      '#5E7184',
+      '#B0862D',
+      '#6A5D4D'
+    ]
+  }
+}
+
+PageTheme homestay_performance_statement_theme {
+  color {
+    data: homestay_performance_statement_palette
+  }
+
+  block {
+    background {
+      bg_color: 'transparent'
+    }
+    border {
+      border_width: 0
+      border_style: 'none'
+      border_color: '#E6E0DB'
+    }
+    shadow: 'none'
+    padding: 0
+    label {
+      font_family: 'Sofia Sans, Arial, sans-serif'
+      font_size: 13
+      font_color: '#141413'
+      font_weight: 'semibold'
+    }
+    text {
+      font_family: 'Sofia Sans, Arial, sans-serif'
+      font_size: 12
+      font_color: '#706D68'
+      font_weight: 'normal'
+    }
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: '#FCFBFA'
+        hover_color: '#F3F0EE'
+        banding_color: '#F8F5F2'
+        font_size: 10
+        font_color: '#141413'
+        font_family: 'Sofia Sans, Arial, sans-serif'
+        border_color: '#E6E0DB'
+        border_width: 1
+        grid_color: '#E6E0DB'
+      }
+      header {
+        bg_color: '#F3F0EE'
+        font_size: 10
+        font_color: '#141413'
+        font_weight: 'semibold'
+      }
+    }
+    metric_kpi {
+      alignment: 'center'
+      label {
+        font_family: 'Sofia Sans, Arial, sans-serif'
+        font_size: 12
+        font_color: '#706D68'
+        font_weight: 'medium'
+      }
+      value {
+        font_family: 'Sofia Sans, Arial, sans-serif'
+        font_size: 30
+        font_color: '#141413'
+        font_weight: 'bold'
+      }
+    }
+  }
+}
+
+Dashboard homestay_performance_statement {
+  title: 'Homestay Performance Statement'
+  description: 'A three-page A4 printable portfolio, booking, market, and listing-register performance statement.'
+  theme: homestay_performance_statement_theme
+
+  block total_listings_kpi: VizBlock {
+    label: 'Total Listings'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      value: VizFieldFull {
+        ref: r(homestay_dataset.total_listing)
+        label: 'Total Listings'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block booking_count_kpi: VizBlock {
+    label: 'Booking Count'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      calculation booking_count {
+        label: 'Booking Count'
+        formula: @aql homestay_bookings | count(homestay_bookings.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'booking_count'
+        label: 'Booking Count'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block total_booked_nights_kpi: VizBlock {
+    label: 'Total Booked Nights'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      calculation total_booked_nights {
+        label: 'Total Booked Nights'
+        formula: @aql homestay_bookings | sum(homestay_bookings.nights);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'total_booked_nights'
+        label: 'Total Booked Nights'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block average_listing_price_kpi: VizBlock {
+    label: 'Average Listing Price'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      calculation average_listing_price {
+        label: 'Average Listing Price'
+        formula: @aql homestay_listings | avg(homestay_listings.price);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'average_listing_price'
+        label: 'Average Listing Price'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block monthly_booking_count_by_check_in_month: VizBlock {
+    label: 'Monthly Booking Count by Check-in Month'
+    viz: CombinationChart {
+      dataset: homestay_dataset
+      calculation booking_count {
+        label: 'Booking Count'
+        formula: @aql homestay_bookings | count(homestay_bookings.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(homestay_bookings.check_in_date)
+        label: 'Check-in Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'booking_count'
+            label: 'Booking Count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block booking_count_by_reservation_status: VizBlock {
+    label: 'Booking Count by Reservation Status'
+    viz: PieChart {
+      dataset: homestay_dataset
+      calculation booking_count {
+        label: 'Booking Count'
+        formula: @aql homestay_bookings | count(homestay_bookings.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      legend: VizFieldFull {
+        ref: r(homestay_bookings.reservation_status)
+        label: 'Reservation Status'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: 'booking_count'
+          label: 'Booking Count'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: 'booking_count'
+            label: 'Booking Count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      ]
+      settings {
+        display_as_donut: true
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'desc'
+      }
+    }
+  }
+
+  block booking_count_by_listing_room_type: VizBlock {
+    label: 'Booking Count by Listing Room Type'
+    viz: CombinationChart {
+      dataset: homestay_dataset
+      calculation booking_count {
+        label: 'Booking Count'
+        formula: @aql homestay_bookings | count(homestay_bookings.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(homestay_listings.room_type)
+        label: 'Room Type'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: 'booking_count'
+            label: 'Booking Count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block neighbourhood_commercial_detail: VizBlock {
+    label: 'Neighbourhood Commercial Detail'
+    viz: ColumnChart {
+      dataset: homestay_dataset
+      calculation average_listing_price {
+        label: 'Average Listing Price'
+        formula: @aql homestay_listings | avg(homestay_listings.price);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Neighbourhood'
+        ref: r(homestay_neighbourhoods.neighbourhood)
+      }
+      y_axis {
+        label: 'Listing Count'
+        series {
+          field: VizFieldFull {
+            label: 'Listing Count'
+            ref: r(homestay_dataset.total_listing)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      y_axis {
+        label: 'Average Listing Price'
+        settings {
+          alignment: 'right'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Average Listing Price'
+            ref: 'average_listing_price'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Listing Count'
+            ref: r(homestay_dataset.total_listing)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Average Listing Price'
+            ref: 'average_listing_price'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        legend_label: 'top'
+        x_axis_label: 'Neighbourhood'
+        x_axis_show_null_datetime: true
+      }
+    }
+  }
+
+  block printable_listing_register: VizBlock {
+    label: 'Printable Listing Register'
+    viz: DataTable {
+      dataset: homestay_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(homestay_listings.name)
+          label: 'Listing Name'
+          format {
+            type: 'text'
+          }
+          uname: 'listing_name'
+        },
+        VizFieldFull {
+          ref: r(homestay_neighbourhoods.neighbourhood)
+          label: 'Neighbourhood'
+          format {
+            type: 'text'
+          }
+          uname: 'neighbourhood'
+        },
+        VizFieldFull {
+          ref: r(homestay_listings.room_type)
+          label: 'Room Type'
+          format {
+            type: 'text'
+          }
+          uname: 'room_type'
+        },
+        VizFieldFull {
+          ref: r(homestay_listings.accommodates)
+          label: 'Accommodates'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'accommodates'
+        },
+        VizFieldFull {
+          ref: r(homestay_listings.bedrooms)
+          label: 'Bedrooms'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'bedrooms'
+        },
+        VizFieldFull {
+          ref: r(homestay_listings.beds)
+          label: 'Beds'
+          format {
+            type: 'number'
+            pattern: '#,###0.00'
+          }
+          uname: 'beds'
+        },
+        VizFieldFull {
+          ref: r(homestay_listings.price)
+          label: 'Price'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+          uname: 'price'
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: false
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'listing_name'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'neighbourhood'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'room_type'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .homestay-statement {
+          --hs-canvas: #F3F0EE;
+          --hs-surface: #FCFBFA;
+          --hs-ink: #141413;
+          --hs-muted: #706D68;
+          --hs-rule: #E6E0DB;
+          --hs-accent: #F37338;
+          --hs-radius-sm: 20px;
+          --hs-radius-md: 40px;
+          --hs-radius-pill: 999px;
+          --hs-page-w: 210mm;
+          --hs-page-h: 297mm;
+          --hs-page-pad: 13mm;
+          color: var(--hs-ink);
+          font-family: 'Sofia Sans', Arial, sans-serif;
+          background: var(--hs-canvas);
+          padding: 12mm 0;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .homestay-statement *, .homestay-statement *::before, .homestay-statement *::after {
+          box-sizing: border-box;
+        }
+        .homestay-statement .hs-page {
+          width: var(--hs-page-w);
+          height: var(--hs-page-h);
+          margin: 0 auto 12mm;
+          padding: var(--hs-page-pad);
+          overflow: hidden;
+          position: relative;
+          background: var(--hs-surface);
+          border-radius: var(--hs-radius-sm);
+          box-shadow: 0 8px 28px rgba(20, 20, 19, 0.10);
+          display: flex;
+          flex-direction: column;
+          gap: 5mm;
+        }
+        .homestay-statement .hs-page::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 42mm;
+          height: 4mm;
+          background: var(--hs-accent);
+          border-radius: 0 0 0 var(--hs-radius-pill);
+        }
+        .homestay-statement .hs-eyebrow {
+          color: var(--hs-accent);
+          font-size: 8pt;
+          font-weight: 700;
+          letter-spacing: .16em;
+          text-transform: uppercase;
+        }
+        .homestay-statement .hs-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 8mm;
+          padding-bottom: 4mm;
+          border-bottom: 1px solid var(--hs-rule);
+        }
+        .homestay-statement .hs-title {
+          margin: 1mm 0 0;
+          font-size: 31pt;
+          line-height: .95;
+          letter-spacing: -.045em;
+          font-weight: 700;
+        }
+        .homestay-statement .hs-meta {
+          margin: 2mm 0 0;
+          color: var(--hs-muted);
+          font-size: 9pt;
+          line-height: 1.35;
+        }
+        .homestay-statement .hs-page-no {
+          color: var(--hs-muted);
+          font-size: 8pt;
+          font-weight: 700;
+          white-space: nowrap;
+        }
+        .homestay-statement .hs-section-title {
+          margin: 0;
+          font-size: 16pt;
+          line-height: 1;
+          letter-spacing: -.02em;
+        }
+        .homestay-statement .hs-section-note {
+          margin: 1mm 0 0;
+          color: var(--hs-muted);
+          font-size: 9pt;
+          line-height: 1.35;
+        }
+        .homestay-statement .hs-kpis {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 3mm;
+        }
+        .homestay-statement .hs-card {
+          min-width: 0;
+          background: var(--hs-surface);
+          border: 1px solid var(--hs-rule);
+          border-radius: var(--hs-radius-sm);
+          padding: 4mm 3mm;
+        }
+        .homestay-statement .hs-chart-card {
+          min-width: 0;
+          background: var(--hs-surface);
+          border: 1px solid var(--hs-rule);
+          border-radius: var(--hs-radius-sm);
+          padding: 4mm;
+          overflow: hidden;
+        }
+        .homestay-statement .hs-chart-card--trend { height: 128mm; }
+        .homestay-statement .hs-chart-card--half { height: 104mm; }
+        .homestay-statement .hs-chart-card--market { height: 172mm; }
+        .homestay-statement .hs-chart-card--register { height: 235mm; padding: 3mm; }
+        .homestay-statement .hs-two-col {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+          gap: 5mm;
+        }
+        .homestay-statement .hs-live {
+          width: 100%;
+          height: 100%;
+          min-width: 0;
+        }
+        .homestay-statement .hs-footer {
+          margin-top: auto;
+          padding-top: 3mm;
+          border-top: 1px solid var(--hs-rule);
+          display: flex;
+          justify-content: space-between;
+          gap: 6mm;
+          color: var(--hs-muted);
+          font-size: 7.5pt;
+          line-height: 1.3;
+        }
+        .homestay-statement .hs-footer strong { color: var(--hs-ink); }
+        .homestay-statement .dac-viz-block-label-container {
+          margin-bottom: 2mm;
+        }
+        .homestay-statement .dac-viz-block-label {
+          color: var(--hs-ink);
+          font-family: 'Sofia Sans', Arial, sans-serif;
+          font-weight: 700;
+        }
+        @media screen and (max-width: 215mm) {
+          .homestay-statement { padding: 0; }
+          .homestay-statement .hs-page {
+            width: 100%;
+            min-height: var(--hs-page-h);
+            height: auto;
+            border-radius: 0;
+            margin: 0;
+            box-shadow: none;
+          }
+        }
+        @media print {
+          .homestay-statement {
+            padding: 0;
+            background: var(--hs-surface);
+          }
+          .homestay-statement .hs-page {
+            width: 210mm;
+            height: 297mm;
+            margin: 0;
+            border: 0;
+            border-radius: 0;
+            box-shadow: none;
+            break-after: page;
+            page-break-after: always;
+          }
+          .homestay-statement .hs-page:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+          .homestay-statement .hs-card,
+          .homestay-statement .hs-chart-card,
+          .homestay-statement .hs-footer {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+      </style>
+
+      <main class="homestay-statement" aria-label="Homestay performance statement">
+        <section class="hs-page" aria-label="Page 1: portfolio and booking trend">
+          <header class="hs-header">
+            <div>
+              <div class="hs-eyebrow">Homestay portfolio</div>
+              <h1 class="hs-title">Performance<br />Statement</h1>
+              <p class="hs-meta">Portfolio and booking overview · Dataset-wide values</p>
+            </div>
+            <div class="hs-page-no">01 / 03</div>
+          </header>
+
+          <div class="hs-kpis">
+            <div class="hs-card"><div class="hs-live"><h-block name="total_listings_kpi" /></div></div>
+            <div class="hs-card"><div class="hs-live"><h-block name="booking_count_kpi" /></div></div>
+            <div class="hs-card"><div class="hs-live"><h-block name="total_booked_nights_kpi" /></div></div>
+            <div class="hs-card"><div class="hs-live"><h-block name="average_listing_price_kpi" /></div></div>
+          </div>
+
+          <div>
+            <div class="hs-eyebrow">Booking cadence</div>
+            <h2 class="hs-section-title">Monthly check-in demand</h2>
+            <p class="hs-section-note">Bookings scheduled to check in each month across the available period.</p>
+          </div>
+          <div class="hs-chart-card hs-chart-card--trend">
+            <div class="hs-live"><h-block name="monthly_booking_count_by_check_in_month" /></div>
+          </div>
+
+          <footer class="hs-footer">
+            <span><strong>Prepared for print</strong> · A4 performance statement</span>
+            <span>Portfolio overview</span>
+          </footer>
+        </section>
+
+        <section class="hs-page" aria-label="Page 2: booking and market mix">
+          <header class="hs-header">
+            <div>
+              <div class="hs-eyebrow">Booking and market mix</div>
+              <h2 class="hs-title">Demand<br />composition</h2>
+              <p class="hs-meta">Reservation outcomes, room-type demand, and neighbourhood commercial detail</p>
+            </div>
+            <div class="hs-page-no">02 / 03</div>
+          </header>
+
+          <div class="hs-two-col">
+            <div class="hs-chart-card hs-chart-card--half">
+              <div class="hs-live"><h-block name="booking_count_by_reservation_status" /></div>
+            </div>
+            <div class="hs-chart-card hs-chart-card--half">
+              <div class="hs-live"><h-block name="booking_count_by_listing_room_type" /></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="hs-eyebrow">Market coverage</div>
+            <h2 class="hs-section-title">Neighbourhood commercial detail</h2>
+            <p class="hs-section-note">Listing inventory and average advertised price by neighbourhood.</p>
+          </div>
+          <div class="hs-chart-card hs-chart-card--market">
+            <div class="hs-live"><h-block name="neighbourhood_commercial_detail" /></div>
+          </div>
+
+          <footer class="hs-footer">
+            <span><strong>Source</strong> · Homestay Dataset</span>
+            <span>Booking and market mix</span>
+          </footer>
+        </section>
+
+        <section class="hs-page" aria-label="Page 3: printable listing register">
+          <header class="hs-header">
+            <div>
+              <div class="hs-eyebrow">Portfolio register</div>
+              <h2 class="hs-title">Listing<br />register</h2>
+              <p class="hs-meta">Alphabetical listing-level detail for review and distribution</p>
+            </div>
+            <div class="hs-page-no">03 / 03</div>
+          </header>
+
+          <div class="hs-chart-card hs-chart-card--register">
+            <div class="hs-live"><h-block name="printable_listing_register" /></div>
+          </div>
+
+          <footer class="hs-footer">
+            <span><strong>Register fields</strong> · Listing, neighbourhood, room type, capacity, bedrooms, beds, price</span>
+            <span>End of statement</span>
+          </footer>
+        </section>
+      </main>
+    ;;
+  }
+}

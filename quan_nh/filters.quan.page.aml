@@ -30,7 +30,6 @@ Dashboard filters_quan {
       }
     }
   }
-  theme: showbie_light_theme
   block f_categories_id: FilterBlock {
     label: 'Categories Id'
     type: 'field'
@@ -183,4 +182,8 @@ Dashboard filters_quan {
       ]
     }
   ]
+  theme: DynamicPageTheme {
+    light: ghibli_meadow
+    dark: forest
+  }
 }

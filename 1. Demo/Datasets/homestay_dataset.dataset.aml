@@ -1,5 +1,5 @@
 Dataset homestay_dataset {
-  label: 'Movies Dataset'
+  label: 'Homestay Dataset'
   description: ''
   data_source_name: 'khai_postgre'
   models: [

@@ -1,0 +1,409 @@
+Skill build_dashboard_theme {
+label: 'Build Dashboard Theme'
+
+description: '''
+Create, update, or apply a custom Holistics dashboard theme from a brand name, website, screenshot, brand guidelines, explicit colors, or a requested visual direction.
+
+```
+Use when the user explicitly wants to theme, brand, restyle, or materially change a dashboard's visual language.
+
+`build_dashboard_v2` may also invoke this skill when a dashboard request includes an explicit custom visual direction.
+
+Typical phrasings: match our brand, use these colors, make it dark, make it warm/minimal/premium/editorial, use Stripe-style visuals, create a custom chart palette, restyle this dashboard.
+
+Do not trigger merely because a new dashboard needs to look good. Without a custom style request, dashboards use Holistics' default visual style.
+
+Do not create a custom ColorPalette unless the requested theme intentionally needs to override Holistics' application-level default chart palette.
+
+Do not use for dashboard analytical structure, block content, controls, or HTML composition.
+```
+
+'''
+
+invocation: 'auto'
+allow_switching_invocation: true
+
+content: @md
+
+# Building a Dashboard Theme
+
+Create and apply an intentional custom visual system for a Holistics dashboard.
+
+A custom theme may control:
+
+* colors;
+* surfaces;
+* typography;
+* density;
+* borders/elevation;
+* KPI/table styling;
+* semantic colors;
+* optionally, chart palette.
+
+A theme does not need to replace Holistics' default chart palette.
+
+## What a good input looks like
+
+Determine:
+
+1. **Visual direction** — brand, style, mood, or explicit reference.
+2. **Mode** — light or dark.
+3. **Anchors** — known brand colors or other locked visual values.
+4. **Surfaces** — background/card character and separation.
+5. **Typography** — body/display fonts and density.
+6. **Personality** — corners, elevation, accent strength.
+7. **Palette policy** — inherit Holistics chart palette or intentionally replace it.
+8. **Target layout** — Canvas/Tab or HTMLLayout.
+9. **Target dashboard(s)** — where the theme should be applied.
+
+Infer reasonable missing values.
+
+If a brand is named, use real supplied or verifiable values when possible.
+
+Do not present guessed brand values as official.
+
+Ask at most one short clarification round when an important locked brand decision cannot reasonably be inferred.
+
+## What a bare minimum output looks like
+
+Every custom-theme run produces:
+
+* one `_theme_tokens` object as the source of truth;
+* one complete `PageTheme` appropriate for the target layout;
+* the theme applied to its target dashboard(s);
+* clean diagnostics.
+
+A `ColorPalette` is conditional.
+
+Create one when:
+
+* the user explicitly asks for a chart palette;
+* brand chart colors are an important part of the requested visual identity;
+* the existing chart palette materially conflicts with the requested theme.
+
+Otherwise, preserve Holistics' application-level default chart palette and omit the theme-level palette override.
+
+Never create a palette merely because a PageTheme exists.
+
+## Workflow
+
+### 1. Derive the visual system
+
+Derive design decisions from:
+
+1. explicit user values;
+2. supplied brand/style references;
+3. existing project themes;
+4. the requested mood or style.
+
+Locked user-provided values should not be aesthetically rewritten.
+
+When a brand is named, inspect supplied guidelines or available brand sources where possible.
+
+Never fabricate logo or asset URLs.
+
+### 2. Determine palette policy
+
+Make this decision explicitly.
+
+#### Inherit Holistics chart palette
+
+Default when the user wants a custom page/theme treatment but does not need custom chart series colors.
+
+Do not create a `ColorPalette`.
+
+Do not add:
+
+```aml
+color {
+  data: ...
+}
+```
+
+Charts continue using Holistics' application-level default palette.
+
+#### Custom chart palette
+
+Use when the requested visual identity needs chart colors to change.
+
+Create a complete categorical `ColorPalette`, normally with eight useful series colors.
+
+Reference it from:
+
+```aml
+color {
+  data: <palette>
+}
+```
+
+Keep chart colors legible across the surfaces on which charts appear.
+
+### 3. Determine layout context
+
+#### Canvas / Tab
+
+A native dashboard theme may control:
+
+* page background;
+* canvas;
+* blocks;
+* chart palette when overridden;
+* tables;
+* KPIs;
+* rendered text.
+
+#### HTMLLayout
+
+HTML controls its own page and layout surfaces.
+
+For an HTML-specific PageTheme, omit:
+
+```aml
+background { ... }
+canvas { ... }
+```
+
+Still style Holistics-rendered content:
+
+* chart palette when intentionally overridden;
+* transparent block chrome;
+* block labels/text;
+* tables;
+* KPIs;
+* rendered markdown/text.
+
+The resolved token values should also be usable by `build_html_layout` as its CSS visual direction.
+
+### 4. Create design tokens
+
+Use a `const _theme_tokens` object as the source of truth for repeated design decisions.
+
+Recommended baseline:
+
+```aml
+const _theme_tokens = {
+  primary: "...",
+  secondary: "...",
+  mode: "light|dark",
+
+  background: "...",
+  canvas_bg: "...",
+  block_bg: "...",
+
+  text_primary: "...",
+  text_muted: "...",
+  text_subtle: "...",
+
+  border: "...",
+  focus_ring: "...",
+
+  semantic_success: "...",
+  semantic_warning: "...",
+  semantic_danger: "...",
+
+  font_body: "...",
+  font_display: "...",
+
+  corner_style: "sharp|rounded|soft",
+  density: "compact|comfortable|spacious",
+  elevation: "hairline|flat|shadow"
+}
+```
+
+Extend only when the theme needs another repeated design decision.
+
+### 5. Build the PageTheme
+
+Use tokens consistently rather than repeating literal values.
+
+For Canvas/Tab, build the complete native theme appropriate to the blocks in use.
+
+For HTML, omit page `background` and `canvas` and make native block containers transparent.
+
+Example HTML block treatment:
+
+```aml
+block {
+  background { bg_color: 'transparent' }
+
+  border {
+    border_width: 0
+    border_style: 'none'
+    border_color: _theme_tokens("border")
+  }
+
+  shadow: 'none'
+  padding: 0
+
+  label {
+    font_family: _theme_tokens("font_display")
+    font_color: _theme_tokens("text_primary")
+    ...
+  }
+
+  text {
+    font_family: _theme_tokens("font_body")
+    font_color: _theme_tokens("text_muted")
+    ...
+  }
+}
+```
+
+Style tables when tables are present.
+
+Style KPI labels, values, progress, and trends consistently.
+
+Use semantic success/danger colors for positive and negative states rather than forcing brand colors into semantic roles.
+
+Use `custom_css` for rendered TextBlock content not covered by structured PageTheme properties.
+
+### 6. Apply the theme
+
+Apply the resulting theme to the requested dashboard(s).
+
+Do not leave:
+
+* an unapplied theme;
+* a dangling `theme:` reference;
+* a palette that is not connected to its theme;
+* a custom palette when the intent was to inherit the app palette.
+
+For HTMLLayout, ensure `build_html_layout` can consume the resolved theme tokens for CSS presentation.
+
+### 7. Verify
+
+Read back touched files and verify:
+
+* tokens are present;
+* PageTheme is complete for the target layout;
+* palette policy is intentional;
+* custom palette exists only when required;
+* HTML themes omit `background` and `canvas`;
+* names/references are valid;
+* theme is applied;
+* diagnostics contain no errors.
+
+Unknown properties or names usually mean invented AML vocabulary. Fix them rather than guessing.
+
+## Schema
+
+A custom theme normally consists of:
+
+```aml
+const _theme_tokens = {
+  ...
+}
+
+ColorPalette _palette {
+  ...
+} // only when intentionally overriding chart colors
+
+PageTheme _theme {
+  ...
+}
+```
+
+When inheriting Holistics' application chart palette, omit the `ColorPalette` and omit `color { data: ... }`.
+
+### Native Canvas/Tab PageTheme
+
+May include:
+
+```aml
+PageTheme _theme {
+  background { ... }
+  canvas { ... }
+
+  block { ... }
+
+  viz {
+    table { ... }
+    metric_kpi { ... }
+  }
+
+  custom_css: @css
+    ...
+}
+```
+
+Add:
+
+```aml
+color {
+  data: _palette
+}
+```
+
+only when a custom palette exists.
+
+### HTML PageTheme
+
+Use:
+
+```aml
+PageTheme _theme {
+  // optional color { data: _palette } only for custom palette
+
+  block {
+    background { bg_color: 'transparent' }
+    ...
+  }
+
+  viz {
+    table { ... }
+    metric_kpi { ... }
+  }
+
+  custom_css: @css
+    ...
+}
+```
+
+Do not include page-level `background` or `canvas`.
+
+Check:
+
+https://docs.holistics.io/reference/aml/theme
+
+## Conventions
+
+### Design principles
+
+* Treat explicit user/brand values as anchors.
+* Derive missing values into a coherent system rather than choosing them independently.
+* Maintain readable contrast.
+* Keep semantic positive/negative colors semantically recognizable.
+* Use typography, spacing, borders, and elevation as part of the theme—not color alone.
+* Keep the design restrained enough for analytical content to remain primary.
+
+### Palette
+
+* Holistics' application palette is the default.
+* A custom PageTheme does not automatically require a custom ColorPalette.
+* When a custom palette is required, build a complete, balanced categorical series.
+* Avoid colors that disappear against the theme's surfaces.
+* Do not override chart colors simply to demonstrate that the theme is customized.
+
+### Do
+
+* Build a coherent visual system.
+* Preserve app chart colors unless there is a reason to replace them.
+* Use one source of truth for repeated design values.
+* Adapt PageTheme structure to Canvas/Tab vs HTML.
+* Apply the theme to the requested dashboard.
+* Let `build_html_layout` consume custom theme tokens for HTML CSS.
+* Check public docs when syntax is unfamiliar.
+
+### Don't
+
+* Don't trigger for ordinary dashboard builds with no custom style request.
+* Don't create arbitrary "default" themes.
+* Don't create a ColorPalette by default.
+* Don't fabricate brand values or assets.
+* Don't include `background` or `canvas` in HTML-specific themes.
+* Don't use brand colors for semantic positive/negative meaning when they conflict.
+* Don't invent AML properties.
+* Don't leave themes unapplied.
+
+;;
+}

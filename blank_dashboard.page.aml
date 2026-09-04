@@ -1,0 +1,122 @@
+Dashboard blank_dashboard {
+  title: 'blank_dashboard'
+  description: ''
+  owner: 'hien.nt@holistics.io'
+  block title: TextBlock {
+    content: @md # Your title goes here ;;
+  }
+  block v_0e2c: VizBlock {
+    label: 'Count of Id by Name'
+    viz: FilledMap {
+      dataset: d_cities
+      location {
+        field: VizFieldFull {
+          ref: r(ecommerce_cities.name)
+          format {
+            type: 'text'
+          }
+        }
+        location_type: 'city'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        ref: r(ecommerce_cities.id)
+        aggregation: 'count'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 80)
+    }
+    block v_0e2c {
+      position: pos(150, 150, 620, 420)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme {
+    dark: purple
+    light {
+  title: 'Purple title'
+  background {
+    bg_image: 'conic-gradient(from 36deg at 40.16% 61.66%, #7D7BD1 0deg, #D4D4F6 360deg)'
+    bg_size: 'cover'
+  }
+  block {
+    label: FontTheme {
+      font_size: 14
+      font_color: '#3C3B7A'
+    }
+    text {
+      font_size: 12
+      font_color: '#3C3B7A'
+    }
+    border {
+      border_width: 1
+      border_radius: 8
+      border_color: '#B2B1F2'
+    }
+    background {
+      bg_color: '#F2F2FC'
+    }
+    padding: 12
+    shadow: 'none'
+}
+  viz {
+    table {
+      general {
+      bg_color: 'white';
+        banding_color: 'transparent';
+        hover_color: '#B2B1F2'; 
+        font_size: '12px'; 
+        font_color: '#3C3B7A'; 
+        border_color: '#6B68EA'; 
+        grid_color: '#6B68EA'; 
+      }
+
+      // Header Styles
+      header {
+        bg_color: '#504DD2'; 
+        font_size: '14px'; 
+        font_color: 'white';
+        font_weight: 'bold'; 
+      }
+
+      // Row Header Styles
+      row_header {
+        font_color: '#3C3B7A'; 
+        font_size: '12px'; 
+        font_weight: 'normal'; 
+      }
+
+      // Column Header Styles
+      column_header {
+        bg_color: '#504DD2'; 
+        font_size: '12px'; 
+        font_color: 'white';
+        font_weight: 'normal'; 
+      }
+
+      // Subtitle Styles
+      sub_title {
+        font_size: '12px';
+        font_color: 'white'
+        font_weight: 'light';
+      }
+    }
+  }
+    }
+}
+}

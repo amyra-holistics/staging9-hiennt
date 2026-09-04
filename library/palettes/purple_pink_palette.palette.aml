@@ -1,0 +1,13 @@
+ColorPalette purple_pink_palette {
+  title: 'Purple & Pink'
+  categorical {
+    colors: [
+      '#5B21B6',
+      '#7C3AED',
+      '#A78BFA',
+      '#9D174D',
+      '#DB2777',
+      '#F472B6'
+    ]
+  }
+}

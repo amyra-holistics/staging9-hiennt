@@ -29,24 +29,6 @@ CustomChartDef bump_chart {
     }
   }
   options {
-    option color_scheme {
-      type: 'select'
-      label: 'Color scheme'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'pastel1',
-        'pastel2',
-        'set1',
-        'set2',
-        'set3'
-      ]
-      default_value: 'tableau10'
-    }
-
     option line_interpolate {
       type: 'select'
       label: 'Line style'
@@ -58,15 +40,15 @@ CustomChartDef bump_chart {
     }
 
     option point_size {
-      type: 'select'
+      type: 'number-input'
       label: 'Point size'
-      options: [
-        60,
-        100,
-        140,
-        180
-      ]
       default_value: 100
+    }
+
+    option show_tooltip {
+      type: 'toggle'
+      label: 'Show tooltip'
+      default_value: true
     }
   }
   template: @vg {
@@ -153,7 +135,7 @@ CustomChartDef bump_chart {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "table", "field": "category"},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "axes": [
@@ -165,6 +147,7 @@ CustomChartDef bump_chart {
         "fill": "color",
         "title": null,
         "orient": "top",
+        "direction": "horizontal",
         "encode": {
           "symbols": {
             "name": "legendSymbol",
@@ -215,7 +198,7 @@ CustomChartDef bump_chart {
                 "size": {"value": @{options.point_size.value}},
                 "opacity": {"signal": "hovered === null || hovered === datum.category ? 1 : 0.15"},
                 "tooltip": {
-                  "signal": "datum.category + ' - ' + datum.period + ': rank ' + datum.rank + ' (' + format(datum.amount, ',') + ')'"
+                  "signal": "@{options.show_tooltip.value} ? datum.category + ' - ' + datum.period + ': rank ' + datum.rank + ' (' + format(datum.amount, ',') + ')' : null"
                 }
               }
             }

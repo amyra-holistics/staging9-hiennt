@@ -1,0 +1,41 @@
+Model annotated_time_series_csv {
+  type: 'table'
+  label: 'Annotated time series csv'
+  description: ''
+  data_source_name: 'demodb'
+  dimension date {
+    label: 'Date'
+    description: ''
+    type: 'date'
+    hidden: false
+    definition: @sql {{ #SOURCE.date }};;
+  }
+  dimension value {
+    label: 'Value'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.value }};;
+  }
+  dimension event_label {
+    label: 'Event label'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.event_label }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'sample-data.csv'
+    uploaded_at: '2026-08-22 04:48:48'
+    hash: '889c75fc47fa926fbb635eb6de3458499276e7d37b791c36ea17b9c2a14e80fa'
+    column_configs: [
+      H.imports.column_config("date", "date", "date"),
+      H.imports.column_config("value", "value", "number"),
+      H.imports.column_config("event_label", "event_label", "text")
+    ]
+  }
+  owner: 'hien.nt@holistics.io'
+  table_name: '"persisted"."holistics_annotated_tim_b0d96_202608220448"'
+}

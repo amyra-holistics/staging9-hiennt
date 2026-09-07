@@ -1,3 +1,34 @@
+const ikea_local_tokens = {
+  primary: "oklch(0.45 0.15 250)"
+  secondary: "oklch(0.88 0.17 92)"
+  background: "oklch(0.96 0.01 90)"
+  canvas_bg: "oklch(0.975 0.005 90)"
+  block_bg: "oklch(1 0 0)"
+  text_primary: "oklch(0.28 0.06 250)"
+  text_muted: "oklch(0.45 0.03 250)"
+  text_subtle: "oklch(0.60 0.02 250)"
+  border: "oklch(0.86 0.02 250)"
+  success: "oklch(0.55 0.14 145)"
+  danger: "oklch(0.54 0.19 28)"
+  font: "Inter"
+}
+
+ColorPalette ikea_local_palette {
+  title: "IKEA-inspired local palette"
+  categorical {
+    colors: [
+      "oklch(0.45 0.15 250)",
+      "oklch(0.88 0.17 92)",
+      "oklch(0.62 0.16 35)",
+      "oklch(0.58 0.15 145)",
+      "oklch(0.60 0.14 190)",
+      "oklch(0.57 0.17 315)",
+      "oklch(0.62 0.15 55)",
+      "oklch(0.52 0.13 285)"
+    ]
+  }
+}
+
 Dashboard sankey_test_new {
   title: 'Sankey Test New'
   description: ''''''
@@ -58,7 +89,7 @@ Dashboard sankey_test_new {
             }
           }
           settings {
-            color: '#E27712'
+            color: '#0058A3'
             color_palette: 'seq-magma'
           }
         }
@@ -72,7 +103,7 @@ Dashboard sankey_test_new {
             }
           }
           settings {
-            color: '#18A59E'
+            color: '#C89211'
             color_palette: 'seq-magma'
           }
         }
@@ -225,7 +256,310 @@ Dashboard sankey_test_new {
       }
     }
   }
-  theme: H.themes.classic
+  theme: DynamicPageTheme {
+    light {
+      background {
+        bg_color: 'oklch(0.96 0.01 90)'
+      }
+      canvas {
+        border {
+          border_width: 0
+          border_radius: 4
+          border_color: 'oklch(0.86 0.02 250)'
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'oklch(0.975 0.005 90)'
+        }
+        shadow: 'none'
+        opacity: 1
+      }
+      block {
+        label {
+          font_family: 'Inter'
+          font_color: 'oklch(0.28 0.06 250)'
+          font_size: 14
+          font_weight: 'semibold'
+          font_style: 'normal'
+          letter_spacing: '0'
+        }
+        text {
+          font_family: 'Inter'
+          font_color: 'oklch(0.45 0.03 250)'
+          font_size: 13
+          font_weight: 'normal'
+          font_style: 'normal'
+        }
+        border {
+          border_width: 1
+          border_radius: 4
+          border_color: 'oklch(0.86 0.02 250)'
+          border_style: 'solid'
+        }
+        background {
+          bg_color: 'oklch(1 0 0)'
+        }
+        padding: 16
+        shadow: 'none'
+        opacity: 1
+      }
+      custom_css: @css .dac-text-block {
+  font-family: Inter;
+  font-size: 14px;
+  color: oklch(0.45 0.03 250);
+  line-height: 1.6;
+}
+.dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+  font-family: Inter;
+  color: oklch(0.28 0.06 250);
+  line-height: 1.3;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+};;
+      viz {
+        table {
+          general {
+            bg_color: 'oklch(1 0 0)'
+            hover_color: 'oklch(0.95 0.02 92)'
+            banding_color: 'oklch(0.985 0.01 90)'
+            font_size: 13
+            font_color: 'oklch(0.45 0.03 250)'
+            font_family: 'Inter'
+            border_color: 'oklch(0.86 0.02 250)'
+            border_width: 1
+            grid_color: 'oklch(0.86 0.02 250)'
+          }
+          header {
+            bg_color: 'oklch(0.45 0.15 250)'
+            font_size: 13
+            font_weight: 'semibold'
+            font_color: 'oklch(1 0 0)'
+          }
+          sub_header {
+            bg_color: 'oklch(0.985 0.01 90)'
+            font_size: 13
+            font_weight: 'medium'
+            font_color: 'oklch(0.45 0.03 250)'
+          }
+          sub_title {
+            font_size: 12
+            font_weight: 'medium'
+            font_color: 'oklch(0.60 0.02 250)'
+          }
+          sparkline {
+            line {
+              color: 'oklch(0.45 0.15 250)'
+            }
+            column {
+              color: 'oklch(0.45 0.15 250)'
+            }
+          }
+        }
+        metric_kpi {
+          label {
+            font_family: 'Inter'
+            font_color: 'oklch(0.45 0.03 250)'
+          }
+          value {
+            font_family: 'Inter'
+            font_color: 'oklch(0.28 0.06 250)'
+          }
+          progress {
+            text {
+              font_color: 'oklch(0.45 0.03 250)'
+            }
+            indicator {
+              bg_color: 'oklch(0.45 0.15 250)'
+            }
+            track {
+              bg_color: 'oklch(0.86 0.02 250)'
+            }
+          }
+          trend {
+            positive {
+              text {
+                font_color: 'oklch(0.55 0.14 145)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.04 145)'
+              }
+            }
+            negative {
+              text {
+                font_color: 'oklch(0.54 0.19 28)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.04 28)'
+              }
+            }
+            neutral {
+              text {
+                font_color: 'oklch(0.45 0.03 250)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.01 250)'
+              }
+            }
+          }
+        }
+      }
+      color {
+        data: ikea_local_palette
+      }
+    }
+    dark {
+      background {
+        bg_color: 'oklch(0.96 0.01 90)'
+      }
+      canvas {
+        border {
+          border_width: 0
+          border_radius: 4
+          border_color: 'oklch(0.86 0.02 250)'
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'oklch(0.975 0.005 90)'
+        }
+        shadow: 'none'
+        opacity: 1
+      }
+      block {
+        label {
+          font_family: 'Inter'
+          font_color: 'oklch(0.28 0.06 250)'
+          font_size: 14
+          font_weight: 'semibold'
+          font_style: 'normal'
+          letter_spacing: '0'
+        }
+        text {
+          font_family: 'Inter'
+          font_color: 'oklch(0.45 0.03 250)'
+          font_size: 13
+          font_weight: 'normal'
+          font_style: 'normal'
+        }
+        border {
+          border_width: 1
+          border_radius: 4
+          border_color: 'oklch(0.86 0.02 250)'
+          border_style: 'solid'
+        }
+        background {
+          bg_color: 'oklch(1 0 0)'
+        }
+        padding: 16
+        shadow: 'none'
+        opacity: 1
+      }
+      custom_css: @css .dac-text-block {
+  font-family: Inter;
+  font-size: 14px;
+  color: oklch(0.45 0.03 250);
+  line-height: 1.6;
+}
+.dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+  font-family: Inter;
+  color: oklch(0.28 0.06 250);
+  line-height: 1.3;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+};;
+      viz {
+        table {
+          general {
+            bg_color: 'oklch(1 0 0)'
+            hover_color: 'oklch(0.95 0.02 92)'
+            banding_color: 'oklch(0.985 0.01 90)'
+            font_size: 13
+            font_color: 'oklch(0.45 0.03 250)'
+            font_family: 'Inter'
+            border_color: 'oklch(0.86 0.02 250)'
+            border_width: 1
+            grid_color: 'oklch(0.86 0.02 250)'
+          }
+          header {
+            bg_color: 'oklch(0.45 0.15 250)'
+            font_size: 13
+            font_weight: 'semibold'
+            font_color: 'oklch(1 0 0)'
+          }
+          sub_header {
+            bg_color: 'oklch(0.985 0.01 90)'
+            font_size: 13
+            font_weight: 'medium'
+            font_color: 'oklch(0.45 0.03 250)'
+          }
+          sub_title {
+            font_size: 12
+            font_weight: 'medium'
+            font_color: 'oklch(0.60 0.02 250)'
+          }
+          sparkline {
+            line {
+              color: 'oklch(0.45 0.15 250)'
+            }
+            column {
+              color: 'oklch(0.45 0.15 250)'
+            }
+          }
+        }
+        metric_kpi {
+          label {
+            font_family: 'Inter'
+            font_color: 'oklch(0.45 0.03 250)'
+          }
+          value {
+            font_family: 'Inter'
+            font_color: 'oklch(0.28 0.06 250)'
+          }
+          progress {
+            text {
+              font_color: 'oklch(0.45 0.03 250)'
+            }
+            indicator {
+              bg_color: 'oklch(0.45 0.15 250)'
+            }
+            track {
+              bg_color: 'oklch(0.86 0.02 250)'
+            }
+          }
+          trend {
+            positive {
+              text {
+                font_color: 'oklch(0.55 0.14 145)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.04 145)'
+              }
+            }
+            negative {
+              text {
+                font_color: 'oklch(0.54 0.19 28)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.04 28)'
+              }
+            }
+            neutral {
+              text {
+                font_color: 'oklch(0.45 0.03 250)'
+              }
+              background {
+                bg_color: 'oklch(0.94 0.01 250)'
+              }
+            }
+          }
+        }
+      }
+      color {
+        data: ikea_local_palette
+      }
+    }
+  }
   interactions: [
     FilterInteraction {
       from: 'v4'

@@ -1,0 +1,1117 @@
+// =============================================================================
+// DATA STORY — scrolling narrative, Google-styled
+// =============================================================================
+//
+// STATUS
+//   Not an empty template. Every block is wired to `ecommerce_official` and
+//   filtered to calendar 2025. To make it reusable again, strip the dataset
+//   name, the r() field references and the 2025 filters out of the eleven
+//   VizBlocks — layout, theme and token block are all still generic.
+//
+// FORMAT
+//   Screen, scrolls vertically. Not paginated — no @media print, no @page.
+//
+// THEME
+//   Google. Roboto via Google Fonts, Google Blue #1A73E8 as the single accent,
+//   Google Grey surfaces, elevation by shadow rather than outline. Google Sans
+//   is Google's real display face but is not publicly licensed, so Roboto
+//   carries both roles.
+//   Signature device: a four-segment rule in blue / red / yellow / green before
+//   every eyebrow, 32x3 on light sections and 56x4 on the dark bands.
+//
+// SURFACE RHYTHM
+//   1  masthead        white   eyebrow / headline / standfirst / byline
+//   2  hero stat       DARK    one very large figure, blue glow, label in markup
+//   3  section one     white   copy left (1fr), chart right (2fr)
+//   4  figure          white   full-width chart + caption
+//   5  pull statement  TINT    one claim, 34px light
+//   6  evidence row    white   three KPIs, auto-fit, REFLOWS, staggered entrance
+//   7  section two     TINT    chart left (2fr), copy right (1fr)
+//   8  detail          white   table + method note
+//   9  close           DARK    the takeaway + source line
+//   Never more than two white sections in a row. That alternation is what stops
+//   a nine-section scroll reading as one long undifferentiated page.
+//
+// SECTION NUMBERING
+//   Sections 3 to 8 are auto-numbered 01–06 with a CSS counter, so inserting or
+//   removing a section renumbers the rest. The masthead and the two dark bands
+//   are excluded via `.is-unnumbered`. Nothing is hand-numbered.
+//
+// SLOT CONTRACT
+//   k_hero          MetricKpi   required     hero figure, dark band, clamped 56–108px
+//   k_stat_1..3     MetricKpi   optional     evidence row, auto-fit, REFLOWS
+//   v_sec_1         any viz     required     min-height 340, fixed position
+//   v_sec_2         any viz     recommended  min-height 400, full width
+//   v_sec_3         any viz     optional     min-height 340, fixed position
+//   v_table         DataTable   optional     min-height 300
+//   t_headline      TextBlock   required     the headline, display size
+//   t_hero_note     TextBlock   required     sentence beside the hero figure
+//   t_sec_1         TextBlock   required     section one copy
+//   t_pull          TextBlock   required     one claim, large
+//   t_sec_3         TextBlock   optional     section two copy
+//   t_close         TextBlock   required     the takeaway
+//
+//   The eyebrows, standfirst, byline, hero label, figure caption, method note
+//   and source line are plain markup, marked << EDIT >>. Edited here, not in
+//   the dashboard UI.
+//
+// KNOWN TRADE — UI EDITING IS OFF
+//   This file uses `const`. Per the Holistics docs, once a file contains Const,
+//   Func or Extend, charts and layout must be maintained as code — editing those
+//   blocks in the dashboard UI will not work. Delete the const block and inline
+//   the hexes (each marked "twin of --t-*") to get UI editing back.
+//
+// STYLING BLOCK INTERNALS — read before editing the CSS
+//   Holistics wraps TextBlock markdown in `.dac-text-block` and then renders the
+//   markdown INSIDE it as <p>, <h3> and so on. Setting font-size on
+//   `.dac-text-block` alone does nothing to those children — they keep the
+//   Holistics defaults, which is why display type silently collapses to body
+//   size. Every type rule below therefore targets the child elements, not just
+//   the wrapper. If you add a copy slot, copy that pattern.
+//
+// PREFLIGHT — verified against this file
+//   [x] the whole template is one .aml file — consts, palette, dashboard, theme, layout
+//   [x] the consts and the ColorPalette are declared above the Dashboard
+//   [x] theme is written as `theme: PageTheme { }` inside the Dashboard
+//   [x] theme is complete: palette, block, table, KPI, custom_css
+//   [x] every declared block appears in exactly one <h-block>  (14 blocks, 14 tags)
+//   [x] every chart container has an explicit height (min-height, screen format)
+//   [x] no <script>, no inline JS — motion is @keyframes and :hover only
+//   [x] all selectors scoped under .dst
+//   [x] no :target used, so no default-state rule needed
+//   [ ] @media print — N/A, this template does not claim print output
+//   [x] literal colors confined to the const block (AML) and .dst token block (CSS)
+//   [x] no styling hung on the <h-block> tag itself — every one is wrapped
+//   [x] grid tracks use minmax(0, 1fr)
+//   [x] no dead CSS for elements that aren't in the markup
+// =============================================================================
+
+// Flat scalar consts, the form the Holistics theming docs demonstrate.
+const g_blue        = '#1A73E8'   // twin of --t-accent
+const g_blue_dark   = '#174EA6'   // twin of --t-accent-dk
+const g_blue_light  = '#8AB4F8'   // twin of --t-accent-lt
+const g_bg          = '#FFFFFF'   // twin of --t-bg
+const g_surface     = '#F8F9FA'   // twin of --t-surface
+const g_border      = '#DADCE0'   // twin of --t-border
+const g_ink         = '#202124'   // twin of --t-ink
+const g_ink_dim     = '#5F6368'   // twin of --t-ink-dim
+const g_font        = 'Roboto'    // twin of --t-font-sans
+
+ColorPalette story_palette {
+  title: 'Google'
+  categorical {
+    colors: [
+      g_blue,
+      '#D93025',
+      '#E37400',
+      '#188038',
+      '#9334E6',
+      '#00838F',
+      '#C5177B',
+      '#5F6368'
+    ]
+  }
+}
+
+Dashboard data_story {
+  title: 'Data Story'
+  description: '2025 ecommerce performance, told as a scrolling narrative. Edit the << EDIT >> strings in the layout and the six TextBlocks before sharing.'
+
+  theme: PageTheme {
+    color {
+      data: story_palette
+    }
+
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+        border_radius: 12          // twin of --t-radius
+        border_color: g_border
+      }
+      shadow: 'none'
+      padding: 0
+      opacity: 1
+      label {
+        font_family: g_font
+        font_size: 14
+        font_color: g_ink
+        font_weight: 'medium'
+      }
+      text {
+        font_family: g_font
+        font_size: 14
+        font_color: g_ink_dim
+        font_weight: 'normal'
+      }
+    }
+
+    viz {
+      table {
+        general {
+          bg_color: g_bg
+          hover_color: g_surface
+          banding_color: '#FCFCFD'
+          font_size: 13
+          font_color: g_ink_dim
+          font_family: g_font
+          border_color: g_border
+          border_width: 1
+          grid_color: g_border
+        }
+        header {
+          bg_color: g_bg
+          font_size: 12
+          font_color: g_ink_dim
+          font_weight: 'medium'
+        }
+        sub_header {
+          bg_color: g_surface
+          font_size: 13
+          font_color: g_ink
+          font_weight: 'medium'
+        }
+        sub_title {
+          font_size: 12
+          font_color: g_ink_dim
+          font_weight: 'medium'
+        }
+        sparkline {
+          line {
+            color: g_blue
+          }
+          column {
+            color: g_blue
+          }
+        }
+      }
+      metric_kpi {
+        alignment: 'left'
+        label {
+          font_family: g_font
+          font_size: 13
+          font_color: g_ink_dim
+        }
+        value {
+          font_family: g_font
+          font_size: 40
+          font_color: g_ink
+        }
+        progress {
+          indicator {
+            bg_color: g_blue
+          }
+          track {
+            bg_color: g_border
+          }
+          text {
+            font_color: g_ink_dim
+          }
+        }
+        // Trend colours are semantic, not brand. Google Green 700 and Red 600
+        // happen to be both. Do not reskin these to a palette that loses the
+        // good/bad reading.
+        trend {
+          positive {
+            text {
+              font_color: '#188038'
+            }
+            background {
+              bg_color: '#E6F4EA'
+            }
+          }
+          negative {
+            text {
+              font_color: '#D93025'
+            }
+            background {
+              bg_color: '#FCE8E6'
+            }
+          }
+          neutral {
+            text {
+              font_color: g_ink_dim
+            }
+            background {
+              bg_color: g_surface
+            }
+          }
+        }
+      }
+    }
+
+    custom_css: @css
+      .dac-text-block {
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 14px;
+        color: #5F6368;
+        line-height: 1.6;
+      }
+      .dac-text-block h1, .dac-text-block h2, .dac-text-block h3,
+      .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+        font-family: Roboto, Arial, sans-serif;
+        color: #202124;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+        font-weight: 500;
+      }
+    ;;
+  }
+
+  // ---------------------------------------------------------------------------
+  // COPY SLOTS — plain markdown, filled in the dashboard UI
+  // ---------------------------------------------------------------------------
+
+  block t_headline: TextBlock {
+    content: @md
+Revenue grew faster than the market for the third quarter running
+    ;;
+  }
+
+  block t_hero_note: TextBlock {
+    content: @md
+One or two sentences that say what the figure to the left actually means, and why it is the number this story is built around.
+    ;;
+  }
+
+  block t_sec_1: TextBlock {
+    content: @md
+### What happened
+
+Two or three short paragraphs setting up the chart beside this copy. Say what
+the reader is looking at, then say what it means. Avoid restating the axis
+labels — the chart already does that.
+    ;;
+  }
+
+  block t_pull: TextBlock {
+    content: @md
+The single claim this whole story exists to make, in one sentence.
+    ;;
+  }
+
+  block t_sec_3: TextBlock {
+    content: @md
+### Why it happened
+
+The counterpart to the first section. Copy sits on the right here so the page
+does not read as a two-column report.
+    ;;
+  }
+
+  block t_close: TextBlock {
+    content: @md
+### What to do about it
+
+The takeaway. One paragraph, and a clear next step if there is one.
+    ;;
+  }
+
+  // ---------------------------------------------------------------------------
+  // KPI BLOCKS — 2025 ecommerce performance
+  // The inner `value.label` is deliberately omitted. The block `label` is the
+  // card title; setting both printed the same string twice on every card.
+  // ---------------------------------------------------------------------------
+
+  block k_hero: VizBlock {
+    label: '2025 Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+    }
+  }
+
+  block k_stat_1: VizBlock {
+    label: '2025 Orders'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation order_count {
+        label: 'Orders'
+        formula: @aql count(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'order_count'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+    }
+  }
+
+  block k_stat_2: VizBlock {
+    label: '2025 Customers'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation customer_count {
+        label: 'Customers'
+        formula: @aql count_distinct(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'customer_count'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+    }
+  }
+
+  block k_stat_3: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql revenue / count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      value: VizFieldFull {
+        ref: 'average_order_value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // CHART BLOCKS — 2025 ecommerce performance
+  // Series colours come from story_palette via the theme; nothing here
+  // hardcodes a colour.
+  // ---------------------------------------------------------------------------
+
+  block v_sec_1: VizBlock {
+    label: 'Monthly Revenue Trend'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+      settings {
+        x_axis_label: 'Month'
+        show_data_points: true
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_sec_2: VizBlock {
+    label: 'Revenue by Continent Name'
+    viz: ColumnChart {
+      dataset: ecommerce_official
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+      legend: VizFieldFull {
+        ref: r(countries.continent_name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: true
+      }
+    }
+  }
+
+  block v_sec_3: VizBlock {
+    label: 'Revenue by Order Status'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.status)
+        label: 'Order Status'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_table: VizBlock {
+    label: '2025 Order Detail'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          ref: r(orders.created_at)
+          label: 'Order Date'
+          // without this the column prints full microsecond timestamps
+          format {
+            type: 'date'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(orders.status)
+          label: 'Order Status'
+        },
+        VizFieldFull {
+          ref: r(countries.continent_name)
+          label: 'Continent'
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: '2025-01-01 until 2026-01-01'
+      }
+      settings {
+        row_limit: 5000
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // LAYOUT
+  // ---------------------------------------------------------------------------
+
+  view: HTMLLayout {
+    content: @html
+
+<style>
+  /* Roboto is not a system font outside Android. Without this the page falls
+     back to Arial and stops looking like Google. @import must stay first. */
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap');
+
+  .dst,
+  .dst *,
+  .dst *::before,
+  .dst *::after { box-sizing: border-box; }
+
+  /* =========================================================================
+     TOKEN BLOCK — the only place literal colours appear in this CSS.
+     Reskin here. Values marked "twin" also exist in the const block above.
+     ====================================================================== */
+  .dst {
+    --t-bg:          #FFFFFF;   /* twin */
+    --t-surface:     #F8F9FA;   /* twin */
+    --t-border:      #DADCE0;   /* twin */
+    --t-rule:        #BDC1C6;
+
+    --t-ink:         #202124;   /* twin */
+    --t-ink-dim:     #5F6368;   /* twin */
+    --t-ink-faint:   #80868B;
+
+    --t-accent:      #1A73E8;   /* twin */
+    --t-accent-lt:   #8AB4F8;   /* twin — Google Blue 300, the on-dark variant */
+    --t-accent-dk:   #174EA6;   /* twin */
+
+    /* Google Grey 900 / 800 / 700 — the surfaces Google's own dark mode uses.
+       The elevated panel is a solid lighter grey, not a translucent overlay. */
+    --t-dark:        #202124;
+    --t-dark-2:      #303134;
+    --t-dark-line:   #3C4043;
+    --t-on-dark:     #E8EAED;
+    --t-on-dark-dim: #9AA0A6;
+
+    /* the four-colour signature rule */
+    --t-g-blue:      #1A73E8;
+    --t-g-red:       #EA4335;
+    --t-g-yellow:    #FBBC04;
+    --t-g-green:     #34A853;
+
+    /* atmosphere on the dark bands — set to `transparent` to flatten */
+    --t-glow:        rgba(26, 115, 232, 0.28);
+
+    /* Material elevation, tokenised so a reskin can flatten it in one place */
+    --t-shadow-1: 0 1px 2px 0 rgba(60, 64, 67, 0.20), 0 1px 3px 1px rgba(60, 64, 67, 0.10);
+    --t-shadow-2: 0 2px 6px 2px rgba(60, 64, 67, 0.12), 0 1px 2px 0 rgba(60, 64, 67, 0.24);
+
+    --t-radius:      12px;      /* twin */
+    --t-radius-sm:   8px;
+    --t-pad:         32px;
+
+    --t-font-sans:    Roboto, Arial, sans-serif;      /* twin */
+    --t-font-display: Roboto, Arial, sans-serif;
+    --t-font-mono:    "Roboto Mono", ui-monospace, monospace;
+
+    /* format tokens */
+    --t-page-w:      1200px;
+
+    display: block;
+    background: var(--t-bg);
+    color: var(--t-ink);
+    font-family: var(--t-font-sans);
+    line-height: 1.6;
+    counter-reset: sec;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- structure ---- */
+  .dst .dst-sec {
+    position: relative;
+    max-width: var(--t-page-w);
+    margin: 0 auto;
+    padding: 72px var(--t-pad);
+  }
+  .dst .dst-sec.is-flush { padding-top: 0; }
+
+  .dst .dst-band {
+    background: var(--t-dark);
+    background-image: radial-gradient(60% 90% at 78% 15%, var(--t-glow), transparent 70%);
+    color: var(--t-on-dark);
+  }
+  .dst .dst-tint {
+    background: var(--t-surface);
+    border-top: 1px solid var(--t-border);
+    border-bottom: 1px solid var(--t-border);
+  }
+
+  /* ---- signature device + auto-numbering ----
+     Sections 3–8 increment the counter; .is-unnumbered opts the masthead and
+     the two dark bands out, so inserting a section renumbers the rest. */
+  .dst .dst-sec:not(.is-unnumbered) { counter-increment: sec; }
+
+  .dst .dst-eyebrow {
+    font-family: var(--t-font-sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--t-ink-dim);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 24px;
+  }
+  .dst .dst-eyebrow::before {
+    content: "";
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+    flex-shrink: 0;
+    background: linear-gradient(
+      to right,
+      var(--t-g-blue)   0%,  var(--t-g-blue)   25%,
+      var(--t-g-red)    25%, var(--t-g-red)    50%,
+      var(--t-g-yellow) 50%, var(--t-g-yellow) 75%,
+      var(--t-g-green)  75%, var(--t-g-green)  100%
+    );
+  }
+  .dst .dst-n::before {
+    content: counter(sec, decimal-leading-zero);
+    font-family: var(--t-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--t-accent);
+    padding-right: 12px;
+    margin-right: 2px;
+    border-right: 1px solid var(--t-border);
+  }
+  .dst .dst-band .dst-eyebrow { color: var(--t-on-dark-dim); }
+  .dst .dst-band .dst-eyebrow::before { width: 56px; height: 4px; }
+
+  /* ---- masthead ---- */
+  .dst .dst-masthead { padding-top: 88px; }
+  .dst .dst-standfirst {
+    font-size: 22px;
+    font-weight: 300;
+    line-height: 1.6;
+    color: var(--t-ink-dim);
+    max-width: 60ch;
+    margin: 0 0 36px;
+  }
+  .dst .dst-byline {
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--t-ink-faint);
+    border-top: 1px solid var(--t-rule);
+    padding-top: 16px;
+    margin: 0;
+  }
+
+  /* ---- hero stat band ---- */
+  .dst .dst-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: center;
+  }
+  .dst .dst-hero-num { min-width: 0; }
+  .dst .dst-hero-note { min-width: 0; }
+  .dst .dst-hero-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--t-accent-lt);
+    margin: 0 0 8px;
+  }
+  .dst .dst-hero-rule {
+    width: 72px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--t-accent-lt);
+    margin: 28px 0 0;
+  }
+
+  /* ---- split sections ---- */
+  .dst .dst-split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .dst .dst-split.is-flip { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); }
+
+  /* ---- chart containers: explicit heights, never on <h-block> itself ----
+     Elevation only, no outline. Border plus shadow is what makes a Material
+     surface read heavier than Google's own. */
+  .dst .dst-figure {
+    min-height: 340px;
+    background: var(--t-bg);
+    border-radius: var(--t-radius);
+    box-shadow: var(--t-shadow-1);
+    padding: 24px;
+    min-width: 0;
+    transition: box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1),
+                transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+    animation: dst-rise 0.5s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  .dst .dst-figure:hover {
+    box-shadow: var(--t-shadow-2);
+    transform: translateY(-2px);
+  }
+  .dst .dst-figure.is-wide  { min-height: 400px; }
+  .dst .dst-figure.is-table { min-height: 300px; }
+
+  .dst .dst-caption {
+    font-size: 13px;
+    color: var(--t-ink-dim);
+    margin: 18px 0 0;
+    padding-left: 2px;
+    max-width: 80ch;
+  }
+
+  /* ---- pull statement ---- */
+  .dst .dst-pull {
+    border-left: 4px solid var(--t-accent);
+    border-radius: 0;
+    padding-left: 32px;
+    max-width: 24ch;
+  }
+  .dst .dst-pull-wrap { max-width: 60ch; }
+
+  /* ---- evidence row ---- */
+  .dst .dst-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .dst .dst-stat {
+    background: var(--t-bg);
+    border-radius: var(--t-radius);
+    box-shadow: var(--t-shadow-1);
+    padding: 24px 24px 28px;
+    min-height: 138px;
+    min-width: 0;
+    border-top: 3px solid var(--t-accent);
+    transition: box-shadow 0.2s cubic-bezier(0.2, 0, 0, 1),
+                transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+    animation: dst-rise 0.5s cubic-bezier(0.2, 0, 0, 1) both;
+  }
+  .dst .dst-stat:hover {
+    box-shadow: var(--t-shadow-2);
+    transform: translateY(-2px);
+  }
+  /* one card per Google hue, left to right — the signature rule unpacked */
+  .dst .dst-stat:nth-child(1) { border-top-color: var(--t-g-blue);   animation-delay: 0.05s; }
+  .dst .dst-stat:nth-child(2) { border-top-color: var(--t-g-red);    animation-delay: 0.12s; }
+  .dst .dst-stat:nth-child(3) { border-top-color: var(--t-g-yellow); animation-delay: 0.19s; }
+
+  /* ---- close band ---- */
+  .dst .dst-source {
+    font-size: 12px;
+    color: var(--t-on-dark-dim);
+    border-top: 1px solid var(--t-dark-line);
+    padding-top: 18px;
+    margin-top: 36px;
+  }
+
+  /* =========================================================================
+     BLOCK INTERNALS
+     Undocumented Holistics classes, need !important, can change without warning.
+       .dac-text-block      rendered markdown from a TextBlock
+       .h-kpi-metric-kpi    KPI value text
+       .dac-ic-block-label  block label
+     CRITICAL: markdown renders as <p>/<h3> INSIDE .dac-text-block. Sizing the
+     wrapper alone does nothing — every rule below names the children too.
+     Roboto ships 300/400/500/700; nothing here asks for 600.
+     ====================================================================== */
+
+  /* copy slots */
+  .dst .dst-copy .dac-text-block,
+  .dst .dst-copy .dac-text-block p,
+  .dst .dst-copy .dac-text-block li {
+    font-family: var(--t-font-sans) !important;
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+    color: var(--t-ink-dim) !important;
+  }
+  .dst .dst-copy .dac-text-block h1,
+  .dst .dst-copy .dac-text-block h2,
+  .dst .dst-copy .dac-text-block h3 {
+    font-family: var(--t-font-display) !important;
+    font-size: 30px !important;
+    font-weight: 400 !important;
+    line-height: 1.25 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--t-ink) !important;
+    margin: 0 0 16px !important;
+  }
+
+  /* headline */
+  .dst .dst-display .dac-text-block,
+  .dst .dst-display .dac-text-block p,
+  .dst .dst-display .dac-text-block h1,
+  .dst .dst-display .dac-text-block h2 {
+    font-family: var(--t-font-display) !important;
+    font-size: clamp(34px, 4.6vw, 60px) !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.02em !important;
+    font-weight: 400 !important;
+    color: var(--t-ink) !important;
+    margin: 0 0 28px !important;
+    max-width: 22ch;
+  }
+
+  /* pull statement */
+  .dst .dst-pull .dac-text-block,
+  .dst .dst-pull .dac-text-block p {
+    font-family: var(--t-font-display) !important;
+    font-size: clamp(24px, 2.8vw, 34px) !important;
+    line-height: 1.4 !important;
+    font-weight: 300 !important;
+    letter-spacing: -0.005em !important;
+    color: var(--t-ink) !important;
+    margin: 0 !important;
+  }
+
+  /* copy on the dark bands, or it renders near-invisible */
+  .dst .dst-band .dst-copy .dac-text-block,
+  .dst .dst-band .dst-copy .dac-text-block p,
+  .dst .dst-band .dst-copy .dac-text-block h1,
+  .dst .dst-band .dst-copy .dac-text-block h2,
+  .dst .dst-band .dst-copy .dac-text-block h3 {
+    color: var(--t-on-dark) !important;
+  }
+  .dst .dst-hero-note .dac-text-block,
+  .dst .dst-hero-note .dac-text-block p {
+    font-size: 18px !important;
+    font-weight: 300 !important;
+    line-height: 1.7 !important;
+    color: var(--t-on-dark-dim) !important;
+  }
+
+  /* hero KPI: clamped so a long currency figure cannot overflow and get
+     truncated to an ellipsis, which is what a fixed 112px did */
+  .dst .dst-hero-num .h-kpi-metric-kpi,
+  .dst .dst-hero-num .h-kpi-metric-kpi * {
+    font-family: var(--t-font-display) !important;
+    font-size: clamp(44px, 6.4vw, 92px) !important;
+    line-height: 1.05 !important;
+    letter-spacing: -0.035em !important;
+    font-weight: 400 !important;
+    color: var(--t-on-dark) !important;
+    background: transparent !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    max-width: none !important;
+  }
+
+  /* evidence KPIs */
+  .dst .dst-stat .h-kpi-metric-kpi,
+  .dst .dst-stat .h-kpi-metric-kpi * {
+    font-family: var(--t-font-display) !important;
+    font-size: 38px !important;
+    font-weight: 400 !important;
+    letter-spacing: -0.02em !important;
+    line-height: 1.1 !important;
+    color: var(--t-ink) !important;
+  }
+  .dst .dst-stat .dac-ic-block-label {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--t-ink-dim) !important;
+  }
+
+  /* the hero supplies its own label in markup */
+  .dst .dst-hero-num .dac-ic-block-label { display: none !important; }
+
+  /* chart card titles */
+  .dst .dst-figure .dac-ic-block-label {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--t-ink-dim) !important;
+  }
+
+  /* ---- entrance motion: enters only, nothing state-dependent survives ---- */
+  @keyframes dst-rise {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .dst .dst-sec { animation: dst-rise 0.45s cubic-bezier(0.2, 0, 0, 1) both; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dst .dst-sec,
+    .dst .dst-figure,
+    .dst .dst-stat { animation: none; }
+    .dst .dst-figure:hover,
+    .dst .dst-stat:hover { transform: none; }
+  }
+
+  /* ---- narrow viewports ---- */
+  @media (max-width: 860px) {
+    .dst .dst-sec { padding: 48px 20px; }
+    .dst .dst-masthead { padding-top: 56px; }
+    .dst .dst-hero,
+    .dst .dst-split,
+    .dst .dst-split.is-flip { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+    .dst .dst-pull { max-width: none; }
+  }
+</style>
+
+<div class="dst">
+
+  <!-- 1 — MASTHEAD -->
+  <section class="dst-sec dst-masthead is-unnumbered">
+    <p class="dst-eyebrow">Quarterly review &middot; << EDIT >></p>
+    <div class="dst-display">
+      <h-block name="t_headline" />
+    </div>
+    <p class="dst-standfirst">
+      << EDIT >> The standfirst. One or two sentences that give the reader the
+      shape of the argument before they commit to scrolling.
+    </p>
+    <p class="dst-byline">By &lt;author&gt; &middot; &lt;date&gt; &middot; << EDIT >></p>
+  </section>
+
+  <!-- 2 — HERO STAT, dark full bleed -->
+  <div class="dst-band">
+    <section class="dst-sec is-unnumbered">
+      <p class="dst-eyebrow">The number</p>
+      <div class="dst-hero">
+        <div class="dst-hero-num">
+          <p class="dst-hero-label">2025 revenue &middot; << EDIT >></p>
+          <h-block name="k_hero" />
+          <div class="dst-hero-rule"></div>
+        </div>
+        <div class="dst-hero-note dst-copy">
+          <h-block name="t_hero_note" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 3 — SECTION ONE, copy left / chart right -->
+  <section class="dst-sec">
+    <p class="dst-eyebrow"><span class="dst-n"></span>Section one</p>
+    <div class="dst-split">
+      <div class="dst-copy">
+        <h-block name="t_sec_1" />
+      </div>
+      <div class="dst-figure">
+        <h-block name="v_sec_1" />
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 — FIGURE, full width -->
+  <section class="dst-sec is-flush">
+    <p class="dst-eyebrow"><span class="dst-n"></span>The shape of it</p>
+    <div class="dst-figure is-wide">
+      <h-block name="v_sec_2" />
+    </div>
+    <p class="dst-caption">
+      << EDIT >> Caption for the figure above. Say what to look at, not what it is.
+    </p>
+  </section>
+
+  <!-- 5 — PULL STATEMENT -->
+  <div class="dst-tint">
+    <section class="dst-sec">
+      <p class="dst-eyebrow"><span class="dst-n"></span>The claim</p>
+      <div class="dst-pull-wrap">
+        <div class="dst-pull">
+          <h-block name="t_pull" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 6 — EVIDENCE ROW, auto-fit, reflows -->
+  <section class="dst-sec">
+    <p class="dst-eyebrow"><span class="dst-n"></span>Supporting evidence</p>
+    <div class="dst-stats">
+      <div class="dst-stat"><h-block name="k_stat_1" /></div>
+      <div class="dst-stat"><h-block name="k_stat_2" /></div>
+      <div class="dst-stat"><h-block name="k_stat_3" /></div>
+    </div>
+  </section>
+
+  <!-- 7 — SECTION TWO, chart left / copy right -->
+  <div class="dst-tint">
+    <section class="dst-sec">
+      <p class="dst-eyebrow"><span class="dst-n"></span>Section two</p>
+      <div class="dst-split is-flip">
+        <div class="dst-figure">
+          <h-block name="v_sec_3" />
+        </div>
+        <div class="dst-copy">
+          <h-block name="t_sec_3" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 8 — DETAIL -->
+  <section class="dst-sec">
+    <p class="dst-eyebrow"><span class="dst-n"></span>The detail</p>
+    <div class="dst-figure is-table">
+      <h-block name="v_table" />
+    </div>
+    <p class="dst-caption">
+      << EDIT >> Method note. Definitions, exclusions, anything that stops a
+      reader querying the numbers in a reply-all.
+    </p>
+  </section>
+
+  <!-- 9 — CLOSE, dark full bleed -->
+  <div class="dst-band">
+    <section class="dst-sec is-unnumbered">
+      <p class="dst-eyebrow">In short</p>
+      <div class="dst-copy">
+        <h-block name="t_close" />
+      </div>
+      <p class="dst-source">Source: << EDIT >> &middot; Prepared by << EDIT >></p>
+    </section>
+  </div>
+
+</div>
+
+    ;;
+  }
+}

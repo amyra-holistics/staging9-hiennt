@@ -1,0 +1,237 @@
+Dashboard homestay_us_listing_geography {
+  title: 'US Listings by State'
+  description: 'US homestay listing inventory by state, with a filled map and state ranking.'
+  theme: DynamicPageTheme {
+    light {
+      block {
+        border {
+          border_width: 0
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'transparent'
+        }
+        padding: 0
+        shadow: 'none'
+      }
+      custom_css: @css .dac-canvas {
+  background: #ffffff;
+  color: #121416;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.dac-viz-block {
+  background: transparent;
+}
+.dac-viz-block-label-container {
+  display: none;
+}
+.homestay-geography__headline {
+  margin: 0;
+  color: #121416;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.homestay-geography__headline-strong {
+  color: #121416;
+  font-weight: 700;
+}
+.homestay-geography__headline-muted {
+  color: #7a7f87;
+  font-weight: 400;
+};;
+    }
+    dark {
+      block {
+        border {
+          border_width: 0
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'transparent'
+        }
+        padding: 0
+        shadow: 'none'
+      }
+      custom_css: @css .dac-canvas {
+  background: #ffffff;
+  color: #121416;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+.dac-viz-block {
+  background: transparent;
+}
+.dac-viz-block-label-container {
+  display: none;
+}
+.homestay-geography__headline {
+  margin: 0;
+  color: #121416;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.homestay-geography__headline-strong {
+  color: #121416;
+  font-weight: 700;
+}
+.homestay-geography__headline-muted {
+  color: #7a7f87;
+  font-weight: 400;
+};;
+    }
+  }
+
+  block geography_headline: TextBlock {
+    content: @md
+      <h1 class="homestay-geography__headline"><span class="homestay-geography__headline-strong">Geo Breakdown.</span> <span class="homestay-geography__headline-muted">Listings by state.</span></h1>
+    ;;
+  }
+  block state_listing_map: VizBlock {
+    label: 'Listing Inventory by State'
+    viz: FilledMap {
+      dataset: homestay_dataset
+      location {
+        field: r(homestay_neighbourhoods.state)
+        primary_field: true
+      }
+      value: r(homestay_dataset.total_listing)
+      settings {
+        map_background: 'light'
+      }
+    }
+    theme {
+      border {
+        border_width: 1
+        border_color: '#dfe3e8'
+        border_style: 'solid'
+      }
+      background {
+        bg_color: '#ffffff'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+  }
+
+  block state_listing_ranking: VizBlock {
+    label: 'State listing ranking'
+    viz: MarkdownViz {
+      dataset: homestay_dataset
+
+      calculation listing_rank {
+        label: 'Rank'
+        formula: @aql rank(order: total_listing | desc());;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation percent_of_all_listings {
+        label: 'Share'
+        formula: @aql (total_listing * 1.0) / (total_listing | of_all(homestay_neighbourhoods.state));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      rows: [
+        VizFieldFull {
+          ref: r(homestay_neighbourhoods.state)
+          label: 'State'
+          format {
+            type: 'text'
+          }
+          uname: 'state'
+        }
+      ]
+
+      values: [
+        VizFieldFull {
+          ref: 'listing_rank'
+          label: 'Rank'
+          format {
+            type: 'number'
+            pattern: '00'
+          }
+          uname: 'rank'
+        },
+        VizFieldFull {
+          ref: r(homestay_dataset.total_listing)
+          label: 'Listings'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'total_listings'
+        },
+        VizFieldFull {
+          ref: 'percent_of_all_listings'
+          label: 'Share'
+          format {
+            type: 'number'
+            pattern: '0.00%'
+          }
+          uname: 'percent_of_all_listings'
+        }
+      ]
+
+      settings {
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'rank'
+            direction: 'asc'
+          }
+        ]
+      }
+
+      content: @md
+<style>
+.state-ranking { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; }
+.state-ranking__tile { display:grid; grid-template-columns:28px 10px minmax(0,1fr) auto auto; align-items:center; gap:9px; min-height:42px; padding:8px 12px; background:#fbfcfe; border:1px solid #e1e7ee; color:#26364a; font-size:12px; line-height:1; }
+.state-ranking__rank { color:#7b8794; font-variant-numeric:tabular-nums; }
+.state-ranking__swatch { width:9px; height:9px; background:#5271e8; }
+.state-ranking__state { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; color:#17202a; }
+.state-ranking__count, .state-ranking__share { font-variant-numeric:tabular-nums; white-space:nowrap; }
+.state-ranking__count { color:#4d5d70; }
+.state-ranking__share { color:#6b7785; min-width:42px; text-align:right; }
+@media screen and (max-width:980px) { .state-ranking { grid-template-columns:repeat(3,minmax(0,1fr)); } }
+@media screen and (max-width:640px) { .state-ranking { grid-template-columns:repeat(1,minmax(0,1fr)); } }
+</style>
+<section class="state-ranking" aria-label="US listing inventory by state ranking">
+{% map(rows) %}
+<article class="state-ranking__tile">
+<span class="state-ranking__rank">{{ values.`Rank`.formatted }}</span>
+<span class="state-ranking__swatch" aria-hidden="true"></span>
+<strong class="state-ranking__state">{{ `State`.formatted }}</strong>
+<span class="state-ranking__count">{{ values.`Listings`.formatted }}</span>
+<span class="state-ranking__share">{{ values.`Share`.formatted }}</span>
+</article>
+{% end %}
+</section>
+      ;;
+    }
+  }
+
+  view: CanvasLayout {
+    width: 1220
+    height: 920
+    grid_size: 20
+
+    block geography_headline {
+      position: pos(20, 20, 1180, 60)
+    }
+
+    block state_listing_map {
+      position: pos(20, 120, 1180, 540)
+    }
+
+    block state_listing_ranking {
+      position: pos(20, 700, 1180, 180)
+    }
+  }
+}

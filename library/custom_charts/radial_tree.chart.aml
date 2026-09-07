@@ -1,5 +1,6 @@
 CustomChartDef radial_tree {
   label: 'Radial Tree'
+  icon: 'hicon:chart-radial-tree'
   description: 'To draw a hierarchy of level columns as a radial node-link tree.'
 
   fields {
@@ -77,19 +78,12 @@ CustomChartDef radial_tree {
       default_value: true
     }
 
-    option color_scheme {
-      label: 'Color scheme (by depth)'
-      type: 'select'
-      options: [
-        'blues',
-        'teals',
-        'greens',
-        'purples',
-        'viridis',
-        'magma'
-      ]
-      default_value: 'blues'
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
     }
+
   }
 
   template: @vg {
@@ -113,6 +107,7 @@ CustomChartDef radial_tree {
       {"name": "labels", "update": "@{options.show_labels.value}"},
       {"name": "layout", "update": "'@{options.layout.value}'"},
       {"name": "links", "update": "'@{options.link_shape.value}'"},
+      {"name": "showTooltip", "update": "@{options.show_tooltip.value}"},
       {
         "name": "hovered",
         "value": null,
@@ -196,10 +191,9 @@ CustomChartDef radial_tree {
     "scales": [
       {
         "name": "color",
-        "type": "linear",
-        "range": {"scheme": @{options.color_scheme.value}},
-        "domain": {"data": "tree", "field": "depth"},
-        "zero": true
+        "type": "ordinal",
+        "range": "category",
+        "domain": {"data": "tree", "field": "depth"}
       }
     ],
     "marks": [
@@ -232,21 +226,21 @@ CustomChartDef radial_tree {
             "fill": {"scale": "color", "field": "depth"},
             "size": {"signal": "datum.node_id === hovered ? 200 : 90"},
             "tooltip": {
-              "signal": "{'Label': datum.label, 'Depth': datum.depth, 'Children': length(datum.children || [])}"
+              "signal": "showTooltip ? {'Label': datum.label, 'Depth': datum.depth, 'Children': length(datum.children || [])} : null"
             }
           }
         }
       },
       {
         "type": "text",
+        "style": "guide-label",
         "from": {"data": "tree"},
         "interactive": false,
         "encode": {
           "enter": {
             "text": {"field": "label"},
             "fontSize": {"value": 10},
-            "baseline": {"value": "middle"},
-            "fill": {"value": "#374151"}
+            "baseline": {"value": "middle"}
           },
           "update": {
             "x": {"field": "x"},

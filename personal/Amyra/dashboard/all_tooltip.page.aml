@@ -1,4 +1,4 @@
-Dashboard all_viz_test {
+Dashboard all_viz_test_copy {
   theme: purple
   title: 'All viz test'
   description: ''
@@ -36,12 +36,12 @@ Dashboard all_viz_test {
         ref: 'value'
         format {
           type: 'number'
-          pattern: '#,###'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting positive_color: '#2cb67f'
       setting negative_color: '#e5484d'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -71,14 +71,14 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting bar_color: '#255dd4'
       setting line_color: '#e5484d'
       setting show_threshold: true
       setting threshold: 0.8
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -98,7 +98,7 @@ Dashboard all_viz_test {
         data_type: 'number'
       }
       custom_chart: bar_chart_with_average_line
-      setting show_tooltip: false
+      setting show_tooltip: true
       field dimension: VizFieldFull {
         ref: r(superstore_csv.category)
         format {
@@ -115,7 +115,7 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       settings {
@@ -163,12 +163,12 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting color_scheme: 'tableau10'
       setting donut_hole: 0.35
-      setting show_tooltip: false
+      setting show_tooltip: true
     }
   }
   block v_hkjd: VizBlock {
@@ -194,11 +194,11 @@ Dashboard all_viz_test {
         ref: r(superstore_csv.sales)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting show_outliers: true
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -267,31 +267,31 @@ Dashboard all_viz_test {
         ref: 'low_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field high: VizFieldFull {
         ref: 'high_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field open: VizFieldFull {
         ref: 'open_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field close: VizFieldFull {
         ref: 'close_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
-      setting tooltip: false
+      setting tooltip: true
       setting green_candle: 'green'
       setting red_candle: 'red'
       settings {
@@ -319,7 +319,7 @@ Dashboard all_viz_test {
         ref: r(superstore_csv.profit)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field dimension: VizFieldFull {
@@ -330,7 +330,7 @@ Dashboard all_viz_test {
       }
       setting point_color: '#255DD4'
       setting extent: 'ci'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -362,10 +362,10 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
-      setting tooltip: false
+      setting tooltip: true
       setting bar_color: '#255DD4'
       setting line_color: '#e5484d'
       setting points_before: -3
@@ -393,7 +393,7 @@ Dashboard all_viz_test {
         ref: 'profit_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field label: VizFieldFull {
@@ -407,15 +407,15 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting end_label: 'Total'
       setting bar_padding: 0.3
       setting positive: '#58A65C'
       setting negative: '#D85140'
-      setting value_format: '$,.0f'
-      setting show_tooltip: false
+      setting value_format: '$,.1f'
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -439,11 +439,11 @@ Dashboard all_viz_test {
         ref: r(superstore_csv.quantity)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting max_bins: 0
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -476,13 +476,13 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting increase_color: '#2cb67f'
       setting decrease_color: '#e5484d'
       setting show_change: true
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -518,7 +518,7 @@ Dashboard all_viz_test {
         ref: 'monthly_sales'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting color_average_line: '#479980'
@@ -526,7 +526,7 @@ Dashboard all_viz_test {
       setting color_near_limit: '#8DD6C3'
       setting color_one_side_run: '#9FC851'
       setting show_mr_chart: true
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -553,7 +553,7 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field event_label: VizFieldFull {
@@ -563,7 +563,7 @@ Dashboard all_viz_test {
         }
       }
       setting event_color: '#e5484d'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -623,12 +623,12 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting line_interpolate: 'monotone'
       setting point_size: 500
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -665,15 +665,16 @@ Dashboard all_viz_test {
         aggregation: 'sum'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
-      setting show_tooltip: false
       setting show_y_axis_label: true
       setting row_sort: 'ascending'
       setting row_height: 100
       setting row_width: 300
       setting row_space: 20
+      setting fill_color: '#255DD4'
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -704,7 +705,7 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field facet: VizFieldFull {
@@ -719,7 +720,7 @@ Dashboard all_viz_test {
           type: 'text'
         }
       }
-      setting show_tooltip: false
+      setting show_tooltip: true
       setting facet_columns: 3
       settings {
         aggregate_awareness {
@@ -750,14 +751,14 @@ Dashboard all_viz_test {
         ref: 'total_sales'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting gravity_x: 0.1
       setting gravity_y: 0.2
       setting show_labels: true
       setting color_scheme: 'tableau10'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -793,13 +794,13 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting pad_angle: 0.05
       setting inner_radius_ratio: 0.9
       setting label_padding: 80
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -835,12 +836,12 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting color_scheme: 'tableau10'
       setting donut_hole: 0.35
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -870,21 +871,21 @@ Dashboard all_viz_test {
         ref: 'profit_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field max_value: VizFieldFull {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting needleScale: 0.8
       setting showLabels: true
       setting showTicks: true
       setting tickGaps: 0.2
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -902,14 +903,14 @@ Dashboard all_viz_test {
         ref: r(homestay_listings.price)
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field y_axis: VizFieldFull {
         ref: r(homestay_listings.weekly_price)
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       field group: VizFieldFull {
@@ -922,7 +923,7 @@ Dashboard all_viz_test {
       setting contour_levels: 4
       setting show_points: true
       setting show_heatmap: true
-      setting show_tooltip: false
+      setting show_tooltip: true
     }
   }
   block v_i3qe: VizBlock {
@@ -958,24 +959,24 @@ Dashboard all_viz_test {
         ref: 'target'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field pace: VizFieldFull {
         ref: 'pace'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field current: VizFieldFull {
         ref: 'current'
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
-      setting show_tooltip: false
+      setting show_tooltip: true
       setting current_bar_height: 7
       setting target_tick_thickness: 3
       settings {
@@ -1001,14 +1002,14 @@ Dashboard all_viz_test {
         ref: r(superstore_csv.profit)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting overlap: 2
       setting bandwidth: 0
       setting scale_by_count: false
       setting color_scheme: 'tableau10'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -1057,7 +1058,7 @@ Dashboard all_viz_test {
       setting spread: 360
       setting show_labels: true
       setting color_scheme: 'magma'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -1093,13 +1094,13 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting node_align: 'justify'
       setting node_width: 15
       setting node_padding: 10
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -1119,7 +1120,7 @@ Dashboard all_viz_test {
         data_type: 'number'
       }
       custom_chart: table_heatmap
-      setting show_tooltip: false
+      setting show_tooltip: true
       field date: VizFieldFull {
         ref: r(superstore_csv.order_date)
         format {
@@ -1131,7 +1132,7 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       settings {
@@ -1163,13 +1164,13 @@ Dashboard all_viz_test {
         ref: 'sales_value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0[$$]'
         }
       }
       setting fill_color: '#255DD4'
       setting text_color: 'white'
       setting layout_method: 'squarify'
-      setting show_tooltip: false
+      setting show_tooltip: true
       settings {
         aggregate_awareness {
           enabled: true
@@ -1183,26 +1184,26 @@ Dashboard all_viz_test {
     viz: CustomChart {
       dataset: superstore
       custom_chart: bubble_chart
-      setting show_tooltip: false
+      setting show_tooltip: true
       field x_axis: VizFieldFull {
         ref: r(superstore_csv.sales)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field y_axis: VizFieldFull {
         ref: r(superstore_csv.profit)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field size: VizFieldFull {
         ref: r(superstore_csv.quantity)
         format {
           type: 'number'
-          pattern: 'none'
+          pattern: '#,###0.0[$$]'
         }
       }
       field category: VizFieldFull {
@@ -1248,6 +1249,10 @@ Dashboard all_viz_test {
       auto_expand_vertically: true
       mobile {
         mode: 'auto'
+      }
+      block v_wx22 {
+        position: pos(20, 20, 760, 660)
+        layer: 4
       }
       block v_pareto_chart {
         position: pos(800, 20, 760, 660)

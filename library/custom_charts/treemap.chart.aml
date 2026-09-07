@@ -21,20 +21,20 @@ CustomChartDef treemap {
     }
   }
   options {
-    option fill_color {
-      label: 'Fill color'
-      type: 'color-picker'
-      default_value: '#255DD4'
-    }
     option text_color {
       label: 'Text color'
       type: 'color-picker'
-      default_value: 'white'
+      default_value: '#FFFFFF'
     }
     option text_length_limit {
       label: 'Text length limit (px)'
       type: 'number-input'
       default_value: 200
+    }
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
     }
     option layout_method {
       label: 'Treemap method'
@@ -91,7 +91,7 @@ CustomChartDef treemap {
         "transform": [
           {
             "type": "filter",
-            "expr": "datum['@{fields.value.name}'] !== null & datum['@{fields.value.name}'] > 0"
+            "expr": "datum['@{fields.value.name}'] !== null && datum['@{fields.value.name}'] > 0"
           },
           {
             "type": "joinaggregate",
@@ -115,7 +115,7 @@ CustomChartDef treemap {
             "as": "_opacity",
             "expr": "datum['@{fields.value.name}'] / datum._max_size"
           },
-          {"type": "nest" },
+          {"type": "nest"},
           {
             "type": "treemap",
             "field": @{fields.value.name},
@@ -131,8 +131,8 @@ CustomChartDef treemap {
       {
         "name": "color",
         "type": "ordinal",
-        "domain": {"data": "tree", "field": @{fields.dimension.name}},
-        "range": [@{options.fill_color.value}]
+        "domain": ["default"],
+        "range": "category"
       }
     ],
     "marks": [
@@ -145,9 +145,9 @@ CustomChartDef treemap {
           "enter": {
             "stroke": {"value": "white"},
             "strokeWidth": {"value": 2},
-            "fill": {"scale": "color", "field": @{fields.dimension.name}},
+            "fill": {"scale": "color", "value": "default"},
             "tooltip": {
-              "signal": "datum['@{fields.dimension.name}'] + ': ' + datum['@{fields.value.name}'] + ' (' + datum._percentage + ')'"
+              "signal": "@{options.show_tooltip.value} ? datum['@{fields.dimension.name}'] + ': ' + datum['@{fields.value.name}'] + ' (' + datum._percentage + ')' : null"
             }
           },
           "update": {
@@ -166,14 +166,14 @@ CustomChartDef treemap {
         "interactive": false,
         "encode": {
           "enter": {
-            "font": { "value": "Inter" },
+            "font": {"value": "Inter"},
             "align": {"value": "center"},
             "baseline": {"value": "middle"},
-            "fill": {"value": @{options.text_color.value}},
             "text": {"field": @{fields.dimension.name}},
             "limit": {"value": @{options.text_length_limit.value}}
           },
           "update": {
+            "fill": {"value": "@{options.text_color.value}"},
             "x": {"signal": "0.5 * (datum.x0 + datum.x1)"},
             "y": {"signal": "0.5 * (datum.y0 + datum.y1 - 15)"}
           }
@@ -185,23 +185,18 @@ CustomChartDef treemap {
         "interactive": false,
         "encode": {
           "enter": {
-            "font": { "value": "Inter" },
+            "font": {"value": "Inter"},
             "fontSize": {"value": 13},
             "fontWeight": {"value": 600},
             "baseline": {"value": "top"},
-            "fill": {"value": @{options.text_color.value}},
-            "text": {"field": "_percentage"},
+            "text": {"field": "_percentage"}
           },
           "update": {
+            "fill": {"value": "@{options.text_color.value}"},
             "x": {"signal": "datum.x0 + 5"},
             "y": {"signal": "datum.y0 + 10"}
           }
         }
-      }
-    ],
-    "params": [
-      {
-        "bind": "..."
       }
     ]
   };;

@@ -55,19 +55,6 @@ CustomChartDef faceted_sparkline {
       default_value: 4
     }
 
-    option color_scheme {
-      label: 'Color scheme'
-      type: 'select'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
-    }
   }
 
   template: @vg {
@@ -196,7 +183,7 @@ CustomChartDef faceted_sparkline {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "plot", "field": "series_value"},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "marks": [
@@ -238,6 +225,7 @@ CustomChartDef faceted_sparkline {
           },
           {
             "type": "text",
+            "style": "guide-label",
             "interactive": false,
             "encode": {
               "update": {
@@ -246,8 +234,7 @@ CustomChartDef faceted_sparkline {
                 "text": {"signal": "parent.facet_value"},
                 "limit": {"signal": "plotW * 0.4"},
                 "fontSize": {"value": 12},
-                "fontWeight": {"value": 600},
-                "fill": {"value": "#374151"}
+                "fontWeight": {"value": 600}
               }
             }
           },
@@ -267,6 +254,7 @@ CustomChartDef faceted_sparkline {
           },
           {
             "type": "text",
+            "style": "guide-label",
             "interactive": false,
             "encode": {
               "update": {
@@ -274,8 +262,7 @@ CustomChartDef faceted_sparkline {
                 "y": {"value": 12},
                 "align": {"value": "right"},
                 "text": {"signal": "hoverDate === null ? '' : timeFormat(hoverDate, '%b %d, %Y')"},
-                "fontSize": {"value": 11},
-                "fill": {"value": "#6b7280"}
+                "fontSize": {"value": 11}
               }
             }
           },

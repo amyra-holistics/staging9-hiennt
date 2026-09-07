@@ -50,19 +50,12 @@ CustomChartDef ridgeline_chart {
       default_value: false
     }
 
-    option color_scheme {
-      label: 'Color scheme'
-      type: 'select'
-      options: [
-        'tableau10',
-        'category10',
-        'accent',
-        'dark2',
-        'paired',
-        'set2'
-      ]
-      default_value: 'tableau10'
+    option show_tooltip {
+      label: 'Show tooltip'
+      type: 'toggle'
+      default_value: true
     }
+
   }
 
   template: @vg {
@@ -80,6 +73,7 @@ CustomChartDef ridgeline_chart {
       },
       {"name": "overlap", "update": "@{options.overlap.value}"},
       {"name": "bandwidth", "update": "@{options.bandwidth.value}"},
+      {"name": "showTooltip", "update": "@{options.show_tooltip.value}"},
       {"name": "ext", "update": "length(data('value_extent')) ? data('value_extent')[0] : null"},
       {"name": "iqr", "update": "ext ? ext.q3 - ext.q1 : 0"},
       {"name": "vmin", "update": "ext ? (iqr > 0 ? max(ext.raw_min, ext.q1 - 1.5 * iqr) : ext.raw_min) : 0"},
@@ -181,7 +175,7 @@ CustomChartDef ridgeline_chart {
         "name": "color",
         "type": "ordinal",
         "domain": {"data": "source", "field": "category", "sort": true},
-        "range": {"scheme": @{options.color_scheme.value}}
+        "range": "category"
       }
     ],
     "axes": [
@@ -198,7 +192,6 @@ CustomChartDef ridgeline_chart {
               "y": {"scale": "yscale", "field": "value", "band": 1},
               "align": {"value": "right"},
               "baseline": {"value": "bottom"},
-              "fill": {"value": "#374151"},
               "fontWeight": {
                 "signal": "hovered === datum.value ? 600 : 400"
               }
@@ -261,7 +254,7 @@ CustomChartDef ridgeline_chart {
                 },
                 "stroke": {"value": "white"},
                 "strokeWidth": {"value": 1},
-                "tooltip": {"signal": "datum.category"}
+                "tooltip": {"signal": "showTooltip ? datum.category : null"}
               }
             }
           }

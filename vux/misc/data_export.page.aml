@@ -36,6 +36,7 @@ Dashboard data_export {
           format {
             type: 'text'
           }
+          uname: 'product_sales_performance_new_csv_product_name'
         },
         VizFieldFull {
           ref: r(product_sales_performance_new_csv.added_to_cart)
@@ -43,6 +44,7 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_added_to_cart'
         },
         VizFieldFull {
           ref: r(product_sales_performance_new_csv.purchased)
@@ -50,6 +52,7 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_purchased'
         },
         VizFieldFull {
           ref: r(product_sales_performance_new_csv.cart_abandonment)
@@ -57,12 +60,14 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_cart_abandonment'
         },
         VizFieldFull {
           ref: r(product_sales_performance_new_csv.conversion_rate)
           format {
             type: 'text'
           }
+          uname: 'product_sales_performance_new_csv_conversion_rate'
         },
         VizFieldFull {
           ref: r(product_performance, product_sales_performance_new_csv.start_percent)
@@ -70,6 +75,7 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_start_percent'
         },
         VizFieldFull {
           ref: r(product_performance, product_sales_performance_new_csv.end_percent)
@@ -77,6 +83,7 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_end_percent'
         },
         VizFieldFull {
           ref: r(product_performance, product_sales_performance_new_csv.bar_width)
@@ -84,10 +91,49 @@ Dashboard data_export {
             type: 'number'
             pattern: 'inherited'
           }
+          uname: 'product_sales_performance_new_csv_bar_width'
         }
       ]
       settings {
         show_row_number: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_product_name'
+            width: 155
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_added_to_cart'
+            width: 152
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_purchased'
+            width: 135
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_cart_abandonment'
+            width: 181
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_conversion_rate'
+            width: 165
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_start_percent'
+            width: 190
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_end_percent'
+            width: 143
+          },
+          ColumnStyle {
+            key: 'product_sales_performance_new_csv_bar_width'
+            width: 190
+          }
+        ]
       }
     }
   }

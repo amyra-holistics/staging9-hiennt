@@ -40,7 +40,7 @@ CustomChartDef trellis_chart {
     }
 
     option row_sort {
-      label: "Row Sort perference"
+      label: "Row sort preference"
       type: "select"
       options: [
         'ascending',
@@ -66,14 +66,6 @@ CustomChartDef trellis_chart {
       type: "number-input"
       default_value: '25'
     }
-
-    option fill_color {
-      label: 'Fill Color'
-      type: 'color-picker'
-      default_value: '#aaa'
-    }
-
-
   }
 
   template: @vgl {
@@ -118,6 +110,7 @@ CustomChartDef trellis_chart {
           "width": @{options.row_width.value},
           "mark": "bar",
           "params": [
+            {"name": "bar_hover", "select": {"type": "point", "fields": [@{fields.facet.name}, @{fields.x_axis.name}], "on": "mouseover", "clear": "mouseout"}},
             {"name": "normalPointSelection", "select": {"type": "point", "toggle": "true", "clear": "mouseup"}},
             {"name": "hoverPointSelection", "select": {"type": "point", "on": "mouseover", "clear": "mouseout"}}
           ],
@@ -138,15 +131,19 @@ CustomChartDef trellis_chart {
                 "format": "~s"
               }
             },
-            "color": {
-              "value": @{options.fill_color.value}
-            },
             "tooltip": [
               {"field": @{fields.facet.name}, "title": @{fields.facet.name}},
               {"field": @{fields.x_axis.name}, "title": @{fields.x_axis.name}},
-              {"field": @{fields.value.name}, "title": @{fields.value.name}, "type": "quantitative"},
-              {"field": "meanValue", "title": "Mean for row", "type": "quantitative"}
-            ]
+              {"field": @{fields.value.name}, "type": "quantitative", "title": @{fields.value.name}, "format": @{fields.value.format}, "formatType": "holisticsFormat"},
+              {"field": "meanValue", "type": "quantitative", "title": "Mean for row", "format": @{fields.value.format}, "formatType": "holisticsFormat"}
+            ],
+            "opacity": {
+              "condition": [
+                {"test": "!length(data('bar_hover_store'))", "value": 1},
+                {"param": "bar_hover", "empty": false, "value": 1}
+              ],
+              "value": 0.15
+            }
           }
         }
       ]

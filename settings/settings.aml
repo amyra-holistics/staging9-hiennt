@@ -2,6 +2,8 @@ ProjectSettings project_settings {
   data_import {
     default_write_schema: "persisted"
   }
-}  // import_settings {
-  //   default_schema: 'public'
+  viz {
+    default_color_palette: purple_pink_palette
+  }
+}  //   default_schema: 'public'
   // }

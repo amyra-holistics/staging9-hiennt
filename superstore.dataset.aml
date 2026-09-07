@@ -7,6 +7,8 @@ Dataset superstore {
     ,
     superstore_bump_chart,
     superstore_percentile_boxplot
+    ,
+    annotated_time_series_csv
   ]
   relationships: []
   metric count_order {

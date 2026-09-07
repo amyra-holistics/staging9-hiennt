@@ -29,8 +29,14 @@ CustomChartDef sankey_chart {
     }
   }
   options {
+    option show_tooltip {
+      label: "Show tooltip"
+      type: "toggle"
+      default_value: true
+    }
+
     option node_align {
-      label: "Node Align"
+      label: "Node align"
       type: "select"
       options: [
         "justify",
@@ -41,22 +47,22 @@ CustomChartDef sankey_chart {
       default_value: "justify"
     }
     option node_width {
-      label: "Node Width"
+      label: "Node width"
       type: "number-input"
       default_value: 15
     }
     option node_padding {
-      label: "Node Padding"
+      label: "Node padding"
       type: "number-input"
       default_value: 10
     }
     option margin_top {
-      label: "Margin Top"
+      label: "Margin top"
       type: "number-input"
       default_value: 10
     }
     option margin_left {
-      label: "Margin Left"
+      label: "Margin left"
       type: "number-input"
       default_value: 10
     }
@@ -341,7 +347,7 @@ CustomChartDef sankey_chart {
               "value": 0.6
             },
             "tooltip": {
-              "signal": "datum.sourceId + ' → ' + datum.targetId + ': ' + datum.value"
+              "signal": "@{options.show_tooltip.value} ? datum.sourceId + ' → ' + datum.targetId + ': ' + datum.value : null"
             }
           },
           "hover": {

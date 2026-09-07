@@ -90,6 +90,9 @@ CustomChartDef candlestick_chart {
           "type": "bar",
           "tooltip": @{options.tooltip.value}
         },
+        "params": [
+          {"name": "candle_hover", "select": {"type": "point", "fields": [@{fields.date.name}], "on": "mouseover", "clear": "mouseout"}}
+        ],
         "encoding": {
           "y": {"field": @{fields.open.name}},
           "y2": {"field": @{fields.close.name}}
@@ -117,6 +120,13 @@ CustomChartDef candlestick_chart {
           "value": @{options.green_candle.value}
         },
         "value": @{options.red_candle.value}
+      },
+      "opacity": {
+        "condition": [
+          {"test": "!length(data('candle_hover_store'))", "value": 1},
+          {"param": "candle_hover", "empty": false, "value": 1}
+        ],
+        "value": 0.15
       }
     },
     "holisticsConfig": {

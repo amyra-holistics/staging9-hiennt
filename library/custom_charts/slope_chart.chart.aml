@@ -34,19 +34,25 @@ CustomChartDef slope_chart {
 
   options {
     option increase_color {
-      label: 'Increase Color'
+      label: 'Increase color'
       type: 'color-picker'
       default_value: '#2cb67f'
     }
 
     option decrease_color {
-      label: 'Decrease Color'
+      label: 'Decrease color'
       type: 'color-picker'
       default_value: '#e5484d'
     }
 
     option show_change {
       label: 'Show % change on the right label'
+      type: 'toggle'
+      default_value: true
+    }
+
+    option show_tooltip {
+      label: 'Show tooltip'
       type: 'toggle'
       default_value: true
     }
@@ -254,7 +260,7 @@ CustomChartDef slope_chart {
             "strokeWidth": {"signal": "hoveredCat === datum.category ? 3.5 : 2"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.15"},
             "tooltip": {
-              "signal": "{'Category': datum.category, 'From': format(datum.amount, ','), 'To': format(datum.end_amount, ','), 'Change': format(datum.delta, '+,') + (datum.amount !== 0 ? ' (' + format(datum.delta / datum.amount, '+.1%') + ')' : '')}"
+              "signal": "@{options.show_tooltip.value} ? {'Category': datum.category, 'From': format(datum.amount, ','), 'To': format(datum.end_amount, ','), 'Change': format(datum.delta, '+,') + (datum.amount !== 0 ? ' (' + format(datum.delta / datum.amount, '+.1%') + ')' : '')} : null"
             }
           }
         }
@@ -289,6 +295,7 @@ CustomChartDef slope_chart {
       },
       {
         "type": "text",
+        "style": "guide-label",
         "name": "leftLabel",
         "from": {"data": "left_labels"},
         "encode": {
@@ -301,13 +308,13 @@ CustomChartDef slope_chart {
             "limit": {"signal": "gutter - 14"},
             "fontSize": {"value": 11},
             "fontWeight": {"signal": "hoveredCat === datum.category ? 700 : 400"},
-            "fill": {"value": "#374151"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.25"}
           }
         }
       },
       {
         "type": "text",
+        "style": "guide-label",
         "name": "rightLabel",
         "from": {"data": "right_labels"},
         "encode": {
@@ -322,7 +329,6 @@ CustomChartDef slope_chart {
             "limit": {"signal": "gutter - 14"},
             "fontSize": {"value": 11},
             "fontWeight": {"signal": "hoveredCat === datum.category ? 700 : 400"},
-            "fill": {"value": "#374151"},
             "opacity": {"signal": "hoveredCat === null || hoveredCat === datum.category ? 1 : 0.25"}
           }
         }

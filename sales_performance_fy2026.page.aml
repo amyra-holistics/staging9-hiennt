@@ -1,0 +1,371 @@
+Dashboard sales_performance_fy2026 {
+  title: 'Sales Performance FY2026'
+  description: 'Revenue, order volume, average order value, and geographic and product performance.'
+
+  block order_date_filter: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block country_filter: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(countries.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block category_filter: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(categories.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block revenue_kpi: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block orders_kpi: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation orders_count {
+        label: 'Orders'
+        formula: @aql count(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'orders_count'
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block avg_order_value_kpi: VizBlock {
+    label: 'Avg Order Value'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation avg_order_value {
+        label: 'Avg Order Value'
+        formula: @aql safe_divide(revenue, count(orders.id));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'avg_order_value'
+        label: 'Avg Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block monthly_revenue_trend: VizBlock {
+    label: 'Monthly Revenue Trend'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block revenue_by_category: VizBlock {
+    label: 'Revenue by Product Category'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(categories.name)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        display_as_donut: true
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'desc'
+      }
+    }
+  }
+
+  block top_8_products_by_revenue: VizBlock {
+    label: 'Top 8 Products by Revenue'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(products.name)
+        label: 'Product'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block country_performance: VizBlock {
+    label: 'Country Performance'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation orders_count {
+        label: 'Orders Count'
+        formula: @aql count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation aov {
+        label: 'AOV'
+        formula: @aql revenue / orders_count;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Country'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: 'orders_count'
+          label: 'Orders Count'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'aov'
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      ]
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'order_date_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'country_filter',
+            'category_filter'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'country_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'order_date_filter',
+            'category_filter'
+          ]
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'category_filter'
+      to: [
+        CustomMapping {
+          block: [
+            'order_date_filter',
+            'country_filter'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1440
+    height: 920
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block order_date_filter {
+      position: pos(20, 40, 200, 100)
+    }
+    block country_filter {
+      position: pos(20, 160, 200, 100)
+    }
+    block category_filter {
+      position: pos(20, 280, 200, 100)
+    }
+
+    block revenue_kpi {
+      position: pos(250, 40, 370, 120)
+    }
+    block orders_kpi {
+      position: pos(640, 40, 370, 120)
+    }
+    block avg_order_value_kpi {
+      position: pos(1030, 40, 370, 120)
+    }
+
+    block monthly_revenue_trend {
+      position: pos(250, 180, 720, 330)
+    }
+    block revenue_by_category {
+      position: pos(990, 180, 410, 330)
+    }
+
+    block top_8_products_by_revenue {
+      position: pos(250, 530, 560, 340)
+    }
+    block country_performance {
+      position: pos(830, 530, 570, 340)
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

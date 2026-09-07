@@ -1,0 +1,1046 @@
+@template(
+  title='Editorial Report',
+  description='Finance Times styled report template',
+  thumbnail=''
+)
+Dashboard editorial_report_2 {
+  title: 'Editorial Report'
+  description: 'Financial-press front page with story report, graph and commentary. Screen format, neutral editorial theme.'
+
+  // ==========================================================================
+  // THEME — inline, complete. Styles blocks wherever they render, including
+  // outside this template's styled containers.
+  //
+  // Values marked "twin" are duplicated in the CSS token block inside the
+  // HTMLLayout. There is no way to share them. A reskin edits both.
+  // ==========================================================================
+  theme: PageTheme {
+    color { data: editorial_report_palette }
+
+    block {
+      // The transparent rule. Without it every slot gets a card inside a card.
+      background { bg_color: 'transparent' }
+      border {
+        border_width: 0
+        border_style: 'none'
+        border_radius: 0          // twin of --t-radius
+        border_color: '#DFD8CA'   // twin of --t-border
+      }
+      shadow: 'none'
+      padding: 0
+      opacity: 1
+      label {
+        // Block labels are chart titles here, set in the display face.
+        // --t-font-sans and --t-font-display are the same stack in this theme,
+        // so one value serves both.
+        font_family: 'Georgia'    // twin of --t-font-display
+        font_size: 16
+        font_color: '#1A1815'     // twin of --t-ink
+        font_weight: 'bold'
+      }
+      text {
+        font_family: 'Georgia'    // twin of --t-font-sans
+        font_size: 14
+        font_color: '#6A645A'     // twin of --t-ink-dim
+        font_weight: 'normal'
+      }
+    }
+
+    viz {
+      // Kept even though no slot is table-specific: every v_* slot accepts any
+      // viz, so a table can land in one.
+      table {
+        general {
+          bg_color: '#FBF9F4'      // twin of --t-bg
+          hover_color: '#F2EEE5'   // twin of --t-surface
+          banding_color: '#F2EEE5' // twin of --t-surface
+          font_size: 14
+          font_color: '#6A645A'    // twin of --t-ink-dim
+          font_family: 'Georgia'   // twin of --t-font-sans
+          border_color: '#DFD8CA'  // twin of --t-border
+          border_width: 1
+          grid_color: '#DFD8CA'    // twin of --t-border
+        }
+        header {
+          bg_color: '#F2EEE5'      // twin of --t-surface
+          font_size: 13
+          font_color: '#1A1815'    // twin of --t-ink
+          font_weight: 'semibold'
+        }
+        sub_header {
+          bg_color: '#F2EEE5'      // twin of --t-surface
+          font_size: 13
+          font_color: '#6A645A'    // twin of --t-ink-dim
+          font_weight: 'medium'
+        }
+        sub_title {
+          font_size: 12
+          font_color: '#9C958A'    // twin of --t-ink-faint
+          font_weight: 'medium'
+        }
+        sparkline {
+          line { color: '#9B3B2E' }    // twin of --t-accent
+          column { color: '#9B3B2E' }  // twin of --t-accent
+        }
+      }
+
+      metric_kpi {
+        // These sizes are the fallback for a KPI rendered outside the styled
+        // strip. Inside .edt-kpi-slot the template's CSS wins via
+        // .h-kpi-metric-kpi, which sets the value to 26px. Kept compact so a
+        // stray KPI still reads as editorial rather than as a dashboard tile.
+        alignment: 'left'
+        label {
+          font_family: 'Helvetica'  // twin of --t-font-ui
+          font_size: 13
+          font_color: '#6A645A'     // twin of --t-ink-dim
+        }
+        value {
+          font_family: 'Georgia'    // twin of --t-font-display
+          font_size: 34
+          font_color: '#1A1815'     // twin of --t-ink
+        }
+        progress {
+          indicator { bg_color: '#9B3B2E' }  // twin of --t-accent
+          track { bg_color: '#DFD8CA' }      // twin of --t-border
+          text { font_color: '#6A645A' }     // twin of --t-ink-dim
+        }
+        // Trend colours are semantic, not brand. The accent is itself a brick
+        // red, so negative uses a cleaner red to stay distinguishable from it.
+        trend {
+          positive {
+            text { font_color: '#2F6B45' }
+            background { bg_color: '#E6EDE7' }
+          }
+          negative {
+            text { font_color: '#B3352A' }
+            background { bg_color: '#F5E4E1' }
+          }
+          neutral {
+            text { font_color: '#6A645A' }
+            background { bg_color: '#F2EEE5' }
+          }
+        }
+      }
+    }
+
+    // Base type for TextBlock markdown. Every copy slot in this template uses
+    // its own classes, which are more specific and win; these catch unclassed
+    // markdown and any TextBlock added later.
+    custom_css: @css
+      .dac-text-block {
+        font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+        font-size: 14px;
+        color: #6A645A;
+        line-height: 1.6;
+      }
+      .dac-text-block h1, .dac-text-block h2, .dac-text-block h3,
+      .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+        font-family: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+        color: #1A1815;
+        line-height: 1.2;
+        margin-top: 0;
+        margin-bottom: 0.4em;
+        font-weight: 700;
+      }
+      .dac-text-block a { color: #9B3B2E; }
+    ;;
+  }
+
+  // --- KPI slots -----------------------------------------------------------
+  // Replace each with a KPI VizBlock. The block's own label renders as the
+  // cell eyebrow, so do not add a label in the markup.
+  block k_kpi_1: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        label: 'Revenue'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings { hide_label: true }
+  }
+  block k_kpi_2: TextBlock { content: @md KPI slot 2 — replace with a KPI VizBlock. ;; }
+  block k_kpi_3: TextBlock { content: @md KPI slot 3 — replace with a KPI VizBlock. ;; }
+  block k_kpi_4: TextBlock { content: @md KPI slot 4 — replace with a KPI VizBlock. ;; }
+
+  // --- Viz slots -----------------------------------------------------------
+  // Replace each with a VizBlock. v_lead is its own chart, not a preview of a
+  // story chart — a block cannot appear on the front page and inside a story.
+  block v_lead: VizBlock {
+    label: 'Revenue by Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+        uname: 'datetrunc_month_created_at_1'
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_s1: TextBlock { content: @md Viz slot — story 1 figure. Replace with a VizBlock. ;; }
+  block v_s2: TextBlock { content: @md Viz slot — story 2 figure. Replace with a VizBlock. ;; }
+  block v_s3: TextBlock { content: @md Viz slot — story 3 figure. Replace with a VizBlock. ;; }
+  block v_s4: TextBlock { content: @md Viz slot — story 4 figure. Replace with a VizBlock. ;; }
+
+  // --- Copy slots ----------------------------------------------------------
+  // Classed HTML, edited in the app. Keep the class names; the layout hangs
+  // its typography off them.
+  block t_lead: TextBlock {
+    content: @md
+<p class="edt-eyebrow">Section label</p>
+<h2 class="edt-headline">This is a lead headline. It runs to about two lines at this width.</h2>
+<p class="edt-standfirst">This is a standfirst. It sets up the story in one or two sentences and sits under the headline.</p>
+<p class="edt-byline">Byline — Role</p>
+    ;;
+  }
+
+  block t_lead_note: TextBlock {
+    content: @md
+<div class="edt-note edt-note-strip">
+  <span class="edt-note-mark">AB</span>
+  <span class="edt-note-body">
+    <span class="edt-eyebrow">Commentary label</span>
+    <span class="edt-note-name">Name — Role</span>
+    <span class="edt-note-text">This is a commentary quote. It is set in italic and runs to two or three sentences. It says what the chart above does not.</span>
+  </span>
+</div>
+    ;;
+  }
+
+  block t_index_news: TextBlock {
+    content: @md
+<p class="edt-section-head">First section</p>
+<a class="edt-card" href="#edt-s1">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-card-head">This is a story headline. It runs to two lines.</span>
+  <span class="edt-card-sub">This is a summary line. One or two sentences.</span>
+  <span class="edt-byline">Byline — Role</span>
+</a>
+<a class="edt-card" href="#edt-s2">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-card-head">This is a second story headline.</span>
+  <span class="edt-card-sub">This is a summary line. One or two sentences.</span>
+  <span class="edt-byline">Byline — Role</span>
+</a>
+<a class="edt-card" href="#edt-s3">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-card-head">This is a third story headline.</span>
+  <span class="edt-card-sub">This is a summary line. One or two sentences.</span>
+  <span class="edt-byline">Byline — Role</span>
+</a>
+    ;;
+  }
+
+  block t_index_rail: TextBlock {
+    content: @md
+<p class="edt-section-head">Second section</p>
+<a class="edt-rail-item" href="#edt-s4">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-rail-head">This is a rail headline. It runs to two lines.</span>
+</a>
+<a class="edt-rail-item" href="#edt-s1">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-rail-head">This is a second rail headline.</span>
+</a>
+<a class="edt-rail-item" href="#edt-s2">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-rail-head">This is a third rail headline.</span>
+</a>
+<a class="edt-rail-item" href="#edt-s3">
+  <span class="edt-tag">Tag</span>
+  <span class="edt-rail-head">This is a fourth rail headline.</span>
+</a>
+    ;;
+  }
+
+  block t_s1: TextBlock {
+    content: @md
+<p class="edt-eyebrow">Section label</p>
+<h2 class="edt-headline edt-headline-lg">This is a story headline. It runs to about two lines at this width.</h2>
+<p class="edt-standfirst">This is a standfirst. It sets up the story in one or two sentences and sits under the headline.</p>
+<p class="edt-byline">Byline — Role</p>
+<p class="edt-body">This is body text. It runs for a paragraph or two before the figure, and carries the argument the chart is there to support.</p>
+<p class="edt-body">This is a second paragraph of body text. That's it.</p>
+    ;;
+  }
+
+  block t_s1_note: TextBlock {
+    content: @md
+<div class="edt-note edt-note-quote">
+  <span class="edt-eyebrow">Commentary label</span>
+  <span class="edt-note-text">This is a pull-quote. It is set larger than body text and runs to three or four sentences. It is the commentary on the figure above.</span>
+  <span class="edt-note-name">Name</span>
+  <span class="edt-note-role">Role</span>
+</div>
+    ;;
+  }
+
+  block t_s2: TextBlock {
+    content: @md
+<p class="edt-eyebrow">Section label</p>
+<h2 class="edt-headline edt-headline-lg">This is a story headline. It runs to about two lines at this width.</h2>
+<p class="edt-standfirst">This is a standfirst. It sets up the story in one or two sentences and sits under the headline.</p>
+<p class="edt-byline">Byline — Role</p>
+<p class="edt-body">This is body text. It runs for a paragraph or two before the figure, and carries the argument the chart is there to support.</p>
+<p class="edt-body">This is a second paragraph of body text. That's it.</p>
+    ;;
+  }
+
+  block t_s2_note: TextBlock {
+    content: @md
+<div class="edt-note edt-note-quote">
+  <span class="edt-eyebrow">Commentary label</span>
+  <span class="edt-note-text">This is a pull-quote. It is set larger than body text and runs to three or four sentences. It is the commentary on the figure above.</span>
+  <span class="edt-note-name">Name</span>
+  <span class="edt-note-role">Role</span>
+</div>
+    ;;
+  }
+
+  block t_s3: TextBlock {
+    content: @md
+<p class="edt-eyebrow">Section label</p>
+<h2 class="edt-headline edt-headline-lg">This is a story headline. It runs to about two lines at this width.</h2>
+<p class="edt-standfirst">This is a standfirst. It sets up the story in one or two sentences and sits under the headline.</p>
+<p class="edt-byline">Byline — Role</p>
+<p class="edt-body">This is body text. It runs for a paragraph or two before the figure, and carries the argument the chart is there to support.</p>
+<p class="edt-body">This is a second paragraph of body text. That's it.</p>
+    ;;
+  }
+
+  block t_s3_note: TextBlock {
+    content: @md
+<div class="edt-note edt-note-quote">
+  <span class="edt-eyebrow">Commentary label</span>
+  <span class="edt-note-text">This is a pull-quote. It is set larger than body text and runs to three or four sentences. It is the commentary on the figure above.</span>
+  <span class="edt-note-name">Name</span>
+  <span class="edt-note-role">Role</span>
+</div>
+    ;;
+  }
+
+  block t_s4: TextBlock {
+    content: @md
+<p class="edt-eyebrow">Section label</p>
+<h2 class="edt-headline edt-headline-lg">This is a story headline. It runs to about two lines at this width.</h2>
+<p class="edt-standfirst">This is a standfirst. It sets up the story in one or two sentences and sits under the headline.</p>
+<p class="edt-byline">Byline — Role</p>
+<p class="edt-body">This is body text. It runs for a paragraph or two before the figure, and carries the argument the chart is there to support.</p>
+<p class="edt-body">This is a second paragraph of body text. That's it.</p>
+    ;;
+  }
+
+  block t_s4_note: TextBlock {
+    content: @md
+<div class="edt-note edt-note-quote">
+  <span class="edt-eyebrow">Commentary label</span>
+  <span class="edt-note-text">This is a pull-quote. It is set larger than body text and runs to three or four sentences. It is the commentary on the figure above.</span>
+  <span class="edt-note-name">Name</span>
+  <span class="edt-note-role">Role</span>
+</div>
+    ;;
+  }
+
+  view: HTMLLayout {
+    content: @html
+
+<style>
+  /* ==========================================================================
+     RESET — scoped, never bare
+     ========================================================================== */
+  .edt,
+  .edt *,
+  .edt *::before,
+  .edt *::after { box-sizing: border-box; }
+
+  /* ==========================================================================
+     TOKENS — the only place a literal color appears.
+     A reskin edits this block and the AML theme {} below. Nothing else.
+     ========================================================================== */
+  .edt {
+    /* surfaces */
+    --t-bg:          #FBF9F4;
+    --t-surface:     #F2EEE5;
+    --t-border:      #DFD8CA;
+    --t-rule:        #C8BFAE;
+
+    /* ink ramp — dim/faint derived toward --t-bg */
+    --t-ink:         #1A1815;
+    --t-ink-dim:     #6A645A;
+    --t-ink-faint:   #9C958A;
+
+    /* accent — restrained brick */
+    --t-accent:      #9B3B2E;
+    --t-accent-dk:   #6F2A20;
+    /* Unused in this template: it has no dark panel to put an accent on.
+       Kept because the contract name has to stay stable — a dark reskin needs
+       it, and it clears 4.5:1 on --t-dark-2 as set below. */
+    --t-accent-lt:   #C97A66;
+
+    /* dark surfaces — solid steps, never translucent overlays.
+       Only --t-dark is used here, by the footer band and the note mark.
+       -2 and -line are the elevated-panel steps a dark reskin needs. */
+    --t-dark:        #1A1815;
+    --t-dark-2:      #2A2723;
+    --t-dark-line:   #3C3831;
+    --t-on-dark:     #F2EEE5;
+    --t-on-dark-dim: #A8A296;
+
+    /* shape */
+    --t-radius:      0px;
+    --t-radius-sm:   0px;
+    --t-pad:         20px;
+
+    /* type — --t-font-sans is the reading face and is a serif here, the way
+       --t-font-sans is Lora in the Anthropic theme. --t-font-ui is an added
+       format token for furniture: eyebrows, nav, bylines, source lines. */
+    --t-font-sans:    Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    --t-font-display: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+    --t-font-ui:      ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --t-font-mono:    ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+    /* format tokens — running text, edited once, printed everywhere */
+    --t-total:       "04";
+    --t-masthead:    "Masthead";
+    --t-edition:     "Edition line";
+    --t-source:      "Source line";
+
+    /* layout */
+    --t-max-w:       1180px;
+    --t-read-w:      720px;
+
+    display: block;
+    max-width: var(--t-max-w);
+    margin: 0 auto;
+    padding: 0 24px 40px;
+    background: var(--t-bg);
+    color: var(--t-ink);
+    font-family: var(--t-font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  /* ==========================================================================
+     MASTHEAD + NAV — outside the pages, so visible on every one
+     ========================================================================== */
+  .edt .edt-masthead {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 20px 0 10px;
+    border-bottom: 1px solid var(--t-border);
+  }
+  .edt .edt-masthead-name {
+    font-family: var(--t-font-display);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    min-width: 0;
+  }
+  .edt .edt-masthead-name::before { content: var(--t-masthead); }
+  .edt .edt-masthead-meta {
+    font-family: var(--t-font-ui);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t-ink-dim);
+    text-align: right;
+    min-width: 0;
+  }
+  .edt .edt-masthead-meta::before { content: var(--t-edition); }
+
+  /* Signature device: 3px double rule at every section boundary */
+  .edt .edt-nav {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 3px double var(--t-rule);
+    margin-bottom: 22px;
+    counter-reset: n;
+  }
+  .edt .edt-nav a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 4px 0;
+    font-family: var(--t-font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--t-ink-dim);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .edt .edt-nav a:hover { color: var(--t-ink); }
+  /* Nav numerals renumber themselves; only story links carry the counter. */
+  .edt .edt-nav .edt-nav-num { counter-increment: n; }
+  .edt .edt-nav .edt-nav-num::before {
+    content: counter(n, decimal-leading-zero);
+    font-family: var(--t-font-mono);
+    font-size: 11px;
+    color: var(--t-ink-faint);
+  }
+  /* Active state. One rule per page — edit this list when pages change. */
+  .edt:not(:has(.edt-page:target)) .edt-nav a[href="#edt-front"],
+  .edt:has(#edt-front:target) .edt-nav a[href="#edt-front"],
+  .edt:has(#edt-s1:target) .edt-nav a[href="#edt-s1"],
+  .edt:has(#edt-s2:target) .edt-nav a[href="#edt-s2"],
+  .edt:has(#edt-s3:target) .edt-nav a[href="#edt-s3"],
+  .edt:has(#edt-s4:target) .edt-nav a[href="#edt-s4"] {
+    color: var(--t-ink);
+    border-bottom-color: var(--t-accent);
+  }
+
+  /* ==========================================================================
+     PAGE SWITCHING — :target, with a default so the front page shows first.
+     scroll-margin-top keeps the anchor jump from scrolling the host page.
+     ========================================================================== */
+  .edt .edt-page {
+    display: none;
+    scroll-margin-top: 9999px;
+    animation: edt-in 0.35s ease both;
+  }
+  .edt .edt-page:target { display: block; }
+  .edt:not(:has(.edt-page:target)) #edt-front { display: block; }
+
+  @keyframes edt-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ==========================================================================
+     SHARED COPY CLASSES — used inside TextBlocks
+     ========================================================================== */
+  .edt .edt-eyebrow {
+    display: block;
+    font-family: var(--t-font-ui);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--t-accent);
+    margin: 0 0 8px;
+  }
+  .edt .edt-headline {
+    font-family: var(--t-font-display);
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.14;
+    letter-spacing: -0.01em;
+    color: var(--t-ink);
+    margin: 0 0 10px;
+  }
+  .edt .edt-headline-lg { font-size: 38px; }
+  .edt .edt-standfirst {
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--t-ink-dim);
+    margin: 0 0 12px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--t-border);
+  }
+  .edt .edt-byline {
+    display: block;
+    font-family: var(--t-font-ui);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t-ink-faint);
+    margin: 0;
+  }
+  .edt .edt-body {
+    font-size: 17px;
+    line-height: 1.68;
+    color: var(--t-ink);
+    margin: 18px 0 0;
+  }
+  .edt .edt-section-head {
+    font-family: var(--t-font-ui);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--t-ink);
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 3px double var(--t-rule);
+  }
+  .edt .edt-tag {
+    display: block;
+    font-family: var(--t-font-ui);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--t-accent);
+    margin-bottom: 5px;
+  }
+
+  /* ==========================================================================
+     FRONT PAGE
+     ========================================================================== */
+  .edt .edt-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    background: var(--t-border);
+    border: 1px solid var(--t-border);
+    border-radius: var(--t-radius);
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .edt .edt-kpi-slot {
+    min-height: 88px;
+    padding: 12px 14px;
+    background: var(--t-surface);
+    min-width: 0;
+  }
+
+  .edt .edt-lead {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+    border: 1px solid var(--t-border);
+    border-radius: var(--t-radius) var(--t-radius) 0 0;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  .edt .edt-lead-copy {
+    padding: 26px 28px;
+    background: var(--t-surface);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .edt .edt-lead-pane {
+    min-height: 260px;
+    padding: 14px;
+    border-left: 1px solid var(--t-border);
+    min-width: 0;
+  }
+
+  .edt .edt-note-wrap {
+    border: 1px solid var(--t-border);
+    border-top: none;
+    border-radius: 0 0 var(--t-radius) var(--t-radius);
+    padding: 16px var(--t-pad);
+    margin-bottom: 28px;
+  }
+
+  .edt .edt-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 32px;
+  }
+  .edt .edt-rail {
+    border-left: 1px solid var(--t-border);
+    padding-left: 24px;
+    min-width: 0;
+  }
+
+  /* index cards — anchors that carry the report */
+  .edt .edt-card {
+    display: block;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--t-border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.15s ease;
+  }
+  .edt .edt-card:last-child { border-bottom: none; }
+  .edt .edt-card:hover { background: var(--t-surface); }
+  .edt .edt-card-head {
+    display: block;
+    font-family: var(--t-font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--t-ink);
+    margin-bottom: 6px;
+  }
+  .edt .edt-card-sub {
+    display: block;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--t-ink-dim);
+    margin-bottom: 6px;
+  }
+  .edt .edt-rail-item {
+    display: block;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--t-border);
+    text-decoration: none;
+    color: inherit;
+  }
+  .edt .edt-rail-item:last-child { border-bottom: none; }
+  .edt .edt-rail-head {
+    display: block;
+    font-family: var(--t-font-display);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--t-ink);
+    transition: color 0.15s ease;
+  }
+  .edt .edt-rail-item:hover .edt-rail-head { color: var(--t-accent); }
+
+  /* ==========================================================================
+     COMMENTARY — strip on the front page, pull-quote inside a story
+     ========================================================================== */
+  .edt .edt-note-strip {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .edt .edt-note-mark {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border-radius: var(--t-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--t-dark);
+    color: var(--t-on-dark);
+    font-family: var(--t-font-display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+  .edt .edt-note-body { display: block; min-width: 0; }
+  .edt .edt-note-name {
+    display: block;
+    font-family: var(--t-font-ui);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--t-ink);
+    margin-bottom: 4px;
+  }
+  .edt .edt-note-role {
+    display: block;
+    font-family: var(--t-font-ui);
+    font-size: 11px;
+    color: var(--t-ink-dim);
+    margin-top: 2px;
+  }
+  .edt .edt-note-text {
+    display: block;
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--t-ink);
+  }
+  .edt .edt-note-quote {
+    background: var(--t-surface);
+    border-left: 3px solid var(--t-accent);
+    border-radius: 0 var(--t-radius) var(--t-radius) 0;
+    padding: 20px var(--t-pad);
+    margin: 28px 0 0;
+  }
+  .edt .edt-note-quote .edt-note-text {
+    font-size: 19px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  /* ==========================================================================
+     STORY PAGE
+     ========================================================================== */
+  .edt .edt-story-inner {
+    max-width: var(--t-read-w);
+    margin: 0 auto;
+    padding-bottom: 20px;
+  }
+  .edt .edt-story-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .edt .edt-back {
+    font-family: var(--t-font-ui);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--t-accent);
+    text-decoration: none;
+  }
+  .edt .edt-back:hover { color: var(--t-accent-dk); }
+  /* Numeral is markup; the total is a token so it is edited once. */
+  .edt .edt-count {
+    font-family: var(--t-font-mono);
+    font-size: 12px;
+    color: var(--t-ink-faint);
+    letter-spacing: 0.04em;
+  }
+  .edt .edt-count::after { content: " / " var(--t-total); }
+
+  .edt .edt-figure {
+    border-top: 3px double var(--t-rule);
+    border-bottom: 1px solid var(--t-border);
+    padding: 16px 0 12px;
+    margin: 28px 0 0;
+  }
+  .edt .edt-figure-slot {
+    min-height: 320px;
+    min-width: 0;
+  }
+  .edt .edt-source {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: var(--t-font-ui);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--t-ink-faint);
+    margin-top: 10px;
+  }
+  .edt .edt-source-note::before { content: var(--t-source); }
+  .edt .edt-source-mark::before { content: var(--t-masthead); }
+
+  /* ==========================================================================
+     FOOTER
+     ========================================================================== */
+  .edt .edt-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 36px;
+    padding: 16px var(--t-pad);
+    background: var(--t-dark);
+    border-radius: var(--t-radius);
+    color: var(--t-on-dark-dim);
+    font-family: var(--t-font-ui);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+  .edt .edt-footer-mark {
+    font-family: var(--t-font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0;
+    color: var(--t-on-dark);
+  }
+  .edt .edt-footer-mark::before { content: var(--t-masthead); }
+
+  /* ==========================================================================
+     BLOCK INTERNALS — undocumented Holistics classes, may change without
+     warning. Each is here for one reason, noted.
+     ========================================================================== */
+  /* Rendered TextBlock wrapper — strip its default padding and typography so
+     the classes above own the look. */
+  .edt .dac-text-block {
+    padding: 0 !important;
+    background: transparent !important;
+    font-family: var(--t-font-sans) !important;
+    color: var(--t-ink) !important;
+  }
+  /* Chart title comes from the block's own label, restyled in place. */
+  .edt .edt-figure .dac-ic-block-label,
+  .edt .edt-lead-pane .dac-ic-block-label {
+    font-family: var(--t-font-display) !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: var(--t-ink) !important;
+    margin-bottom: 6px !important;
+  }
+  /* KPI cell: label reads as an eyebrow, value in the display face. */
+  .edt .edt-kpi-slot .dac-ic-block-label {
+    font-family: var(--t-font-ui) !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.12em !important;
+    text-transform: uppercase !important;
+    color: var(--t-ink-dim) !important;
+  }
+  .edt .edt-kpi-slot .h-kpi-metric-kpi,
+  .edt .edt-kpi-slot .h-kpi-metric-kpi * {
+    font-family: var(--t-font-display) !important;
+    font-size: 26px !important;
+    font-weight: 700 !important;
+    line-height: 1.05 !important;
+    color: var(--t-ink) !important;
+    background: transparent !important;
+  }
+
+  /* ==========================================================================
+     NARROW WIDTHS
+     ========================================================================== */
+  @media (max-width: 860px) {
+    .edt .edt-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .edt .edt-lead { grid-template-columns: minmax(0, 1fr); }
+    .edt .edt-lead-pane { border-left: none; border-top: 1px solid var(--t-border); }
+    .edt .edt-columns { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+    .edt .edt-rail { border-left: none; border-top: 1px solid var(--t-border); padding-left: 0; padding-top: 22px; }
+    .edt .edt-headline-lg { font-size: 30px; }
+  }
+</style>
+
+<div class="edt">
+
+  <!-- ===== MASTHEAD + NAV (running, so markup not blocks) ================ -->
+  <header class="edt-masthead">
+    <div class="edt-masthead-name"></div>
+    <div class="edt-masthead-meta"></div>
+  </header>
+
+  <nav class="edt-nav">
+    <a href="#edt-front">Front page</a>
+    <a href="#edt-s1"><span class="edt-nav-num"></span>Nav label</a>
+    <a href="#edt-s2"><span class="edt-nav-num"></span>Nav label</a>
+    <a href="#edt-s3"><span class="edt-nav-num"></span>Nav label</a>
+    <a href="#edt-s4"><span class="edt-nav-num"></span>Nav label</a>
+  </nav>
+
+  <!-- ===== FRONT PAGE =================================================== -->
+  <section class="edt-page" id="edt-front">
+
+    <div class="edt-kpis">
+      <div class="edt-kpi-slot"><h-block name="k_kpi_1" /></div>
+      <div class="edt-kpi-slot"><h-block name="k_kpi_2" /></div>
+      <div class="edt-kpi-slot"><h-block name="k_kpi_3" /></div>
+      <div class="edt-kpi-slot"><h-block name="k_kpi_4" /></div>
+    </div>
+
+    <div class="edt-lead">
+      <div class="edt-lead-copy"><h-block name="t_lead" /></div>
+      <div class="edt-lead-pane"><h-block name="v_lead" /></div>
+    </div>
+
+    <div class="edt-note-wrap"><h-block name="t_lead_note" /></div>
+
+    <div class="edt-columns">
+      <div class="edt-col"><h-block name="t_index_news" /></div>
+      <div class="edt-rail"><h-block name="t_index_rail" /></div>
+    </div>
+
+  </section>
+
+  <!-- ===== STORY 1 ====================================================== -->
+  <section class="edt-page" id="edt-s1">
+    <div class="edt-story-inner">
+      <div class="edt-story-top">
+        <a class="edt-back" href="#edt-front">&#8592; Front page</a>
+        <span class="edt-count">01</span>
+      </div>
+      <h-block name="t_s1" />
+      <figure class="edt-figure">
+        <div class="edt-figure-slot"><h-block name="v_s1" /></div>
+        <figcaption class="edt-source">
+          <span class="edt-source-note"></span>
+          <span class="edt-source-mark"></span>
+        </figcaption>
+      </figure>
+      <h-block name="t_s1_note" />
+    </div>
+  </section>
+
+  <!-- ===== STORY 2 ====================================================== -->
+  <section class="edt-page" id="edt-s2">
+    <div class="edt-story-inner">
+      <div class="edt-story-top">
+        <a class="edt-back" href="#edt-front">&#8592; Front page</a>
+        <span class="edt-count">02</span>
+      </div>
+      <h-block name="t_s2" />
+      <figure class="edt-figure">
+        <div class="edt-figure-slot"><h-block name="v_s2" /></div>
+        <figcaption class="edt-source">
+          <span class="edt-source-note"></span>
+          <span class="edt-source-mark"></span>
+        </figcaption>
+      </figure>
+      <h-block name="t_s2_note" />
+    </div>
+  </section>
+
+  <!-- ===== STORY 3 ====================================================== -->
+  <section class="edt-page" id="edt-s3">
+    <div class="edt-story-inner">
+      <div class="edt-story-top">
+        <a class="edt-back" href="#edt-front">&#8592; Front page</a>
+        <span class="edt-count">03</span>
+      </div>
+      <h-block name="t_s3" />
+      <figure class="edt-figure">
+        <div class="edt-figure-slot"><h-block name="v_s3" /></div>
+        <figcaption class="edt-source">
+          <span class="edt-source-note"></span>
+          <span class="edt-source-mark"></span>
+        </figcaption>
+      </figure>
+      <h-block name="t_s3_note" />
+    </div>
+  </section>
+
+  <!-- ===== STORY 4 ====================================================== -->
+  <section class="edt-page" id="edt-s4">
+    <div class="edt-story-inner">
+      <div class="edt-story-top">
+        <a class="edt-back" href="#edt-front">&#8592; Front page</a>
+        <span class="edt-count">04</span>
+      </div>
+      <h-block name="t_s4" />
+      <figure class="edt-figure">
+        <div class="edt-figure-slot"><h-block name="v_s4" /></div>
+        <figcaption class="edt-source">
+          <span class="edt-source-note"></span>
+          <span class="edt-source-mark"></span>
+        </figcaption>
+      </figure>
+      <h-block name="t_s4_note" />
+    </div>
+  </section>
+
+  <!-- ===== FOOTER (running, so markup not blocks) ======================= -->
+  <footer class="edt-footer">
+    <span class="edt-footer-mark"></span>
+    <span>Footer line</span>
+  </footer>
+
+</div>
+
+    ;;
+  }
+
+}

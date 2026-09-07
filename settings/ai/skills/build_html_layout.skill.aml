@@ -1,0 +1,431 @@
+Skill build_html_layout {
+label: 'Build HTML Layout'
+
+description: '''
+Build, redesign, or fix the HTMLLayout presentation of a Holistics dashboard.
+
+```
+Use when `build_dashboard_v2` selects HTMLLayout, when the user explicitly requests HTMLLayout, or when an existing dashboard needs custom HTML/CSS presentation such as custom tabs/navigation, branded dashboard shells, narrative/asymmetric layouts, slides, paginated reports, or specialized embedded views.
+
+This skill owns HTML structure, CSS composition, live-block placement, responsive/print behavior, and HTML-specific presentation.
+
+It does not decide what analysis the dashboard should contain.
+
+When no custom style is requested, use the Holistics default HTML style defined in this skill.
+
+When a custom theme has been resolved by `build_dashboard_theme`, use that theme's design tokens as the visual direction for the HTML composition.
+
+Do not use for ordinary native Canvas/Tab dashboards or theme-only changes.
+```
+
+'''
+
+invocation: 'auto'
+allow_switching_invocation: true
+
+content: @md
+
+# Building an HTML Layout
+
+Build or edit the `HTMLLayout` presentation of an approved Holistics dashboard.
+
+HTML/CSS owns presentation.
+
+Holistics analytical blocks own live data and interactions.
+
+Never hard-code dataset-derived values into HTML.
+
+## What a good input looks like
+
+Determine:
+
+1. **Live blocks** — visualizations, KPIs, filters, and controls.
+2. **Composition** — grouping, reading order, relative prominence.
+3. **Format** — dashboard, custom tabs, slides, paginated report, embedded view, etc.
+4. **Presentation behavior** — navigation, responsive behavior, print behavior, density.
+5. **Visual direction** — Holistics default or an explicitly resolved custom theme.
+
+When invoked from `build_dashboard_v2`, treat its approved composition contract as authoritative.
+
+Do not restart analytical planning.
+
+When editing an existing HTMLLayout, inspect it first and preserve unrelated behavior.
+
+If the analytical structure is missing or materially wrong, use `build_dashboard_v2`.
+
+## What a bare minimum output looks like
+
+A valid HTMLLayout:
+
+* preserves intended analytical blocks and interactions;
+* places every intended live block exactly once;
+* uses HTML/CSS only for presentation;
+* contains no JavaScript;
+* scopes CSS beneath one root class;
+* gives visualizations explicit usable space;
+* has an intentional visual system;
+* works for its intended screen/navigation/print format;
+* passes HTML preflight.
+
+A technically valid but visually unfinished/basic HTMLLayout is not complete.
+
+## Workflow
+
+### 1. Read the approved composition
+
+Establish:
+
+* required live blocks;
+* grouping;
+* reading order;
+* prominence;
+* target format;
+* navigation behavior;
+* visual direction.
+
+Do not add analytical blocks merely to fill space.
+
+Do not remove or replace blocks because another composition is easier.
+
+### 2. Resolve visual direction
+
+Visual direction must be known before composing the HTML.
+
+#### Holistics default
+
+If no custom style was requested, use the Holistics default HTML visual system below.
+
+Do not invoke `build_dashboard_theme`.
+
+#### Custom theme
+
+If `build_dashboard_theme` produced a custom theme, inspect its design tokens and use them as the visual direction.
+
+Mirror relevant theme values into the HTML CSS token block where necessary.
+
+Do not independently redesign the custom theme.
+
+### 3. Choose or create a layout skeleton
+
+If a suitable public HTMLLayout template is available, use it as a structural starting point.
+
+Choose by:
+
+* format;
+* block count/types;
+* grouping;
+* navigation;
+* responsive or paginated behavior.
+
+Do not choose solely by aesthetic similarity.
+
+Do not force the dashboard into an unsuitable template.
+
+The approved composition contract always wins.
+
+If no suitable template exists, build from scratch.
+
+### 4. Establish the root and CSS tokens
+
+Use one short, unique root class.
+
+Scope all layout CSS beneath it.
+
+Example:
+
+```html
+<div class="sales-dashboard">
+  ...
+</div>
+```
+
+Use CSS custom properties for reusable visual decisions.
+
+## Holistics default HTML style
+
+When no custom style is requested, use this visual direction.
+
+```css
+.dashboard-root {
+  --t-bg: #FFFFFF;
+  --t-surface: #F5F8FA;
+  --t-border: #E1E7EE;
+
+  --t-ink: #05264C;
+  --t-ink-dim: #5C6E85;
+  --t-ink-faint: #8FA0B4;
+
+  --t-accent: #259B6C;
+  --t-accent-lt: #3FBE88;
+  --t-accent-dk: #1B7A54;
+
+  --t-dark: #06213F;
+  --t-dark-2: #0D3562;
+  --t-dark-line: #1A4A80;
+
+  --t-on-dark: #FFFFFF;
+  --t-on-dark-dim: #D7E1EA;
+
+  --t-radius: 10px;
+  --t-radius-sm: 6px;
+  --t-pad: 20px;
+
+  --t-font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+  --t-font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+  --t-font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+```
+
+Visual character:
+
+* clean and minimal;
+* light surfaces;
+* dark navy text;
+* restrained green accent;
+* comfortable density;
+* subtle borders rather than heavy shadows;
+* clear typography hierarchy;
+* accent used selectively, not as large page backgrounds.
+
+These tokens style the HTML presentation.
+
+Do **not** define a `ColorPalette` for the default Holistics style. Charts should continue to inherit Holistics' application-level default chart palette.
+
+### 5. Apply an HTML-compatible PageTheme
+
+HTMLLayout owns its outer surfaces, so an HTML-specific theme must not define page-level:
+
+```aml
+background { ... }
+canvas { ... }
+```
+
+For the default Holistics HTML presentation, style Holistics-rendered blocks consistently while preserving the application's default chart palette.
+
+Do not add `color { data: ... }` unless a custom chart palette was intentionally created.
+
+At minimum, remove native block chrome:
+
+```aml
+block {
+  background { bg_color: 'transparent' }
+
+  border {
+    border_width: 0
+    border_style: 'none'
+  }
+
+  shadow: 'none'
+  padding: 0
+}
+```
+
+Also keep block typography, tables, KPIs, and rendered text aligned with the resolved visual direction.
+
+When a custom theme exists, preserve its palette policy:
+
+* custom palette defined → use it;
+* no custom palette → inherit Holistics application palette.
+
+### 6. Build the HTML structure
+
+Render live blocks with:
+
+```html
+<h-block name="block_name" />
+```
+
+Wrap each block in an element you control.
+
+```html
+<section class="dashboard-root__hero">
+  <div class="dashboard-root__chart">
+    <h-block name="v_revenue_trend" />
+  </div>
+</section>
+```
+
+Never depend on styling `<h-block>` directly.
+
+Each live block appears in exactly one `<h-block>`.
+
+Use normal HTML for static presentation content such as:
+
+* titles;
+* labels;
+* explanations;
+* separators;
+* repeated headers;
+* repeated footers.
+
+Dataset-derived content must remain in live Holistics blocks.
+
+### 7. Build resilient CSS
+
+Every visualization container needs explicit usable height.
+
+For responsive layouts:
+
+```css
+.dashboard-root .hero-chart {
+  min-height: 420px;
+}
+```
+
+For fixed/paginated layouts, use a fixed height where needed.
+
+Do not rely on `flex: 1` alone.
+
+Use resilient grid tracks:
+
+```css
+grid-template-columns:
+  minmax(0, 1fr)
+  minmax(0, 1fr);
+```
+
+Use `min-width: 0` on constrained grid/flex children when needed.
+
+Scope all selectors beneath the root class.
+
+Do not use unscoped selectors such as:
+
+```css
+body
+*
+table
+```
+
+### 8. Build custom navigation without JavaScript
+
+Never use JavaScript, `<script>`, or inline event handlers.
+
+For custom tabs/slides/navigation, use CSS mechanisms such as `:target`, `:has()`, or static state classes.
+
+When using `:target`, include a default state so content appears before the first interaction.
+
+Do not duplicate live blocks across tabs, slides, or pages.
+
+Repeated presentation content should be static HTML/CSS.
+
+### 9. Handle paginated output when needed
+
+For print/paginated formats:
+
+* use explicit page dimensions;
+* control page breaks;
+* avoid splitting important figures;
+* prevent an unnecessary trailing blank page.
+
+If Holistics export behavior cannot be verified, state the limitation rather than assuming print behavior.
+
+### 10. Verify and repair
+
+Run the HTML preflight against the actual AML.
+
+Fix failures before delivery.
+
+## Schema
+
+### HTMLLayout
+
+```aml
+view: HTMLLayout {
+  content: @html
+    <style>
+      .dashboard-root {
+        /* tokens */
+      }
+
+      .dashboard-root .section {
+        /* scoped styles */
+      }
+    </style>
+
+    <div class="dashboard-root">
+      <div class="section">
+        <h-block name="v_example" />
+      </div>
+    </div>
+}
+```
+
+Check:
+
+https://docs.holistics.io/reference/aml/html-layout
+
+### Declaration order
+
+AML is block-scoped.
+
+Anything referenced by the Dashboard must be declared before use.
+
+Do not invent syntax.
+
+### HTML PageTheme
+
+For HTMLLayout:
+
+* omit page `background`;
+* omit `canvas`;
+* keep Holistics block chrome transparent;
+* style labels/text;
+* style tables when used;
+* style KPIs;
+* style rendered markdown/text;
+* only override `color { data: ... }` when a custom chart palette is intentional.
+
+## Conventions
+
+### Do
+
+* Treat the approved dashboard specification as authoritative.
+* Use Holistics default HTML style when no custom style is requested.
+* Use custom theme tokens when a custom theme was explicitly resolved.
+* Keep live values in Holistics blocks.
+* Use HTML for composition and static presentation.
+* Scope CSS beneath one root.
+* Style wrappers rather than `<h-block>`.
+* Give visualizations explicit height.
+* Use resilient grid/flex sizing.
+* Preserve Holistics' default chart palette unless intentionally overridden.
+* Check public docs rather than guessing AML syntax.
+
+### Don't
+
+* Don't invent data or metrics.
+* Don't hard-code analytical values into HTML.
+* Don't create a new arbitrary "basic theme."
+* Don't create a ColorPalette just because HTMLLayout is being used.
+* Don't use JavaScript.
+* Don't style `<h-block>` directly.
+* Don't duplicate live blocks.
+* Don't use unscoped CSS.
+* Don't force unsuitable templates.
+* Don't fabricate asset URLs.
+* Don't redefine the analytical dashboard.
+
+## Preflight
+
+Before delivery, verify:
+
+* [ ] every intended live block appears exactly once
+* [ ] every `<h-block>` references a declared block
+* [ ] no dataset-derived values are hard-coded
+* [ ] no JavaScript or inline event handlers
+* [ ] all CSS is scoped
+* [ ] `<h-block>` is not styled directly
+* [ ] visualization containers have explicit usable height
+* [ ] grid/flex contents cannot unexpectedly overflow
+* [ ] visual tokens are used consistently
+* [ ] Holistics default chart palette is preserved unless intentionally overridden
+* [ ] referenced AML objects are declared before use
+* [ ] HTML theme excludes `background` and `canvas`
+* [ ] native block chrome is transparent
+* [ ] custom navigation has a default state
+* [ ] no live blocks are duplicated across pages/tabs/slides
+* [ ] paginated layouts handle final-page breaks
+* [ ] diagnostics contain no errors
+
+;;
+}

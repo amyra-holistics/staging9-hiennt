@@ -1,0 +1,188 @@
+Dashboard test_2 {
+  title: 'test'
+  description: ''
+  owner: 'di.hoang@holistics.io'
+  block title: TextBlock {
+    content: @md # Your title goes here ;;
+  }
+  block f_hosts_location: FilterBlock {
+    label: 'Hosts Location'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: homestay_dataset
+      field: r(homestay_hosts.location)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block v_l8ye: VizBlock {
+    label: 'Url, Registered Date and 3 more'
+    viz: DataTable {
+      dataset: homestay_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(homestay_hosts.url)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.registered_date)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.about)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.location)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.response_time)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  block v_8art: VizBlock {
+    label: 'Url, Registered Date and 3 more copy'
+    viz: DataTable {
+      dataset: homestay_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(homestay_hosts.url)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.registered_date)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.about)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.location)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.response_time)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  block v_w44i: VizBlock {
+    label: 'Url, Registered Date and 3 more copy'
+    viz: DataTable {
+      dataset: homestay_dataset
+      fields: [
+        VizFieldFull {
+          ref: r(homestay_hosts.url)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.registered_date)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.about)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.location)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.response_time)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 1040
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1260, 60)
+    }
+    block f_hosts_location {
+      position: pos(40, 80, 300, 80)
+    }
+    block v_l8ye {
+      position: pos(20, 160, 440, 420)
+    }
+    block v_8art {
+      position: pos(480, 160, 440, 420)
+    }
+    block v_w44i {
+      position: pos(20, 600, 440, 420)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  interactions: [
+    FilterInteraction {
+      from: 'f_hosts_location'
+      to: [
+        CustomMapping {
+          block: [
+            'v_8art',
+            'v_w44i'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
+}

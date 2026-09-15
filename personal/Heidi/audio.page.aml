@@ -4,7 +4,7 @@ Dashboard untitled_3 {
 
   view: CanvasLayout {
     label: 'View 1'
-    height: 840
+    height: 1000
     grid_size: 20
     mobile {
       mode: 'auto'
@@ -21,8 +21,15 @@ Dashboard untitled_3 {
       position: pos(40, 100, 860, 240)
       layer: 3
     }
+    block v_5vs2 {
+      position: pos(40, 520, 500, 400)
+      layer: 3
+    }
+    block ai_9vq5 {
+      position: pos(540, 520, 520, 400)
+      layer: 3
+    }
   }
-
   theme: H.themes.vanilla
   block v1: VizBlock {
     label: 'Audio Detail'
@@ -93,5 +100,52 @@ Dashboard untitled_3 {
         }
       ]
     }
+  }
+  block v_5vs2: VizBlock {
+    label: 'Days to ship actual, Sales forecast and 3 more'
+    viz: DataTable {
+      dataset: superstore
+      fields: [
+        VizFieldFull {
+          ref: r(superstore_csv.days_to_ship_actual)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(superstore_csv.sales_forecast)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(superstore_csv.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(superstore_csv.country)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(superstore_csv.city)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  block ai_9vq5: AiBlock {
+    label: 'summarize @VizBlock:untitled_3.v_5vs2'
+    prompt: @md summarize @VizBlock:untitled_3.v_5vs2;;
   }
 }

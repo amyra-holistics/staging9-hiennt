@@ -1,4 +1,4 @@
-Dashboard all_viz_test {
+Dashboard all_viz {
   theme: DynamicPageTheme {
     light: purple
     dark: forest

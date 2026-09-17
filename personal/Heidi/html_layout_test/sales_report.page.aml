@@ -1,0 +1,1342 @@
+// =====================================================================
+// TEMPLATE  newspaper_report
+// FORMAT    Paginated report, 11in x 17in tabloid portrait, 5 pages
+// THEME     Broadsheet newspaper — near-black navy ink on white stock,
+//           masthead red as the single accent, serif throughout.
+//           Signature device: a 3px accent rule above the masthead,
+//           repeated as the section-band top edge and the pull-quote frame.
+// ROOT      .npr
+//
+// ---------------------------------------------------------------------
+// PAGE LIST
+//   1  masthead, scoreboard strip, lead story
+//   2  Won, Lost  (+ two optional figure slots)
+//   3  Live, Risk, New
+//   4  Moving, Quiet
+//   5  Product, Diary, Pattern (+ optional table slot), footer
+//
+// ---------------------------------------------------------------------
+// SLOT CONTRACT
+//   t_score_1..5   TextBlock  recommended  scoreboard strip, FIXED 5 columns,
+//                                          does not reflow. Fill all five or
+//                                          delete the unused ones AND their
+//                                          <h-block>, then change
+//                                          --t-score-cols to match.
+//   t_lead_top     TextBlock  recommended  kicker / headline / deck, full width
+//   t_lead_body    TextBlock  recommended  lead prose. Wrap in
+//                                          <div class="npr-lead-body"> for the
+//                                          2-column flow + drop cap.
+//   t_won          TextBlock  recommended  Won section body
+//   t_lost         TextBlock  recommended  Lost section body
+//   t_live         TextBlock  recommended  Good Progress section body
+//   t_risk         TextBlock  recommended  Stuck-at-the-line section body
+//   t_new          TextBlock  recommended  New deals section body
+//   t_highlights   TextBlock  recommended  Highlights section body
+//   t_quiet        TextBlock  recommended  Quiet deals section body
+//   t_product      TextBlock  recommended  Product engineering list + net-net
+//   t_watch        TextBlock  recommended  Diary / what to watch
+//   t_pattern      TextBlock  recommended  Pattern essay, table, closing line
+//   v_fig_1..2     any viz    OPTIONAL     figure row, 2 fixed columns,
+//                                          FIXED 3.1in height. Commented out
+//                                          by default — see "ADDING CHARTS".
+//   v_pattern      table viz  OPTIONAL     full width, FIXED 3.4in height.
+//                                          Commented out by default.
+//
+//   Minimum useful fill: t_lead_top, t_lead_body, and at least one section
+//   TextBlock. Everything else can be deleted in pairs (declaration +
+//   <h-block>). A block declared but not placed will not render; a block
+//   placed but not declared will not compile.
+//
+// ---------------------------------------------------------------------
+// EDITING INSTRUCTIONS
+//
+// 1. RUNNING TEXT lives in the token block, not in the markup, because a
+//    Holistics block cannot appear twice and these strings print on every
+//    page. Edit these five and the whole paper updates:
+//        --t-report-title   masthead wordmark + running header
+//        --t-issue          issue line
+//        --t-date           dateline
+//        --t-window         masthead subline
+//        --t-total          page count, quoted and zero-padded: "05"
+//    The footer line is --t-footer-text.
+//
+// 2. MULTI-COLUMN WRAPPERS GO INSIDE THE TEXTBLOCK, not in the layout.
+//    Write <div class="npr-cols"> ... </div> as the outermost element of
+//    your markdown. This is deliberate: it keeps the whole column flow
+//    inside one rendered container so it fragments reliably. Putting the
+//    multicol class on the layout div instead makes the flow depend on how
+//    Holistics wraps <h-block>, which is not something this template can
+//    guarantee.
+//
+// 3. COMPONENT CLASSES available inside any TextBlock:
+//        .npr-cols                    two-column flow
+//        .npr-deal                    a deal card
+//          + .is-lost .is-live .is-risk .is-new .is-hi   left-rule accent
+//          .npr-name .npr-rep .npr-stat .npr-body .npr-next
+//        .npr-pill  + .is-hot .is-warm .is-risk          inline status chip
+//        .npr-pull                    pull quote, spans both columns
+//        .npr-lead-body               2-col lead flow with drop cap
+//        .npr-subhead                 small caps divider inside a section
+//        .npr-qi                      one-line quiet-deal item
+//        .npr-eng                     arrow list for the product section
+//        .npr-netnet                  tinted takeaway box
+//        .npr-watch / .npr-wi         diary rows  + .is-urgent .is-soon
+//        .npr-pat                     pattern table  + tr.is-lost tr.is-win
+//        .npr-closing                 closing paragraph above the rule
+//    Each one appears at least once in the placeholder copy below, so you
+//    can see the shape before you replace it.
+//
+// 4. SECTION BANDS are plain markup in the layout, not blocks, because a
+//    block cannot repeat. Change the label, the <h2>, the note, and the
+//    is-* modifier on .npr-sec. Available: is-won is-lost is-live is-risk
+//    is-new is-hi is-quiet is-eng is-pattern.
+//
+// 5. RESKIN: change only the token block at the top of the <style> and the
+//    twinned values in the AML theme. Twins are commented individually.
+//    No layout property belongs in the theme; no hex belongs in the CSS
+//    outside the token block.
+//
+// ---------------------------------------------------------------------
+// ADDING CHARTS
+// The three viz slots ship commented out, in both the block declaration
+// and the markup, so this file compiles and renders with no dataset
+// attached. To switch one on, uncomment BOTH halves and point it at your
+// dataset. The containers already carry explicit fixed heights, which a
+// paginated format requires — a min-height is not enough when the page
+// cannot grow.
+//
+// ---------------------------------------------------------------------
+// PREFLIGHT — verified against this file
+//   [x] the whole template is one .aml file — palette, dashboard, theme, layout
+//   [x] the ColorPalette is declared above the Dashboard that references it
+//   [x] theme is written as theme: PageTheme { } inside the Dashboard
+//   [x] theme is complete: palette, block, table, KPI, custom_css
+//   [x] every declared block appears in exactly one <h-block>
+//       (17 TextBlocks declared, 17 placed; the 3 viz slots are commented
+//        out in both places, so the pairing holds either way)
+//   [x] every chart container has an explicit height — .npr-figure 3.1in,
+//       .npr-figure.is-wide 3.4in, both fixed rather than min-height
+//   [x] no <script>, no inline JS, no event handlers
+//   [x] all selectors scoped under .npr — the only unscoped rule is @page,
+//       which has no scoped form and is required for print
+//   [x] no :target in this template, so no default-state rule needed
+//   [x] @media print with break-after, and the :last-child break-after:auto
+//       rule that prevents a blank trailing page
+//   [x] literal colors confined to the token block
+//   [x] no styling hung on the <h-block> tag itself — every slot is wrapped
+//       in a classed div
+//   [x] grid tracks use minmax(0, 1fr); flex children carry min-width: 0
+//   [x] no dead CSS — every class appears in the placeholder copy
+//
+// UNVERIFIED
+//   - Whether Holistics' PDF export honours @page and break-after, or
+//     screenshots the rendered DOM. If the latter, the print block is inert
+//     and you get one continuous 5-page-tall column. Test one page before
+//     committing to this for a real weekly run.
+//   - Whether the TextBlock markdown renderer passes through the inline
+//     <div>/<table> markup the components rely on. If it strips them, the
+//     components degrade to plain paragraphs and need to move into the
+//     layout markup instead.
+// =====================================================================
+
+
+// Chart palette. Eight mid-tone hues — every one has to stay legible on
+// white stock and on the near-black masthead ink, so none is very light or
+// very dark. Starts from the accent, then spaces hues around the wheel at
+// roughly matched lightness and saturation.
+ColorPalette newspaper_report_palette {
+  title: 'Newspaper Report'
+  categorical {
+    colors: [
+      '#C4444F',  // twin of --t-accent (#B21F2C), lightened for chart use
+      '#2E7BC4',
+      '#2F9E63',
+      '#D08B1E',
+      '#7A5FC4',
+      '#1F98A6',
+      '#C46A9E',
+      '#7D8794'
+    ]
+  }
+}
+
+
+Dashboard newspaper_report {
+  title: 'Newspaper Report'
+  description: 'Tabloid-portrait paginated report in a broadsheet newspaper style. Before sharing: replace --t-report-title, --t-issue, --t-date, --t-window, --t-total and --t-footer-text in the token block, then replace the placeholder copy in every t_* block. Optional chart slots are commented out — see ADDING CHARTS in the header.'
+
+  theme: PageTheme {
+    color { data: newspaper_report_palette }
+
+    block {
+      background { bg_color: 'transparent' }
+      border {
+        border_width: 0
+        border_style: 'none'
+        border_radius: 5           // twin of --t-radius
+        border_color: '#DCD6C9'    // twin of --t-border
+      }
+      shadow: 'none'
+      padding: 0
+      opacity: 1
+      label {
+        // AML font_family takes a single family; the CSS token carries the
+        // full fallback stack. Georgia is the common member of both.
+        font_family: 'Georgia'     // twin of --t-font-sans (first web-safe member)
+        font_size: 13
+        font_color: '#14202E'      // twin of --t-ink
+        font_weight: 'semibold'
+      }
+      text {
+        font_family: 'Georgia'
+        font_size: 12              // paginated base — smaller than a screen theme
+        font_color: '#41505F'      // twin of --t-ink-dim
+        font_weight: 'normal'
+      }
+    }
+
+    viz {
+      table {
+        general {
+          bg_color: '#FFFFFF'      // twin of --t-bg
+          hover_color: '#F7F6F2'   // twin of --t-surface
+          banding_color: '#F7F6F2'
+          font_size: 12
+          font_color: '#41505F'    // twin of --t-ink-dim
+          font_family: 'Georgia'
+          border_color: '#DCD6C9'  // twin of --t-border
+          border_width: 1
+          grid_color: '#DCD6C9'
+        }
+        header {
+          bg_color: '#F7F6F2'      // twin of --t-surface
+          font_size: 12
+          font_color: '#14202E'    // twin of --t-ink
+          font_weight: 'semibold'
+        }
+        sub_header {
+          bg_color: '#F7F6F2'
+          font_size: 12
+          font_color: '#14202E'
+          font_weight: 'medium'
+        }
+        sub_title {
+          font_size: 11
+          font_color: '#41505F'
+          font_weight: 'medium'
+        }
+        sparkline {
+          line { color: '#B21F2C' }      // twin of --t-accent
+          column { color: '#B21F2C' }
+        }
+      }
+      metric_kpi {
+        alignment: 'center'
+        label {
+          font_family: 'Georgia'
+          font_size: 11
+          font_color: '#41505F'    // twin of --t-ink-dim
+        }
+        value {
+          font_family: 'Georgia'
+          font_size: 40            // fallback only; the scoreboard sizes its own
+          font_color: '#14202E'    // twin of --t-ink
+        }
+        progress {
+          indicator { bg_color: '#B21F2C' }   // twin of --t-accent
+          track { bg_color: '#DCD6C9' }       // twin of --t-border
+          text { font_color: '#41505F' }
+        }
+        // Trend colours are semantic, not brand. Green reads as good and red
+        // as bad regardless of what the palette happens to be.
+        trend {
+          positive {
+            text { font_color: '#1C7A47' }
+            background { bg_color: '#E3F2E9' }
+          }
+          negative {
+            text { font_color: '#B21F2C' }
+            background { bg_color: '#F6E7E6' }
+          }
+          neutral {
+            text { font_color: '#41505F' }
+            background { bg_color: '#F7F6F2' }
+          }
+        }
+      }
+    }
+
+    // Base type for TextBlocks. The template's own classes inside each copy
+    // slot are more specific and win, so these apply to unclassed markdown.
+    custom_css: @css
+      .dac-text-block {
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 13px;
+        color: #41505F;
+        line-height: 1.56;
+      }
+      .dac-text-block h1, .dac-text-block h2, .dac-text-block h3,
+      .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+        font-family: Georgia, 'Times New Roman', serif;
+        color: #14202E;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+        font-weight: 600;
+      }
+    ;;
+  }
+
+
+  // ---------------- SCOREBOARD ----------------
+  // Five figures across the top of page one. TextBlocks rather than KPI
+  // vizzes, so the whole strip renders with no dataset attached. Swap the
+  // number and label; keep the two classes.
+
+  block t_score_1: TextBlock {
+    content: @md
+<div class="npr-score-n is-won">0</div>
+<div class="npr-score-l">Won</div>
+    ;;
+  }
+
+  block t_score_2: TextBlock {
+    content: @md
+<div class="npr-score-n is-lost">4</div>
+<div class="npr-score-l">Lost</div>
+    ;;
+  }
+
+  block t_score_3: TextBlock {
+    content: @md
+<div class="npr-score-n is-live">8</div>
+<div class="npr-score-l">Late-stage live</div>
+    ;;
+  }
+
+  block t_score_4: TextBlock {
+    content: @md
+<div class="npr-score-n is-new">1</div>
+<div class="npr-score-l">New</div>
+    ;;
+  }
+
+  block t_score_5: TextBlock {
+    content: @md
+<div class="npr-score-n is-risk">3</div>
+<div class="npr-score-l">Awaiting response</div>
+    ;;
+  }
+
+
+  // ---------------- LEAD STORY ----------------
+
+  block t_lead_top: TextBlock {
+    content: @md
+<div class="npr-kicker">The week in one line</div>
+<div class="npr-headline">The single sentence that carries the whole week, written long enough to fill two lines.</div>
+<div class="npr-deck">A standfirst in italic. One or two sentences setting up the tension the lead paragraphs resolve, and naming the counterweight.</div>
+    ;;
+  }
+
+  block t_lead_body: TextBlock {
+    content: @md
+<div class="npr-lead-body">
+<p><b>First subject</b> carries the opening paragraph. The drop cap is applied to whatever letter starts this paragraph, so lead with a word rather than a number. Keep this paragraph to roughly four sentences — it sets the frame for everything below.</p>
+<div class="npr-pull">A pull quote spans both columns and breaks the grey. One sentence, no more.</div>
+<p><b>Second subject</b> takes the rest of the flow. Bold the entity names so the eye can find them, and keep the paragraph count to two or three. Anything longer belongs in a section below rather than the lead.</p>
+</div>
+    ;;
+  }
+
+
+  // ---------------- SECTION BODIES ----------------
+
+  block t_won: TextBlock {
+    content: @md
+<div class="npr-deal">
+<div class="npr-body">A short paragraph when there is nothing to report, or a set of <code>.npr-deal</code> cards wrapped in <code>.npr-cols</code> when there is. Name the nearest signature paths either way.</div>
+</div>
+    ;;
+  }
+
+  block t_lost: TextBlock {
+    content: @md
+<div class="npr-cols">
+
+<div class="npr-deal is-lost">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-stat">lost 00 Mon · $0,000 · 00-day cycle</span></div>
+<div class="npr-body">What happened, in one paragraph. End on the transferable lesson in bold: <b>the sentence someone would repeat in a pipeline review.</b></div>
+</div>
+
+<div class="npr-deal is-lost">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-stat">lost 00 Mon · $0,000 · 00-day cycle</span></div>
+<div class="npr-body">Second card. Two columns balance at four to six cards; below four, drop the <code>.npr-cols</code> wrapper and let them run full width.</div>
+</div>
+
+</div>
+    ;;
+  }
+
+  block t_live: TextBlock {
+    content: @md
+<div class="npr-cols">
+
+<div class="npr-deal is-live">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-pill is-hot">decision session booked</span></div>
+<div class="npr-body">State of play in one paragraph. The pill carries the stage so the body does not have to.</div>
+<div class="npr-next"><b>Next:</b> the one action, with an owner and a date.</div>
+</div>
+
+<div class="npr-deal is-live">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-pill is-warm">terms in negotiation</span></div>
+<div class="npr-body">Second card.</div>
+<div class="npr-next"><b>Next:</b> the one action, with an owner and a date.</div>
+</div>
+
+</div>
+    ;;
+  }
+
+  block t_risk: TextBlock {
+    content: @md
+<div class="npr-cols">
+
+<div class="npr-deal is-risk">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-pill is-risk">competitor POC open</span></div>
+<div class="npr-body">What is blocking it, and whether the blocker is commercial, access, or product. Say which.</div>
+<div class="npr-next"><b>Next:</b> the one action that unblocks it.</div>
+</div>
+
+<div class="npr-deal is-risk">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span> <span class="npr-pill is-risk">trial expires 00 Mon</span></div>
+<div class="npr-body">Second card.</div>
+<div class="npr-next"><b>Next:</b> the one action that unblocks it.</div>
+</div>
+
+</div>
+    ;;
+  }
+
+  block t_new: TextBlock {
+    content: @md
+<div class="npr-deal is-new">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span></div>
+<div class="npr-body">Where it came from, who booked it, and what the form or the first call already told you. Say plainly what is still unknown.</div>
+<div class="npr-next"><b>Next:</b> the booked call, and who should attend.</div>
+</div>
+    ;;
+  }
+
+  block t_highlights: TextBlock {
+    content: @md
+<div class="npr-cols">
+
+<div class="npr-deal is-hi">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span></div>
+<div class="npr-body">One movement worth reporting. Lead with the change, not the history.</div>
+<div class="npr-next"><b>Next:</b> the one action.</div>
+</div>
+
+<div class="npr-deal is-hi">
+<div class="npr-name">Account name <span class="npr-rep">· Owner</span></div>
+<div class="npr-body">Second card. This section usually runs longest — six to eight cards is normal.</div>
+<div class="npr-next"><b>Next:</b> the one action.</div>
+</div>
+
+</div>
+    ;;
+  }
+
+  block t_quiet: TextBlock {
+    content: @md
+<div class="npr-subhead">Worth a final revival attempt</div>
+<div class="npr-cols">
+<div class="npr-qi"><b>Account name</b> <span class="npr-rep">· Owner</span> One or two sentences. Say how many days silent and what the last real signal was.</div>
+<div class="npr-qi"><b>Account name</b> <span class="npr-rep">· Owner</span> Second item.</div>
+</div>
+
+<div class="npr-subhead">Pre-revenue or low-value</div>
+<div class="npr-cols">
+<div class="npr-qi"><b>Account name</b> <span class="npr-rep">· Owner</span> One line is enough here.</div>
+<div class="npr-qi"><b>Account name</b> <span class="npr-rep">· Owner</span> Second item.</div>
+</div>
+    ;;
+  }
+
+  block t_product: TextBlock {
+    content: @md
+<ul class="npr-eng">
+<li><b>A gap that cost a named deal.</b> Say which deal, what the gap was, and why it will recur rather than why it was unlucky.</li>
+<li><b>A capability that closed a gap live.</b> Same shape, opposite sign — engineering rarely hears this half.</li>
+</ul>
+
+<div class="npr-netnet">
+<div class="npr-subhead">Net net</div>
+<div>The first pattern across the items above.</div>
+<div>The second pattern, if there is one. Two or three lines total.</div>
+</div>
+    ;;
+  }
+
+  block t_watch: TextBlock {
+    content: @md
+<div class="npr-watch">
+<div class="npr-wi is-urgent"><div class="npr-d">00 Mon · Day</div><div class="npr-t"><b>Account</b> · the thing happening, and why it matters.</div></div>
+<div class="npr-wi is-soon"><div class="npr-d">00 Mon · Day</div><div class="npr-t"><b>Account</b> · the thing happening.</div></div>
+<div class="npr-wi"><div class="npr-d">Ongoing</div><div class="npr-t"><b>Account</b> · an open question with no date attached.</div></div>
+</div>
+    ;;
+  }
+
+  block t_pattern: TextBlock {
+    content: @md
+<div class="npr-deck2">One paragraph naming the pattern. Not a summary of the week — the thing the week is evidence of.</div>
+
+<table class="npr-pat">
+<tr class="is-lost"><td><b>Account</b> (lost)</td><td>The one-line evidence.</td></tr>
+<tr class="is-lost"><td><b>Account</b> (lost, prior edition)</td><td>The one-line evidence.</td></tr>
+<tr class="is-win"><td><b>Account</b> (at risk)</td><td>The one-line evidence.</td></tr>
+</table>
+
+<div class="npr-closing">The fix, stated as something a person could do on Monday morning. One sentence.</div>
+    ;;
+  }
+
+
+  // ---------------- OPTIONAL VIZ SLOTS ----------------
+  // Uncomment a declaration here AND its <h-block> in the layout below.
+  // Containers already carry fixed heights; do not convert them to
+  // min-height, a fixed page cannot grow to accommodate a floor.
+  //
+  // block v_fig_1: VizBlock {
+  //   label: 'Figure one'
+  //   viz: ColumnChart { dataset: your_dataset }
+  //   settings { hide_label: true hide_controls: true }
+  // }
+  //
+  // block v_fig_2: VizBlock {
+  //   label: 'Figure two'
+  //   viz: LineChart { dataset: your_dataset }
+  //   settings { hide_label: true hide_controls: true }
+  // }
+  //
+  // block v_pattern: VizBlock {
+  //   label: 'Pattern table'
+  //   viz: DataTable { dataset: your_dataset }
+  //   settings { hide_label: true hide_controls: true }
+  // }
+
+
+  view: HTMLLayout {
+    content: @html
+
+<style>
+/* =====================================================================
+   TOKEN BLOCK — the only place a literal colour, font or running string
+   appears. A reskin touches this and the AML theme above, nothing else.
+   ===================================================================== */
+.npr {
+  /* --- surfaces --- */
+  --t-bg:        #FFFFFF;
+  --t-surface:   #F7F6F2;
+  --t-border:    #DCD6C9;
+  --t-rule:      #14202E;
+
+  /* --- ink. dim ~60% and faint ~40% toward the background --- */
+  --t-ink:       #14202E;
+  --t-ink-dim:   #41505F;
+  --t-ink-faint: #8A94A0;
+
+  /* --- accent. masthead red, the single brand-carrying colour --- */
+  --t-accent:    #B21F2C;
+  --t-accent-lt: #D14652;   /* clears 4.5:1 on --t-dark-2 */
+  --t-accent-dk: #8A1722;
+
+  /* --- dark surfaces. -2 is a solid lighter shade, not a white overlay,
+         because overlays read flat --- */
+  --t-dark:        #14202E;
+  --t-dark-2:      #22303F;
+  --t-dark-line:   #35424F;
+  --t-on-dark:     #FFFFFF;
+  --t-on-dark-dim: #C3CBD3;
+
+  /* --- geometry --- */
+  --t-radius:    5px;
+  --t-radius-sm: 3px;
+  --t-pad:       14px;
+
+  /* --- type. No display face in this design; hierarchy comes from size
+         and weight, so display equals sans. --t-font-mono is NOT a
+         monospace here — it carries the small-caps label face, which is
+         the only second face the design uses. --- */
+  --t-font-sans:    "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --t-font-display: "Iowan Old Style", "Palatino Linotype", Georgia, "Times New Roman", serif;
+  --t-font-mono:    Georgia, "Times New Roman", serif;
+
+  /* --- format tokens: page geometry --- */
+  --t-page-w:  11in;
+  --t-page-h:  17in;
+  --t-page-pt: 0.7in;
+  --t-page-px: 0.66in;
+  --t-page-pb: 0.6in;
+  --t-score-cols: 5;
+
+  /* --- format tokens: running text. These print on every page, and a
+         Holistics block cannot appear twice, so they live here. --- */
+  --t-report-title: "Weekly Deal Desk";
+  --t-issue:        "Issue 0000-W00";
+  --t-channel:      "Internal · #your-channel";
+  --t-date:         "Thursday, 00 Month 0000";
+  --t-window:       "Weekly update · window 00 – 00 Month 0000 · 00 items reviewed";
+  --t-total:        "05";
+  --t-footer-text:  "Generated weekly · replace this line with your provenance note, counts, and who to contact.";
+
+  /* --- format tokens: section vocabulary. Semantic, not brand, but they
+         are still literal colours so they belong in here. --- */
+  --t-sec-won:   #1C7A47;
+  --t-sec-lost:  #B21F2C;
+  --t-sec-risk:  #B9760C;
+  --t-sec-live:  #2256A0;
+  --t-sec-new:   #5E3FA3;
+  --t-sec-hi:    #157F8C;
+  --t-sec-quiet: #6F6857;
+  --t-sec-eng:   #37424F;
+  --t-link:      #1F4488;
+  --t-tint-lost: #F6E7E6;
+  --t-tint-live: #EEF2F8;
+  --t-tint-line: #CDD9EA;
+}
+
+/* =====================================================================
+   ROOT
+   ===================================================================== */
+.npr, .npr *, .npr *::before, .npr *::after { box-sizing: border-box; }
+
+.npr {
+  font-family: var(--t-font-sans);
+  color: var(--t-ink);
+  font-size: 14px;
+  counter-reset: pg;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* Targeted reset. Deliberately not `.npr *`, which would reach inside
+   rendered block internals and strip spacing the charts rely on. */
+.npr p, .npr ul, .npr ol, .npr li, .npr table, .npr h1, .npr h2,
+.npr h3, .npr h4, .npr h5, .npr h6 { margin: 0; padding: 0; }
+.npr a { color: var(--t-link); text-decoration: none; }
+.npr code {
+  font-family: var(--t-font-mono);
+  font-size: 0.9em;
+  color: var(--t-ink-dim);
+  background: var(--t-surface);
+  padding: 1px 4px;
+  border-radius: var(--t-radius-sm);
+}
+
+/* Internal Holistics class — undocumented, may change without warning.
+   Suppresses the block label chrome above each slot. */
+.npr .dac-ic-block-label { display: none !important; }
+
+/* =====================================================================
+   PAGE
+   ===================================================================== */
+.npr-page {
+  width: var(--t-page-w);
+  min-height: var(--t-page-h);
+  background: var(--t-bg);
+  margin: 0 auto 24px;
+  padding: var(--t-page-pt) var(--t-page-px) var(--t-page-pb);
+  position: relative;
+  counter-increment: pg;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.14);
+}
+
+/* Running header, pages two onward. Text comes from a token because a
+   block cannot repeat across pages. */
+.npr-runhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--t-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t-ink-faint);
+  border-bottom: 1px solid var(--t-border);
+  padding-bottom: 7px;
+  margin-bottom: 22px;
+}
+.npr-runhead .npr-rh-title::before { content: var(--t-report-title); }
+.npr-runhead .npr-rh-issue::before { content: var(--t-issue); }
+.npr-folio::before {
+  content: counter(pg, decimal-leading-zero) " / " var(--t-total);
+}
+
+/* =====================================================================
+   MASTHEAD
+   ===================================================================== */
+.npr-mh-rule { height: 3px; background: var(--t-accent); }
+.npr-mh-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-family: var(--t-font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--t-ink-dim);
+  padding: 6px 0;
+}
+.npr-mh-top .npr-mh-channel::before { content: var(--t-channel); }
+.npr-mh-top .npr-mh-issue::before   { content: var(--t-issue); }
+.npr-mh-top .npr-mh-date::before    { content: var(--t-date); }
+
+.npr-title {
+  font-family: var(--t-font-display);
+  font-weight: 800;
+  font-size: 80px;
+  line-height: 0.94;
+  letter-spacing: -1.5px;
+  text-align: center;
+  margin: 10px 0 8px;
+}
+.npr-title::before { content: var(--t-report-title); }
+
+.npr-sub {
+  text-align: center;
+  font-family: var(--t-font-mono);
+  font-size: 12.5px;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: var(--t-ink-dim);
+  border-top: 1.5px solid var(--t-rule);
+  border-bottom: 1.5px solid var(--t-rule);
+  padding: 8px 0;
+}
+.npr-sub::before { content: var(--t-window); }
+
+/* =====================================================================
+   SCOREBOARD
+   ===================================================================== */
+.npr-score {
+  display: grid;
+  grid-template-columns: repeat(var(--t-score-cols), minmax(0, 1fr));
+  gap: 10px;
+  margin: 20px 0 6px;
+}
+.npr-score-cell {
+  min-width: 0;
+  padding: 16px 8px;
+  text-align: center;
+  border: 1.5px solid var(--t-border);
+  border-top: 5px solid var(--t-ink);
+  border-radius: var(--t-radius);
+}
+.npr-score-cell.is-won   { border-top-color: var(--t-sec-won); }
+.npr-score-cell.is-lost  { border-top-color: var(--t-sec-lost); }
+.npr-score-cell.is-live  { border-top-color: var(--t-sec-live); }
+.npr-score-cell.is-new   { border-top-color: var(--t-sec-new); }
+.npr-score-cell.is-risk  { border-top-color: var(--t-sec-risk); }
+
+.npr .npr-score-n {
+  font-family: var(--t-font-display);
+  font-size: 46px;
+  font-weight: 800;
+  line-height: 0.9;
+  color: var(--t-ink);
+}
+.npr .npr-score-n.is-won  { color: var(--t-sec-won); }
+.npr .npr-score-n.is-lost { color: var(--t-sec-lost); }
+.npr .npr-score-n.is-live { color: var(--t-sec-live); }
+.npr .npr-score-n.is-new  { color: var(--t-sec-new); }
+.npr .npr-score-n.is-risk { color: var(--t-sec-risk); }
+.npr .npr-score-l {
+  font-family: var(--t-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t-ink-dim);
+  margin-top: 9px;
+}
+
+/* =====================================================================
+   LEAD STORY
+   ===================================================================== */
+.npr-lead { margin-top: 24px; }
+
+.npr .npr-kicker {
+  font-family: var(--t-font-mono);
+  font-size: 13px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--t-accent);
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+.npr .npr-headline {
+  font-family: var(--t-font-display);
+  font-size: 50px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--t-ink);
+  margin-bottom: 12px;
+}
+.npr .npr-deck {
+  font-size: 17px;
+  color: var(--t-ink-dim);
+  font-style: italic;
+  line-height: 1.35;
+  margin-bottom: 18px;
+}
+.npr .npr-lead-body {
+  column-count: 2;
+  column-gap: 34px;
+  font-size: 14.5px;
+  line-height: 1.62;
+  text-align: justify;
+  hyphens: auto;
+  color: var(--t-ink);
+}
+.npr .npr-lead-body p { margin-bottom: 11px; }
+.npr .npr-lead-body p:first-of-type::first-letter {
+  font-family: var(--t-font-display);
+  font-size: 62px;
+  float: left;
+  line-height: 0.8;
+  font-weight: 800;
+  padding: 6px 10px 0 0;
+  color: var(--t-accent);
+}
+.npr .npr-pull {
+  column-span: all;
+  text-align: center;
+  font-size: 23px;
+  line-height: 1.32;
+  font-weight: 600;
+  font-style: italic;
+  color: var(--t-ink);
+  margin: 14px auto 16px;
+  max-width: 8.6in;
+  padding: 16px 0;
+  border-top: 2px solid var(--t-accent);
+  border-bottom: 2px solid var(--t-accent);
+}
+
+/* =====================================================================
+   SECTION BANDS — markup, not blocks, because a block cannot repeat
+   ===================================================================== */
+.npr-sec {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 11px 20px;
+  border-radius: var(--t-radius);
+  margin: 30px 0 17px;
+  color: var(--t-on-dark);
+  background: var(--t-dark);
+  break-after: avoid;
+}
+.npr-sec .npr-lab {
+  font-family: var(--t-font-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.22);
+  padding: 4px 12px;
+  border-radius: 30px;
+}
+.npr-sec h2 {
+  font-family: var(--t-font-display);
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.npr-sec .npr-note {
+  margin-left: auto;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--t-on-dark-dim);
+}
+.npr-sec.is-won     { background: var(--t-sec-won); }
+.npr-sec.is-lost    { background: var(--t-sec-lost); }
+.npr-sec.is-live    { background: var(--t-sec-live); }
+.npr-sec.is-risk    { background: var(--t-sec-risk); }
+.npr-sec.is-new     { background: var(--t-sec-new); }
+.npr-sec.is-hi      { background: var(--t-sec-hi); }
+.npr-sec.is-quiet   { background: var(--t-sec-quiet); }
+.npr-sec.is-eng     { background: var(--t-sec-eng); }
+.npr-sec.is-pattern { background: var(--t-dark); }
+
+/* =====================================================================
+   DEAL CARDS — authored inside TextBlocks
+   ===================================================================== */
+.npr .npr-cols { column-count: 2; column-gap: 32px; }
+
+.npr .npr-deal {
+  break-inside: avoid;
+  margin-bottom: 18px;
+  padding: 2px 0 15px var(--t-pad);
+  border-left: 3px solid var(--t-border);
+  border-bottom: 1px solid var(--t-border);
+}
+.npr .npr-deal:last-child { border-bottom: none; }
+.npr .npr-deal.is-lost { border-left-color: var(--t-sec-lost); }
+.npr .npr-deal.is-live { border-left-color: var(--t-sec-live); }
+.npr .npr-deal.is-risk { border-left-color: var(--t-sec-risk); }
+.npr .npr-deal.is-new  { border-left-color: var(--t-sec-new); }
+.npr .npr-deal.is-hi   { border-left-color: var(--t-sec-hi); }
+
+.npr .npr-name {
+  font-family: var(--t-font-display);
+  font-weight: 800;
+  font-size: 16.5px;
+  line-height: 1.2;
+  color: var(--t-ink);
+  margin-bottom: 5px;
+}
+.npr .npr-deal.is-lost .npr-name { color: var(--t-sec-lost); }
+.npr .npr-rep {
+  color: var(--t-ink-dim);
+  font-weight: 700;
+  font-size: 14px;
+}
+.npr .npr-stat {
+  display: inline-block;
+  font-family: var(--t-font-mono);
+  font-size: 12px;
+  background: var(--t-tint-lost);
+  color: var(--t-sec-lost);
+  padding: 2px 9px;
+  border-radius: var(--t-radius-sm);
+  font-weight: 700;
+  margin-left: 4px;
+}
+.npr .npr-body {
+  font-size: 13.5px;
+  line-height: 1.56;
+  color: var(--t-ink);
+}
+.npr .npr-next {
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 7px;
+  padding: 7px 11px;
+  background: var(--t-surface);
+  border-radius: var(--t-radius-sm);
+  color: var(--t-ink-dim);
+}
+.npr .npr-next b { color: var(--t-ink); }
+
+.npr .npr-pill {
+  display: inline-block;
+  font-family: var(--t-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 9px;
+  border-radius: 20px;
+  vertical-align: middle;
+  margin-left: 6px;
+  color: var(--t-on-dark);
+  background: var(--t-ink-dim);
+}
+.npr .npr-pill.is-hot  { background: var(--t-sec-won); }
+.npr .npr-pill.is-warm { background: var(--t-sec-live); }
+.npr .npr-pill.is-risk { background: var(--t-sec-risk); }
+
+/* =====================================================================
+   QUIET
+   ===================================================================== */
+.npr .npr-subhead {
+  font-family: var(--t-font-mono);
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--t-sec-quiet);
+  font-weight: 800;
+  margin: 6px 0 9px;
+  border-bottom: 2px solid var(--t-border);
+  padding-bottom: 4px;
+}
+.npr .npr-qi {
+  break-inside: avoid;
+  margin-bottom: 11px;
+  font-size: 13px;
+  line-height: 1.5;
+  padding-left: 12px;
+  border-left: 3px solid var(--t-border);
+  color: var(--t-ink);
+}
+
+/* =====================================================================
+   PRODUCT
+   ===================================================================== */
+.npr ul.npr-eng { list-style: none; }
+.npr ul.npr-eng li {
+  font-size: 14px;
+  line-height: 1.56;
+  margin-bottom: 12px;
+  padding-left: 20px;
+  position: relative;
+  color: var(--t-ink);
+}
+.npr ul.npr-eng li::before {
+  content: "\25B8";
+  position: absolute;
+  left: 0;
+  top: 2px;
+  font-size: 13px;
+  color: var(--t-sec-eng);
+}
+.npr .npr-netnet {
+  background: var(--t-tint-live);
+  border: 1px solid var(--t-tint-line);
+  border-left: 5px solid var(--t-sec-live);
+  padding: 14px 18px 6px;
+  margin-top: 14px;
+  border-radius: var(--t-radius-sm);
+}
+.npr .npr-netnet .npr-subhead {
+  color: var(--t-sec-live);
+  border-color: var(--t-tint-line);
+}
+.npr .npr-netnet > div:not(.npr-subhead) {
+  font-size: 14px;
+  line-height: 1.56;
+  margin-bottom: 11px;
+  padding-left: 18px;
+  position: relative;
+  color: var(--t-ink);
+}
+.npr .npr-netnet > div:not(.npr-subhead)::before {
+  content: "\2192";
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--t-sec-live);
+}
+
+/* =====================================================================
+   DIARY
+   ===================================================================== */
+.npr .npr-watch {
+  border: 2px solid var(--t-rule);
+  border-radius: var(--t-radius);
+  overflow: hidden;
+}
+.npr .npr-wi {
+  display: flex;
+  border-bottom: 1px solid var(--t-border);
+  break-inside: avoid;
+}
+.npr .npr-wi:last-child { border-bottom: none; }
+.npr .npr-d {
+  width: 1.45in;
+  flex: none;
+  min-width: 0;
+  background: var(--t-dark);
+  color: var(--t-on-dark);
+  font-family: var(--t-font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+}
+.npr .npr-wi.is-urgent .npr-d { background: var(--t-sec-lost); }
+.npr .npr-wi.is-soon .npr-d   { background: var(--t-sec-risk); }
+.npr .npr-t {
+  min-width: 0;
+  padding: 12px 16px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--t-ink);
+}
+
+/* =====================================================================
+   PATTERN
+   ===================================================================== */
+.npr .npr-deck2 {
+  font-size: 15.5px;
+  line-height: 1.45;
+  margin-bottom: 6px;
+  color: var(--t-ink);
+}
+.npr table.npr-pat {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 14px 0 16px;
+  font-size: 13.5px;
+  table-layout: fixed;
+}
+.npr table.npr-pat td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--t-border);
+  vertical-align: top;
+  color: var(--t-ink);
+  word-wrap: break-word;
+}
+.npr table.npr-pat tr:nth-child(even) td { background: var(--t-surface); }
+.npr table.npr-pat tr.is-lost td:first-child {
+  color: var(--t-sec-lost);
+  font-weight: 800;
+}
+.npr table.npr-pat tr.is-win td:first-child {
+  color: var(--t-sec-won);
+  font-weight: 800;
+}
+.npr .npr-closing {
+  font-size: 16px;
+  line-height: 1.6;
+  border-top: 3px solid var(--t-rule);
+  padding-top: var(--t-pad);
+  color: var(--t-ink);
+}
+
+/* =====================================================================
+   FIGURE SLOTS — fixed heights, not floors. A paginated page cannot grow.
+   Height lives on the wrapper div; never on <h-block>, which is replaced
+   at render and cannot be styled reliably.
+   ===================================================================== */
+.npr-figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 22px;
+}
+.npr-figure {
+  height: 3.1in;
+  min-width: 0;
+  border: 1px solid var(--t-border);
+  border-top: 3px solid var(--t-ink);
+  border-radius: var(--t-radius-sm);
+  padding: 10px;
+  break-inside: avoid;
+}
+.npr-figure.is-wide {
+  height: 3.4in;
+  margin-top: 16px;
+}
+.npr-figure-cap {
+  font-family: var(--t-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--t-ink-faint);
+  margin-top: 6px;
+}
+
+/* =====================================================================
+   FOOTER
+   ===================================================================== */
+.npr-footer {
+  margin-top: 22px;
+  border-top: 3px double var(--t-rule);
+  padding-top: 9px;
+  font-size: 10px;
+  color: var(--t-ink-dim);
+  font-style: italic;
+  line-height: 1.45;
+}
+.npr-footer::before { content: var(--t-footer-text); }
+
+/* =====================================================================
+   PRINT
+   ===================================================================== */
+@page { size: 11in 17in; margin: 0; }
+
+@media print {
+  .npr-page {
+    margin: 0;
+    box-shadow: none;
+    border-radius: 0;
+    break-after: page;
+  }
+  /* Not optional. Without it the last page is followed by a blank one. */
+  .npr-page:last-child { break-after: auto; }
+  .npr-figure, .npr-deal, .npr-qi, .npr-wi, .npr-netnet { break-inside: avoid; }
+  .npr-sec { break-after: avoid; }
+}
+</style>
+
+<div class="npr">
+
+  <!-- ============================ PAGE 1 ============================ -->
+  <div class="npr-page">
+
+    <div class="npr-mh-rule"></div>
+    <div class="npr-mh-top">
+      <span class="npr-mh-channel"></span>
+      <span class="npr-mh-issue"></span>
+      <span class="npr-mh-date"></span>
+    </div>
+    <div class="npr-title"></div>
+    <div class="npr-sub"></div>
+
+    <div class="npr-score">
+      <div class="npr-score-cell is-won"><h-block name="t_score_1" /></div>
+      <div class="npr-score-cell is-lost"><h-block name="t_score_2" /></div>
+      <div class="npr-score-cell is-live"><h-block name="t_score_3" /></div>
+      <div class="npr-score-cell is-new"><h-block name="t_score_4" /></div>
+      <div class="npr-score-cell is-risk"><h-block name="t_score_5" /></div>
+    </div>
+
+    <div class="npr-lead">
+      <h-block name="t_lead_top" />
+      <h-block name="t_lead_body" />
+    </div>
+
+  </div>
+
+  <!-- ============================ PAGE 2 ============================ -->
+  <div class="npr-page">
+
+    <div class="npr-runhead">
+      <span class="npr-rh-title"></span>
+      <span class="npr-rh-issue"></span>
+      <span class="npr-folio"></span>
+    </div>
+
+    <div class="npr-sec is-won">
+      <span class="npr-lab">Won</span>
+      <h2>Won</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_won" />
+
+    <div class="npr-sec is-lost">
+      <span class="npr-lab">Lost</span>
+      <h2>Lost</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_lost" />
+
+    <!-- OPTIONAL figure row. Uncomment the two <h-block> lines together
+         with the v_fig_1 / v_fig_2 declarations above. Leaving the wrapper
+         divs in place with no block inside renders two empty framed boxes,
+         so delete this whole .npr-figures div if you are not using them. -->
+    <div class="npr-figures">
+      <div>
+        <div class="npr-figure">
+          <!-- <h-block name="v_fig_1" /> -->
+        </div>
+        <div class="npr-figure-cap">Fig. 1 — caption</div>
+      </div>
+      <div>
+        <div class="npr-figure">
+          <!-- <h-block name="v_fig_2" /> -->
+        </div>
+        <div class="npr-figure-cap">Fig. 2 — caption</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================ PAGE 3 ============================ -->
+  <div class="npr-page">
+
+    <div class="npr-runhead">
+      <span class="npr-rh-title"></span>
+      <span class="npr-rh-issue"></span>
+      <span class="npr-folio"></span>
+    </div>
+
+    <div class="npr-sec is-live">
+      <span class="npr-lab">Live</span>
+      <h2>Good Progress</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_live" />
+
+    <div class="npr-sec is-risk">
+      <span class="npr-lab">Risk</span>
+      <h2>Stuck at the line</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_risk" />
+
+    <div class="npr-sec is-new">
+      <span class="npr-lab">New</span>
+      <h2>New</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_new" />
+
+  </div>
+
+  <!-- ============================ PAGE 4 ============================ -->
+  <div class="npr-page">
+
+    <div class="npr-runhead">
+      <span class="npr-rh-title"></span>
+      <span class="npr-rh-issue"></span>
+      <span class="npr-folio"></span>
+    </div>
+
+    <div class="npr-sec is-hi">
+      <span class="npr-lab">Moving</span>
+      <h2>Highlights</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_highlights" />
+
+    <div class="npr-sec is-quiet">
+      <span class="npr-lab">Quiet</span>
+      <h2>Quiet</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_quiet" />
+
+  </div>
+
+  <!-- ============================ PAGE 5 ============================ -->
+  <div class="npr-page">
+
+    <div class="npr-runhead">
+      <span class="npr-rh-title"></span>
+      <span class="npr-rh-issue"></span>
+      <span class="npr-folio"></span>
+    </div>
+
+    <div class="npr-sec is-eng">
+      <span class="npr-lab">Product</span>
+      <h2>For product engineering</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_product" />
+
+    <div class="npr-sec is-risk">
+      <span class="npr-lab">Diary</span>
+      <h2>What to watch next week</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_watch" />
+
+    <div class="npr-sec is-pattern">
+      <span class="npr-lab">Pattern</span>
+      <h2>One thing we are noticing</h2>
+      <span class="npr-note">edit this note each week</span>
+    </div>
+    <h-block name="t_pattern" />
+
+    <!-- OPTIONAL full-width table slot. Uncomment with v_pattern above,
+         or delete this div entirely. -->
+    <div class="npr-figure is-wide">
+      <!-- <h-block name="v_pattern" /> -->
+    </div>
+
+    <div class="npr-footer"></div>
+
+  </div>
+
+</div>
+
+    ;;
+  }
+}

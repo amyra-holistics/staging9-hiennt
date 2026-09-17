@@ -5,7 +5,6 @@ Dashboard blank_dashboard {
   block title: TextBlock {
     content: @md # Your title goes here ;;
   }
-
   view: CanvasLayout {
     label: 'View 1'
     width: 1300
@@ -20,7 +19,68 @@ Dashboard blank_dashboard {
     }
   }
   theme {
-    light: H.themes.classic
-    dark: forest
+    dark: purple
+    light {
+      title: 'Purple title'
+      background {
+        bg_image: 'conic-gradient(from 36deg at 40.16% 61.66%, #7D7BD1 0deg, #D4D4F6 360deg)'
+        bg_size: 'cover'
+      }
+      block {
+        label: FontTheme {
+          font_size: 14
+          font_color: '#3C3B7A'
+        }
+        text {
+          font_size: 12
+          font_color: '#3C3B7A'
+        }
+        border {
+          border_width: 1
+          border_radius: 8
+          border_color: '#B2B1F2'
+        }
+        background {
+          bg_color: '#F2F2FC'
+        }
+        padding: 12
+        shadow: 'none'
+      }
+      viz {
+        table {
+          general {
+            bg_color: 'white';
+            banding_color: 'transparent';
+            hover_color: '#B2B1F2';
+            font_size: '12px';
+            font_color: '#3C3B7A';
+            border_color: '#6B68EA';
+            grid_color: '#6B68EA';
+          }
+          header {
+            bg_color: '#504DD2';
+            font_size: '14px';
+            font_color: 'white';
+            font_weight: 'bold';
+          }
+          row_header {
+            font_color: '#3C3B7A';
+            font_size: '12px';
+            font_weight: 'normal';
+          }
+          column_header {
+            bg_color: '#504DD2';
+            font_size: '12px';
+            font_color: 'white';
+            font_weight: 'normal';
+          }
+          sub_title {
+            font_size: '12px';
+            font_color: 'white'
+            font_weight: 'light';
+          }
+        }
+      }
+    }
   }
 }

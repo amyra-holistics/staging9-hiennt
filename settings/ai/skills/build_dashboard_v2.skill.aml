@@ -1,0 +1,410 @@
+Skill build_dashboard_v2 {
+label: 'Build Dashboard V2'
+
+description: '''
+Build or edit a Holistics dashboard (`page.aml` / a `Dashboard {}` object).
+
+```
+This is the dashboard orchestrator. It understands the user's goal, derives the analytical structure, proposes the dashboard, and after approval coordinates blocks, controls, layout, and styling.
+
+Use when building a dashboard from scratch or materially changing what an existing dashboard contains or answers.
+
+Prefer CanvasLayout for conventional single-page dashboards and TabLayout for conventional tabbed dashboards.
+
+Use HTMLLayout when the user explicitly requests it or when the requested presentation materially exceeds the native Canvas/Tab experience, such as custom navigation, custom-looking tabs, narrative/asymmetric composition, slides, paginated reports, or specialized embedded views.
+
+When HTMLLayout is selected, use `build_html_layout` for implementation.
+
+When the user explicitly requests a custom brand, theme, mood, palette, or visual direction, use `build_dashboard_theme`.
+
+If no custom style is requested, use Holistics' default visual style. Do not invoke `build_dashboard_theme` merely to make a normal dashboard look good.
+
+Do not use for a one-off data question, standalone visualization, theme-only change, HTML-only presentation edit, or editing models/datasets/metrics.
+```
+
+'''
+
+invocation: 'auto'
+allow_switching_invocation: true
+
+content: @md
+
+# Building a Dashboard
+
+Build or edit a Holistics dashboard.
+
+This skill owns the dashboard specification and orchestrates the specialists needed to implement it.
+
+## What a good input looks like
+
+Determine:
+
+1. **Audience & decision** — who reads this and what do they decide?
+2. **Reader job** — monitoring, diagnosing, comparing, planning, or looking something up.
+3. **Questions, ranked** — what questions should the dashboard answer, in reading order?
+4. **Data required** — which measures, dimensions, and comparisons answer them?
+5. **Time** — relevant date field, grain, and reporting window.
+6. **Interactivity** — what should viewers filter, compare, drill, or change?
+7. **Presentation** — single page, tabs, HTML/custom presentation, or explicit format requirements.
+8. **Style** — only when the user specifies a brand, mood, palette, theme, or other visual direction.
+
+Infer reasonable gaps from the request, project context, and dataset.
+
+Ask only when an unresolved choice would materially change the result.
+
+Never invent datasets, models, fields, or metrics.
+
+## What a bare minimum output looks like
+
+A completed dashboard must:
+
+* answer every ranked question;
+* contain no analytical block without a purpose;
+* use real dataset/model fields;
+* have intentional controls and interactions;
+* place every intended visible block;
+* use the appropriate layout;
+* use either Holistics default styling or the user's requested custom theme;
+* have clean diagnostics.
+
+"No style requested" means Holistics default styling, not an unstyled dashboard.
+
+## Workflow
+
+### 1. Derive the dashboard specification
+
+Start from the user request, then inspect the available dataset.
+
+Inspect:
+
+1. predefined metrics;
+2. relevant date fields;
+3. useful dimensions;
+4. detail/lookup fields.
+
+Identify the reader job and rank the questions before choosing visualizations.
+
+Turn those questions into sections and blocks.
+
+For an existing dashboard, inspect the current `page.aml` first and preserve unrelated structure and behavior.
+
+### 2. Choose the presentation approach
+
+Prefer native layouts when they satisfy the requested experience well.
+
+#### CanvasLayout
+
+Default for conventional single-page dashboards.
+
+A request for something polished, executive, modern, or attractive does not itself justify HTMLLayout.
+
+#### TabLayout
+
+Default for conventional multi-page/tabbed dashboards using Holistics' native tab experience.
+
+#### HTMLLayout
+
+Use when:
+
+* the user explicitly requests HTMLLayout; or
+* presentation materially requires customization beyond native Canvas/Tab.
+
+Examples:
+
+* custom-looking tabs;
+* branded/custom navigation;
+* sidebar navigation;
+* product-like dashboard shells;
+* narrative/editorial composition;
+* asymmetric or nested layouts;
+* slides;
+* paginated reports;
+* specialized embedded presentation;
+* highly customized responsive behavior.
+
+HTMLLayout may still represent an ordinary dashboard or tabbed dashboard. The difference is that its presentation is custom.
+
+When native and HTML can both satisfy the request well, prefer native.
+
+### 3. Propose and confirm
+
+For a new dashboard or substantial redesign, propose before building.
+
+Use:
+
+````
+## Proposed plan to build
+
+**Output**: <dashboard/report, audience, and primary reader job>
+
+**Dataset**: @Dataset:<dataset>
+
+**Questions addressed**
+
+1. ...
+2. ...
+3. ...
+
+**Controls**
+- <control> — <viewer purpose>
+
+```mermaid
+---
+config:
+  fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif"
+  htmlLabels: false
+---
+block-beta
+columns 1
+block:frame
+  columns 12
+  b_title["Sales Overview"]:12
+  f_date["Date Range"]:3 f_country["Office Country"]:3 c_pop["Compare To"]:3 space:3
+  k_sales["Total Sales · KPI"]:3 k_orders["Orders · KPI"]:3 k_cust["Customers · KPI"]:3 space:3
+  h_trend["How sales are moving"]:12
+  v_trend["Monthly Sales Trend · Line"]:12
+  h_where["Where it comes from"]:12
+  v_country["Sales by Country · Bar"]:6 v_detail["Order Detail · Table"]:6
+end
+classDef board fill:none,stroke:#e3e7ed
+classDef sect fill:#ffffff,fill-opacity:0.6,stroke:none
+classDef ctrl fill:#f5f8fa,stroke:#cbd0d7
+classDef viz fill:#d1e5fa,stroke:#1b7ce4
+class frame board
+class b_title,h_trend,h_where sect
+class f_date,f_country,c_pop ctrl
+class k_sales,k_orders,k_cust,v_trend,v_country,v_detail viz
+```
+
+````
+
+Omit Controls when none are useful.
+
+<!-- Then show the proposed composition.
+
+For Canvas/Tab, the wireframe represents the intended block arrangement.
+
+For HTMLLayout, the wireframe is a **composition contract** showing:
+
+* live blocks;
+* grouping;
+* reading order;
+* relative prominence;
+* navigation or page structure when relevant.
+
+Do not describe HTML using Canvas pixel coordinates.
+
+Get user approval before continuing.
+
+Small, explicit edits to an existing dashboard do not require another approval round. -->
+
+### 4. Build the analytical blocks
+
+After approval, build the dashboard's analytical structure first.
+
+#### Static text
+
+Author titles, section headings, explanations, and other static dashboard copy directly in this skill.
+
+#### Visualizations
+
+Use `build_viz` to create analytical visualizations.
+
+Prefer generated visualization AML over hand-written visualization bodies.
+
+#### Controls and interactions
+
+Use `build_control` for dashboard controls and their interaction behavior.
+
+Build only controls the reader needs.
+
+Do not add filters simply because dashboards commonly contain filters.
+
+### 5. Resolve style
+
+Determine the visual direction before final layout implementation.
+
+#### No custom style requested
+
+Use Holistics' default visual style.
+
+Do not invoke `build_dashboard_theme`.
+
+For native Canvas/Tab dashboards, inherit Holistics' normal application styling and default chart palette.
+
+Do not create a custom `ColorPalette` just to make the dashboard more colorful.
+
+#### Custom style requested
+
+Use `build_dashboard_theme` when the user explicitly requests:
+
+* a brand;
+* custom colors;
+* dark/light visual direction;
+* another product's visual language;
+* a mood such as editorial, premium, warm, minimal, etc.;
+* a custom chart palette;
+* a substantial restyle.
+
+For HTMLLayout, resolve the custom theme before building the HTML composition so `build_html_layout` can use its visual tokens.
+
+For Canvas/Tab, the theme may be applied after the native layout is arranged.
+
+### 6. Arrange the layout
+
+#### CanvasLayout
+
+Build the CanvasLayout directly in this skill according to the approved wireframe.
+
+#### TabLayout
+
+Build the TabLayout directly in this skill according to the approved tab structure.
+
+Each tab must be coherent on its own.
+
+#### HTMLLayout
+
+Use `build_html_layout`.
+
+Pass it the approved contract:
+
+* live blocks;
+* controls/interactions;
+* reading order;
+* grouping;
+* relative prominence;
+* format/navigation requirements;
+* resolved visual direction.
+
+Treat this contract as authoritative.
+
+`build_html_layout` owns HTML/CSS implementation, not analytical redesign.
+
+### 7. Apply style
+
+For native Canvas/Tab with no custom style, preserve Holistics default application styling.
+
+For custom themes, apply the theme produced by `build_dashboard_theme`.
+
+For HTMLLayout, `build_html_layout` applies either:
+
+* Holistics default HTML presentation; or
+* the resolved custom theme.
+
+### 8. Verify
+
+Check:
+
+* every ranked question is answered;
+* every analytical block has a purpose;
+* all dataset/model/field references are real;
+* controls and interactions are intentional;
+* every intended visible block is placed;
+* the selected layout matches the requested experience;
+* style matches default Holistics behavior or the explicit custom direction;
+* diagnostics contain no errors.
+
+For HTMLLayout, rely on `build_html_layout` for HTML-specific preflight.
+
+## Schema
+
+A dashboard is a `Dashboard <uname> { ... }` object containing analytical blocks, interactions, layout, settings, and optionally a theme.
+
+Never invent AML syntax.
+
+Check public documentation when uncertain:
+
+* https://docs.holistics.io/reference/aml/dashboard
+* https://docs.holistics.io/reference/aml/canvas-layout
+* https://docs.holistics.io/reference/aml/tab-layout
+* https://docs.holistics.io/reference/aml/html-layout
+* https://docs.holistics.io/reference/aml/theme
+
+### Block types
+
+* **VizBlock** — analytical visualization.
+* **TextBlock** — static dashboard copy.
+* **FilterBlock** — dashboard-level filtering.
+* **PopBlock** — period comparison.
+* **DateDrillBlock** — date granularity.
+
+Dataset-derived values must remain in live analytical blocks.
+
+### CanvasLayout
+
+Use for conventional single-page dashboards.
+
+```aml
+view: CanvasLayout {
+  width: 1220
+  height: <height>
+  grid_size: 20
+  auto_expand_vertically: true
+
+  block <name> {
+    position: pos(<x>, <y>, <width>, <height>)
+    layer: 1
+  }
+
+  mobile { mode: 'auto' }
+}
+```
+
+For the standard 1220px canvas:
+
+* quarter → 280
+* third → 380
+* half → 580
+* full → 1180
+
+### TabLayout
+
+Use for conventional native multi-page dashboards.
+
+```aml
+view: TabLayout {
+  tab overview: CanvasLayout {
+    label: 'Overview'
+    ...
+  }
+
+  tab detail: CanvasLayout {
+    label: 'Detail'
+    ...
+  }
+}
+```
+
+### HTMLLayout
+
+HTMLLayout renders live blocks through `<h-block>` and uses HTML/CSS for presentation.
+
+Detailed implementation belongs to `build_html_layout`.
+
+## Conventions
+
+### Do
+
+* Start from reader questions.
+* Inspect real data before choosing blocks.
+* Prefer Canvas for ordinary single-page dashboards.
+* Prefer Tab for ordinary native tabbed dashboards.
+* Use HTML for explicit or materially custom presentation.
+* Use Holistics default styling when no custom style is requested.
+* Invoke theme generation only when a custom visual direction is needed.
+* Preserve unrelated structure when editing.
+* Prefer specialist skills for visualizations, controls, HTML composition, and custom themes.
+
+### Don't
+
+* Don't invent data or AML syntax.
+* Don't make KPI cards the default opening for every dashboard.
+* Don't add unnecessary controls.
+* Don't use HTML merely because it is more flexible.
+* Don't invoke theme generation merely because a dashboard should look good.
+* Don't override Holistics' default chart palette without a reason.
+* Don't let presentation implementation redefine the approved analysis.
+* Don't silently change what the user approved.
+
+;;
+}

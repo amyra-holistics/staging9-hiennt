@@ -1,5 +1,9 @@
-Dashboard demo_dashboard_papge_aml {
-  title: 'Demo dashboard'
+Dashboard all_viz_test {
+  theme: DynamicPageTheme {
+    light: purple
+    dark: forest
+  }
+  title: 'All viz test'
   description: ''
   owner: 'hien.nt@holistics.io'
   // block v_tydi: VizBlock {

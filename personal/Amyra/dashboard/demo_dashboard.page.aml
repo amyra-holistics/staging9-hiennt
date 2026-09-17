@@ -1,533 +1,199 @@
-Dashboard all_viz_test {
-  theme: purple
-  title: 'All viz test'
+Dashboard demo_dashboard_papge_aml {
+  title: 'Demo dashboard'
   description: ''
   owner: 'hien.nt@holistics.io'
-  block v_wx22: VizBlock {
-    label: 'Diverging Bar Chart'
-    viz: CustomChart {
-      dataset: superstore
-      calculation target {
-        label: 'Average Profit Across All Sub Categories'
-        formula: @aql superstore_csv | sum(superstore_csv.discount);;
-        calc_type: 'measure'
-        data_type: 'number'
+  // block v_tydi: VizBlock {
+  //   label: 'KPI Overview'
+  //   viz: MetricSheet {
+  //     dataset: ecommerce_official
+  //     filter {
+  //       field: r(dim_dates.date_key)
+  //       operator: 'matches'
+  //       value: '12 months ago to last month end'
+  //     }
+  //     date_field: VizFieldFull {
+  //       ref: r(dim_dates.date_key)
+  //       transformation: 'datetrunc month'
+  //       format {
+  //         type: 'date'
+  //       }
+  //     }
+  //     rows: [
+  //       MetricHeading {
+  //         label: '🎯Orders'
+  //         settings {
+  //           background_color: '#05264C'
+  //           text_color: '#FFFFFF'
+  //         }
+  //       },
+  //       MetricSeries {
+  //         field: VizFieldFull {
+  //           ref: r(ecommerce_orders.total_orders_count)
+  //           format {
+  //             type: 'number'
+  //             pattern: 'inherited'
+  //           }
+  //         }
+  //       },
+  //       MetricSeries {
+  //         field: VizFieldFull {
+  //           ref: r(ecommerce_orders.cancelled_orders_count)
+  //           format {
+  //             type: 'number'
+  //             pattern: 'inherited'
+  //           }
+  //         }
+  //         settings {
+  //           mark_type: 'line'
+  //         }
+  //       },
+  //       MetricHeading {
+  //         label: '💰 Revenue'
+  //         settings {
+  //           background_color: '#05264C'
+  //           text_color: '#FFFFFF'
+  //         }
+  //       },
+  //       MetricSeries {
+  //         field: VizFieldFull {
+  //           ref: r(order_master.nmv)
+  //           format {
+  //             type: 'number'
+  //             pattern: '[$$]#,###0.00'
+  //           }
+  //         }
+  //       },
+  //       MetricSeries {
+  //         field: VizFieldFull {
+  //           ref: r(order_master.gmv)
+  //           format {
+  //             type: 'number'
+  //             pattern: '[$$]#,###0.00'
+  //           }
+  //         }
+  //         settings {
+  //           mark_type: 'line'
+  //         }
+  //       },
+  //       MetricSeries {
+  //         field: VizFieldFull {
+  //           ref: r(order_master.aov)
+  //           format {
+  //             type: 'number'
+  //             pattern: 'inherited'
+  //           }
+  //         }
+  //         settings {
+  //           mark_type: 'line'
+  //         }
+  //       }
+  //     ]
+  //     settings {
+  //       aggregate_awareness {
+  //         enabled: true
+  //         debug_comments: true
+  //       }
+  //     }
+  //   }
+  //   settings {
+  //     hide_label: true
+  //     hide_controls: true
+  //   }
+  // }
+  block t_block_ha_page_header_bg: block_ha_page_header_bg()
+  block t_block_ha_page_header: block_ha_page_header(
+    'Sales and Orders',
+    'Monitor overall sales performance, order trends, and fulfillment outcomes to understand revenue drivers and operational efficiency.'
+  )
+  block t_2pu8: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
       }
-      calculation current {
-        label: 'Profit'
-        formula: @aql superstore_csv | sum(superstore_csv.quantity);;
-        calc_type: 'measure'
-        data_type: 'number'
+      border {
+        border_width: 0
+        border_style: 'none'
       }
-      calculation value {
-        label: 'Profit - Average Profit'
-        formula: @aql current - target*30;;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: diverging_bar_chart
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'value'
-        format {
-          type: 'number'
-          pattern: '#,###'
-        }
-      }
-      setting positive_color: '#2cb67f'
-      setting negative_color: '#e5484d'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
+      padding: 0
+      shadow: 'none'
     }
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
   }
-  block v_pareto_chart: VizBlock {
-    label: 'Pareto Chart by Sub-Category'
-    viz: CustomChart {
+  block v_fofr: VizBlock {
+    label: 'Total Sales by Ship mode'
+    viz: CombinationChart {
       dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation sum_of_superstore_sales {
+        label: 'Total Sales'
+        formula: @aql sum(superstore_csv.sales);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: pareto_chart
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting bar_color: '#255dd4'
-      setting line_color: '#e5484d'
-      setting show_threshold: true
-      setting threshold: 0.8
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_bar_avg_line: VizBlock {
-    label: 'Bar Chart with Average Line'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation sum_of_superstore_profit {
+        label: 'Total Profit'
+        formula: @aql sum(superstore_csv.profit);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: bar_chart_with_average_line
-      setting show_tooltip: false
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.category)
-        format {
-          type: 'text'
-        }
-      }
-      field series: VizFieldFull {
-        ref: r(superstore_csv.region)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block t_4zai: TextBlock {
-    content: @md # Tables;;
-  }
-  block t_5yjt: TextBlock {
-    content: @md # Line, Bar, and other charts
-;;
-  }
-  block t_g9vu: TextBlock {
-    content: @md # Maps
-
-;;
-  }
-  block t_7vcl: TextBlock {
-    content: @md # Tables;;
-  }
-  block v_pgpo: VizBlock {
-    label: 'Sunburst Chart'
-    viz: CustomChart {
-      dataset: superstore
-      custom_chart: sunburst_chart
-      field level_1: VizFieldFull {
-        ref: r(superstore_csv.country)
-        format {
-          type: 'text'
-        }
-      }
-      field level_2: VizFieldFull {
-        ref: r(superstore_csv.region)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting color_scheme: 'tableau10'
-      setting donut_hole: 0.35
-      setting show_tooltip: false
-    }
-  }
-  block v_hkjd: VizBlock {
-    label: 'Box Plot of Sales by Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      filter {
-        field: r(superstore_csv.sub_category)
-        operator: 'is_not'
-        value: [
-          'Copiers',
-          'Machines'
-        ]
-      }
-      custom_chart: box_plot
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting show_outliers: true
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_llp5: VizBlock {
-    label: 'Candlestick Chart - Monthly Sales OHLC'
-    viz: CustomChart {
-      dataset: superstore
-      calculation daily_sales {
-        label: 'Daily Sales'
-        formula: @aql unique(superstore_csv.order_date)
-          | select(
-            order_date: superstore_csv.order_date,
-            month_order_date: superstore_csv.order_date | month(),
-            daily_sales_value: superstore_csv | sum(superstore_csv.sales),
-          );;
+      calculation sum_of_superstore_discount {
+        label: 'Total Discount'
+        formula: @aql sum(superstore_csv.discount);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      calculation low_value {
-        label: 'Low'
-        formula: @aql daily_sales | min(daily_sales_value);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation high_value {
-        label: 'High'
-        formula: @aql daily_sales | max(daily_sales_value);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation open_value {
-        label: 'Open'
-        formula: @aql daily_sales
-          | select(
-            open_daily_sales_value: first_value(daily_sales_value, order: order_date | asc(), partition: month_order_date),
-          )
-          | max(open_daily_sales_value);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation close_value {
-        label: 'Close'
-        formula: @aql daily_sales
-          | select(
-            close_daily_sales_value: last_value(daily_sales_value, order: order_date | asc(), partition: month_order_date),
-          )
-          | max(close_daily_sales_value);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: candlestick_chart
-      field date: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        transformation: 'datetrunc month'
-        format {
-          type: 'date'
-          pattern: 'inherited'
-        }
-      }
-      field low: VizFieldFull {
-        ref: 'low_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field high: VizFieldFull {
-        ref: 'high_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field open: VizFieldFull {
-        ref: 'open_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field close: VizFieldFull {
-        ref: 'close_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting tooltip: false
-      setting green_candle: 'green'
-      setting red_candle: 'red'
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_6y41: VizBlock {
-    label: 'Error Bar - Profit by Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      filter {
-        field: r(superstore_csv.sub_category)
-        operator: 'is_not'
-        value: [
-          'Copiers',
-          'Machines'
-        ]
-      }
-      custom_chart: error_bar
-      field value: VizFieldFull {
-        ref: r(superstore_csv.profit)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      setting point_color: '#255DD4'
-      setting extent: 'ci'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_ypp5: VizBlock {
-    label: 'Bar Chart with Running Average Line'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: bar_chart_with_running_average_line
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        transformation: 'datetrunc year'
-        format {
-          type: 'date'
-          pattern: 'yyyy'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting tooltip: false
-      setting bar_color: '#255DD4'
-      setting line_color: '#e5484d'
-      setting points_before: -3
-      setting points_after: 0
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_l240: VizBlock {
-    label: 'Waterfall Chart - Profit by Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      calculation profit_value {
-        label: 'Profit'
-        formula: @aql superstore_csv | sum(superstore_csv.profit);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: waterfall_chart
-      field amount: VizFieldFull {
-        ref: 'profit_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field label: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field sort_order: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting end_label: 'Total'
-      setting bar_padding: 0.3
-      setting positive: '#58A65C'
-      setting negative: '#D85140'
-      setting value_format: '$,.0f'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_tlgf: VizBlock {
-    label: 'Histogram of Sales'
-    viz: CustomChart {
-      dataset: superstore
-      custom_chart: histogram
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.product_name)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.quantity)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting max_bins: 40
-      setting show_tooltip: true
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_qyc6: VizBlock {
-    label: 'Sales Slope Chart by Category (2016 vs 2017)'
-    viz: CustomChart {
-      dataset: superstore
-      custom_chart: slope_chart
-      field period: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        transformation: 'datetrunc year'
-        format {
-          type: 'date'
-          pattern: 'yyyy'
-        }
-      }
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting increase_color: '#2cb67f'
-      setting decrease_color: '#e5484d'
-      setting show_change: true
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_pcrs: VizBlock {
-    label: 'Control Chart - Monthly Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation monthly_sales {
-        label: 'Monthly Sales'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation sum_of_superstore_sales_prev_1y {
+        label: 'Sum Of Superstore Sales (prev. 1y)'
+        formula: @aql sum_of_superstore_sales | relative_period(superstore_csv.order_date, interval(-1 year), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
       filter {
         field: r(superstore_csv.order_date)
         operator: 'matches'
-        value: '2016-01-01 - 2016-06-30'
+        value: '2016-01-01 - 2017-12-31'
       }
-      custom_chart: control_chart
-      field period: VizFieldFull {
+      x_axis: VizFieldFull {
         ref: r(superstore_csv.order_date)
+        transformation: 'datetrunc quarter'
         format {
           type: 'date'
-          pattern: 'inherited'
+          pattern: 'yyyy Qq'
         }
       }
-      field value: VizFieldFull {
-        ref: 'monthly_sales'
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'sum_of_superstore_sales'
+            format {
+              type: 'number'
+              pattern: '#,###0.00"A"'
+            }
+          }
         }
       }
-      setting color_average_line: '#479980'
-      setting color_outside_limits: '#AF7DED'
-      setting color_near_limit: '#8DD6C3'
-      setting color_one_side_run: '#9FC851'
-      setting show_mr_chart: true
-      setting show_tooltip: false
+      y_axis {
+        settings {
+          alignment: 'right'
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Prev. 1 year'
+            ref: 'sum_of_superstore_sales_prev_1y'
+            format {
+              type: 'number'
+              pattern: '#,###0.00"A"'
+            }
+          }
+        }
+      }
       settings {
+        row_limit: 10000
+        x_axis_show_null_datetime: false
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -535,530 +201,60 @@ Dashboard all_viz_test {
       }
     }
   }
-  block v_wow3: VizBlock {
-    label: 'Day Date, Event label, and Sum of Value'
-    viz: CustomChart {
+  block v_quxa: VizBlock {
+    label: 'Sales by Segment'
+    viz: PieChart {
       dataset: superstore
-      custom_chart: annotated_time_series
-      field date: VizFieldFull {
-        ref: r(annotated_time_series_csv.date)
-        transformation: 'datetrunc day'
-        format {
-          type: 'date'
-          pattern: 'LLL dd, yyyy'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(annotated_time_series_csv.value)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field event_label: VizFieldFull {
-        ref: r(annotated_time_series_csv.event_label)
-        format {
-          type: 'text'
-        }
-      }
-      setting event_color: '#e5484d'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_6dtp: VizBlock {
-    label: 'Bump Chart by Category (Monthly, Top 5)'
-    viz: CustomChart {
-      dataset: superstore
-      calculation order_month {
-        label: 'Order Month'
-        formula: @aql superstore_csv.order_date | month() ;;
-        calc_type: 'dimension'
-        data_type: 'date'
-      }
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: r(superstore_bump_chart.category)
-        operator: 'is'
-        value: [
-          'Art',
-          'Phones',
-          'Machines',
-          'Labels',
-          'Supplies',
-          'Furnishings'
-        ]
-      }
-      filter {
-        field: r(superstore_bump_chart.period)
-        operator: 'matches'
-        value: '2017'
-      }
-      custom_chart: bump_chart
-      field period: VizFieldFull {
-        ref: r(superstore_bump_chart.month_name)
-        format {
-          type: 'text'
-        }
-      }
-      field dimension: VizFieldFull {
-        ref: r(superstore_bump_chart.category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_bump_chart.value)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting line_interpolate: 'monotone'
-      setting point_size: 500
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_e8i4: VizBlock {
-    label: 'Trellis Chart - Sales by Category per Region'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: trellis_chart
-      field facet: VizFieldFull {
-        ref: r(superstore_csv.region)
-        format {
-          type: 'text'
-        }
-      }
-      field x_axis: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.profit)
-        aggregation: 'sum'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting show_tooltip: false
-      setting show_y_axis_label: true
-      setting row_sort: 'ascending'
-      setting row_height: 100
-      setting row_width: 300
-      setting row_space: 20
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_xzev: VizBlock {
-    label: 'Sales Trend by Category copy'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: faceted_sparkline
-      field date: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        format {
-          type: 'date'
-          pattern: 'inherited'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field facet: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field series: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      setting show_tooltip: false
-      setting facet_columns: 3
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_9m5p: VizBlock {
-    label: 'Packed Bubble Force by Sub Category Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation total_sales {
+      calculation sum_of_superstore_sales {
         label: 'Total Sales'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+        formula: @aql sum(superstore_csv.sales);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: packed_bubble
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'total_sales'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting gravity_x: 0.1
-      setting gravity_y: 0.2
-      setting show_labels: true
-      setting color_scheme: 'tableau10'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_nzrn: VizBlock {
-    label: 'Chord Diagram - Region to Category Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation sum_of_superstore_profit {
+        label: 'Total Profit'
+        formula: @aql sum(superstore_csv.profit);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: chord_diagram
-      field source: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field target: VizFieldFull {
-        ref: r(superstore_csv.category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting pad_angle: 0.05
-      setting inner_radius_ratio: 0.9
-      setting label_padding: 80
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_04pe: VizBlock {
-    label: 'Sunburst Chart by Category and Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation sum_of_superstore_discount {
+        label: 'Total Discount'
+        formula: @aql sum(superstore_csv.discount);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: sunburst_chart
-      field level_1: VizFieldFull {
-        ref: r(superstore_csv.category)
-        format {
-          type: 'text'
-        }
-      }
-      field level_2: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting color_scheme: 'tableau10'
-      setting donut_hole: 0.35
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_euit: VizBlock {
-    label: 'Gauge Chart - Profit out of Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation profit_value {
-        label: 'Profit'
-        formula: @aql superstore_csv | sum(superstore_csv.profit);;
+      calculation sum_of_superstore_sales_prev_1y {
+        label: 'Sum Of Superstore Sales (prev. 1y)'
+        formula: @aql sum_of_superstore_sales | relative_period(superstore_csv.order_date, interval(-1 year), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      calculation sales_value {
-        label: 'Sales'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: gauge_chart
-      field value: VizFieldFull {
-        ref: 'profit_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field max_value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting needleScale: 0.8
-      setting showLabels: true
-      setting showTicks: true
-      setting tickGaps: 0.2
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_6hg1: VizBlock {
-    label: 'Density Contour Plot'
-    viz: CustomChart {
-      dataset: homestay_dataset
-      custom_chart: density_contour_plot
-      field x_axis: VizFieldFull {
-        ref: r(homestay_listings.price)
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field y_axis: VizFieldFull {
-        ref: r(homestay_listings.weekly_price)
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      field group: VizFieldFull {
-        ref: r(homestay_listings.bed_type)
-        format {
-          type: 'text'
-        }
-      }
-      setting bandwidth: 0
-      setting contour_levels: 4
-      setting show_points: true
-      setting show_heatmap: true
-      setting show_tooltip: false
-    }
-  }
-  block v_i3qe: VizBlock {
-    label: 'Bullet Chart by Category'
-    viz: CustomChart {
-      dataset: superstore
-      calculation target {
-        label: 'Target'
-        formula: @aql (superstore_csv | sum(superstore_csv.sales)) * 0.2 + 30000;;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation current {
-        label: 'Current'
-        formula: @aql superstore_csv | sum(superstore_csv.profit);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation pace {
-        label: 'Pace'
-        formula: @aql current * 1.25;;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: bullet_chart
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field target: VizFieldFull {
-        ref: 'target'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field pace: VizFieldFull {
-        ref: 'pace'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field current: VizFieldFull {
-        ref: 'current'
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting show_tooltip: false
-      setting current_bar_height: 7
-      setting target_tick_thickness: 3
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_1lc3: VizBlock {
-    label: 'Ridgeline Chart by Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      custom_chart: ridgeline_chart
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: r(superstore_csv.profit)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      setting overlap: 2
-      setting bandwidth: 0
-      setting scale_by_count: false
-      setting color_scheme: 'tableau10'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_cak9: VizBlock {
-    label: 'Radial Tree by Product Hierarchy'
-    viz: CustomChart {
-      dataset: superstore
       filter {
-        field: r(superstore_csv.sub_category)
-        operator: 'is'
-        value: [
-          'Appliances',
-          'Chairs',
-          'Supplies',
-          'Tables',
-          'Machines'
-        ]
+        field: r(superstore_csv.order_date)
+        operator: 'matches'
+        value: '2016-01-01 - 2017-12-31'
       }
-      custom_chart: radial_tree
-      field level_1: VizFieldFull {
-        ref: r(superstore_csv.region)
+      legend: VizFieldFull {
+        ref: r(superstore_csv.segment)
         format {
           type: 'text'
         }
       }
-      field level_2: VizFieldFull {
-        ref: r(superstore_csv.state)
-        format {
-          type: 'text'
+      series {
+        field: VizFieldFull {
+          label: ' '
+          ref: 'sum_of_superstore_sales'
+          format {
+            type: 'number'
+            pattern: '#,###0.00"A"'
+          }
         }
+
       }
-      field level_3: VizFieldFull {
-        ref: r(superstore_csv.category)
-        format {
-          type: 'text'
-        }
-      }
-      setting root_label: 'All'
-      setting layout: 'cluster'
-      setting link_shape: 'diagonal'
-      setting spread: 360
-      setting show_labels: true
-      setting color_scheme: 'magma'
-      setting show_tooltip: false
       settings {
+        display_as_donut: true
+        row_limit: 10000
+        data_label_position: 'none'
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -1066,1344 +262,461 @@ Dashboard all_viz_test {
       }
     }
   }
-  block v_oex3: VizBlock {
-    label: 'Sankey Chart - Region to Category Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+  block v_ny30: VizBlock {
+    label: 'User Signed Up'
+    viz: MarkdownViz {
+      dataset: ecommerce_dataset
+      calculation users_users_signed_up_prev_1y {
+        label: 'Users Users Signed Up (prev. 1y)'
+        formula: @aql ecommerce_ga_users.users_signed_up_count | relative_period(ecommerce_users.sign_up_date, interval(-1 year), strict: true);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: sankey_chart
-      field source: VizFieldFull {
-        ref: r(superstore_csv.region)
-        format {
-          type: 'text'
-        }
-      }
-      field target: VizFieldFull {
-        ref: r(superstore_csv.category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting node_align: 'justify'
-      setting node_width: 15
-      setting node_padding: 10
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_xgpv: VizBlock {
-    label: 'Table Heatmap - Daily Sales'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
+      calculation users_users_signed_up_prev_1y_01 {
+        label: 'Users Users Signed Up (prev. 1y) 01'
+        formula: @aql ecommerce_users.users_signed_up_count | exact_period(ecommerce_users.sign_up_at, @(2026-03-01 - 2026-03-08));;
         calc_type: 'measure'
         data_type: 'number'
       }
-      custom_chart: table_heatmap
-      setting show_tooltip: false
-      field date: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        format {
-          type: 'date'
-          pattern: 'inherited'
+      values: [
+        VizFieldFull {
+          label: 'PoP Comparison of Users Signed Up'
+          ref: 'users_users_signed_up_prev_1y_01'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
         }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_f115: VizBlock {
-    label: 'Treemap - Sales by Sub-Category'
-    viz: CustomChart {
-      dataset: superstore
-      calculation sales_value {
-        label: 'Sales Value'
-        formula: @aql superstore_csv | sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      custom_chart: treemap
-      field dimension: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      field value: VizFieldFull {
-        ref: 'sales_value'
-        format {
-          type: 'number'
-          pattern: 'inherited'
-        }
-      }
-      setting fill_color: '#255DD4'
-      setting text_color: 'white'
-      setting layout_method: 'squarify'
-      setting show_tooltip: false
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_2nnb: VizBlock {
-    label: 'Bubble Chart - Sales vs Profit sized by Quantity'
-    viz: CustomChart {
-      dataset: superstore
-      custom_chart: bubble_chart
-      setting show_tooltip: false
-      field x_axis: VizFieldFull {
-        ref: r(superstore_csv.sales)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field y_axis: VizFieldFull {
-        ref: r(superstore_csv.profit)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field size: VizFieldFull {
-        ref: r(superstore_csv.quantity)
-        format {
-          type: 'number'
-          pattern: 'none'
-        }
-      }
-      field category: VizFieldFull {
-        ref: r(superstore_csv.sub_category)
-        format {
-          type: 'text'
-        }
-      }
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block f_superstore_csv_city: FilterBlock {
-    label: 'Superstore csv City'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: superstore
-      field: r(superstore_csv.city)
-    }
-    default {
-      operator: 'is'
-      value: [
-        'Aberdeen',
-        'Abilene',
-        'Akron',
-        'Albuquerque',
-        'Alexandria',
-        'Allentown'
       ]
+      content: @md <style>
+.kpi-card {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #3760D6;
+  border-radius: 8px;
+  padding: 8px;
+  padding-top: 16px;
+  color: white;
+  width: 100%;
+  height: 300px;
+}
+
+.kpi-title { font-size: 14px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.9; }
+
+.kpi-value {
+  font-size: 56px;
+  font-weight: 700;
+  margin-top: 20px;
+}
+
+.kpi-change-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 40px;
+}
+
+.kpi-pill-blue {
+  background: white;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: #1A1A2E;
+  font-size: 12px;
+  font-weight: 500;
+  align-items: center;
+  gap: 6px;
+}
+
+.kpi-vs {
+  opacity: 0.6;
+  font-size: 14px;
+}
+
+</style>
+
+<div class="kpi-card">
+
+<!-- <div class="kpi-title">
+Users Signed Up
+</div> -->
+
+<div class="kpi-value">
+{{ rows[0].values.`Users Signed Up`.formatted }}
+</div>
+
+<div class="kpi-change-row">
+
+<div class="kpi-pill-blue">
+  <span style="vertical-align: middle;"> ▼  {{ rows[0].values.`PoP Comparison of Users Signed Up`.formatted }}</span>
+</div>
+
+
+</div>
+
+
+</div>                     ;;
+      settings {
+        show_row_total: true
+        show_column_total: true
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
     }
+  }
+  // block v_k7dv: VizBlock {
+  //   label: 'Month Sign Up Date and Users Signed Up'
+  //   viz: CustomChart {
+  //     dataset: ecommerce_dataset
+  //     custom_chart_id: 33033
+  //     field x: VizFieldFull {
+  //       ref: r(ecommerce_ga_users.sign_up_date)
+  //       transformation: 'datetrunc month'
+  //       format {
+  //         type: 'date'
+  //         pattern: 'LLL yyyy'
+  //       }
+  //     }
+  //     field y: VizFieldFull {
+  //       ref: r(ecommerce_users.users_signed_up_count)
+  //       format {
+  //         type: 'number'
+  //         pattern: 'inherited'
+  //       }
+  //     }
+  //     setting tooltip: true
+  //     setting show_axis: true
+  //     setting line_color: '#FFB84D'
+  //     setting show_ticks: false
+  //     setting smooth_line: true
+  //     setting show_data_point: false
+  //     setting background_color: 'transparent'
+  //     settings {
+  //       row_limit: 10000
+  //     }
+  //   }
+  //   settings {
+  //     hide_label: true
+  //   }
+  // }
+  block v_ld9y: VizBlock {
+    theme {
+      padding {
+        top: 56
+        left: 16
+        right: 16
+        bottom: 16
+      }
+    }
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: superstore
+      calculation sum_of_superstore_sales {
+        label: 'Sum of Superstore Sales'
+        formula: @aql sum(superstore_csv.sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: 'sum_of_superstore_sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_nrin: VizBlock {
+    label: 'Total Sales copy'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        label: 'Product listed'
+        ref: r(products.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_audi: VizBlock {
+    label: 'Total Sales copy copy'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        label: 'Merchant listed'
+        ref: r(merchants.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_acsc: VizBlock {
+    theme {
+      padding {
+        top: 56
+        left: 16
+        right: 16
+        bottom: 16
+      }
+    }
+    label: 'Total Sales copy copy copy'
+    viz: MetricKpi {
+      dataset: superstore
+      calculation sum_of_superstore_sales {
+        label: 'Sum of Superstore Sales'
+        formula: @aql sum(superstore_csv.sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation sum_of_superstore_profit {
+        label: 'Sum of Superstore Profit'
+        formula: @aql sum(superstore_csv.profit);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation count_of_superstore_order_id {
+        label: 'Count of Superstore Order id'
+        formula: @aql count(superstore_csv.order_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: 'All-time Orders'
+        ref: 'count_of_superstore_order_id'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block t_pour: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12S6.477 2 12 2s10 4.477 10 10" clip-rule="evenodd" opacity="0.25"/><path fill="currentColor" d="M12.75 6a.75.75 0 0 0-1.5 0v.317c-1.63.292-3 1.517-3 3.183c0 1.917 1.813 3.25 3.75 3.25c1.377 0 2.25.906 2.25 1.75s-.873 1.75-2.25 1.75c-1.376 0-2.25-.906-2.25-1.75a.75.75 0 0 0-1.5 0c0 1.666 1.37 2.891 3 3.183V18a.75.75 0 0 0 1.5 0v-.317c1.63-.292 3-1.517 3-3.183c0-1.917-1.813-3.25-3.75-3.25c-1.376 0-2.25-.906-2.25-1.75s.874-1.75 2.25-1.75c1.377 0 2.25.906 2.25 1.75a.75.75 0 0 0 1.5 0c0-1.666-1.37-2.891-3-3.183z"/></svg>;;
+  }
+  block t_7cbr: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M14.5 21.991V18.5c0-.935 0-1.402-.201-1.75a1.5 1.5 0 0 0-.549-.549C13.402 16 12.935 16 12 16s-1.402 0-1.75.201a1.5 1.5 0 0 0-.549.549c-.201.348-.201.815-.201 1.75v3.491z"/><path fill="currentColor" fill-rule="evenodd" d="M5.732 12c-.89 0-1.679-.376-2.232-.967V14c0 3.771 0 5.657 1.172 6.828c.943.944 2.348 1.127 4.828 1.163h5c2.48-.036 3.885-.22 4.828-1.163C20.5 19.657 20.5 17.771 20.5 14v-2.966a3.06 3.06 0 0 1-5.275-1.789l-.073-.728a3.167 3.167 0 1 1-6.307.038l-.069.69A3.06 3.06 0 0 1 5.732 12m8.768 6.5v3.491h-5V18.5c0-.935 0-1.402.201-1.75a1.5 1.5 0 0 1 .549-.549C10.598 16 11.065 16 12 16s1.402 0 1.75.201a1.5 1.5 0 0 1 .549.549c.201.348.201.815.201 1.75" clip-rule="evenodd" opacity="0.25"/><path fill="currentColor" d="M9.5 2h5l.652 6.517a3.167 3.167 0 1 1-6.304 0z"/><path fill="currentColor" d="M3.33 5.351c.178-.89.267-1.335.448-1.696a3 3 0 0 1 1.889-1.548C6.057 2 6.51 2 7.418 2h2.083l-.725 7.245a3.06 3.06 0 1 1-6.044-.904zm17.34 0c-.178-.89-.267-1.335-.448-1.696a3 3 0 0 0-1.888-1.548C17.944 2 17.49 2 16.582 2H14.5l.725 7.245a3.06 3.06 0 1 0 6.043-.904z" opacity="0.5"/></svg>;;
+  }
+  block t_zz87: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M8.422 20.618C10.178 21.54 11.056 22 12 22V12L2.638 7.073l-.04.067C2 8.154 2 9.417 2 11.942v.117c0 2.524 0 3.787.597 4.801c.598 1.015 1.674 1.58 3.825 2.709z"/><path fill="currentColor" d="m17.577 4.432l-2-1.05C13.822 2.461 12.944 2 12 2c-.945 0-1.822.46-3.578 1.382l-2 1.05C4.318 5.536 3.242 6.1 2.638 7.072L12 12l9.362-4.927c-.606-.973-1.68-1.537-3.785-2.641" opacity="0.5"/><path fill="currentColor" d="m21.403 7.14l-.041-.067L12 12v10c.944 0 1.822-.46 3.578-1.382l2-1.05c2.151-1.129 3.227-1.693 3.825-2.708c.597-1.014.597-2.277.597-4.8v-.117c0-2.525 0-3.788-.597-4.802" opacity="0.25"/><path fill="currentColor" d="m6.323 4.484l.1-.052l1.493-.784l9.1 5.005l4.025-2.011q.205.232.362.498c.15.254.262.524.346.825L17.75 9.964V13a.75.75 0 0 1-1.5 0v-2.286l-3.5 1.75v9.44A3 3 0 0 1 12 22c-.248 0-.493-.032-.75-.096v-9.44l-8.998-4.5c.084-.3.196-.57.346-.824q.156-.266.362-.498l9.04 4.52l3.387-1.693z"/></svg>;;
+  }
+  block t_4o8m: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M5.574 4.691c-.833.692-1.052 1.862-1.491 4.203l-.75 4c-.617 3.292-.926 4.938-.026 6.022S5.88 20 9.23 20h5.54c3.35 0 5.025 0 5.924-1.084c.9-1.084.591-2.73-.026-6.022l-.75-4c-.439-2.34-.658-3.511-1.491-4.203C17.593 4 16.403 4 14.02 4H9.98c-2.382 0-3.572 0-4.406.691" opacity="0.25"/><path fill="currentColor" d="M12 9.25a2.25 2.25 0 0 1-2.122-1.5a.75.75 0 1 0-1.414.5a3.751 3.751 0 0 0 7.073 0a.75.75 0 1 0-1.414-.5A2.25 2.25 0 0 1 12 9.25"/></svg>;;
   }
   view: TabLayout {
     label: 'View 1'
-    tab tab_ryor: CanvasLayout {
-      label: 'Tab 1'
-      width: 2360
-      height: 700
-      grid_size: 20
+    tab view_1: CanvasLayout {
+      label: 'Overview'
+      width: 1220
       auto_expand_vertically: true
+      block v_tydi {
+        position: pos(20, 810, 1180, 400)
+        layer: 2
+      }
+      block t_block_ha_page_header_bg {
+        position: pos(0, 0, 1220, 200)
+      }
+      block t_block_ha_page_header {
+        position: pos(20, 80, 1180, 100)
+      }
+      block t_2pu8 {
+        position: pos(20, 20, 180, 60)
+        layer: 2
+      }
+      block v_fofr {
+        position: pos(20, 390, 760, 400)
+      }
+      block v_quxa {
+        position: pos(800, 390, 400, 400)
+      }
+      block v_ld9y {
+        position: pos(20, 220, 280, 160)
+      }
+      block v_nrin {
+        position: pos(320, 220, 280, 160)
+        layer: 2
+      }
+      block v_audi {
+        position: pos(620, 220, 280, 160)
+        layer: 2
+      }
+      block v_acsc {
+        position: pos(920, 220, 280, 160)
+        layer: 2
+      }
+      block t_pour {
+        position: pos(40, 230, 40, 40)
+      }
+      block t_7cbr {
+        position: pos(640, 230, 40, 40)
+        layer: 3
+      }
+      block t_zz87 {
+        position: pos(340, 230, 40, 40)
+        layer: 3
+      }
+      block t_4o8m {
+        position: pos(940, 230, 40, 40)
+        layer: 3
+      }
       mobile {
         mode: 'auto'
       }
-      block v_pareto_chart {
-        position: pos(800, 20, 760, 660)
-        layer: 4
-      }
-      block v_bar_avg_line {
-        position: pos(1580, 20, 760, 660)
-        layer: 4
-      }
-      block v_annotated_time_series {
-        position: pos(20, 700, 760, 660)
-        layer: 4
-      }
-      block v_density_contour {
-        position: pos(800, 2060, 760, 660)
-        layer: 4
-      }
+      height: 800
     }
-    tab tab_ngja: CanvasLayout {
-      label: 'Tab 2'
-      width: 2380
-      height: 720
+    tab tab_fb50: CanvasLayout {
+      label: 'Details'
+      width: 940
+      height: 1600
       grid_size: 20
       auto_expand_vertically: true
       mobile {
         mode: 'auto'
       }
-      block v_hkjd {
-        position: pos(20, 40, 760, 660)
+      block v_ny30 {
+        position: pos(20, 60, 760, 320)
       }
-      block v_llp5 {
-        position: pos(1580, 40, 760, 660)
-      }
-      block v_6y41 {
-        position: pos(800, 40, 760, 660)
-      }
-    }
-    tab tab_bkfo: CanvasLayout {
-      label: 'Tab 3'
-      width: 2360
-      height: 700
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_ypp5 {
-        position: pos(20, 20, 760, 660)
-      }
-      block v_l240 {
-        position: pos(1580, 20, 760, 660)
-      }
-      block v_tlgf {
-        position: pos(800, 20, 760, 660)
-      }
-    }
-    tab tab_2bfl: CanvasLayout {
-      label: 'Tab 4'
-      width: 1580
-      height: 1420
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_qyc6 {
-        position: pos(800, 40, 760, 660)
-      }
-      block v_pcrs {
-        position: pos(20, 720, 1540, 660)
-      }
-      block v_wow3 {
-        position: pos(20, 40, 760, 660)
-      }
-    }
-    tab tab_zx1v: CanvasLayout {
-      label: 'Tab 5'
-      width: 1580
-      height: 1880
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_6dtp {
-        position: pos(20, 20, 760, 660)
-      }
-      block v_e8i4 {
-        position: pos(800, 20, 760, 660)
-      }
-      block v_xzev {
-        position: pos(20, 700, 1540, 1160)
-      }
-    }
-    tab tab_j1j5: CanvasLayout {
-      label: 'Tab 6'
-      width: 1600
-      height: 720
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_9m5p {
-        position: pos(800, 40, 760, 660)
-      }
-      block v_nzrn {
-        position: pos(20, 40, 760, 660)
-      }
-    }
-    tab tab_f62q: CanvasLayout {
-      label: 'Tab 7'
-      width: 2360
-      height: 700
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_04pe {
-        position: pos(20, 20, 760, 660)
-      }
-      block v_euit {
-        position: pos(800, 20, 760, 660)
-      }
-      block v_6hg1 {
-        position: pos(1580, 20, 760, 660)
-      }
-    }
-    tab tab_65ve: CanvasLayout {
-      label: 'Tab 8'
-      width: 2360
-      height: 720
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_i3qe {
-        position: pos(800, 40, 760, 660)
-      }
-      block v_1lc3 {
-        position: pos(20, 40, 760, 660)
-      }
-      block v_cak9 {
-        position: pos(1580, 40, 760, 660)
-      }
-    }
-    tab tab_hsdr: CanvasLayout {
-      label: 'Tab 9'
-      width: 2360
-      height: 700
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_oex3 {
-        position: pos(1580, 20, 760, 660)
-      }
-      block v_xgpv {
-        position: pos(20, 20, 760, 660)
-      }
-      block v_f115 {
-        position: pos(800, 20, 760, 660)
-      }
-    }
-    tab tab_jhuu: CanvasLayout {
-      label: 'Untitled'
-      width: 980
-      height: 860
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_2nnb {
-        position: pos(20, 20, 940, 720)
-      }
-      block f_superstore_csv_city {
-        position: pos(20, 760, 300, 80)
+      block v_k7dv {
+        position: pos(280, 120, 460, 200)
       }
     }
   }
   settings {
-    timezone: 'Etc/UTC'
-    cache_duration: 1440
-    autorun_on_open: false
+    autorun_on_open: true
   }
-  interactions: [
+  explicit_interactions: [
     FilterInteraction {
-      from: 'v_wx22'
+      from: 'v_fofr'
       to: [
-        CustomMapping {
-          block: [
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
+        'v_quxa',
+        'v_ld9y',
+        'v_acsc'
       ]
     },
     FilterInteraction {
-      from: 'v_pareto_chart'
+      from: 'v_quxa'
       to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
+        'v_fofr',
+        'v_ld9y',
+        'v_acsc'
       ]
     },
     FilterInteraction {
-      from: 'v_bar_avg_line'
+      from: 'v_ld9y'
       to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
+        'v_fofr',
+        'v_quxa',
+        'v_acsc'
       ]
     },
     FilterInteraction {
-      from: 'v_pgpo'
+      from: 'v_acsc'
       to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
+        'v_fofr',
+        'v_quxa',
+        'v_ld9y'
       ]
     },
     FilterInteraction {
-      from: 'v_hkjd'
+      from: 'v_nrin'
       to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
+        'v_audi'
       ]
     },
     FilterInteraction {
-      from: 'v_llp5'
+      from: 'v_audi'
       to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_6y41'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_ypp5'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_l240'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_tlgf'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_qyc6'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_pcrs'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_wow3'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_6dtp'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_e8i4'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_xzev'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_9m5p'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_nzrn'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_04pe'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_euit'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_i3qe'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_1lc3'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_cak9'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_oex3'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_xgpv'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_f115'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_2nnb'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'v_2nnb'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115'
-          ]
-          disabled: true
-        }
-      ]
-    },
-    FilterInteraction {
-      from: 'f_superstore_csv_city'
-      to: [
-        CustomMapping {
-          block: [
-            'v_wx22',
-            'v_pareto_chart',
-            'v_bar_avg_line',
-            'v_pgpo',
-            'v_hkjd',
-            'v_llp5',
-            'v_6y41',
-            'v_ypp5',
-            'v_l240',
-            'v_tlgf',
-            'v_qyc6',
-            'v_pcrs',
-            'v_wow3',
-            'v_6dtp',
-            'v_e8i4',
-            'v_xzev',
-            'v_9m5p',
-            'v_nzrn',
-            'v_04pe',
-            'v_euit',
-            'v_i3qe',
-            'v_1lc3',
-            'v_cak9',
-            'v_oex3',
-            'v_xgpv',
-            'v_f115'
-          ]
-          disabled: true
-        }
+        'v_nrin'
       ]
     }
   ]

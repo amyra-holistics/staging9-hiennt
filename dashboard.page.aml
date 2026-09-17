@@ -380,4 +380,8 @@ Dashboard dashboard {
       ]
     }
   ]
+  theme: DynamicPageTheme {
+    light: H.themes.metropolitan
+    dark: forest
+  }
 }

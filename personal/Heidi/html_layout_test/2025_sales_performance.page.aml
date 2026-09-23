@@ -39,10 +39,14 @@ Dashboard ecommerce_2025_sales_performance {
   description: 'A CSS-only three-slide company update for full-year 2025 sales performance: overview, regional performance, and gender performance.'
 
   theme: PageTheme {
-    color { data: sales_deck_categorical }
+    color {
+      data: sales_deck_categorical
+    }
 
     block {
-      background { bg_color: 'transparent' }
+      background {
+        bg_color: 'transparent'
+      }
       border {
         border_width: 0
         border_style: 'none'
@@ -78,12 +82,20 @@ Dashboard ecommerce_2025_sales_performance {
         }
         trend {
           positive {
-            text { font_color: _theme_tokens('semantic_success') }
-            background { bg_color: 'transparent' }
+            text {
+              font_color: _theme_tokens('semantic_success')
+            }
+            background {
+              bg_color: 'transparent'
+            }
           }
           negative {
-            text { font_color: _theme_tokens('semantic_danger') }
-            background { bg_color: 'transparent' }
+            text {
+              font_color: _theme_tokens('semantic_danger')
+            }
+            background {
+              bg_color: 'transparent'
+            }
           }
         }
       }
@@ -185,18 +197,26 @@ Dashboard ecommerce_2025_sales_performance {
       }
     }
   }
-
   block v_monthly_revenue: VizBlock {
     label: 'Monthly Revenue Trend'
     viz: CombinationChart {
       dataset: ecommerce_official
+      conditions: [
+        'orders.created_at matches @(2025-01-01 until 2026-01-01)'
+      ]
       x_axis: VizFieldFull {
-        ref: r(orders.created_at)
         label: 'Month'
+        ref: r(orders.created_at)
         transformation: 'datetrunc month'
         format {
           type: 'date'
           pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(orders.status)
+        format {
+          type: 'text'
         }
       }
       y_axis {
@@ -204,8 +224,8 @@ Dashboard ecommerce_2025_sales_performance {
         series {
           mark_type: 'line'
           field: VizFieldFull {
-            ref: r(ecommerce_official.revenue)
             label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
             format {
               type: 'number'
               pattern: '[$$]#,###0.00'
@@ -213,16 +233,15 @@ Dashboard ecommerce_2025_sales_performance {
           }
         }
       }
-      conditions: [
-        "orders.created_at matches @(2025-01-01 until 2026-01-01)",
-      ]
       settings {
-        x_axis_label: 'Month'
         show_data_points: true
-        sort: LineFamilySort {
-          type: 'xaxis'
+        sort {
+          field_index: 0
           direction: 'asc'
+          type: 'xaxis'
         }
+        x_axis_label: 'Month'
+        x_axis_show_null_datetime: false
       }
     }
   }

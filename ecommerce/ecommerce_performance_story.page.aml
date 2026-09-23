@@ -3,58 +3,238 @@ Dashboard ecommerce_performance_story {
   description: @md
 Full-year 2025 ecommerce performance: gross merchandise value grew 124.4% year over year, alongside a prominent order-quality caveat.
   ;;
-
-  theme: PageTheme {
-    block {
-      background { bg_color: 'transparent' }
-      border { border_width: 0 border_style: 'none' border_radius: 12 border_color: '#DADCE0' }
-      shadow: 'none'
-      padding: 0
-      opacity: 1
-      label { font_family: 'Roboto, Arial, sans-serif' font_size: 14 font_color: '#202124' font_weight: 'medium' }
-      text { font_family: 'Roboto, Arial, sans-serif' font_size: 14 font_color: '#5F6368' font_weight: 'normal' }
-    }
-    viz {
-      table {
-        general { bg_color: '#FFFFFF' hover_color: '#F8F9FA' banding_color: '#FCFCFD' font_size: 13 font_color: '#5F6368' font_family: 'Roboto, Arial, sans-serif' border_color: '#DADCE0' border_width: 1 grid_color: '#DADCE0' }
-        header { bg_color: '#FFFFFF' font_size: 12 font_color: '#5F6368' font_weight: 'medium' }
-        sub_header { bg_color: '#F8F9FA' font_size: 13 font_color: '#202124' font_weight: 'medium' }
+  theme: DynamicPageTheme {
+    light {
+      block {
+        label {
+          font_family: 'Roboto, Arial, sans-serif'
+          font_color: '#202124'
+          font_size: 14
+          font_weight: 'medium'
+        }
+        text {
+          font_family: 'Roboto, Arial, sans-serif'
+          font_color: '#5F6368'
+          font_size: 14
+          font_weight: 'normal'
+        }
+        border {
+          border_width: 0
+          border_radius: 12
+          border_color: '#DADCE0'
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'transparent'
+        }
+        padding: 0
+        shadow: 'none'
+        opacity: 1
       }
-      metric_kpi {
-        alignment: 'left'
-        label { font_family: 'Roboto, Arial, sans-serif' font_size: 13 font_color: '#5F6368' }
-        value { font_family: 'Roboto, Arial, sans-serif' font_size: 40 font_color: '#202124' }
-        trend {
-          positive { text { font_color: '#188038' } background { bg_color: '#E6F4EA' } }
-          negative { text { font_color: '#D93025' } background { bg_color: '#FCE8E6' } }
-          neutral { text { font_color: '#5F6368' } background { bg_color: '#F8F9FA' } }
+      custom_css: @css .dac-text-block { font-family: Roboto, Arial, sans-serif; font-size: 14px; color: #5F6368; line-height: 1.6; }
+.dst, .dst *, .dst *::before, .dst *::after { box-sizing: border-box; }
+.dst { --t-bg:#FFFFFF; --t-surface:#F8F9FA; --t-border:#DADCE0; --t-rule:#BDC1C6; --t-ink:#202124; --t-ink-dim:#5F6368; --t-ink-faint:#80868B; --t-accent:#1A73E8; --t-accent-lt:#8AB4F8; --t-dark:#202124; --t-dark-line:#3C4043; --t-on-dark:#E8EAED; --t-on-dark-dim:#9AA0A6; --t-g-blue:#1A73E8; --t-g-red:#EA4335; --t-g-yellow:#FBBC04; --t-g-green:#34A853; --t-glow:rgba(26,115,232,.28); --t-shadow-1:0 1px 2px 0 rgba(60,64,67,.20),0 1px 3px 1px rgba(60,64,67,.10); --t-shadow-2:0 2px 6px 2px rgba(60,64,67,.12),0 1px 2px 0 rgba(60,64,67,.24); --t-radius:12px; --t-pad:32px; --t-font-sans:Roboto,Arial,sans-serif; --t-font-display:Roboto,Arial,sans-serif; --t-font-mono:"Roboto Mono",ui-monospace,monospace; --t-page-w:1200px; display:block; background:var(--t-bg); color:var(--t-ink); font-family:var(--t-font-sans); line-height:1.6; counter-reset:sec; -webkit-font-smoothing:antialiased; }
+.dst .dst-sec { position:relative; max-width:var(--t-page-w); margin:0 auto; padding:72px var(--t-pad); } .dst .dst-sec.is-flush { padding-top:0; } .dst .dst-band { background:var(--t-dark); background-image:radial-gradient(60% 90% at 78% 15%,var(--t-glow),transparent 70%); color:var(--t-on-dark); } .dst .dst-tint { background:var(--t-surface); border-top:1px solid var(--t-border); border-bottom:1px solid var(--t-border); } .dst .dst-sec:not(.is-unnumbered) { counter-increment:sec; }
+.dst .dst-eyebrow { font-family:var(--t-font-sans); font-size:11px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--t-ink-dim); display:flex; align-items:center; gap:14px; margin:0 0 24px; } .dst .dst-eyebrow::before { content:""; width:32px; height:3px; border-radius:2px; flex-shrink:0; background:linear-gradient(to right,var(--t-g-blue) 0%,var(--t-g-blue) 25%,var(--t-g-red) 25%,var(--t-g-red) 50%,var(--t-g-yellow) 50%,var(--t-g-yellow) 75%,var(--t-g-green) 75%,var(--t-g-green) 100%); } .dst .dst-eyebrow-logo::before { display:none; } .dst .dst-google-logo { width:28px; height:28px; object-fit:contain; flex-shrink:0; } .dst .dst-n::before { content:counter(sec,decimal-leading-zero); font-family:var(--t-font-mono); font-size:11px; letter-spacing:.06em; color:var(--t-accent); padding-right:12px; margin-right:2px; border-right:1px solid var(--t-border); } .dst .dst-band .dst-eyebrow { color:var(--t-on-dark-dim); } .dst .dst-band .dst-eyebrow::before { width:56px; height:4px; }
+.dst .dst-masthead { padding-top:88px; } .dst .dst-standfirst { font-size:22px; font-weight:300; line-height:1.6; color:var(--t-ink-dim); max-width:60ch; margin:0 0 36px; } .dst .dst-byline { font-size:12px; letter-spacing:.02em; color:var(--t-ink-faint); border-top:1px solid var(--t-rule); padding-top:16px; margin:0; } .dst .dst-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:0 0 36px; }
+.dst .dst-hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:56px; align-items:center; } .dst .dst-hero-num,.dst .dst-hero-note { min-width:0; } .dst .dst-hero-label { font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--t-accent-lt); margin:0 0 8px; } .dst .dst-hero-rule { width:72px; height:4px; border-radius:2px; background:var(--t-accent-lt); margin:28px 0 0; }
+.dst .dst-split { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:48px; align-items:center; } .dst .dst-split.is-flip { grid-template-columns:minmax(0,2fr) minmax(0,1fr); } .dst .dst-figure { min-height:340px; background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px; min-width:0; transition:box-shadow .2s,transform .2s; } .dst .dst-figure:hover,.dst .dst-stat:hover { box-shadow:var(--t-shadow-2); transform:translateY(-2px); } .dst .dst-figure.is-wide { min-height:400px; } .dst .dst-figure.is-table { min-height:300px; } .dst .dst-caption { font-size:13px; color:var(--t-ink-dim); margin:18px 0 0; padding-left:2px; max-width:80ch; }
+.dst .dst-pull { border-left:4px solid var(--t-accent); padding-left:32px; max-width:48ch; } .dst .dst-pull-wrap { max-width:60ch; } .dst .dst-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; } .dst .dst-stat { background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px 24px 28px; min-height:138px; min-width:0; border-top:3px solid var(--t-accent); transition:box-shadow .2s,transform .2s; } .dst .dst-stat:nth-child(1) { border-top-color:var(--t-g-blue); } .dst .dst-stat:nth-child(2) { border-top-color:var(--t-g-red); } .dst .dst-stat:nth-child(3) { border-top-color:var(--t-g-yellow); } .dst .dst-source { font-size:12px; color:var(--t-on-dark-dim); border-top:1px solid var(--t-dark-line); padding-top:18px; margin-top:36px; }
+.dst .dst-copy .dac-text-block,.dst .dst-copy .dac-text-block p,.dst .dst-copy .dac-text-block li { font-family:var(--t-font-sans)!important; font-size:16px!important; line-height:1.75!important; color:var(--t-ink-dim)!important; } .dst .dst-copy .dac-text-block h1,.dst .dst-copy .dac-text-block h2,.dst .dst-copy .dac-text-block h3 { font-family:var(--t-font-display)!important; font-size:30px!important; font-weight:400!important; line-height:1.25!important; letter-spacing:-.01em!important; color:var(--t-ink)!important; margin:0 0 16px!important; } .dst .dst-display .dac-text-block,.dst .dst-display .dac-text-block p,.dst .dst-display .dac-text-block h1,.dst .dst-display .dac-text-block h2 { font-family:var(--t-font-display)!important; font-size:clamp(34px,4.6vw,60px)!important; line-height:1.1!important; letter-spacing:-.02em!important; font-weight:400!important; color:var(--t-ink)!important; margin:0 0 28px!important; max-width:22ch; } .dst .dst-pull .dac-text-block,.dst .dst-pull .dac-text-block p { font-family:var(--t-font-display)!important; font-size:clamp(24px,2.8vw,34px)!important; line-height:1.4!important; font-weight:300!important; color:var(--t-ink)!important; margin:0!important; } .dst .dst-band .dst-copy .dac-text-block,.dst .dst-band .dst-copy .dac-text-block p,.dst .dst-band .dst-copy .dac-text-block h1,.dst .dst-band .dst-copy .dac-text-block h2,.dst .dst-band .dst-copy .dac-text-block h3 { color:var(--t-on-dark)!important; } .dst .dst-hero-note .dac-text-block,.dst .dst-hero-note .dac-text-block p { font-size:18px!important; font-weight:300!important; line-height:1.7!important; color:var(--t-on-dark-dim)!important; } .dst .dst-hero-num .h-kpi-metric-kpi,.dst .dst-hero-num .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:clamp(44px,6.4vw,92px)!important; line-height:1.05!important; letter-spacing:-.035em!important; font-weight:400!important; color:var(--t-on-dark)!important; background:transparent!important; white-space:normal!important; overflow:visible!important; text-overflow:clip!important; max-width:none!important; } .dst .dst-stat .h-kpi-metric-kpi,.dst .dst-stat .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:38px!important; font-weight:400!important; letter-spacing:-.02em!important; line-height:1.1!important; color:var(--t-ink)!important; } .dst .dst-stat .dac-ic-block-label,.dst .dst-figure .dac-ic-block-label { font-size:12px!important; font-weight:500!important; letter-spacing:.1em!important; text-transform:uppercase!important; color:var(--t-ink-dim)!important; } .dst .dst-hero-num .dac-ic-block-label { display:none!important; }
+@media (max-width:860px) { .dst .dst-sec { padding:48px 20px; } .dst .dst-masthead { padding-top:56px; } .dst .dst-controls,.dst .dst-hero,.dst .dst-split,.dst .dst-split.is-flip { grid-template-columns:minmax(0,1fr); gap:32px; } };;
+      viz {
+        table {
+          general {
+            bg_color: '#FFFFFF'
+            hover_color: '#F8F9FA'
+            banding_color: '#FCFCFD'
+            font_size: 13
+            font_color: '#5F6368'
+            font_family: 'Roboto, Arial, sans-serif'
+            border_color: '#DADCE0'
+            border_width: 1
+            grid_color: '#DADCE0'
+          }
+          header {
+            bg_color: '#FFFFFF'
+            font_size: 12
+            font_weight: 'medium'
+            font_color: '#5F6368'
+          }
+          sub_header {
+            bg_color: '#F8F9FA'
+            font_size: 13
+            font_weight: 'medium'
+            font_color: '#202124'
+          }
+        }
+        metric_kpi {
+          label {
+            font_family: 'Roboto, Arial, sans-serif'
+            font_color: '#5F6368'
+            font_size: 13
+          }
+          value {
+            font_family: 'Roboto, Arial, sans-serif'
+            font_color: '#202124'
+            font_size: 40
+          }
+          trend {
+            positive {
+              text {
+                font_color: '#188038'
+              }
+              background {
+                bg_color: '#E6F4EA'
+              }
+            }
+            negative {
+              text {
+                font_color: '#D93025'
+              }
+              background {
+                bg_color: '#FCE8E6'
+              }
+            }
+            neutral {
+              text {
+                font_color: '#5F6368'
+              }
+              background {
+                bg_color: '#F8F9FA'
+              }
+            }
+          }
         }
       }
     }
-    custom_css: @css
-      .dac-text-block { font-family: Roboto, Arial, sans-serif; font-size: 14px; color: #5F6368; line-height: 1.6; }
-      .dst, .dst *, .dst *::before, .dst *::after { box-sizing: border-box; }
-      .dst { --t-bg:#FFFFFF; --t-surface:#F8F9FA; --t-border:#DADCE0; --t-rule:#BDC1C6; --t-ink:#202124; --t-ink-dim:#5F6368; --t-ink-faint:#80868B; --t-accent:#1A73E8; --t-accent-lt:#8AB4F8; --t-dark:#202124; --t-dark-line:#3C4043; --t-on-dark:#E8EAED; --t-on-dark-dim:#9AA0A6; --t-g-blue:#1A73E8; --t-g-red:#EA4335; --t-g-yellow:#FBBC04; --t-g-green:#34A853; --t-glow:rgba(26,115,232,.28); --t-shadow-1:0 1px 2px 0 rgba(60,64,67,.20),0 1px 3px 1px rgba(60,64,67,.10); --t-shadow-2:0 2px 6px 2px rgba(60,64,67,.12),0 1px 2px 0 rgba(60,64,67,.24); --t-radius:12px; --t-pad:32px; --t-font-sans:Roboto,Arial,sans-serif; --t-font-display:Roboto,Arial,sans-serif; --t-font-mono:"Roboto Mono",ui-monospace,monospace; --t-page-w:1200px; display:block; background:var(--t-bg); color:var(--t-ink); font-family:var(--t-font-sans); line-height:1.6; counter-reset:sec; -webkit-font-smoothing:antialiased; }
-      .dst .dst-sec { position:relative; max-width:var(--t-page-w); margin:0 auto; padding:72px var(--t-pad); } .dst .dst-sec.is-flush { padding-top:0; } .dst .dst-band { background:var(--t-dark); background-image:radial-gradient(60% 90% at 78% 15%,var(--t-glow),transparent 70%); color:var(--t-on-dark); } .dst .dst-tint { background:var(--t-surface); border-top:1px solid var(--t-border); border-bottom:1px solid var(--t-border); } .dst .dst-sec:not(.is-unnumbered) { counter-increment:sec; }
-      .dst .dst-eyebrow { font-family:var(--t-font-sans); font-size:11px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--t-ink-dim); display:flex; align-items:center; gap:14px; margin:0 0 24px; } .dst .dst-eyebrow::before { content:""; width:32px; height:3px; border-radius:2px; flex-shrink:0; background:linear-gradient(to right,var(--t-g-blue) 0%,var(--t-g-blue) 25%,var(--t-g-red) 25%,var(--t-g-red) 50%,var(--t-g-yellow) 50%,var(--t-g-yellow) 75%,var(--t-g-green) 75%,var(--t-g-green) 100%); } .dst .dst-eyebrow-logo::before { display:none; } .dst .dst-google-logo { width:28px; height:28px; object-fit:contain; flex-shrink:0; } .dst .dst-n::before { content:counter(sec,decimal-leading-zero); font-family:var(--t-font-mono); font-size:11px; letter-spacing:.06em; color:var(--t-accent); padding-right:12px; margin-right:2px; border-right:1px solid var(--t-border); } .dst .dst-band .dst-eyebrow { color:var(--t-on-dark-dim); } .dst .dst-band .dst-eyebrow::before { width:56px; height:4px; }
-      .dst .dst-masthead { padding-top:88px; } .dst .dst-standfirst { font-size:22px; font-weight:300; line-height:1.6; color:var(--t-ink-dim); max-width:60ch; margin:0 0 36px; } .dst .dst-byline { font-size:12px; letter-spacing:.02em; color:var(--t-ink-faint); border-top:1px solid var(--t-rule); padding-top:16px; margin:0; } .dst .dst-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:0 0 36px; }
-      .dst .dst-hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:56px; align-items:center; } .dst .dst-hero-num,.dst .dst-hero-note { min-width:0; } .dst .dst-hero-label { font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--t-accent-lt); margin:0 0 8px; } .dst .dst-hero-rule { width:72px; height:4px; border-radius:2px; background:var(--t-accent-lt); margin:28px 0 0; }
-      .dst .dst-split { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:48px; align-items:center; } .dst .dst-split.is-flip { grid-template-columns:minmax(0,2fr) minmax(0,1fr); } .dst .dst-figure { min-height:340px; background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px; min-width:0; transition:box-shadow .2s,transform .2s; } .dst .dst-figure:hover,.dst .dst-stat:hover { box-shadow:var(--t-shadow-2); transform:translateY(-2px); } .dst .dst-figure.is-wide { min-height:400px; } .dst .dst-figure.is-table { min-height:300px; } .dst .dst-caption { font-size:13px; color:var(--t-ink-dim); margin:18px 0 0; padding-left:2px; max-width:80ch; }
-      .dst .dst-pull { border-left:4px solid var(--t-accent); padding-left:32px; max-width:48ch; } .dst .dst-pull-wrap { max-width:60ch; } .dst .dst-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; } .dst .dst-stat { background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px 24px 28px; min-height:138px; min-width:0; border-top:3px solid var(--t-accent); transition:box-shadow .2s,transform .2s; } .dst .dst-stat:nth-child(1) { border-top-color:var(--t-g-blue); } .dst .dst-stat:nth-child(2) { border-top-color:var(--t-g-red); } .dst .dst-stat:nth-child(3) { border-top-color:var(--t-g-yellow); } .dst .dst-source { font-size:12px; color:var(--t-on-dark-dim); border-top:1px solid var(--t-dark-line); padding-top:18px; margin-top:36px; }
-      .dst .dst-copy .dac-text-block,.dst .dst-copy .dac-text-block p,.dst .dst-copy .dac-text-block li { font-family:var(--t-font-sans)!important; font-size:16px!important; line-height:1.75!important; color:var(--t-ink-dim)!important; } .dst .dst-copy .dac-text-block h1,.dst .dst-copy .dac-text-block h2,.dst .dst-copy .dac-text-block h3 { font-family:var(--t-font-display)!important; font-size:30px!important; font-weight:400!important; line-height:1.25!important; letter-spacing:-.01em!important; color:var(--t-ink)!important; margin:0 0 16px!important; } .dst .dst-display .dac-text-block,.dst .dst-display .dac-text-block p,.dst .dst-display .dac-text-block h1,.dst .dst-display .dac-text-block h2 { font-family:var(--t-font-display)!important; font-size:clamp(34px,4.6vw,60px)!important; line-height:1.1!important; letter-spacing:-.02em!important; font-weight:400!important; color:var(--t-ink)!important; margin:0 0 28px!important; max-width:22ch; } .dst .dst-pull .dac-text-block,.dst .dst-pull .dac-text-block p { font-family:var(--t-font-display)!important; font-size:clamp(24px,2.8vw,34px)!important; line-height:1.4!important; font-weight:300!important; color:var(--t-ink)!important; margin:0!important; } .dst .dst-band .dst-copy .dac-text-block,.dst .dst-band .dst-copy .dac-text-block p,.dst .dst-band .dst-copy .dac-text-block h1,.dst .dst-band .dst-copy .dac-text-block h2,.dst .dst-band .dst-copy .dac-text-block h3 { color:var(--t-on-dark)!important; } .dst .dst-hero-note .dac-text-block,.dst .dst-hero-note .dac-text-block p { font-size:18px!important; font-weight:300!important; line-height:1.7!important; color:var(--t-on-dark-dim)!important; } .dst .dst-hero-num .h-kpi-metric-kpi,.dst .dst-hero-num .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:clamp(44px,6.4vw,92px)!important; line-height:1.05!important; letter-spacing:-.035em!important; font-weight:400!important; color:var(--t-on-dark)!important; background:transparent!important; white-space:normal!important; overflow:visible!important; text-overflow:clip!important; max-width:none!important; } .dst .dst-stat .h-kpi-metric-kpi,.dst .dst-stat .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:38px!important; font-weight:400!important; letter-spacing:-.02em!important; line-height:1.1!important; color:var(--t-ink)!important; } .dst .dst-stat .dac-ic-block-label,.dst .dst-figure .dac-ic-block-label { font-size:12px!important; font-weight:500!important; letter-spacing:.1em!important; text-transform:uppercase!important; color:var(--t-ink-dim)!important; } .dst .dst-hero-num .dac-ic-block-label { display:none!important; }
-      @media (max-width:860px) { .dst .dst-sec { padding:48px 20px; } .dst .dst-masthead { padding-top:56px; } .dst .dst-controls,.dst .dst-hero,.dst .dst-split,.dst .dst-split.is-flip { grid-template-columns:minmax(0,1fr); gap:32px; } }
-    ;;
+    dark {
+      block {
+        label {
+          font_family: 'Roboto, Arial, sans-serif'
+          font_color: '#202124'
+          font_size: 14
+          font_weight: 'medium'
+        }
+        text {
+          font_family: 'Roboto, Arial, sans-serif'
+          font_color: '#5F6368'
+          font_size: 14
+          font_weight: 'normal'
+        }
+        border {
+          border_width: 0
+          border_radius: 12
+          border_color: '#DADCE0'
+          border_style: 'none'
+        }
+        background {
+          bg_color: 'transparent'
+        }
+        padding: 0
+        shadow: 'none'
+        opacity: 1
+      }
+      custom_css: @css .dac-text-block { font-family: Roboto, Arial, sans-serif; font-size: 14px; color: #5F6368; line-height: 1.6; }
+.dst, .dst *, .dst *::before, .dst *::after { box-sizing: border-box; }
+.dst { --t-bg:#FFFFFF; --t-surface:#F8F9FA; --t-border:#DADCE0; --t-rule:#BDC1C6; --t-ink:#202124; --t-ink-dim:#5F6368; --t-ink-faint:#80868B; --t-accent:#1A73E8; --t-accent-lt:#8AB4F8; --t-dark:#202124; --t-dark-line:#3C4043; --t-on-dark:#E8EAED; --t-on-dark-dim:#9AA0A6; --t-g-blue:#1A73E8; --t-g-red:#EA4335; --t-g-yellow:#FBBC04; --t-g-green:#34A853; --t-glow:rgba(26,115,232,.28); --t-shadow-1:0 1px 2px 0 rgba(60,64,67,.20),0 1px 3px 1px rgba(60,64,67,.10); --t-shadow-2:0 2px 6px 2px rgba(60,64,67,.12),0 1px 2px 0 rgba(60,64,67,.24); --t-radius:12px; --t-pad:32px; --t-font-sans:Roboto,Arial,sans-serif; --t-font-display:Roboto,Arial,sans-serif; --t-font-mono:"Roboto Mono",ui-monospace,monospace; --t-page-w:1200px; display:block; background:var(--t-bg); color:var(--t-ink); font-family:var(--t-font-sans); line-height:1.6; counter-reset:sec; -webkit-font-smoothing:antialiased; }
+.dst .dst-sec { position:relative; max-width:var(--t-page-w); margin:0 auto; padding:72px var(--t-pad); } .dst .dst-sec.is-flush { padding-top:0; } .dst .dst-band { background:var(--t-dark); background-image:radial-gradient(60% 90% at 78% 15%,var(--t-glow),transparent 70%); color:var(--t-on-dark); } .dst .dst-tint { background:var(--t-surface); border-top:1px solid var(--t-border); border-bottom:1px solid var(--t-border); } .dst .dst-sec:not(.is-unnumbered) { counter-increment:sec; }
+.dst .dst-eyebrow { font-family:var(--t-font-sans); font-size:11px; font-weight:500; letter-spacing:.16em; text-transform:uppercase; color:var(--t-ink-dim); display:flex; align-items:center; gap:14px; margin:0 0 24px; } .dst .dst-eyebrow::before { content:""; width:32px; height:3px; border-radius:2px; flex-shrink:0; background:linear-gradient(to right,var(--t-g-blue) 0%,var(--t-g-blue) 25%,var(--t-g-red) 25%,var(--t-g-red) 50%,var(--t-g-yellow) 50%,var(--t-g-yellow) 75%,var(--t-g-green) 75%,var(--t-g-green) 100%); } .dst .dst-eyebrow-logo::before { display:none; } .dst .dst-google-logo { width:28px; height:28px; object-fit:contain; flex-shrink:0; } .dst .dst-n::before { content:counter(sec,decimal-leading-zero); font-family:var(--t-font-mono); font-size:11px; letter-spacing:.06em; color:var(--t-accent); padding-right:12px; margin-right:2px; border-right:1px solid var(--t-border); } .dst .dst-band .dst-eyebrow { color:var(--t-on-dark-dim); } .dst .dst-band .dst-eyebrow::before { width:56px; height:4px; }
+.dst .dst-masthead { padding-top:88px; } .dst .dst-standfirst { font-size:22px; font-weight:300; line-height:1.6; color:var(--t-ink-dim); max-width:60ch; margin:0 0 36px; } .dst .dst-byline { font-size:12px; letter-spacing:.02em; color:var(--t-ink-faint); border-top:1px solid var(--t-rule); padding-top:16px; margin:0; } .dst .dst-controls { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin:0 0 36px; }
+.dst .dst-hero { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:56px; align-items:center; } .dst .dst-hero-num,.dst .dst-hero-note { min-width:0; } .dst .dst-hero-label { font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--t-accent-lt); margin:0 0 8px; } .dst .dst-hero-rule { width:72px; height:4px; border-radius:2px; background:var(--t-accent-lt); margin:28px 0 0; }
+.dst .dst-split { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,2fr); gap:48px; align-items:center; } .dst .dst-split.is-flip { grid-template-columns:minmax(0,2fr) minmax(0,1fr); } .dst .dst-figure { min-height:340px; background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px; min-width:0; transition:box-shadow .2s,transform .2s; } .dst .dst-figure:hover,.dst .dst-stat:hover { box-shadow:var(--t-shadow-2); transform:translateY(-2px); } .dst .dst-figure.is-wide { min-height:400px; } .dst .dst-figure.is-table { min-height:300px; } .dst .dst-caption { font-size:13px; color:var(--t-ink-dim); margin:18px 0 0; padding-left:2px; max-width:80ch; }
+.dst .dst-pull { border-left:4px solid var(--t-accent); padding-left:32px; max-width:48ch; } .dst .dst-pull-wrap { max-width:60ch; } .dst .dst-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; } .dst .dst-stat { background:var(--t-bg); border-radius:var(--t-radius); box-shadow:var(--t-shadow-1); padding:24px 24px 28px; min-height:138px; min-width:0; border-top:3px solid var(--t-accent); transition:box-shadow .2s,transform .2s; } .dst .dst-stat:nth-child(1) { border-top-color:var(--t-g-blue); } .dst .dst-stat:nth-child(2) { border-top-color:var(--t-g-red); } .dst .dst-stat:nth-child(3) { border-top-color:var(--t-g-yellow); } .dst .dst-source { font-size:12px; color:var(--t-on-dark-dim); border-top:1px solid var(--t-dark-line); padding-top:18px; margin-top:36px; }
+.dst .dst-copy .dac-text-block,.dst .dst-copy .dac-text-block p,.dst .dst-copy .dac-text-block li { font-family:var(--t-font-sans)!important; font-size:16px!important; line-height:1.75!important; color:var(--t-ink-dim)!important; } .dst .dst-copy .dac-text-block h1,.dst .dst-copy .dac-text-block h2,.dst .dst-copy .dac-text-block h3 { font-family:var(--t-font-display)!important; font-size:30px!important; font-weight:400!important; line-height:1.25!important; letter-spacing:-.01em!important; color:var(--t-ink)!important; margin:0 0 16px!important; } .dst .dst-display .dac-text-block,.dst .dst-display .dac-text-block p,.dst .dst-display .dac-text-block h1,.dst .dst-display .dac-text-block h2 { font-family:var(--t-font-display)!important; font-size:clamp(34px,4.6vw,60px)!important; line-height:1.1!important; letter-spacing:-.02em!important; font-weight:400!important; color:var(--t-ink)!important; margin:0 0 28px!important; max-width:22ch; } .dst .dst-pull .dac-text-block,.dst .dst-pull .dac-text-block p { font-family:var(--t-font-display)!important; font-size:clamp(24px,2.8vw,34px)!important; line-height:1.4!important; font-weight:300!important; color:var(--t-ink)!important; margin:0!important; } .dst .dst-band .dst-copy .dac-text-block,.dst .dst-band .dst-copy .dac-text-block p,.dst .dst-band .dst-copy .dac-text-block h1,.dst .dst-band .dst-copy .dac-text-block h2,.dst .dst-band .dst-copy .dac-text-block h3 { color:var(--t-on-dark)!important; } .dst .dst-hero-note .dac-text-block,.dst .dst-hero-note .dac-text-block p { font-size:18px!important; font-weight:300!important; line-height:1.7!important; color:var(--t-on-dark-dim)!important; } .dst .dst-hero-num .h-kpi-metric-kpi,.dst .dst-hero-num .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:clamp(44px,6.4vw,92px)!important; line-height:1.05!important; letter-spacing:-.035em!important; font-weight:400!important; color:var(--t-on-dark)!important; background:transparent!important; white-space:normal!important; overflow:visible!important; text-overflow:clip!important; max-width:none!important; } .dst .dst-stat .h-kpi-metric-kpi,.dst .dst-stat .h-kpi-metric-kpi * { font-family:var(--t-font-display)!important; font-size:38px!important; font-weight:400!important; letter-spacing:-.02em!important; line-height:1.1!important; color:var(--t-ink)!important; } .dst .dst-stat .dac-ic-block-label,.dst .dst-figure .dac-ic-block-label { font-size:12px!important; font-weight:500!important; letter-spacing:.1em!important; text-transform:uppercase!important; color:var(--t-ink-dim)!important; } .dst .dst-hero-num .dac-ic-block-label { display:none!important; }
+@media (max-width:860px) { .dst .dst-sec { padding:48px 20px; } .dst .dst-masthead { padding-top:56px; } .dst .dst-controls,.dst .dst-hero,.dst .dst-split,.dst .dst-split.is-flip { grid-template-columns:minmax(0,1fr); gap:32px; } };;
+      viz {
+        table {
+          general {
+            bg_color: '#FFFFFF'
+            hover_color: '#F8F9FA'
+            banding_color: '#FCFCFD'
+            font_size: 13
+            font_color: '#5F6368'
+            font_family: 'Roboto, Arial, sans-serif'
+            border_color: '#DADCE0'
+            border_width: 1
+            grid_color: '#DADCE0'
+          }
+          header {
+            bg_color: '#FFFFFF'
+            font_size: 12
+            font_weight: 'medium'
+            font_color: '#5F6368'
+          }
+          sub_header {
+            bg_color: '#F8F9FA'
+            font_size: 13
+            font_weight: 'medium'
+            font_color: '#202124'
+          }
+        }
+        metric_kpi {
+          label {
+            font_family: 'Roboto, Arial, sans-serif'
+            font_color: '#5F6368'
+            font_size: 13
+          }
+          value {
+            font_family: 'Roboto, Arial, sans-serif'
+            font_color: '#202124'
+            font_size: 40
+          }
+          trend {
+            positive {
+              text {
+                font_color: '#188038'
+              }
+              background {
+                bg_color: '#E6F4EA'
+              }
+            }
+            negative {
+              text {
+                font_color: '#D93025'
+              }
+              background {
+                bg_color: '#FCE8E6'
+              }
+            }
+            neutral {
+              text {
+                font_color: '#5F6368'
+              }
+              background {
+                bg_color: '#F8F9FA'
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
-  block t_headline: TextBlock { content: @md 2025 ecommerce scale more than doubled — but order quality needs attention. ;; }
-  block t_hero_note: TextBlock { content: @md Gross merchandise value reached $3,784,847 in 2025, up 124.4% from $1,686,827 in 2024. This is gross item value — it includes every order status, not only delivered orders. ;; }
-  block t_sec_1: TextBlock { content: @md ### Growth accelerated through year end
-2025 began at $322,770 in monthly gross merchandise value and ended at its $510,704 December peak. The period was complete across all 12 calendar months, making the full-year comparison dependable. ;; }
-  block t_pull: TextBlock { content: @md Buyer-led scale lifted 2025 gross merchandise value 124.4%, while 3,266 of 10,934 orders (29.8%) were cancelled or refunded. ;; }
-  block t_sec_3: TextBlock { content: @md ### Growth was broad, not concentrated in one market
-Nineteen categories and 10 buyer countries generated 2025 activity. Body was the leading category at $357,609, while the United States led countries at $434,102. ;; }
-  block t_close: TextBlock { content: @md ### Keep growth and execution quality together
-Use gross merchandise value to monitor marketplace demand and scale, but do not treat it as realized revenue. Track the cancelled and refunded share alongside the headline until a status-excluding metric is available. ;; }
+  block t_headline: TextBlock {
+    content: @md 2025 ecommerce scale more than doubled — but order quality needs attention. ;;
+  }
+  block t_hero_note: TextBlock {
+    content: @md Gross merchandise value reached $3,784,847 in 2025, up 124.4% from $1,686,827 in 2024. This is gross item value — it includes every order status, not only delivered orders. ;;
+  }
+  block t_sec_1: TextBlock {
+    content: @md ### Growth accelerated through year end
+2025 began at $322,770 in monthly gross merchandise value and ended at its $510,704 December peak. The period was complete across all 12 calendar months, making the full-year comparison dependable. ;;
+  }
+  block t_pull: TextBlock {
+    content: @md Buyer-led scale lifted 2025 gross merchandise value 124.4%, while 3,266 of 10,934 orders (29.8%) were cancelled or refunded. ;;
+  }
+  block t_sec_3: TextBlock {
+    content: @md ### Growth was broad, not concentrated in one market
+Nineteen categories and 10 buyer countries generated 2025 activity. Body was the leading category at $357,609, while the United States led countries at $434,102. ;;
+  }
+  block t_close: TextBlock {
+    content: @md ### Keep growth and execution quality together
+Use gross merchandise value to monitor marketplace demand and scale, but do not treat it as realized revenue. Track the cancelled and refunded share alongside the headline until a status-excluding metric is available. ;;
+  }
 
   block f_date: FilterBlock {
     label: 'Order date — 2025 default'
@@ -76,11 +256,15 @@ Use gross merchandise value to monitor marketplace demand and scale, but do not 
       field: r(countries.name)
     }
   }
-  block c_pop: PopBlock { label: 'Period comparison' }
+  block c_pop: PopBlock {
+    label: 'Period comparison'
+  }
 
   block k_hero: VizBlock {
     label: 'Gross merchandise value'
-    settings { hide_label: true }
+    settings {
+      hide_label: true
+    }
     viz: MetricKpi {
       dataset: ecommerce_official
       value: r(ecommerce_official.revenue)
@@ -88,7 +272,9 @@ Use gross merchandise value to monitor marketplace demand and scale, but do not 
   }
   block k_stat_1: VizBlock {
     label: 'Distinct orders'
-    settings { hide_label: true }
+    settings {
+      hide_label: true
+    }
     viz: MetricKpi {
       dataset: ecommerce_official
       calculation distinct_orders {
@@ -100,14 +286,22 @@ Use gross merchandise value to monitor marketplace demand and scale, but do not 
       value: VizFieldFull {
         ref: 'distinct_orders'
         label: 'Distinct Orders'
-        format { type: 'number' pattern: '#,###0' }
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
       }
-      settings { display_mode: 'single' alignment: 'center' }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
     }
   }
   block k_stat_2: VizBlock {
     label: 'Distinct buying users'
-    settings { hide_label: true }
+    settings {
+      hide_label: true
+    }
     viz: MetricKpi {
       dataset: ecommerce_official
       calculation distinct_buying_users {
@@ -119,9 +313,15 @@ Use gross merchandise value to monitor marketplace demand and scale, but do not 
       value: VizFieldFull {
         ref: 'distinct_buying_users'
         label: 'Distinct Buying Users'
-        format { type: 'number' pattern: '#,###0' }
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
       }
-      settings { display_mode: 'single' alignment: 'center' }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
     }
   }
   block k_stat_3: TextBlock {
@@ -139,7 +339,10 @@ Cancelled or refunded orders in 2025 (3,266 of 10,934).
         ref: r(orders.created_at)
         label: 'Order Month'
         transformation: 'datetrunc month'
-        format { type: 'date' pattern: 'LLL yyyy' }
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
       }
       y_axis {
         series {
@@ -147,25 +350,52 @@ Cancelled or refunded orders in 2025 (3,266 of 10,934).
           field: VizFieldFull {
             ref: r(ecommerce_official.revenue)
             label: 'Revenue'
-            format { type: 'number' pattern: '[$$]#,###0.00' }
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
           }
         }
       }
-      settings { sort: LineFamilySort { type: 'xaxis' direction: 'asc' } }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
     }
   }
   block v_sec_2: VizBlock {
     label: 'Gross merchandise value by category'
     viz: CombinationChart {
       dataset: ecommerce_official
-      x_axis: VizFieldFull { ref: r(categories.name) label: 'Category' format { type: 'text' } }
+      x_axis: VizFieldFull {
+        ref: r(categories.name)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
       y_axis {
         series {
           mark_type: 'bar'
-          field: VizFieldFull { ref: r(ecommerce_official.revenue) label: 'Gross merchandise value' format { type: 'number' pattern: '[$$]#,###0.00' } }
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Gross merchandise value'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
         }
       }
-      settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
     }
   }
   block v_sec_3: VizBlock {
@@ -173,7 +403,11 @@ Cancelled or refunded orders in 2025 (3,266 of 10,934).
     viz: CombinationChart {
       dataset: ecommerce_official
       x_axis: r(countries.name)
-      y_axis { series { field: r(ecommerce_official.revenue) } }
+      y_axis {
+        series {
+          field: r(ecommerce_official.revenue)
+        }
+      }
     }
   }
   block v_table: VizBlock {
@@ -181,13 +415,45 @@ Cancelled or refunded orders in 2025 (3,266 of 10,934).
     viz: DataTable {
       dataset: ecommerce_official
       fields: [
-        VizFieldFull { ref: r(categories.name) format { type: 'text' } },
-        VizFieldFull { ref: r(merchants.name) format { type: 'text' } },
-        VizFieldFull { ref: r(ecommerce_official.revenue) format { type: 'number' pattern: 'inherited' } },
-        VizFieldFull { ref: r(order_items.quantity) aggregation: 'sum' format { type: 'number' pattern: 'inherited' } },
-        VizFieldFull { ref: r(order_items.order_id) aggregation: 'count distinct' format { type: 'number' pattern: 'inherited' } }
+        VizFieldFull {
+          ref: r(categories.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(merchants.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(order_items.quantity)
+          aggregation: 'sum'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(order_items.order_id)
+          aggregation: 'count distinct'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
       ]
-      settings { show_row_number: true }
+      settings {
+        show_row_number: true
+      }
     }
   }
 
@@ -195,21 +461,61 @@ Cancelled or refunded orders in 2025 (3,266 of 10,934).
     FilterInteraction {
       from: 'f_date'
       to: [
-        CustomMapping { block: ['k_hero', 'k_stat_1', 'k_stat_2', 'v_sec_1', 'v_sec_2', 'v_sec_3', 'v_table'] field: r(orders.created_at) },
-        CustomMapping { block: ['f_country'] disabled: true }
+        CustomMapping {
+          block: [
+            'k_hero',
+            'k_stat_1',
+            'k_stat_2',
+            'v_sec_1',
+            'v_sec_2',
+            'v_sec_3',
+            'v_table'
+          ]
+          field: r(orders.created_at)
+        },
+        CustomMapping {
+          block: [
+            'f_country'
+          ]
+          disabled: true
+        }
       ]
     },
     FilterInteraction {
       from: 'f_country'
       to: [
-        CustomMapping { block: ['k_hero', 'k_stat_1', 'k_stat_2', 'v_sec_1', 'v_sec_2', 'v_sec_3', 'v_table'] field: r(countries.name) },
-        CustomMapping { block: ['f_date'] disabled: true }
+        CustomMapping {
+          block: [
+            'k_hero',
+            'k_stat_1',
+            'k_stat_2',
+            'v_sec_1',
+            'v_sec_2',
+            'v_sec_3',
+            'v_table'
+          ]
+          field: r(countries.name)
+        },
+        CustomMapping {
+          block: [
+            'f_date'
+          ]
+          disabled: true
+        }
       ]
     },
     PopInteraction {
       from: 'c_pop'
       to: [
-        CustomMapping { block: ['k_hero', 'k_stat_1', 'k_stat_2', 'v_sec_1'] field: r(orders.created_at) }
+        CustomMapping {
+          block: [
+            'k_hero',
+            'k_stat_1',
+            'k_stat_2',
+            'v_sec_1'
+          ]
+          field: r(orders.created_at)
+        }
       ]
     }
   ]

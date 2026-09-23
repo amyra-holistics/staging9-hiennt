@@ -359,5 +359,8 @@ Dashboard sales_performance_fy2026 {
       mode: 'auto'
     }
   }
-  theme: ghibli_meadow
+  theme: DynamicPageTheme {
+    light: ghibli_meadow
+    dark: forest
+  }
 }

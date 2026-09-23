@@ -51,6 +51,13 @@ Dashboard test_2 {
           format {
             type: 'text'
           }
+        },
+        VizFieldFull {
+          ref: r(homestay_hosts.total_listings_count)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
         }
       ]
       settings {
@@ -125,7 +132,8 @@ Dashboard test_2 {
         VizFieldFull {
           ref: r(homestay_hosts.location)
           format {
-            type: 'text'
+            type: 'number'
+            pattern: 'inherit'
           }
         },
         VizFieldFull {
@@ -166,11 +174,11 @@ Dashboard test_2 {
       mode: 'auto'
     }
   }
-
   theme: DynamicPageTheme {
-    light: H.themes.vanilla
-    dark: H.themes.charcoal
+    light: ghibli_meadow
+    dark: forest
   }
+
   interactions: [
     FilterInteraction {
       from: 'f_hosts_location'

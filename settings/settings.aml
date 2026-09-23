@@ -3,7 +3,6 @@ ProjectSettings project_settings {
     default_write_schema: "persisted"
   }
   viz {
-    default_color_palette: purple_pink_palette
+    default_color_palette: ikea_local_palette
   }
-}  //   default_schema: 'public'
-  // }
+}

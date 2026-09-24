@@ -1,14 +1,14 @@
 AiTask qa_r3_e6_slack_no_app {
   label: 'QA R3 E6 Slack channel without the app'
-  description: 'QA test 2026-09-24 round 3 (nhi.ty), delete after test: scheduled Slack post to a channel the Holistics app is not in.'
+  description: 'QA test 2026-09-24 round 3 (nhi.ty), delete after test: scheduled Slack post to a channel that does not exist.'
 
   brief: @md
 Using the Ecommerce Official dataset and its Revenue metric, compute total Revenue for August 2026 (by order created date).
 
-Then post ONE Slack message to the channel #nhity-test with the text "[QA R3 E6] August 2026 revenue: <value>". Do not post to any other channel and do not send any email.
+Then post ONE Slack message to the channel #qa-r3-no-such-channel with the text "[QA R3 E6b] August 2026 revenue: <value>". Do not post to any other channel and do not send any email.
 ;;
 
   acceptance_criteria: @md
-A Slack message starting with "[QA R3 E6]" was posted to #nhity-test, stating the August 2026 revenue.
+A Slack message starting with "[QA R3 E6b]" was posted to #qa-r3-no-such-channel, stating the August 2026 revenue.
 ;;
 }

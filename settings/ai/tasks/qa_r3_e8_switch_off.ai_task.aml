@@ -1,0 +1,14 @@
+AiTask qa_r3_e8_switch_off {
+  label: 'QA R3 E8 delivery switched off'
+  description: 'QA test 2026-09-24 round 3 (nhi.ty), delete after test: scheduled email while AI delivery is switched off for the tenant.'
+
+  brief: @md
+Using the Ecommerce Official dataset and its Revenue metric, compute total Revenue for August 2026 and for July 2026 (by order created date).
+
+Then send ONE email to nhi.ty@holistics.io with the subject "[QA R3 E8] August vs July 2026 revenue" and a two-sentence body stating the August 2026 revenue and the July 2026 revenue. Do not send anything else.
+;;
+
+  acceptance_criteria: @md
+An email with the subject "[QA R3 E8] August vs July 2026 revenue" was delivered to nhi.ty@holistics.io, stating the August 2026 and July 2026 revenue.
+;;
+}

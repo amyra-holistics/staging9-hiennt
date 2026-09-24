@@ -1,0 +1,7 @@
+const schedules = [
+  AiSchedule {
+    cron: '0 9 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [daily_homestay_performance_summary]
+  }
+]

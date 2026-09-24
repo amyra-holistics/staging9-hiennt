@@ -1,0 +1,23 @@
+AiTask daily_homestay_performance_summary {
+  label: 'Daily Homestay Performance Summary'
+  description: 'Creates a concise, data-grounded daily summary of the Homestay Performance Statement dashboard. The result is retained in the AI Task run record for review; this task does not send or claim to deliver messages.'
+  brief: @md
+    Review @Dashboard:homestay_performance_statement using its current dashboard data and write a concise daily homestay performance summary.
+
+    Use emoji-led bullets and include only observations supported by the dashboard's current results. Cover all of the following:
+    - Portfolio KPIs: total listings, booking count, total booked nights, and average listing price.
+    - Booking cadence: the latest available check-in month and the booking pattern in the monthly booking series; identify a comparison only when the relevant current dashboard values support it.
+    - Reservation status: booking counts and the dominant status.
+    - Room type mix: booking counts by room type and the leading room type.
+    - Neighbourhood market coverage: number of neighbourhoods represented, the highest listing-count neighbourhood(s), and noteworthy average-price observations when supported by the dashboard.
+
+    Keep the narrative decision-ready and compact. Clearly distinguish observed facts from any cautious interpretation. Do not invent data, assume a reporting date, use stale results, or claim that this task sends email, Slack, or any other message. The task output is retained in its run record for review.
+  ;;
+  acceptance_criteria: @md
+    - The output is a concise, scannable set of emoji-led bullets grounded in the current results of @Dashboard:homestay_performance_statement.
+    - It reports all four portfolio KPIs: total listings, booking count, total booked nights, and average listing price.
+    - It includes evidence-based observations for booking cadence, reservation-status mix, room-type mix, and neighbourhood market coverage, including the relevant counts or values available in the dashboard.
+    - It identifies the dominant reservation status and leading room type from current dashboard data, and does not make an unsupported period-over-period comparison or causal claim.
+    - It contains no invented values, no stale-data assertion, and no claim to deliver via email, Slack, or another channel; it states that the output is retained in the task run record for review.
+  ;;
+}

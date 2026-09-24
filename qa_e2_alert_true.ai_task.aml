@@ -1,0 +1,18 @@
+AiTask qa_e2_alert_true {
+  label: 'QA E2a conditional Slack alert (condition met)'
+  description: 'QA test 2026-09-24, delete after test: conditional alert, expected to send.'
+
+  brief: @md
+Using the Ecommerce Official dataset, count the distinct orders created yesterday (the full previous calendar day).
+
+If yesterday had FEWER than 120 orders, post a short alert to the Slack channel #hoa. Start the message with "[QA E2a]", then give yesterday's date, the order count, the threshold (120), and the top 3 countries by order count yesterday.
+
+If yesterday had 120 orders or more, do not send anything.
+
+In your final answer, state the date you checked, the order count, and whether you sent the alert.
+;;
+
+  acceptance_criteria: @md
+The order count for yesterday is correct. An alert starting with "[QA E2a]" was posted to #hoa only if the count was below 120; otherwise nothing was sent. The final answer states the date, the count and the decision.
+;;
+}

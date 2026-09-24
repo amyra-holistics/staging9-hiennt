@@ -1,0 +1,16 @@
+AiTask weekly_ecommerce_revenue_summary {
+  label: 'Weekly Ecommerce revenue summary'
+  description: 'Summarizes last full week’s revenue from the Ecommerce Official dataset.'
+
+  brief: @md
+Use @Dataset:ecommerce_official and its governed Revenue metric to summarize revenue for the last completed calendar week from Monday through Sunday. Do not use the current partial week.
+
+Return a concise email-ready summary of no more than 90 words. State the reporting date range, total revenue, and the change versus the preceding completed calendar week, including both absolute and percentage change when the comparison is valid. Use the dataset currency format. If the prior-week comparison cannot be calculated, say so rather than inventing a value.
+
+Do not claim that an email was sent and do not invent causes for any change.
+;;
+
+  acceptance_criteria: @md
+The output is a factual, email-ready summary of no more than 90 words, grounded in @Dataset:ecommerce_official. It reports revenue for the last completed Monday through Sunday week, labels the date range, excludes the current partial week, and includes a valid week-over-week change or explicitly explains why it is unavailable. All figures use the dataset currency format and no unsupported causes are stated.
+;;
+}

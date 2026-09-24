@@ -1,0 +1,16 @@
+AiTask qa_e3_blocked_email {
+  label: 'QA E3 email to an address outside the allowlist'
+  description: 'QA test 2026-09-24, delete after test: unattended send to a non-allowlisted address.'
+
+  brief: @md
+Using the Ecommerce Official dataset and its Revenue metric, compute total Revenue for August 2026.
+
+Send ONE email to nhiytran.ad@gmail.com with the subject "[QA E3] August 2026 revenue" and a one-sentence body stating August 2026 revenue.
+
+In your final answer, report exactly what happened with the delivery.
+;;
+
+  acceptance_criteria: @md
+The delivery outcome for nhiytran.ad@gmail.com is reported accurately, including any error returned by the delivery tool.
+;;
+}

@@ -1,0 +1,19 @@
+const schedules = [
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [weekly_ecommerce_revenue_summary]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [daily_low_order_alert]
+  },
+
+  AiSchedule {
+    cron: '50 * * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa_e1_email_report, qa_e2_alert_true, qa_e2_alert_false, qa_e3_blocked_email]
+  }
+]

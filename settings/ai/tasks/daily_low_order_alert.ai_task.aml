@@ -1,0 +1,22 @@
+AiTask daily_low_order_alert {
+  label: 'Daily low-order alert'
+  description: 'Checks yesterday’s order volume and prepares a Slack-ready alert only when it falls below the threshold.'
+
+  brief: @md
+Use @Dataset:ecommerce_official to evaluate the full calendar day yesterday in the workspace timezone. Filter orders by `orders.created_at` to yesterday only and count distinct `orders.id`.
+
+Also calculate the top three countries for yesterday, ranked by descending distinct order count, using `countries.name`. Include each country name and its distinct order count. If fewer than three countries have orders, return all countries with orders and say fewer than three were available.
+
+Decision rule:
+- If yesterday’s distinct order count is below 120, prepare a concise Slack-ready low-order alert addressed to `#hoa`. Include the reporting date, the distinct order count, the threshold of 120, and the top three countries by order count.
+- If yesterday’s distinct order count is 120 or greater, respond exactly that no alert is required, while still stating the reporting date and distinct order count.
+
+Direct AI Task-to-Slack delivery is currently unsupported. Prepare the wording for `#hoa` only; do not claim that an alert was posted, sent, or delivered.
+;;
+
+  acceptance_criteria: @md
+The result is grounded in @Dataset:ecommerce_official and evaluates exactly yesterday’s full calendar day in the workspace timezone. It counts distinct `orders.id`, not order rows, and identifies up to three `countries.name` values ranked by descending distinct order count.
+
+When the distinct order count is below 120, the result contains a concise Slack-ready alert for `#hoa` that includes the reporting date, actual count, threshold 120, and country ranking, while explicitly not claiming delivery. When the count is 120 or above, it states that no alert is required and includes the reporting date and actual count. No unsupported causes or delivery claims are included.
+;;
+}

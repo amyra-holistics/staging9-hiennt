@@ -1,0 +1,23 @@
+AiTask qa5_t03_low_order_count {
+  label: 'QA5 T03 Low Yesterday Order Count'
+  description: 'Checks @Dataset:ecommerce_official for yesterday’s order count and emails nhi.ty@holistics.io only when it is below 105 orders.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query for the full calendar day immediately preceding the task run date, using the workspace timezone.
+
+    Count distinct orders using `orders.id`, and calculate yesterday's `revenue` using the dataset's defined Revenue metric for the same date range.
+
+    If yesterday's order count is strictly fewer than **105**, send exactly one concise email through the available AI delivery capability to **nhi.ty@holistics.io**. The email subject must begin exactly with **[QA5 T03]**. Include the reporting date, the order count, and yesterday's revenue formatted as USD.
+
+    If yesterday's order count is **105 or more**, do not send an email or any other delivery. Do not infer causes or make unsupported claims.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official covers exactly the full calendar day immediately preceding the task run date, in the workspace timezone.
+    - The query counts distinct orders using `orders.id` and calculates the dataset-defined Revenue metric for that same date range.
+    - If the order count is fewer than 105, exactly one email is delivered to nhi.ty@holistics.io through the available AI delivery capability.
+    - The email subject begins exactly with [QA5 T03] and includes the reporting date, the order count, and revenue formatted as USD.
+    - If the order count is 105 or more, no email or other delivery is sent.
+    - All reported information is grounded in the fresh query result, with no invented data or unsupported claims.
+  ;;
+}

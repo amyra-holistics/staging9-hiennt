@@ -1,0 +1,26 @@
+AiTask qa5_t04_country_wow {
+  label: 'QA5 T04 Weekly Country Revenue Change'
+  description: 'Compares last week’s revenue by country with the preceding week and posts only material changes to #nhity-test.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query in the workspace timezone that calculates the dataset-defined `revenue` metric by `countries.name` for two complete, consecutive calendar weeks:
+    - Last week: the most recently completed Monday–Sunday week immediately before the task run date.
+    - Prior week: the complete Monday–Sunday week immediately before last week.
+
+    Include countries that have revenue in either comparison week. For each country, calculate the percentage change as `(last week revenue - prior week revenue) / prior week revenue` when prior-week revenue is non-zero. When prior-week revenue is zero, do not calculate a percentage change or flag the country based on percentage change.
+
+    Identify every country whose calculated revenue percentage change is strictly greater than **30%** or strictly less than **-30%**. If one or more countries are flagged, send exactly one concise Slack message through the available AI delivery capability to **#nhity-test**. The message must begin exactly with **[QA5 T04]** and list each flagged country with its last-week revenue, prior-week revenue, and percentage change. Format revenue as USD and percentage change as a percentage.
+
+    If no country has an absolute revenue percentage change greater than 30%, do not send a Slack message or any other delivery. Do not infer causes or make unsupported claims.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official compares the two most recently completed, consecutive Monday–Sunday calendar weeks in the workspace timezone.
+    - The query calculates the dataset-defined Revenue metric by `countries.name` for both comparison weeks, including countries with revenue in either week.
+    - Percentage change is calculated as `(last week revenue - prior week revenue) / prior week revenue` only where prior-week revenue is non-zero.
+    - Every and only country with a percentage change strictly above 30% or strictly below -30% is flagged.
+    - If one or more countries are flagged, exactly one Slack message is delivered to #nhity-test through the available AI delivery capability. It begins exactly with [QA5 T04] and includes each flagged country, both weeks’ USD-formatted revenue, and percentage change.
+    - If no country is flagged, no Slack message or other delivery is sent.
+    - All reported information is grounded in the fresh query result, with no invented data or unsupported claims.
+  ;;
+}

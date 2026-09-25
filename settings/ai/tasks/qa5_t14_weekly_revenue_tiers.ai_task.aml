@@ -1,0 +1,37 @@
+AiTask qa5_t14_weekly_revenue_tiers {
+  label: 'QA5 T14 Weekly Revenue Tiers'
+  description: 'Verifies yesterday order data, compares the last two completed calendar weeks of revenue, and delivers a tiered weekly status.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, first run a **fresh** data query in the workspace timezone that counts distinct `orders.id` for orders whose `orders.created_at` falls in **yesterday**, defined as the full prior calendar date from 00:00:00 through 23:59:59 immediately before the task run date.
+
+    If yesterday's distinct order count is zero, use the available AI delivery capability to post **exactly one** brief Slack alert to **#nhity-test**. The alert must begin exactly with **[QA5 T14]** and contain the exact phrase **order data missing**. Stop immediately: do not calculate or summarize the weekly comparison, create an artifact, send an email, or make any other delivery.
+
+    Only when yesterday's distinct order count is greater than zero, use fresh data to compare the **last fully completed calendar week** with the immediately preceding fully completed calendar week. Each week is Monday 00:00:00 through Sunday 23:59:59 in the workspace timezone; exclude the current partial week. Use dataset metric `revenue` and filter each period using `orders.created_at`. Calculate unrounded absolute weekly revenue change as last-completed-week revenue minus prior-week revenue. When prior-week revenue is greater than zero, calculate unrounded percentage change as `(last-completed-week revenue - prior-week revenue) / prior-week revenue`; when prior-week revenue is zero, do not divide by zero and treat the outcome as a non-decline.
+
+    Build a short, accurate summary that states the exact start and end dates for both completed weeks, both revenue totals, absolute revenue change, and percentage revenue change when defined. Do not make causal claims.
+
+    Use the available AI delivery capability and a subject/message beginning exactly with **[QA5 T14]** for exactly one applicable tier:
+    - If the percentage revenue decline is **strictly greater than 10%** (percentage change strictly below -10%), send exactly one short summary to Slack **#nhity-test** and exactly one email to **nhi.ty@holistics.io** with the same short summary. Create a CSV attachment containing the last fully completed week's governed `revenue` metric grouped by both `countries.code` and `countries.name`, including both country values and the revenue value; attach that CSV to the email only.
+    - If the percentage revenue decline is **from 3% through 10% inclusive** (percentage change from -10% through -3% inclusive), send exactly one email to **nhi.ty@holistics.io** with the short summary only. Do not send Slack, create or attach a CSV, or make any other delivery.
+    - If the revenue decline is **less than 3%**, revenue is flat, revenue grew, or prior-week revenue is zero, send exactly one one-line status email to **nhi.ty@holistics.io**. Do not send Slack, create or attach a CSV, or make any other delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official runs first in the workspace timezone and counts distinct `orders.id` for the full prior calendar date (yesterday) using `orders.created_at` from 00:00:00 through 23:59:59.
+
+    - When yesterday's distinct order count is zero, exactly one brief Slack alert is delivered through AI delivery to #nhity-test; it begins with [QA5 T14] and contains the exact phrase order data missing. The run stops with no weekly comparison, summary, artifact, email, or other delivery.
+
+    - When yesterday's distinct order count is greater than zero, fresh data compares only the last fully completed Monday-through-Sunday calendar week against the immediately preceding fully completed Monday-through-Sunday calendar week in the workspace timezone. The current partial week is excluded, and both periods filter `orders.created_at` and use the governed dataset `revenue` metric.
+
+    - The comparison uses unrounded totals: absolute change equals last-completed-week revenue minus prior-week revenue; percentage change equals `(last - prior) / prior` only when prior-week revenue is greater than zero. If prior-week revenue is zero, no division occurs and the result is treated as a non-decline.
+
+    - Any short summary states the exact comparison start and end dates, both weekly revenue totals, absolute change, and percentage change when defined; it contains no causal claims.
+
+    - If percentage decline is strictly greater than 10% (change strictly below -10%), exactly one Slack post goes to #nhity-test and exactly one email goes to nhi.ty@holistics.io. Both begin with [QA5 T14] and carry the same short accurate summary. The email, and only the email, has one CSV attachment for the last fully completed week that groups the governed `revenue` metric by both `countries.code` and `countries.name` and includes code, name, and revenue values.
+
+    - If percentage decline is from 3% through 10% inclusive (change from -10% through -3% inclusive), exactly one email only goes to nhi.ty@holistics.io with a [QA5 T14] short summary. No Slack, CSV attachment, or other delivery occurs.
+
+    - If decline is less than 3%, revenue is flat, revenue grew, or prior-week revenue is zero, exactly one one-line [QA5 T14] status email only goes to nhi.ty@holistics.io. No Slack, CSV attachment, or other delivery occurs.
+  ;;
+}

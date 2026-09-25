@@ -1,0 +1,25 @@
+AiTask qa5_t07_top_products_changed {
+  label: 'QA5 T07 Top Products Changed'
+  description: 'Emails the top five products by trailing-30-day revenue only when the ordered top-five list changes.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query in the workspace timezone. Calculate revenue for each product over the **30 complete calendar days immediately before the task run date**. Use the dataset's `revenue` metric, grouped by `products.id` and `products.name`. Exclude the current partial calendar day. Rank products by revenue descending, breaking ties by `products.id` ascending, and retain exactly the top five products. Include each product's name and revenue, formatted as currency.
+
+    Define the list-comparison signature as the ordered sequence of the five `products.id` values after applying the ranking and tie-breaker. Retrieve the signature from the immediately preceding completed run of this same task, if one exists. The prior-run signature must use the same definition, window, ranking, tie-breaker, and five-product limit. Compare the current signature with that prior signature.
+
+    If there is no preceding completed run of this task, treat this as the first run and send the current list. If a preceding completed run exists and the current signature differs from its signature in either membership or order, send the current list. If the signatures are identical, send nothing to any destination.
+
+    When a send is required, use the available AI delivery capability to email **nhi.ty@holistics.io** exactly once. The email subject must begin exactly with **[QA5 T07]**. Its body must state the trailing 30-day date range and list ranks 1 through 5 with each product name and revenue. Do not send an email for unchanged lists, insufficient data to form five products, or an inability to reliably retrieve or compare the prior-run signature (except when there is definitively no prior completed run).
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official calculates each product's revenue using the dataset `revenue` metric over the 30 complete calendar days immediately before the run date, excluding the current partial day.
+    - Results are grouped by `products.id` and `products.name`, ranked by revenue descending with `products.id` ascending as the deterministic tie-breaker, and limited to exactly five products.
+    - The comparison signature is the ordered sequence of the five product IDs; a membership change or order change is considered different.
+    - The current signature is compared with the immediately preceding completed run's signature using the same calculation and ranking definition.
+    - If no preceding completed run exists, exactly one email is delivered to nhi.ty@holistics.io. If the signature changed, exactly one email is delivered. If the signature is unchanged, no delivery is sent.
+    - Every delivered email has a subject beginning exactly with [QA5 T07] and a body containing the trailing-30-day date range plus the ranks, names, and currency-formatted revenues of all five products.
+    - No email is sent when fewer than five products can be reliably ranked or prior-run state cannot be reliably retrieved or compared, except for a definitively first run.
+    - All delivered values and statements are grounded in the fresh query result; no data is invented.
+  ;;
+}

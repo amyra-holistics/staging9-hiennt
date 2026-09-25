@@ -1,0 +1,27 @@
+AiTask qa5_t06_order_volume_anomaly {
+  label: 'QA5 T06 Order Volume Anomaly'
+  description: 'Checks yesterday’s order volume against recent comparable weekdays and posts to Slack only when it is unusually high or low.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query in the workspace timezone to calculate yesterday’s order volume: the distinct count of `orders.id` whose `orders.created_at` falls on the complete calendar day immediately before the task run date.
+
+    Establish a weekday-adjusted baseline using the **eight most recent complete calendar dates with the same weekday as yesterday**, excluding yesterday itself. For each baseline date, calculate order volume using the same distinct count of `orders.id`. Do not include partial days or dates after yesterday.
+
+    If there are at least six baseline dates with data, calculate the normal range as the baseline mean minus two sample standard deviations through the baseline mean plus two sample standard deviations. Set the lower bound to zero if the calculated lower bound is negative. Treat yesterday as unusually low only when its volume is strictly below the lower bound, and unusually high only when it is strictly above the upper bound. Values equal to either boundary are within the normal range.
+
+    If yesterday is unusually high or low, send exactly one concise Slack message through the available AI delivery capability to **#nhity-test**. The message must begin exactly with **[QA5 T06]** and state: yesterday’s date and order volume; whether it was unusually high or low; and the normal range considered, including the baseline period (the eight comparable weekday dates). Use whole orders with thousands separators. Do not claim a cause.
+
+    If yesterday is within the normal range, if fewer than six comparable weekday baseline dates are available, or if the query cannot reliably calculate the range, send nothing to Slack or any other destination.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official calculates yesterday’s complete-calendar-day order volume as the distinct count of `orders.id`, in the workspace timezone.
+    - The baseline uses the eight most recent complete dates before yesterday that have the same weekday as yesterday; each baseline order volume uses the same distinct order-count definition.
+    - Partial days and dates after yesterday are excluded from both the evaluated day and baseline.
+    - With at least six baseline dates with data, the normal range is calculated as baseline mean ± two sample standard deviations, with any negative lower bound set to zero.
+    - Yesterday is flagged only when its volume is strictly below the lower bound or strictly above the upper bound; values on either boundary are normal.
+    - When flagged, exactly one Slack message is delivered to #nhity-test through the available AI delivery capability. It begins exactly with [QA5 T06] and reports the date, yesterday’s order volume, high/low verdict, normal range, and eight comparable weekday baseline dates.
+    - When yesterday is within range, fewer than six comparable weekday dates are available, or the range cannot be calculated reliably, no Slack or other delivery is sent.
+    - All delivered values and statements are grounded in the fresh query result, with no causal claims or invented data.
+  ;;
+}

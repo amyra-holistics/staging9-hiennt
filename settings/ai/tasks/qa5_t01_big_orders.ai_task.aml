@@ -1,0 +1,26 @@
+AiTask qa5_t01_big_orders {
+  label: 'QA5 T01 Big Orders'
+  description: 'Checks @Dataset:ecommerce_official for orders over $1,000 placed yesterday and emails nhi.ty@holistics.io only when qualifying orders exist.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, query fresh data for orders placed during the full calendar day immediately preceding the task run date, using the workspace timezone.
+
+    Calculate each order's value as the sum of its order-item quantities multiplied by product prices. Return only orders with an order value strictly greater than **$1,000**.
+
+    If one or more qualifying orders exist, send a concise, scannable email through the available AI delivery capability to **nhi.ty@holistics.io**. The subject must begin exactly with **[QA5 T01]** and identify that the message contains yesterday's large orders. Include the reporting date and a row for every qualifying order with:
+    - Order ID
+    - Status
+    - Order value, formatted as USD
+
+    If there are no qualifying orders, do not send an email or any other delivery. Do not infer causes or include unsupported claims.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis runs a fresh query against @Dataset:ecommerce_official and covers exactly the full calendar day immediately preceding the task run date in the workspace timezone.
+    - Each order's value is accurately calculated as the sum of order-item quantity multiplied by product price.
+    - Only orders with value strictly greater than $1,000 are included.
+    - When qualifying orders exist, exactly one concise email is delivered to nhi.ty@holistics.io; its subject begins exactly with [QA5 T01] and it lists every qualifying order's ID, status, and USD-formatted order value.
+    - When no qualifying orders exist, no email or other delivery is sent.
+    - All reported values and statements are grounded in the fresh query results, with no invented data or unsupported claims.
+  ;;
+}

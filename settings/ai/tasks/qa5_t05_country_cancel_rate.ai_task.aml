@@ -1,0 +1,25 @@
+AiTask qa5_t05_country_cancel_rate {
+  label: 'QA5 T05 Country Cancellation Rate'
+  description: 'Checks trailing seven-day order cancellation rates by country and emails only when a country exceeds 30%.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query in the workspace timezone that calculates order cancellation rate by `countries.name` for the trailing seven complete calendar days immediately before the task run date. Use orders created during that period. Define cancellation rate as the number of orders whose `orders.status` is `cancelled`, divided by total orders, for each country. Calculate the overall cancellation rate using the same definition and period across all countries.
+
+    Include only countries with at least one order during the period. Identify every country whose cancellation rate is strictly above **30%**, regardless of the overall cancellation rate.
+
+    If one or more countries are flagged, send exactly one concise email through the available AI delivery capability to **nhi.ty@holistics.io**. The subject must begin exactly with **[QA5 T05]**. In the email body, list every flagged country and its cancellation rate, and include the overall cancellation rate for context. Format all rates as percentages.
+
+    If no country has a cancellation rate above 30%, do not send an email or any other delivery. Do not infer causes or make unsupported claims.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official uses orders created during the trailing seven complete calendar days immediately before the task run date, in the workspace timezone.
+    - Country is defined by `countries.name`; only countries with at least one order in the period are considered.
+    - Each country cancellation rate is calculated as cancelled orders divided by total orders, where cancelled orders have `orders.status` equal to `cancelled`.
+    - The overall cancellation rate is calculated using the same definition and period across all countries.
+    - Every and only country with a cancellation rate strictly above 30% is flagged, even when the overall cancellation rate is at or below 30%.
+    - If one or more countries are flagged, exactly one email is delivered to nhi.ty@holistics.io through the available AI delivery capability. Its subject begins exactly with [QA5 T05], and its body lists each flagged country with its percentage cancellation rate and the overall percentage cancellation rate.
+    - If no country is flagged, no email or other delivery is sent.
+    - All reported information is grounded in the fresh query result, with no invented data or unsupported claims.
+  ;;
+}

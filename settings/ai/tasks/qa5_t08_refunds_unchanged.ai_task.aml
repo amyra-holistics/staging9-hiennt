@@ -1,0 +1,24 @@
+AiTask qa5_t08_refunds_unchanged {
+  label: 'QA5 T08 Refund Count Unchanged'
+  description: 'Checks the trailing seven-day refunded-order count and posts to Slack only when it is unchanged from the preceding completed run.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run a fresh query in the workspace timezone. Count distinct `orders.id` for orders whose `orders.status` is `refunded` and whose `orders.created_at` falls within the trailing seven complete calendar days immediately before the task run date. Exclude the current partial calendar day.
+
+    Retrieve the refunded-order count from the immediately preceding completed run of this same task, if one exists. The prior count must use this same metric definition, order-status filter, and trailing-seven-complete-calendar-day window.
+
+    If a preceding completed run exists and the current refunded-order count is exactly equal to that prior run's count, send exactly one concise Slack message through the available AI delivery capability to **#nhity-test**. The message must begin exactly with **[QA5 T08]** and clearly state that the trailing seven-day refund count has not moved, including the count. Include the current reporting date range for clarity.
+
+    If the count changed, there is no previous completed run, or the prior-run result cannot be reliably retrieved or compared, send nothing to Slack or any other destination. Do not infer causes or make unsupported claims.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official counts distinct `orders.id` where `orders.status` equals `refunded`, using orders created during the trailing seven complete calendar days immediately before the task run date, in the workspace timezone.
+    - The current window excludes the partial calendar day containing the task run; the same definition is used for the preceding completed run's count.
+    - The current count is compared with the immediately preceding completed run of this same task.
+    - If and only if a preceding completed run exists and the counts are exactly equal, exactly one Slack message is delivered to #nhity-test through the available AI delivery capability.
+    - Every delivered Slack message begins exactly with [QA5 T08], states that the refund count has not moved, and includes the count and current seven-day reporting range.
+    - If the count differs, no preceding completed run exists, or prior-run state cannot be retrieved or compared reliably, no Slack or other delivery is sent.
+    - All reported information is grounded in the fresh query result, with no invented data or unsupported causal claims.
+  ;;
+}

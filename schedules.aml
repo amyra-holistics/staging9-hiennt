@@ -3,5 +3,95 @@ const schedules = [
     cron: '0 9 * * *'
     run_as: 'nhi.ty@holistics.io'
     targets: [daily_homestay_performance_summary]
+  },
+
+  AiSchedule {
+    cron: '0 9 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t00_weekly_category_revenue]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t01_big_orders]
+  },
+
+  AiSchedule {
+    cron: '0 9 * * 1-5'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t02_orders_loaded]
+  },
+
+  AiSchedule {
+    cron: '0 18 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t03_low_order_count]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t04_country_wow]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t05_country_cancel_rate]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t06_order_volume_anomaly]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t07_top_products_changed]
+  },
+
+  AiSchedule {
+    cron: '0 9 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t08_refunds_unchanged]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t09_country_revenue_diff]
+  },
+
+  AiSchedule {
+    cron: '0 10,20 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t10_working_hours_routing]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t11_leadership_digest]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t12_same_weekday_swing]
+  },
+
+  AiSchedule {
+    cron: '0 8 1 * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t13_country_risk_rules]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t14_weekly_revenue_tiers]
   }
 ]

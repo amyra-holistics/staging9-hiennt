@@ -1,0 +1,38 @@
+AiTask qa5_t13_country_risk_rules {
+  label: 'QA5 T13 Country Risk Rules'
+  description: 'Flags country-level revenue and cancellation-rate risks for the latest completed month and emails a PNG report only when findings exist.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run fresh data queries in the workspace timezone. Define the **latest month** as the most recently completed calendar month immediately before the task run date, and define the **prior month** as the completed calendar month immediately preceding the latest month. Exclude the current partial calendar month.
+
+    Group country by both `countries.code` and `countries.name`. For each country, calculate the dataset `revenue` metric for the latest month and prior month. Retain precise, unrounded values for all comparisons. Calculate absolute revenue change as latest-month revenue minus prior-month revenue, and percentage revenue change as `(latest-month revenue - prior-month revenue) / prior-month revenue`. Treat a country with zero or missing prior-month revenue as not meeting Rule A because its prior-month revenue is not strictly above USD 90,000 and its percentage change is not meaningful for that rule.
+
+    For the latest month only, calculate country cancellation rate as distinct `orders.id` where `orders.status` equals the exact value `cancelled`, divided by distinct total `orders.id`. Include only countries with at least one latest-month order in this cancellation-rate calculation.
+
+    Flag every country that meets either rule below, using strict comparisons:
+    - **Rule A — Revenue risk:** percentage revenue change is strictly less than **-10%** and prior-month revenue is strictly above **USD 90,000**.
+    - **Rule B — Cancellation risk:** latest-month cancellation rate is strictly above **30%**.
+
+    Union and deduplicate countries that meet the rules so each flagged country appears exactly once. For every flagged country, report country code and name, latest-month revenue, prior-month revenue, absolute revenue change, percentage revenue change, latest-month cancellation rate, and an explicit rule label of **Rule A**, **Rule B**, or **Rule A and Rule B**. Format displayed revenue as USD currency and displayed rates/changes as percentages, but make all rule decisions from unrounded values.
+
+    If one or more countries are flagged, create one readable PNG chart or table artifact containing **only** the flagged countries and all required reported fields. Then send exactly one email through the available AI delivery capability to **nhi.ty@holistics.io**, with that PNG attached. The subject must begin exactly with **[QA5 T13]** and identify the latest completed calendar month. The email body must identify the latest and prior completed calendar months and list the flagged countries with their rule labels. If no countries are flagged, do not create a delivery and do not send an email or any other delivery. Do not infer causes or make unsupported causal claims.
+  ;;
+
+  acceptance_criteria: @md
+    - A fresh query against @Dataset:ecommerce_official uses the workspace timezone, defines the latest month as the most recently completed calendar month before the run date and the prior month as the completed calendar month immediately before it, and excludes the current partial month.
+
+    - Results group country by both `countries.code` and `countries.name`, and use the dataset `revenue` metric for latest-month and prior-month revenue.
+
+    - Revenue risk calculations preserve unrounded values: absolute change is latest minus prior revenue, percentage change is `(latest - prior) / prior`, and Rule A flags only countries with percentage change strictly less than -10% and prior-month revenue strictly above USD 90,000. Countries with zero or missing prior-month revenue do not meet Rule A.
+
+    - Latest-month cancellation rate is calculated only from orders created in the latest month as distinct `orders.id` with `orders.status` exactly `cancelled`, divided by distinct total `orders.id`; Rule B flags only countries with a rate strictly above 30%, and only countries with at least one latest-month order are considered for that rate.
+
+    - Flagged countries are the deduplicated union of Rule A and Rule B. Every flagged country appears exactly once and reports code, name, latest and prior revenue, absolute and percentage revenue change, latest-month cancellation rate, and exactly one explicit label: Rule A, Rule B, or Rule A and Rule B.
+
+    - When at least one country is flagged, exactly one readable PNG chart or table artifact is created containing only flagged countries and all required fields; exactly one email is sent through the available AI delivery capability to nhi.ty@holistics.io with that PNG attached. Its subject begins exactly with [QA5 T13] and identifies the latest completed calendar month; its body identifies both completed months and each flagged country with its rule label.
+
+    - When zero countries are flagged, no email or other delivery is sent.
+
+    - All reported values and statements are grounded in fresh query results and contain no invented data or unsupported causal claims.
+  ;;
+}

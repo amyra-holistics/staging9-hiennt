@@ -1,0 +1,34 @@
+Dataset qa6_ds_ecommerce_managers {
+  label: 'QA6 Ecommerce with Country Managers'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  models: [
+    categories,
+    users,
+    products,
+    orders,
+    order_items,
+    merchants,
+    countries,
+    cities,
+    qa6_country_managers
+  ]
+  relationships: [
+    relationship(orders.user_id > users.id, true, 'one_way'),
+    relationship(order_items.order_id > orders.id, true, 'one_way'),
+    relationship(order_items.product_id > products.id, true, 'one_way'),
+    relationship(cities.country_code > countries.code, true, 'one_way'),
+    relationship(users.city_id > cities.id, true, 'one_way'),
+    relationship(merchants.city_id > cities.id, false, 'one_way'),
+    relationship(products.merchant_id > merchants.id, true, 'one_way'),
+    relationship(products.category_id > categories.id, true, 'one_way'),
+    relationship(countries.code > qa6_country_managers.country_code, true, 'one_way')
+  ]
+  metric revenue {
+    label: "Revenue"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql sum(order_items, order_items.quantity * products.price);;
+  }
+}

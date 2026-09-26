@@ -1,0 +1,30 @@
+Model qa6_list_zero {
+  type: 'query'
+  label: 'QA6 Partners (all clear)'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  query: @sql
+    select * from (values
+      ('Oakridge Cover', 'nhi.ty+oakridge@holistics.io', 0),
+      ('Pinecrest Brokers', 'nhi.ty+pinecrest@holistics.io', 0),
+      ('Quartz Mutual', 'nhi.ty+quartz@holistics.io', 0),
+      ('Riverside Assure', 'nhi.ty+riverside@holistics.io', 0)
+    ) as t(partner, contact_email, policies_approaching_cancellation);;
+
+  dimension partner {
+    label: 'Partner'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner }};;
+    primary_key: true
+  }
+  dimension contact_email {
+    label: 'Contact email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.contact_email }};;
+  }
+  dimension policies_approaching_cancellation {
+    label: 'Policies approaching cancellation'
+    type: 'number'
+    definition: @sql {{ #SOURCE.policies_approaching_cancellation }};;
+  }
+}

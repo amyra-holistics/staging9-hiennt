@@ -1,0 +1,56 @@
+Model qa6_ar_policies {
+  type: 'query'
+  label: 'QA6 AR Policies'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  query: @sql
+    select * from (values
+      ('P-A01', 'Partner A', 'Lena Ortiz', 'Home', 1200, 'approaching_cancellation', '2026-10-05'::date),
+      ('P-A02', 'Partner A', 'Marco Diaz', 'Auto', 950, 'approaching_cancellation', '2026-10-09'::date),
+      ('P-A03', 'Partner A', 'Priya Nair', 'Home', 2050, 'approaching_cancellation', '2026-10-14'::date),
+      ('P-A04', 'Partner A', 'Tom Becker', 'Auto', 800, 'active', null::date),
+      ('P-A05', 'Partner A', 'Sara Kim', 'Life', 1500, 'active', null::date),
+      ('P-B01', 'Partner B', 'Omar Haddad', 'Auto', 900, 'approaching_cancellation', '2026-10-07'::date),
+      ('P-B02', 'Partner B', 'Julia Rossi', 'Home', 1100, 'active', null::date),
+      ('P-B03', 'Partner B', 'Ken Sato', 'Life', 700, 'active', null::date),
+      ('P-C01', 'Partner C', 'Ana Silva', 'Home', 1300, 'active', null::date),
+      ('P-C02', 'Partner C', 'Ivan Petrov', 'Auto', 650, 'active', null::date)
+    ) as t(policy_id, ar_partner, policyholder, product, annual_premium, status, cancellation_date);;
+
+  dimension policy_id {
+    label: 'Policy ID'
+    type: 'text'
+    definition: @sql {{ #SOURCE.policy_id }};;
+    primary_key: true
+  }
+  dimension ar_partner {
+    label: 'AR Partner'
+    type: 'text'
+    definition: @sql {{ #SOURCE.ar_partner }};;
+  }
+  dimension policyholder {
+    label: 'Policyholder'
+    type: 'text'
+    definition: @sql {{ #SOURCE.policyholder }};;
+  }
+  dimension product {
+    label: 'Product'
+    type: 'text'
+    definition: @sql {{ #SOURCE.product }};;
+  }
+  dimension annual_premium {
+    label: 'Annual premium'
+    type: 'number'
+    definition: @sql {{ #SOURCE.annual_premium }};;
+  }
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+  dimension cancellation_date {
+    label: 'Cancellation date'
+    type: 'date'
+    definition: @sql {{ #SOURCE.cancellation_date }};;
+  }
+}

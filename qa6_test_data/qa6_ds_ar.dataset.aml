@@ -1,0 +1,12 @@
+Dataset qa6_ds_ar {
+  label: 'QA6 AR Partners'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  models: [
+    qa6_ar_partners,
+    qa6_ar_policies
+  ]
+  relationships: [
+    relationship(qa6_ar_policies.ar_partner > qa6_ar_partners.ar_partner, true, 'one_way')
+  ]
+}

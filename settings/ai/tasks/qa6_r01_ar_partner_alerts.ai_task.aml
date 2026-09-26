@@ -1,0 +1,36 @@
+AiTask qa6_r01_ar_partner_alerts {
+  label: 'Weekly AR Partner Cancellation Alerts'
+
+  description: 'Sends one isolated weekly cancellation-alert email to each AR partner that currently has policies approaching cancellation.'
+
+  brief: @md
+    Use fresh, current data from @Dataset:qa6_ds_ar on every run; do not reuse results from a prior run.
+
+    First query @Dataset:qa6_ds_ar at the AR-partner grain and form exactly one row per partner using:
+    - `qa6_ar_partners.ar_partner`
+    - `qa6_ar_partners.contact_email`
+    - `qa6_ar_partners.policies_approaching_cancellation`
+
+    Retain only rows where `policies_approaching_cancellation > 0`. For each retained partner row, use AI delivery to send exactly one email to that row's own dynamic `contact_email`. Never send to another partner, a shared distribution list, or any address derived from another row. Do not send any email or any other delivery for a row whose count is 0.
+
+    For each email, retrieve only that retained partner's own policy rows from `qa6_ar_policies`, matched on `ar_partner`, with `status` exactly `approaching_cancellation`. Do not include another partner's policy data or email address. The email must contain:
+    - the recipient partner's `ar_partner` name;
+    - that row's current `policies_approaching_cancellation` count; and
+    - a concise itemized list of only the matched policies, showing `policy_id`, `policyholder`, `product`, `annual_premium`, and `cancellation_date` for each item.
+
+    Before delivering, verify that the number of listed policy items equals that partner row's `policies_approaching_cancellation` count. If it does not reconcile, do not deliver an inaccurate alert for that partner; report the discrepancy in the task run record without exposing other partners' data or email addresses.
+
+    Start every delivered email subject with exactly `[QA6 R01]`. State only the current data; make no causal claims.
+  ;;
+
+  acceptance_criteria: @md
+    - Each run queries fresh current data from @Dataset:qa6_ds_ar and does not reuse prior-run results.
+    - The partner selection is exactly one row per `qa6_ar_partners.ar_partner`, containing that row's `contact_email` and `policies_approaching_cancellation`, with only rows where the count is greater than 0 retained for delivery.
+    - There is exactly one delivered email for every retained qualifying partner row, addressed only to that row's dynamic `qa6_ar_partners.contact_email`; no delivery goes to a shared list, another partner, or any additional address.
+    - Every partner row with `policies_approaching_cancellation = 0` receives no email and no other delivery.
+    - Every delivered email is isolated to its own partner: it names that `ar_partner`, includes no other partner's email address or policy data, and lists only `qa6_ar_policies` rows whose `ar_partner` matches that partner and whose `status` is exactly `approaching_cancellation`.
+    - Each policy item in a delivered email includes `policy_id`, `policyholder`, `product`, `annual_premium`, and `cancellation_date`; the number of listed items exactly equals the recipient partner row's current `policies_approaching_cancellation` count.
+    - Every delivered email subject begins exactly with `[QA6 R01]`, and its content makes no causal claims.
+    - The task is scheduled by an `AiSchedule` with cron `0 8 * * 1`, `run_as: 'nhi.ty@holistics.io'`, and `targets: [qa6_r01_ar_partner_alerts]`, which runs every Monday at 08:00 in the workspace timezone.
+  ;;
+}

@@ -1,0 +1,48 @@
+AiTask qa6_r02_ar_alerts_with_digest {
+  label: 'Weekly AR Cancellation Alerts with Administrator Digest'
+
+  description: 'Uses current AR-partner cancellation counts to send isolated partner alerts, then one administrator-only delivery digest.'
+
+  brief: @md
+    Use fresh, current data from @Dataset:qa6_ds_ar on every run; do not reuse results or delivery status from any prior run.
+
+    Query the dataset at the AR-partner grain and form exactly one row per partner with only:
+    - `qa6_ar_partners.ar_partner`
+    - `qa6_ar_partners.contact_email`
+    - `qa6_ar_partners.policies_approaching_cancellation`
+
+    Process the resulting partner rows one at a time and keep each row isolated. Do not query, include, or expose another partner's contact email, count, or any policy-level data in a partner alert.
+
+    For every row with `policies_approaching_cancellation > 0`, validate that the row's own `contact_email` is present and a valid single email recipient. If valid, use AI delivery to initiate exactly one email only to that row's own `contact_email`. The subject must begin exactly `[QA6 R02]`. State only that recipient partner's `ar_partner` and current `policies_approaching_cancellation` count. Do not include any other partner data, contact address, or policy-level details. Do not use a shared list, CC, BCC, copied recipient, or a recipient derived from another row.
+
+    If a count-greater-than-zero row has a missing or invalid email, withhold its partner alert. Record it distinctly as `withheld_missing_or_invalid_email`; do not call it contacted and do not substitute any recipient.
+
+    For every row with `policies_approaching_cancellation = 0`, send no partner alert and no other partner delivery. Record it distinctly as `skipped_count_0`.
+
+    Complete processing of all partner rows and record the result for every row before sending the administrator digest. Classify a partner as `contacted` only after AI delivery for that partner has actually been initiated. If an attempted delivery was not initiated, record it as `not_contacted_delivery_not_initiated` rather than contacted.
+
+    Only after all partner alerts have been processed, use AI delivery to initiate exactly one administrator digest email to `nhi.ty@holistics.io`. Its subject must begin exactly `[QA6 R02]`. The digest must list every partner row and its count, separated into: `contacted` (including the intended recipient address only for partners whose delivery was initiated), `skipped_count_0`, `withheld_missing_or_invalid_email`, and `not_contacted_delivery_not_initiated` where applicable. Never include policy-level details in the digest. Do not include any partner recipient address except the intended address for a contacted partner. Do not claim that a partner was contacted unless its delivery was actually initiated.
+
+    In the task run record, report the fresh-data query, each partner identifier, count, final status, the intended address only for contacted partners, and confirmation that exactly one administrator digest delivery was initiated after partner processing. Do not put policy-level details or any non-contacted partner email address in the run record.
+  ;;
+
+  acceptance_criteria: @md
+    - Each run uses fresh current data from @Dataset:qa6_ds_ar and forms exactly one partner-level row per `qa6_ar_partners.ar_partner` using only that partner's `contact_email` and `policies_approaching_cancellation`; no prior-run data or status is reused.
+
+    - Each row is processed in isolation. A partner alert contains only its recipient partner's identifier and current count, and exposes no other partner's count, contact email, recipient, or policy-level data. No shared list, CC, BCC, copied recipient, or cross-row recipient derivation is used.
+
+    - For every and only row where `policies_approaching_cancellation > 0` and that row has a valid single `contact_email`, AI delivery initiates exactly one partner email to that row's own address. Each such subject begins exactly `[QA6 R02]` and includes only that partner's current count.
+
+    - Every row where `policies_approaching_cancellation = 0` receives no partner alert or other partner delivery and is recorded as `skipped_count_0`.
+
+    - Every count-greater-than-zero row with a missing or invalid email receives no partner alert, no replacement recipient, and is recorded distinctly as `withheld_missing_or_invalid_email` rather than `skipped_count_0` or contacted.
+
+    - A partner is recorded as `contacted` only when its AI delivery was actually initiated. Any partner whose attempted delivery was not initiated is recorded as `not_contacted_delivery_not_initiated`, never as contacted.
+
+    - Partner alerts are all processed before the administrator digest. Exactly one administrator digest delivery is initiated per run, only to `nhi.ty@holistics.io`, and its subject begins exactly `[QA6 R02]`.
+
+    - The administrator digest lists every partner and its count in clearly separated contacted, zero-count skipped, missing/invalid-email withheld, and delivery-not-initiated sections as applicable. It includes the intended recipient address only for contacted partners, includes no policy-level details, and does not claim a partner was contacted unless its delivery was actually initiated.
+
+    - An `AiSchedule` targets `qa6_r02_ar_alerts_with_digest` with cron `0 8 * * 1` and `run_as: 'nhi.ty@holistics.io'`, running every Monday at 08:00 in the workspace timezone.
+  ;;
+}

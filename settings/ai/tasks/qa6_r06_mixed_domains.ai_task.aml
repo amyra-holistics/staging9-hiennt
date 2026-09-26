@@ -1,0 +1,36 @@
+AiTask qa6_r06_mixed_domains {
+  label: 'Weekly Partner Cancellation Alerts — Mixed Domains'
+
+  description: 'Emails each qualifying mixed-domain partner an isolated cancellation-count alert using only that partner row and valid single contact email.'
+
+  brief: @md
+    Use fresh, current data from @Dataset:qa6_ds_lists on every run; do not reuse results, recipients, counts, normalization decisions, or delivery status from a prior run.
+
+    Query only the `QA6 Partners (mixed domains)` model (`qa6_list_external`) and form exactly one row per partner using only:
+
+    - `qa6_list_external.partner`
+    - `qa6_list_external.contact_email`
+    - `qa6_list_external.policies_approaching_cancellation`
+
+    Process every partner row independently and keep partner rows isolated. For every and only row where `policies_approaching_cancellation > 0`, validate the row's own `contact_email` as a single email recipient. Trim leading and trailing whitespace before validation and delivery. Do not otherwise alter an address. If the trimmed address is a valid single email recipient, use AI delivery to initiate exactly one email only to that normalized address, with no CC, BCC, shared distribution list, copied recipient, or replacement recipient. Start the subject exactly with `[QA6 R06]`.
+
+    The body must state only that recipient partner's `partner` name and its current `policies_approaching_cancellation` count, making clear that this is the count of policies approaching cancellation. Do not include any other partner's name, count, contact address, or data.
+
+    For every row where `policies_approaching_cancellation = 0`, send no email or any other delivery and record it distinctly as `skipped_count_0`.
+
+    If a count-greater-than-zero row has a missing, blank, malformed, or otherwise invalid email after trimming, withhold its email; do not substitute another recipient and record it distinctly as `withheld_missing_or_invalid_email`. Classify a partner as `contacted` only after AI delivery for that partner row has actually been initiated. If an attempted delivery is not initiated, record `not_contacted_delivery_not_initiated`.
+
+    In the task run record, report each partner identifier, fresh current count, and final status. Include the normalized intended recipient address only for a partner row whose delivery was actually initiated. Do not include another partner's data or any non-contacted email address.
+  ;;
+
+  acceptance_criteria: @md
+    - Each run uses fresh current data from @Dataset:qa6_ds_lists and queries only `qa6_list_external` (`QA6 Partners (mixed domains)`), forming exactly one partner-level row per `qa6_list_external.partner` using that row's `contact_email` and `policies_approaching_cancellation`; no prior-run data, recipients, counts, normalization decisions, or delivery status is reused.
+    - Each partner row is processed independently and in isolation. An alert includes only its own partner name and current count of policies approaching cancellation; it exposes no other partner's name, count, contact email, recipient, or data.
+    - For every and only row where `policies_approaching_cancellation > 0`, leading and trailing whitespace is trimmed from the row's own contact email before validation. If and only if the resulting value is a valid single email recipient, AI delivery initiates exactly one email only to that normalized `qa6_list_external.contact_email`, with no CC, BCC, shared list, copied recipient, replacement recipient, or cross-row recipient derivation.
+    - Every delivered email subject begins exactly with `[QA6 R06]`, and its body contains only that recipient partner's name and that partner's current policies-approaching-cancellation count.
+    - Every row where `policies_approaching_cancellation = 0` receives no email or other delivery and is recorded as `skipped_count_0`.
+    - A count-greater-than-zero row with a missing, blank, malformed, or otherwise invalid contact email after trimming receives no delivery and is recorded as `withheld_missing_or_invalid_email`. A partner is recorded as `contacted` only when its delivery was actually initiated; any attempted but uninitiated delivery is recorded as `not_contacted_delivery_not_initiated`.
+    - The task run record includes every partner identifier, current count, and final status; it includes a normalized intended address only for initiated deliveries, and includes no non-contacted email addresses or cross-partner data.
+    - An `AiSchedule` targets `qa6_r06_mixed_domains` with cron `0 8 * * 1` and `run_as: 'nhi.ty@holistics.io'`, running every Monday at 08:00 in the workspace timezone.
+  ;;
+}

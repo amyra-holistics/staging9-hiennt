@@ -1,0 +1,287 @@
+Dashboard v1_a1 {
+  title: 'Executive Sales Overview'
+  description: @md
+    Executive monitoring dashboard for sales performance in the TheLook eCommerce dataset.
+  ;;
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 60
+  }
+
+  // ---- Header and dashboard controls
+  block header: TextBlock {
+    content: @md
+      # Executive Sales Overview
+      Monitor net sales performance, order volume, customer value, and gross margin.
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Order Item Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block data_note: TextBlock {
+    content: @md
+      **Data source:** `demodb` &nbsp;•&nbsp; **Dataset:** TheLook eCommerce &nbsp;•&nbsp; **Last updated:** 27 Sep 2026, 11:27 UTC
+    ;;
+  }
+
+  // ---- Executive KPIs
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+
+  // ---- Sales trend
+  block sales_trend_heading: TextBlock {
+    content: @md
+      ## Monthly Net Sales Trend
+    ;;
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Created Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // ---- Category performance
+  block category_heading: TextBlock {
+    content: @md
+      ## Top 10 Categories by Net Sales
+    ;;
+  }
+
+  block top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ---- Dashboard interactions
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: [
+        'kpi_net_sales',
+        'kpi_aov',
+        'kpi_gross_margin',
+        'monthly_net_sales',
+        'top_categories',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'date_filter'
+      to: ['kpi_orders']
+      field: r(thelook_orders.created_at)
+    },
+  ]
+
+  // ---- Canvas layout
+  view: CanvasLayout {
+    width: 1220
+    height: 1250
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block header {
+      position: pos(20, 20, 760, 100)
+      layer: 1
+    }
+
+    block date_filter {
+      position: pos(800, 30, 400, 80)
+      layer: 1
+    }
+
+    block data_note {
+      position: pos(20, 130, 1180, 50)
+      layer: 1
+    }
+
+    block kpi_net_sales {
+      position: pos(20, 200, 280, 160)
+      layer: 1
+    }
+
+    block kpi_orders {
+      position: pos(320, 200, 280, 160)
+      layer: 1
+    }
+
+    block kpi_aov {
+      position: pos(620, 200, 280, 160)
+      layer: 1
+    }
+
+    block kpi_gross_margin {
+      position: pos(920, 200, 280, 160)
+      layer: 1
+    }
+
+    block sales_trend_heading {
+      position: pos(20, 390, 1180, 50)
+      layer: 1
+    }
+
+    block monthly_net_sales {
+      position: pos(20, 450, 1180, 390)
+      layer: 1
+    }
+
+    block category_heading {
+      position: pos(20, 870, 1180, 50)
+      layer: 1
+    }
+
+    block top_categories {
+      position: pos(20, 930, 1180, 300)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

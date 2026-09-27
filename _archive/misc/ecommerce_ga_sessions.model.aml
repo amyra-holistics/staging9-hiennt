@@ -1,9 +1,0 @@
-Model ecommerce_ga_sessions {
-  type: 'table'
-  label: 'Ga Sessions'
-  description: ''
-  data_source_name: 'demodb'
-
-  owner: 'my.nguyen@holistics.io'
-  table_name: '"ecommerce"."ga_sessions"'
-}

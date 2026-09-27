@@ -1,0 +1,282 @@
+Dashboard v2_a1 {
+  title: 'Executive Sales Overview'
+  description: 'Executive view of sales performance, order volume, order value, and gross margin.'
+  theme: H.themes.classic
+
+  block dashboard_header: TextBlock {
+    content: @md
+# Executive Sales Overview
+Monitor sales performance, order economics, and category contribution.
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Created Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Month'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block data_note: TextBlock {
+    content: @md
+_Data source: TheLook eCommerce (`thelook`) · Latest available order-item record: 30 Sep 2026, 23:57 UTC._
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: [
+        'kpi_net_sales',
+        'kpi_aov',
+        'kpi_gross_margin',
+        'monthly_net_sales',
+        'top_categories',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'date_filter'
+      to: ['kpi_orders']
+      field: r(thelook_orders.created_at)
+    },
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .sales-dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .dashboard-toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .chart-grid > div,
+  .kpi-grid > div {
+    min-width: 0;
+  }
+
+  .footer-note {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 8px;
+  }
+
+  @media (max-width: 960px) {
+    .kpi-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .chart-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .sales-dashboard {
+      padding: 16px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="sales-dashboard">
+  <header>
+    <h-block name="dashboard_header" />
+  </header>
+
+  <section class="dashboard-toolbar">
+    <h-block name="date_filter" />
+  </section>
+
+  <section class="kpi-grid">
+    <div><h-block name="kpi_net_sales" /></div>
+    <div><h-block name="kpi_orders" /></div>
+    <div><h-block name="kpi_aov" /></div>
+    <div><h-block name="kpi_gross_margin" /></div>
+  </section>
+
+  <section class="chart-grid">
+    <div><h-block name="monthly_net_sales" /></div>
+    <div><h-block name="top_categories" /></div>
+  </section>
+
+  <footer class="footer-note">
+    <h-block name="data_note" />
+  </footer>
+</div>
+    ;;
+  }
+}

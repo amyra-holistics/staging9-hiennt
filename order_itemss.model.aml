@@ -1,0 +1,105 @@
+Model order_itemss {
+  type: 'table'
+  label: 'Order itemss'
+  description: ''
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension order_id {
+    label: 'Order'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.order_id }};;
+  }
+  dimension user_id {
+    label: 'User'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+  dimension product_id {
+    label: 'Product'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension inventory_item_id {
+    label: 'Inventory item'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.inventory_item_id }};;
+  }
+  dimension status {
+    label: 'Status'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.status }};;
+  }
+  dimension created_at {
+    label: 'Created at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension shipped_at {
+    label: 'Shipped at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.shipped_at }};;
+  }
+  dimension delivered_at {
+    label: 'Delivered at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.delivered_at }};;
+  }
+  dimension returned_at {
+    label: 'Returned at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.returned_at }};;
+  }
+  dimension sale_price {
+    label: 'Sale price'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.sale_price }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'order_items.csv'
+    uploaded_at: '2026-09-27 11:26:44'
+    hash: '97e86b3c159f7512af80f2b460c6e8b4c7ac42c176dc9771ae642a42373ba0fa'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("order_id", "order_id", "number"),
+      H.imports.column_config("user_id", "user_id", "number"),
+      H.imports.column_config("product_id", "product_id", "number"),
+      H.imports.column_config("inventory_item_id", "inventory_item_id", "number"),
+      H.imports.column_config("status", "status", "text"),
+      H.imports.column_config("created_at", "created_at", "datetime"),
+      H.imports.column_config("shipped_at", "shipped_at", "datetime"),
+      H.imports.column_config("delivered_at", "delivered_at", "datetime"),
+      H.imports.column_config("returned_at", "returned_at", "datetime"),
+      H.imports.column_config("sale_price", "sale_price", "number")
+    ]
+  }
+  owner: 'thinh.nt@holistics.io'
+  table_name: '"persisted"."holistics_order_itemss_404b9_202609271126"'
+}

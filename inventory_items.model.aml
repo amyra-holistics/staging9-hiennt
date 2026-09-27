@@ -1,0 +1,113 @@
+Model inventory_items {
+  type: 'table'
+  label: 'Inventory items'
+  description: ''
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension product_id {
+    label: 'Product'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_id }};;
+  }
+  dimension created_at {
+    label: 'Created at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension sold_at {
+    label: 'Sold at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.sold_at }};;
+  }
+  dimension cost {
+    label: 'Cost'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+  dimension product_category {
+    label: 'Product category'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_category }};;
+  }
+  dimension product_name {
+    label: 'Product name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_name }};;
+  }
+  dimension product_brand {
+    label: 'Product brand'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_brand }};;
+  }
+  dimension product_retail_price {
+    label: 'Product retail price'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_retail_price }};;
+  }
+  dimension product_department {
+    label: 'Product department'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_department }};;
+  }
+  dimension product_sku {
+    label: 'Product sku'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_sku }};;
+  }
+  dimension product_distribution_center_id {
+    label: 'Product distribution center'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.product_distribution_center_id }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'inventory_items.csv'
+    uploaded_at: '2026-09-27 11:25:49'
+    hash: 'd63a352da24fa856ba36cd7656ba1d70036c8c5a57797a7336585be858431566'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("product_id", "product_id", "number"),
+      H.imports.column_config("created_at", "created_at", "datetime"),
+      H.imports.column_config("sold_at", "sold_at", "datetime"),
+      H.imports.column_config("cost", "cost", "number"),
+      H.imports.column_config("product_category", "product_category", "text"),
+      H.imports.column_config("product_name", "product_name", "text"),
+      H.imports.column_config("product_brand", "product_brand", "text"),
+      H.imports.column_config("product_retail_price", "product_retail_price", "number"),
+      H.imports.column_config("product_department", "product_department", "text"),
+      H.imports.column_config("product_sku", "product_sku", "text"),
+      H.imports.column_config("product_distribution_center_id", "product_distribution_center_id", "number")
+    ]
+  }
+  owner: 'thinh.nt@holistics.io'
+  table_name: '"persisted"."holistics_inventory_ite_f7e67_202609271125"'
+}

@@ -1,0 +1,137 @@
+Model userss {
+  type: 'table'
+  label: 'Userss'
+  description: ''
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension first_name {
+    label: 'First name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.first_name }};;
+  }
+  dimension last_name {
+    label: 'Last name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.last_name }};;
+  }
+  dimension email {
+    label: 'Email'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.email }};;
+  }
+  dimension age {
+    label: 'Age'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.age }};;
+  }
+  dimension gender {
+    label: 'Gender'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.gender }};;
+  }
+  dimension state {
+    label: 'State'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.state }};;
+  }
+  dimension street_address {
+    label: 'Street address'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.street_address }};;
+  }
+  dimension postal_code {
+    label: 'Postal code'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.postal_code }};;
+  }
+  dimension city {
+    label: 'City'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.city }};;
+  }
+  dimension country {
+    label: 'Country'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.country }};;
+  }
+  dimension latitude {
+    label: 'Latitude'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.latitude }};;
+  }
+  dimension longitude {
+    label: 'Longitude'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.longitude }};;
+  }
+  dimension traffic_source {
+    label: 'Traffic source'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.traffic_source }};;
+  }
+  dimension created_at {
+    label: 'Created at'
+    description: ''
+    type: 'datetime'
+    hidden: false
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'users.csv'
+    uploaded_at: '2026-09-27 11:27:53'
+    hash: '5ff11d20d2e5ed6e63e2293c7edfdf8ac8bea9955b725f77ed6bff825857e741'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("first_name", "first_name", "text"),
+      H.imports.column_config("last_name", "last_name", "text"),
+      H.imports.column_config("email", "email", "text"),
+      H.imports.column_config("age", "age", "number"),
+      H.imports.column_config("gender", "gender", "text"),
+      H.imports.column_config("state", "state", "text"),
+      H.imports.column_config("street_address", "street_address", "text"),
+      H.imports.column_config("postal_code", "postal_code", "text"),
+      H.imports.column_config("city", "city", "text"),
+      H.imports.column_config("country", "country", "text"),
+      H.imports.column_config("latitude", "latitude", "number"),
+      H.imports.column_config("longitude", "longitude", "number"),
+      H.imports.column_config("traffic_source", "traffic_source", "text"),
+      H.imports.column_config("created_at", "created_at", "datetime")
+    ]
+  }
+  owner: 'thinh.nt@holistics.io'
+  table_name: '"persisted"."holistics_userss_11632_202609271127"'
+}

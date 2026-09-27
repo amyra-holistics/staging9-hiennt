@@ -1,0 +1,89 @@
+Model productss {
+  type: 'table'
+  label: 'Productss'
+  description: ''
+  data_source_name: 'demodb'
+  dimension id {
+    label: 'Id'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.id }};;
+  }
+  dimension cost {
+    label: 'Cost'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.cost }};;
+  }
+  dimension category {
+    label: 'Category'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.category }};;
+  }
+  dimension name {
+    label: 'Name'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.name }};;
+  }
+  dimension brand {
+    label: 'Brand'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.brand }};;
+  }
+  dimension retail_price {
+    label: 'Retail price'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.retail_price }};;
+  }
+  dimension department {
+    label: 'Department'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.department }};;
+  }
+  dimension sku {
+    label: 'Sku'
+    description: ''
+    type: 'text'
+    hidden: false
+    definition: @sql {{ #SOURCE.sku }};;
+  }
+  dimension distribution_center_id {
+    label: 'Distribution center'
+    description: ''
+    type: 'number'
+    hidden: false
+    definition: @sql {{ #SOURCE.distribution_center_id }};;
+  }
+
+  import_source: ImportSource {
+    type: 'csv'
+    original_file_name: 'products.csv'
+    uploaded_at: '2026-09-27 11:27:23'
+    hash: '5573c3248b0896eba93700d337b764b22e4f1861277ecc2adf523e982861ae77'
+    column_configs: [
+      H.imports.column_config("id", "id", "number"),
+      H.imports.column_config("cost", "cost", "number"),
+      H.imports.column_config("category", "category", "text"),
+      H.imports.column_config("name", "name", "text"),
+      H.imports.column_config("brand", "brand", "text"),
+      H.imports.column_config("retail_price", "retail_price", "number"),
+      H.imports.column_config("department", "department", "text"),
+      H.imports.column_config("sku", "sku", "text"),
+      H.imports.column_config("distribution_center_id", "distribution_center_id", "number")
+    ]
+  }
+  owner: 'thinh.nt@holistics.io'
+  table_name: '"persisted"."holistics_productss_fa807_202609271127"'
+}

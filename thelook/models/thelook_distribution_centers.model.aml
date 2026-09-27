@@ -1,6 +1,6 @@
-Model distribution_centers {
+Model thelook_distribution_centers {
   type: 'table'
-  label: 'Distribution centers'
+  label: 'Distribution Centers'
   description: ''
   data_source_name: 'demodb'
   dimension id {
@@ -8,6 +8,7 @@ Model distribution_centers {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension name {

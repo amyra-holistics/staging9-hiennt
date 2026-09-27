@@ -1,4 +1,4 @@
-Model events {
+Model thelook_events {
   type: 'table'
   label: 'Events'
   description: ''
@@ -8,14 +8,15 @@ Model events {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension user_id {
     label: 'User'
     description: ''
-    type: 'text'
-    hidden: false
-    definition: @sql {{ #SOURCE.user_id }};;
+    type: 'number'
+    hidden: true
+    definition: @sql NULLIF({{ #SOURCE.user_id }}::text, '')::bigint;;
   }
   dimension sequence_number {
     label: 'Sequence number'

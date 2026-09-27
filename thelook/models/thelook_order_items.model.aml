@@ -1,6 +1,6 @@
-Model order_itemss {
+Model thelook_order_items {
   type: 'table'
-  label: 'Order itemss'
+  label: 'Order Items'
   description: ''
   data_source_name: 'demodb'
   dimension id {
@@ -8,34 +8,35 @@ Model order_itemss {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension order_id {
     label: 'Order'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.order_id }};;
   }
   dimension user_id {
     label: 'User'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.user_id }};;
   }
   dimension product_id {
     label: 'Product'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.product_id }};;
   }
   dimension inventory_item_id {
     label: 'Inventory item'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.inventory_item_id }};;
   }
   dimension status {

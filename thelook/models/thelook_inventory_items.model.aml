@@ -1,6 +1,6 @@
-Model inventory_items {
+Model thelook_inventory_items {
   type: 'table'
-  label: 'Inventory items'
+  label: 'Inventory Items'
   description: ''
   data_source_name: 'demodb'
   dimension id {
@@ -8,13 +8,14 @@ Model inventory_items {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension product_id {
     label: 'Product'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.product_id }};;
   }
   dimension created_at {
@@ -84,7 +85,7 @@ Model inventory_items {
     label: 'Product distribution center'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.product_distribution_center_id }};;
   }
 

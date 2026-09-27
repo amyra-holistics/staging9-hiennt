@@ -1,6 +1,6 @@
-Model orderss {
+Model thelook_orders {
   type: 'table'
-  label: 'Orderss'
+  label: 'Orders'
   description: ''
   data_source_name: 'demodb'
   dimension order_id {
@@ -8,13 +8,14 @@ Model orderss {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.order_id }};;
   }
   dimension user_id {
     label: 'User'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.user_id }};;
   }
   dimension status {
@@ -41,23 +42,23 @@ Model orderss {
   dimension returned_at {
     label: 'Returned at'
     description: ''
-    type: 'text'
+    type: 'datetime'
     hidden: false
-    definition: @sql {{ #SOURCE.returned_at }};;
+    definition: @sql NULLIF({{ #SOURCE.returned_at }}::text, '')::timestamp;;
   }
   dimension shipped_at {
     label: 'Shipped at'
     description: ''
-    type: 'text'
+    type: 'datetime'
     hidden: false
-    definition: @sql {{ #SOURCE.shipped_at }};;
+    definition: @sql NULLIF({{ #SOURCE.shipped_at }}::text, '')::timestamp;;
   }
   dimension delivered_at {
     label: 'Delivered at'
     description: ''
-    type: 'text'
+    type: 'datetime'
     hidden: false
-    definition: @sql {{ #SOURCE.delivered_at }};;
+    definition: @sql NULLIF({{ #SOURCE.delivered_at }}::text, '')::timestamp;;
   }
   dimension num_of_item {
     label: 'Num of item'

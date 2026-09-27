@@ -1,0 +1,143 @@
+Dataset thelook {
+  label: 'TheLook eCommerce'
+  description: '''
+Online fashion retailer: customers, orders, order items, products, inventory, distribution centers and website events (2019 to 2026).
+
+- Order items are the sales grain; an order has one or more items.
+- Item and order status: Processing, Shipped, Complete, Cancelled, Returned.
+- Net sales exclude Cancelled and Returned items.
+- Events are website clickstream; anonymous sessions have no user.
+'''
+  data_source_name: 'demodb'
+  owner: 'thinh.nt@holistics.io'
+
+  models: [
+    thelook_order_items,
+    thelook_orders,
+    thelook_users,
+    thelook_products,
+    thelook_distribution_centers,
+    thelook_inventory_items,
+    thelook_events,
+  ]
+  relationships: [
+    relationship(thelook_order_items.order_id > thelook_orders.order_id, true),
+    relationship(thelook_orders.user_id > thelook_users.id, true),
+    relationship(thelook_order_items.product_id > thelook_products.id, true),
+    relationship(thelook_products.distribution_center_id > thelook_distribution_centers.id, true),
+    relationship(thelook_inventory_items.product_id > thelook_products.id, true),
+    relationship(thelook_events.user_id > thelook_users.id, true),
+  ]
+
+  metric gross_sales {
+    label: 'Gross Sales'
+    type: 'number'
+    definition: @aql sum(thelook_order_items.sale_price) ;;
+    format: '[$$]#,###0'
+    description: 'Sale price of all order items, every status.'
+  }
+
+  metric net_sales {
+    label: 'Net Sales'
+    type: 'number'
+    definition: @aql sum(thelook_order_items.sale_price) | where(thelook_order_items.status not in ['Cancelled', 'Returned']) ;;
+    format: '[$$]#,###0'
+    description: 'Sale price of order items, excluding Cancelled and Returned items.'
+  }
+
+  metric cogs {
+    label: 'COGS'
+    type: 'number'
+    definition: @aql thelook_order_items | sum(thelook_products.cost) | where(thelook_order_items.status not in ['Cancelled', 'Returned']) ;;
+    format: '[$$]#,###0'
+    description: 'Product cost of order items counted in Net Sales.'
+  }
+
+  metric gross_profit {
+    label: 'Gross Profit'
+    type: 'number'
+    definition: @aql net_sales - cogs ;;
+    format: '[$$]#,###0'
+    description: 'Net Sales minus COGS.'
+  }
+
+  metric gross_margin {
+    label: 'Gross Margin'
+    type: 'number'
+    definition: @aql safe_divide(gross_profit, net_sales) ;;
+    format: '#,###0.0%'
+    description: 'Gross Profit as a share of Net Sales.'
+  }
+
+  metric total_orders {
+    label: 'Orders'
+    type: 'number'
+    definition: @aql count(thelook_orders.order_id) ;;
+    format: '#,###0'
+    description: 'Number of orders, every status.'
+  }
+
+  metric fulfilled_orders {
+    label: 'Fulfilled Orders'
+    type: 'number'
+    definition: @aql count_distinct(thelook_order_items.order_id) | where(thelook_order_items.status not in ['Cancelled', 'Returned']) ;;
+    format: '#,###0'
+    description: 'Orders with at least one item counted in Net Sales.'
+  }
+
+  metric aov {
+    label: 'Average Order Value'
+    type: 'number'
+    definition: @aql safe_divide(net_sales, fulfilled_orders) ;;
+    format: '[$$]#,###0.00'
+    description: 'Net Sales per fulfilled order.'
+  }
+
+  metric items_sold {
+    label: 'Items Sold'
+    type: 'number'
+    definition: @aql count(thelook_order_items.id) | where(thelook_order_items.status not in ['Cancelled', 'Returned']) ;;
+    format: '#,###0'
+    description: 'Order items counted in Net Sales.'
+  }
+
+  metric return_rate {
+    label: 'Return Rate'
+    type: 'number'
+    definition: @aql safe_divide(count(thelook_order_items.id) | where(thelook_order_items.status == 'Returned'), count(thelook_order_items.id)) ;;
+    format: '#,###0.0%'
+    description: 'Share of order items that were returned.'
+  }
+
+  metric customers {
+    label: 'Customers'
+    type: 'number'
+    definition: @aql count(thelook_users.id) ;;
+    format: '#,###0'
+    description: 'Registered users.'
+  }
+
+  metric sessions {
+    label: 'Sessions'
+    type: 'number'
+    definition: @aql count_distinct(thelook_events.session_id) ;;
+    format: '#,###0'
+    description: 'Website sessions, including anonymous ones.'
+  }
+
+  metric purchase_conversion_rate {
+    label: 'Purchase Conversion Rate'
+    type: 'number'
+    definition: @aql safe_divide(count_distinct(thelook_events.session_id) | where(thelook_events.event_type == 'purchase'), sessions) ;;
+    format: '#,###0.0%'
+    description: 'Share of sessions with a purchase event.'
+  }
+
+  metric units_in_stock {
+    label: 'Units in Stock'
+    type: 'number'
+    definition: @aql count(thelook_inventory_items.id) | where(thelook_inventory_items.sold_at is null) ;;
+    format: '#,###0'
+    description: 'Inventory items not yet sold.'
+  }
+}

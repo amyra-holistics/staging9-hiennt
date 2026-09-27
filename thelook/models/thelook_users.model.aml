@@ -1,6 +1,6 @@
-Model userss {
+Model thelook_users {
   type: 'table'
-  label: 'Userss'
+  label: 'Users'
   description: ''
   data_source_name: 'demodb'
   dimension id {
@@ -8,6 +8,7 @@ Model userss {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension first_name {

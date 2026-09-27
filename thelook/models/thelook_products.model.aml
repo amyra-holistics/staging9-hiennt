@@ -1,6 +1,6 @@
-Model productss {
+Model thelook_products {
   type: 'table'
-  label: 'Productss'
+  label: 'Products'
   description: ''
   data_source_name: 'demodb'
   dimension id {
@@ -8,6 +8,7 @@ Model productss {
     description: ''
     type: 'number'
     hidden: false
+    primary_key: true
     definition: @sql {{ #SOURCE.id }};;
   }
   dimension cost {
@@ -63,7 +64,7 @@ Model productss {
     label: 'Distribution center'
     description: ''
     type: 'number'
-    hidden: false
+    hidden: true
     definition: @sql {{ #SOURCE.distribution_center_id }};;
   }
 

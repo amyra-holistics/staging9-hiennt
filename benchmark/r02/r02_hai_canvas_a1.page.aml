@@ -1,0 +1,1230 @@
+Dashboard r02_hai_canvas_a1 {
+  title: 'Sales Performance'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'UTC'
+    autorun: true
+    cache_duration: 3600
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Shared filter controls
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  block f_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_country: FilterBlock {
+    label: 'Customer Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Overview tab blocks
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  block overview_title: TextBlock {
+    content: @md
+# Sales Performance
+Monitor commercial health, product performance, customer behavior, and geographic demand.
+;;
+  }
+
+  block overview_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block overview_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block overview_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block overview_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block overview_trend_heading: TextBlock {
+    content: @md
+## Sales trend
+;;
+  }
+
+  block overview_monthly_sales: VizBlock {
+    label: 'Monthly Net Sales'
+
+    viz: CombinationChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'hidden'
+        show_data_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block overview_status_heading: TextBlock {
+    content: @md
+## Order-item status mix
+;;
+  }
+
+  block overview_sales_by_status: VizBlock {
+    label: 'Gross Sales by Status'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.status)
+        label: 'Order Item Status'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_sales)
+            label: 'Gross Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block overview_profit_by_status: VizBlock {
+    label: 'Net Sales by Status'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.status)
+        label: 'Order Item Status'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Products tab blocks
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  block products_title: TextBlock {
+    content: @md
+# Product Performance
+Compare categories and brands to focus assortment, merchandising, and margin decisions.
+;;
+  }
+
+  block products_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block products_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block products_items_sold: VizBlock {
+    label: 'Items Sold'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.items_sold)
+        label: 'Items Sold'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block products_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block products_category_heading: TextBlock {
+    content: @md
+## Category performance
+;;
+  }
+
+  block products_sales_by_category: VizBlock {
+    label: 'Net Sales by Category'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block products_profit_by_category: VizBlock {
+    label: 'Gross Profit by Category'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block products_brand_heading: TextBlock {
+    content: @md
+## Brand performance
+;;
+  }
+
+  block products_sales_by_brand: VizBlock {
+    label: 'Net Sales by Brand'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.brand)
+        label: 'Brand'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block products_return_by_category: VizBlock {
+    label: 'Return Rate by Category'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Customers tab blocks
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  block customers_title: TextBlock {
+    content: @md
+# Customer Performance
+Understand customer reach, demand, and the acquisition sources associated with sales.
+;;
+  }
+
+  block customers_total: VizBlock {
+    label: 'Customers'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.customers)
+        label: 'Customers'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block customers_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block customers_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block customers_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block customers_segment_heading: TextBlock {
+    content: @md
+## Customer segments
+;;
+  }
+
+  block customers_sales_by_gender: VizBlock {
+    label: 'Net Sales by Gender'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.gender)
+        label: 'Customer Gender'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block customers_count_by_country: VizBlock {
+    label: 'Customers by Country'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Customer Country'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.customers)
+            label: 'Customers'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block customers_acquisition_heading: TextBlock {
+    content: @md
+## Acquisition source performance
+;;
+  }
+
+  block customers_sales_by_source: VizBlock {
+    label: 'Net Sales by Traffic Source'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.traffic_source)
+        label: 'Traffic Source'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block customers_by_source: VizBlock {
+    label: 'Customers by Traffic Source'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.traffic_source)
+        label: 'Traffic Source'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.customers)
+            label: 'Customers'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Geography tab blocks
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  block geography_title: TextBlock {
+    content: @md
+# Geographic Performance
+Identify the countries and states generating the most revenue, order volume, and margin.
+;;
+  }
+
+  block geography_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block geography_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block geography_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block geography_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block geography_country_heading: TextBlock {
+    content: @md
+## Country performance
+;;
+  }
+
+  block geography_sales_by_country: VizBlock {
+    label: 'Net Sales by Country'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Customer Country'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block geography_orders_by_country: VizBlock {
+    label: 'Fulfilled Orders by Country'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Customer Country'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            label: 'Fulfilled Orders'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block geography_state_heading: TextBlock {
+    content: @md
+## State performance
+;;
+  }
+
+  block geography_sales_by_state: VizBlock {
+    label: 'Net Sales by State'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.state)
+        label: 'Customer State'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block geography_margin_by_state: VizBlock {
+    label: 'Gross Margin by State'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.state)
+        label: 'Customer State'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 15
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Shared interactions
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        'overview_net_sales',
+        'overview_fulfilled_orders',
+        'overview_aov',
+        'overview_margin',
+        'overview_monthly_sales',
+        'overview_sales_by_status',
+        'overview_profit_by_status',
+        'products_net_sales',
+        'products_gross_profit',
+        'products_items_sold',
+        'products_return_rate',
+        'products_sales_by_category',
+        'products_profit_by_category',
+        'products_sales_by_brand',
+        'products_return_by_category',
+        'customers_total',
+        'customers_net_sales',
+        'customers_orders',
+        'customers_aov',
+        'customers_sales_by_gender',
+        'customers_count_by_country',
+        'customers_sales_by_source',
+        'customers_by_source',
+        'geography_net_sales',
+        'geography_orders',
+        'geography_aov',
+        'geography_margin',
+        'geography_sales_by_country',
+        'geography_orders_by_country',
+        'geography_sales_by_state',
+        'geography_margin_by_state',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+
+    FilterInteraction {
+      from: 'f_country'
+      to: [
+        'overview_net_sales',
+        'overview_fulfilled_orders',
+        'overview_aov',
+        'overview_margin',
+        'overview_monthly_sales',
+        'overview_sales_by_status',
+        'overview_profit_by_status',
+        'products_net_sales',
+        'products_gross_profit',
+        'products_items_sold',
+        'products_return_rate',
+        'products_sales_by_category',
+        'products_profit_by_category',
+        'products_sales_by_brand',
+        'products_return_by_category',
+        'customers_total',
+        'customers_net_sales',
+        'customers_orders',
+        'customers_aov',
+        'customers_sales_by_gender',
+        'customers_count_by_country',
+        'customers_sales_by_source',
+        'customers_by_source',
+        'geography_net_sales',
+        'geography_orders',
+        'geography_aov',
+        'geography_margin',
+        'geography_sales_by_country',
+        'geography_orders_by_country',
+        'geography_sales_by_state',
+        'geography_margin_by_state',
+      ]
+      field: r(thelook_users.country)
+    },
+
+    FilterInteraction {
+      from: 'f_category'
+      to: [
+        'overview_net_sales',
+        'overview_fulfilled_orders',
+        'overview_aov',
+        'overview_margin',
+        'overview_monthly_sales',
+        'overview_sales_by_status',
+        'overview_profit_by_status',
+        'products_net_sales',
+        'products_gross_profit',
+        'products_items_sold',
+        'products_return_rate',
+        'products_sales_by_category',
+        'products_profit_by_category',
+        'products_sales_by_brand',
+        'products_return_by_category',
+        'customers_total',
+        'customers_net_sales',
+        'customers_orders',
+        'customers_aov',
+        'customers_sales_by_gender',
+        'customers_count_by_country',
+        'customers_sales_by_source',
+        'customers_by_source',
+        'geography_net_sales',
+        'geography_orders',
+        'geography_aov',
+        'geography_margin',
+        'geography_sales_by_country',
+        'geography_orders_by_country',
+        'geography_sales_by_state',
+        'geography_margin_by_state',
+      ]
+      field: r(thelook_products.category)
+    },
+  ]
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Canvas layout
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 1360
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block overview_title             { position: pos(20, 20, 1180, 90) layer: 1 }
+      block f_date                     { position: pos(20, 130, 360, 80) layer: 1 }
+      block f_country                  { position: pos(400, 130, 360, 80) layer: 1 }
+      block f_category                 { position: pos(780, 130, 420, 80) layer: 1 }
+
+      block overview_net_sales         { position: pos(20, 230, 280, 140) layer: 1 }
+      block overview_fulfilled_orders  { position: pos(320, 230, 280, 140) layer: 1 }
+      block overview_aov               { position: pos(620, 230, 280, 140) layer: 1 }
+      block overview_margin            { position: pos(920, 230, 280, 140) layer: 1 }
+
+      block overview_trend_heading     { position: pos(20, 390, 1180, 50) layer: 1 }
+      block overview_monthly_sales     { position: pos(20, 450, 1180, 360) layer: 1 }
+
+      block overview_status_heading    { position: pos(20, 830, 1180, 50) layer: 1 }
+      block overview_sales_by_status   { position: pos(20, 890, 580, 360) layer: 1 }
+      block overview_profit_by_status  { position: pos(620, 890, 580, 360) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+
+    tab products: CanvasLayout {
+      label: 'Products'
+      width: 1220
+      height: 1360
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block products_title                 { position: pos(20, 20, 1180, 90) layer: 1 }
+      block f_date                         { position: pos(20, 130, 360, 80) layer: 1 }
+      block f_country                      { position: pos(400, 130, 360, 80) layer: 1 }
+      block f_category                     { position: pos(780, 130, 420, 80) layer: 1 }
+
+      block products_net_sales             { position: pos(20, 230, 280, 140) layer: 1 }
+      block products_gross_profit          { position: pos(320, 230, 280, 140) layer: 1 }
+      block products_items_sold            { position: pos(620, 230, 280, 140) layer: 1 }
+      block products_return_rate           { position: pos(920, 230, 280, 140) layer: 1 }
+
+      block products_category_heading      { position: pos(20, 390, 1180, 50) layer: 1 }
+      block products_sales_by_category     { position: pos(20, 450, 580, 360) layer: 1 }
+      block products_profit_by_category    { position: pos(620, 450, 580, 360) layer: 1 }
+
+      block products_brand_heading         { position: pos(20, 830, 1180, 50) layer: 1 }
+      block products_sales_by_brand        { position: pos(20, 890, 580, 360) layer: 1 }
+      block products_return_by_category    { position: pos(620, 890, 580, 360) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+
+    tab customers: CanvasLayout {
+      label: 'Customers'
+      width: 1220
+      height: 1360
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block customers_title                { position: pos(20, 20, 1180, 90) layer: 1 }
+      block f_date                         { position: pos(20, 130, 360, 80) layer: 1 }
+      block f_country                      { position: pos(400, 130, 360, 80) layer: 1 }
+      block f_category                     { position: pos(780, 130, 420, 80) layer: 1 }
+
+      block customers_total                { position: pos(20, 230, 280, 140) layer: 1 }
+      block customers_net_sales            { position: pos(320, 230, 280, 140) layer: 1 }
+      block customers_orders               { position: pos(620, 230, 280, 140) layer: 1 }
+      block customers_aov                  { position: pos(920, 230, 280, 140) layer: 1 }
+
+      block customers_segment_heading      { position: pos(20, 390, 1180, 50) layer: 1 }
+      block customers_sales_by_gender      { position: pos(20, 450, 580, 360) layer: 1 }
+      block customers_count_by_country     { position: pos(620, 450, 580, 360) layer: 1 }
+
+      block customers_acquisition_heading  { position: pos(20, 830, 1180, 50) layer: 1 }
+      block customers_sales_by_source      { position: pos(20, 890, 580, 360) layer: 1 }
+      block customers_by_source            { position: pos(620, 890, 580, 360) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+
+    tab geography: CanvasLayout {
+      label: 'Geography'
+      width: 1220
+      height: 1360
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block geography_title                { position: pos(20, 20, 1180, 90) layer: 1 }
+      block f_date                         { position: pos(20, 130, 360, 80) layer: 1 }
+      block f_country                      { position: pos(400, 130, 360, 80) layer: 1 }
+      block f_category                     { position: pos(780, 130, 420, 80) layer: 1 }
+
+      block geography_net_sales            { position: pos(20, 230, 280, 140) layer: 1 }
+      block geography_orders               { position: pos(320, 230, 280, 140) layer: 1 }
+      block geography_aov                  { position: pos(620, 230, 280, 140) layer: 1 }
+      block geography_margin               { position: pos(920, 230, 280, 140) layer: 1 }
+
+      block geography_country_heading      { position: pos(20, 390, 1180, 50) layer: 1 }
+      block geography_sales_by_country     { position: pos(20, 450, 580, 360) layer: 1 }
+      block geography_orders_by_country    { position: pos(620, 450, 580, 360) layer: 1 }
+
+      block geography_state_heading        { position: pos(20, 830, 1180, 50) layer: 1 }
+      block geography_sales_by_state       { position: pos(20, 890, 580, 360) layer: 1 }
+      block geography_margin_by_state      { position: pos(620, 890, 580, 360) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+  }
+}

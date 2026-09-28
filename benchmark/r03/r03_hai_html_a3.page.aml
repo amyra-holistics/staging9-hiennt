@@ -1,0 +1,648 @@
+Dashboard r03_hai_html_a3 {
+  title: 'TheLook Business Review'
+  description: 'Branded monthly eCommerce business review for TheLook.'
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 3600
+  }
+
+  block f_date: FilterBlock {
+    label: 'Reporting month'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'this month'
+    }
+  }
+
+  block p_mom: PopBlock {
+    label: 'Month-over-month'
+    description: 'Compare the selected reporting period with the prior month.'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+    }
+  }
+
+  block v_net_sales_trend: VizBlock {
+    label: 'Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            line_interpolation: 'smooth'
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_category_sales: VizBlock {
+    label: 'Top Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        'v_net_sales',
+        'v_orders',
+        'v_aov',
+        'v_gross_margin',
+        'v_net_sales_trend',
+        'v_category_sales',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    PopInteraction {
+      from: 'p_mom'
+      to: [
+        'v_net_sales',
+        'v_orders',
+        'v_aov',
+        'v_gross_margin',
+        'v_net_sales_trend',
+        'v_category_sales',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+
+        :root {
+          --ink: #1B1F3B;
+          --coral: #FF6B5A;
+          --sand: #F5EFE6;
+          --teal: #1F9E8F;
+          --alert: #D64545;
+          --slate: #5B6477;
+          --white: #FFFFFF;
+          --border: rgba(27, 31, 59, 0.10);
+        }
+
+        .thelook-review {
+          background: var(--sand);
+          color: var(--ink);
+          font-family: 'Manrope', Arial, sans-serif;
+          margin: -24px;
+          min-height: 100vh;
+          padding: 28px;
+        }
+
+        .thelook-review * {
+          box-sizing: border-box;
+        }
+
+        .review-shell {
+          margin: 0 auto;
+          max-width: 1440px;
+        }
+
+        .brand-header {
+          align-items: center;
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          box-shadow: 0 8px 30px rgba(27, 31, 59, 0.07);
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 24px;
+          padding: 20px 24px;
+        }
+
+        .brand-lockup {
+          align-items: center;
+          display: flex;
+          gap: 18px;
+        }
+
+        .brand-logo {
+          display: block;
+          height: 40px;
+          width: 176px;
+        }
+
+        .header-divider {
+          background: var(--border);
+          height: 32px;
+          width: 1px;
+        }
+
+        .header-copy .eyebrow {
+          color: var(--coral);
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          margin-bottom: 2px;
+          text-transform: uppercase;
+        }
+
+        .header-copy h1 {
+          color: var(--ink);
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+          line-height: 1.2;
+          margin: 0;
+        }
+
+        .header-controls {
+          align-items: center;
+          display: flex;
+          gap: 12px;
+        }
+
+        .control-wrap {
+          background: var(--sand);
+          border: 1px solid var(--border);
+          border-radius: 10px;
+          min-width: 180px;
+          padding: 5px 10px;
+        }
+
+        .control-wrap .dac-ic-block,
+        .control-wrap .dac-ic-block > div {
+          background: transparent !important;
+          border: 0 !important;
+          box-shadow: none !important;
+          padding: 0 !important;
+        }
+
+        .control-wrap .dac-ic-block-label {
+          color: var(--slate) !important;
+          font-family: 'Manrope', Arial, sans-serif !important;
+          font-size: 11px !important;
+          font-weight: 800 !important;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .section-intro {
+          align-items: flex-end;
+          display: flex;
+          justify-content: space-between;
+          margin: 30px 0 14px;
+        }
+
+        .section-intro h2 {
+          color: var(--ink);
+          font-size: 24px;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+          margin: 0;
+        }
+
+        .section-intro p {
+          color: var(--slate);
+          font-size: 13px;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .kpi-grid {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .kpi-card {
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          box-shadow: 0 6px 22px rgba(27, 31, 59, 0.06);
+          min-height: 196px;
+          overflow: hidden;
+          padding: 18px;
+          position: relative;
+        }
+
+        .kpi-card::before {
+          background: var(--coral);
+          content: '';
+          height: 4px;
+          left: 0;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+
+        .kpi-card.margin-card::before {
+          background: var(--teal);
+        }
+
+        .kpi-heading {
+          align-items: center;
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+        }
+
+        .kpi-name {
+          color: var(--slate);
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .metric-icon {
+          align-items: center;
+          background: rgba(255, 107, 90, 0.12);
+          border-radius: 10px;
+          color: var(--coral);
+          display: flex;
+          font-size: 19px;
+          height: 36px;
+          justify-content: center;
+          width: 36px;
+        }
+
+        .margin-card .metric-icon {
+          background: rgba(31, 158, 143, 0.13);
+          color: var(--teal);
+        }
+
+        .kpi-card .dac-viz-block {
+          background: transparent !important;
+          border: 0 !important;
+          box-shadow: none !important;
+          min-height: 88px;
+          padding: 0 !important;
+        }
+
+        .kpi-card .dac-viz-block-label-container {
+          display: none !important;
+        }
+
+        .kpi-card .dac-viz-block,
+        .kpi-card .dac-viz-block * {
+          font-family: 'Manrope', Arial, sans-serif !important;
+        }
+
+        .kpi-card .kpi-value,
+        .kpi-card [class*='metric-value'] {
+          color: var(--ink) !important;
+          font-size: 30px !important;
+          font-weight: 800 !important;
+          letter-spacing: -0.05em !important;
+        }
+
+        .kpi-card .growth-rate,
+        .kpi-card [class*='growth'],
+        .kpi-card [class*='comparison'] {
+          border-radius: 999px !important;
+          font-weight: 800 !important;
+        }
+
+        .kpi-card .positive,
+        .kpi-card [class*='positive'] {
+          color: var(--teal) !important;
+        }
+
+        .kpi-card .negative,
+        .kpi-card [class*='negative'] {
+          color: var(--alert) !important;
+        }
+
+        .mom-hint {
+          align-items: center;
+          color: var(--slate);
+          display: flex;
+          font-size: 11px;
+          font-weight: 600;
+          gap: 6px;
+          margin-top: 2px;
+        }
+
+        .mom-hint .dot {
+          background: var(--coral);
+          border-radius: 50%;
+          display: inline-block;
+          height: 6px;
+          width: 6px;
+        }
+
+        .margin-card .mom-hint .dot {
+          background: var(--teal);
+        }
+
+        .chart-grid {
+          display: grid;
+          gap: 16px;
+          grid-template-columns: minmax(0, 1.65fr) minmax(320px, 1fr);
+        }
+
+        .chart-card {
+          background: var(--white);
+          border: 1px solid var(--border);
+          border-radius: 16px;
+          box-shadow: 0 6px 22px rgba(27, 31, 59, 0.06);
+          min-height: 410px;
+          overflow: hidden;
+          padding: 8px 12px 14px;
+        }
+
+        .chart-card .dac-viz-block {
+          height: 100%;
+        }
+
+        .chart-card .dac-viz-block-label {
+          color: var(--ink) !important;
+          font-family: 'Manrope', Arial, sans-serif !important;
+          font-size: 16px !important;
+          font-weight: 800 !important;
+          letter-spacing: -0.02em !important;
+        }
+
+        .footer-note {
+          color: var(--slate);
+          font-size: 11px;
+          font-weight: 600;
+          margin: 18px 2px 0;
+        }
+
+        @media (max-width: 1080px) {
+          .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .chart-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .thelook-review {
+            margin: -16px;
+            padding: 16px;
+          }
+
+          .brand-header,
+          .brand-lockup,
+          .header-controls {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .header-divider {
+            display: none;
+          }
+
+          .header-controls {
+            width: 100%;
+          }
+
+          .control-wrap {
+            width: 100%;
+          }
+
+          .kpi-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .section-intro {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 6px;
+          }
+        }
+      </style>
+
+      <main class="thelook-review">
+        <div class="review-shell">
+          <header class="brand-header">
+            <div class="brand-lockup">
+              <img
+                class="brand-logo"
+                alt="thelook"
+                src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='40' viewBox='0 0 176 40'%3E%3Ccircle cx='18' cy='20' r='11' fill='%23FF6B5A'/%3E%3Ccircle cx='18' cy='20' r='4.5' fill='%23F5EFE6'/%3E%3Ctext x='38' y='28' font-family='Manrope, Arial, sans-serif' font-size='24' font-weight='800' letter-spacing='-0.5' fill='%231B1F3B'%3Ethelook%3C/text%3E%3C/svg%3E"
+              />
+              <div class="header-divider"></div>
+              <div class="header-copy">
+                <div class="eyebrow">Commerce intelligence</div>
+                <h1>Monthly Business Review</h1>
+              </div>
+            </div>
+
+            <div class="header-controls">
+              <div class="control-wrap">
+                <h-block name="f_date"></h-block>
+              </div>
+              <div class="control-wrap">
+                <h-block name="p_mom"></h-block>
+              </div>
+            </div>
+          </header>
+
+          <section>
+            <div class="section-intro">
+              <div>
+                <h2>Performance snapshot</h2>
+                <p>Selected period with month-over-month comparison</p>
+              </div>
+            </div>
+
+            <div class="kpi-grid">
+              <article class="kpi-card">
+                <div class="kpi-heading">
+                  <span class="kpi-name">Net Sales</span>
+                  <span class="metric-icon" aria-hidden="true">$</span>
+                </div>
+                <h-block name="v_net_sales"></h-block>
+                <div class="mom-hint"><span class="dot"></span>vs. prior month</div>
+              </article>
+
+              <article class="kpi-card">
+                <div class="kpi-heading">
+                  <span class="kpi-name">Orders</span>
+                  <span class="metric-icon" aria-hidden="true">◫</span>
+                </div>
+                <h-block name="v_orders"></h-block>
+                <div class="mom-hint"><span class="dot"></span>vs. prior month</div>
+              </article>
+
+              <article class="kpi-card">
+                <div class="kpi-heading">
+                  <span class="kpi-name">AOV</span>
+                  <span class="metric-icon" aria-hidden="true">⌁</span>
+                </div>
+                <h-block name="v_aov"></h-block>
+                <div class="mom-hint"><span class="dot"></span>vs. prior month</div>
+              </article>
+
+              <article class="kpi-card margin-card">
+                <div class="kpi-heading">
+                  <span class="kpi-name">Gross Margin</span>
+                  <span class="metric-icon" aria-hidden="true">%</span>
+                </div>
+                <h-block name="v_gross_margin"></h-block>
+                <div class="mom-hint"><span class="dot"></span>vs. prior month</div>
+              </article>
+            </div>
+          </section>
+
+          <section>
+            <div class="section-intro">
+              <div>
+                <h2>Sales performance</h2>
+                <p>Trend and category contribution for the selected reporting period</p>
+              </div>
+            </div>
+
+            <div class="chart-grid">
+              <article class="chart-card">
+                <h-block name="v_net_sales_trend"></h-block>
+              </article>
+
+              <article class="chart-card">
+                <h-block name="v_category_sales"></h-block>
+              </article>
+            </div>
+          </section>
+
+          <div class="footer-note">
+            Net Sales excludes cancelled and returned items. Gross Margin is calculated as Gross Profit divided by Net Sales.
+          </div>
+        </div>
+      </main>
+    ;;
+  }
+}

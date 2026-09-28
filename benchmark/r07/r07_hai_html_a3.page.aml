@@ -1,0 +1,244 @@
+// benchmark/r07/r07_hai_html_a3.page.aml
+Dashboard r07_hai_html_a3 {
+  title: 'Operations Dashboard'
+  theme: H.themes.classic
+
+  block dashboard_intro: TextBlock {
+    content: @md
+# Operations Dashboard
+
+Monitor inventory availability and return-risk exposure across distribution centers and product categories.
+;;
+  }
+
+  block interaction_guide: TextBlock {
+    content: @md
+**How to use this dashboard:** Click a distribution center or category in the stock bars to cross-filter the dashboard. Expand a distribution center in the operations matrix to view its categories. Use Drill Down on a category to inspect its products. Return rates above **10%** are highlighted in red.
+;;
+  }
+
+  block stock_levels: VizBlock {
+    label: 'Stock Levels by Distribution Center and Category'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+      }
+
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            label: 'Units in Stock'
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block operations_matrix: VizBlock {
+    label: 'Inventory and Return Rate by Distribution Center'
+
+    viz: PivotTable {
+      dataset: thelook
+
+      calculation return_rate_over_10_percent {
+        label: 'Return Rate Threshold Flag'
+        formula: @aql case(
+          when: return_rate > 0.10,
+          then: 'Above 10%',
+          else: 'At or below 10%'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_distribution_centers.name)
+          label: 'Distribution Center'
+        },
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+        }
+      ]
+
+      values: [
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          label: 'Units in Stock'
+
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'return_rate_over_10_percent'
+          label: 'Return Rate Threshold Flag'
+
+          format {
+            type: 'text'
+          }
+        }
+      ]
+
+      settings {
+        show_row_total: false
+        show_column_total: false
+        show_sub_total: false
+        pagination_size: 100
+        wrap_header_text: true
+        wrap_cell_text: true
+
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.10
+              }
+
+              text_color: '#991B1B'
+              background_color: '#FEE2E2'
+            }
+          }
+        ]
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_distribution_centers.name'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'thelook_products.category'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: []
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .operations-dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+    color: #172033;
+  }
+
+  .operations-header {
+    padding: 8px 4px 4px;
+    border-bottom: 1px solid #E5E7EB;
+  }
+
+  .operations-guide {
+    margin: 16px 0 24px;
+    padding: 14px 18px;
+    border: 1px solid #DBEAFE;
+    border-radius: 10px;
+    background: #F8FBFF;
+  }
+
+  .operations-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .operations-card {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+
+  .operations-card h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .operations-card p {
+    margin: 0 0 16px;
+    color: #667085;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 720px) {
+    .operations-dashboard {
+      padding: 14px;
+    }
+
+    .operations-card {
+      padding: 14px;
+    }
+  }
+</style>
+
+<div class="operations-dashboard">
+  <section class="operations-header">
+    <h-block name="dashboard_intro" />
+  </section>
+
+  <section class="operations-guide">
+    <h-block name="interaction_guide" />
+  </section>
+
+  <main class="operations-grid">
+    <section class="operations-card">
+      <h2>Stock-level bars</h2>
+      <p>Compare available units across distribution centers and categories.</p>
+      <h-block name="stock_levels" />
+    </section>
+
+    <section class="operations-card">
+      <h2>Inventory and return-risk matrix</h2>
+      <p>Expand each distribution center to review category-level inventory and return-rate exposure.</p>
+      <h-block name="operations_matrix" />
+    </section>
+  </main>
+</div>
+;;
+  }
+}

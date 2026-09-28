@@ -1,0 +1,371 @@
+Dashboard r06_hai_html_a1 {
+  title: 'Marketing Funnel by Traffic Source'
+  description: 'Sessions and purchase conversion rate by traffic source.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+  }
+
+  block date_range: FilterBlock {
+    label: 'Event date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_events.created_at)
+    }
+  }
+
+  block funnel_headline: VizBlock {
+    label: 'Marketing Funnel Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+        <style>
+          .funnel-headline-card {
+            box-sizing: border-box;
+            padding: 1.5rem 1.75rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            background: #FFFFFF;
+            color: #374151;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          }
+
+          .funnel-headline-eyebrow {
+            margin: 0 0 0.5rem;
+            color: #6B7280;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+          }
+
+          .funnel-headline-text {
+            margin: 0;
+            font-size: 1.1rem;
+            line-height: 1.55;
+          }
+
+          .funnel-headline-sessions {
+            color: #111827;
+            font-size: 1.45em;
+            font-weight: 700;
+          }
+
+          .funnel-headline-rate {
+            color: #111827;
+            font-weight: 650;
+          }
+        </style>
+
+        <section class="funnel-headline-card">
+          <p class="funnel-headline-eyebrow">Marketing Funnel</p>
+          <p class="funnel-headline-text">
+            The funnel generated
+            <span class="funnel-headline-sessions">{{ rows[0].values.`Sessions` }}</span>
+            sessions at a
+            <span class="funnel-headline-rate">{{ rows[0].values.`Purchase Conversion Rate` }}</span>
+            purchase conversion rate.
+          </p>
+        </section>
+      ;;
+    }
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+
+      calculation traffic_source_category {
+        label: 'Traffic Source Category'
+        formula: @aql coalesce(thelook_events.traffic_source, 'Unknown');;
+        calc_type: 'dimension'
+        data_type: 'text'
+        model: thelook_events
+      }
+
+      x_axis: VizFieldFull {
+        ref: ref('thelook_events', 'traffic_source_category')
+        label: 'Traffic Source'
+      }
+
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: '#,###,"K"'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+      ### Commentary
+
+      This view shows the **acquisition scale** of each source. Prioritize investment decisions by considering both session volume here and purchase conversion in the companion chart—high-volume sources can still require landing-page or audience optimization.
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+
+      calculation traffic_source_category {
+        label: 'Traffic Source Category'
+        formula: @aql coalesce(thelook_events.traffic_source, 'Unknown');;
+        calc_type: 'dimension'
+        data_type: 'text'
+        model: thelook_events
+      }
+
+      x_axis: VizFieldFull {
+        ref: ref('thelook_events', 'traffic_source_category')
+        label: 'Traffic Source'
+      }
+
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+      ### Commentary
+
+      This view indicates **traffic quality**: a higher purchase conversion rate means more sessions progress to purchase. Use it to identify sources worth scaling and sources where campaign targeting, creative, or onsite experience may need attention.
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_range'
+      to: [
+        'funnel_headline',
+        'sessions_by_source',
+        'conversion_by_source',
+      ]
+      field: r(thelook_events.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .marketing-funnel-dashboard {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 28px;
+          color: #111827;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .dashboard-header {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          margin-bottom: 24px;
+          padding-bottom: 24px;
+          border-bottom: 1px solid #E5E7EB;
+        }
+
+        .dashboard-kicker {
+          margin: 0 0 6px;
+          color: #2563EB;
+          font-size: 0.75rem;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .dashboard-title {
+          margin: 0;
+          font-size: 2rem;
+          line-height: 1.15;
+          letter-spacing: -0.03em;
+        }
+
+        .dashboard-subtitle {
+          max-width: 680px;
+          margin: 10px 0 0;
+          color: #6B7280;
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+
+        .filter-container {
+          min-width: 250px;
+        }
+
+        .headline-section {
+          margin-bottom: 32px;
+        }
+
+        .section-heading {
+          margin: 0 0 6px;
+          font-size: 1.25rem;
+          letter-spacing: -0.015em;
+        }
+
+        .section-intro {
+          margin: 0 0 16px;
+          color: #6B7280;
+          font-size: 0.95rem;
+          line-height: 1.5;
+        }
+
+        .chart-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 24px;
+        }
+
+        .chart-section {
+          min-width: 0;
+          overflow: hidden;
+          border: 1px solid #E5E7EB;
+          border-radius: 12px;
+          background: #FFFFFF;
+        }
+
+        .chart-block {
+          min-height: 390px;
+          padding: 8px 8px 0;
+        }
+
+        .commentary-block {
+          min-height: 130px;
+          padding: 4px 20px 16px;
+          border-top: 1px solid #F3F4F6;
+          background: #F9FAFB;
+        }
+
+        @media (max-width: 900px) {
+          .marketing-funnel-dashboard {
+            padding: 18px;
+          }
+
+          .dashboard-header {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          .filter-container {
+            width: 100%;
+          }
+
+          .chart-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
+
+      <main class="marketing-funnel-dashboard">
+        <header class="dashboard-header">
+          <div>
+            <p class="dashboard-kicker">Acquisition performance</p>
+            <h1 class="dashboard-title">Marketing Funnel by Traffic Source</h1>
+            <p class="dashboard-subtitle">
+              Compare traffic volume and purchase conversion to identify the sources that create the most valuable sessions.
+            </p>
+          </div>
+
+          <div class="filter-container">
+            <h-block name="date_range" />
+          </div>
+        </header>
+
+        <section class="headline-section">
+          <h-block name="funnel_headline" />
+        </section>
+
+        <section>
+          <h2 class="section-heading">Traffic-source performance</h2>
+          <p class="section-intro">
+            Use the same date range across both views to compare the scale and efficiency of each acquisition channel.
+          </p>
+
+          <div class="chart-grid">
+            <article class="chart-section">
+              <div class="chart-block">
+                <h-block name="sessions_by_source" />
+              </div>
+              <div class="commentary-block">
+                <h-block name="sessions_commentary" />
+              </div>
+            </article>
+
+            <article class="chart-section">
+              <div class="chart-block">
+                <h-block name="conversion_by_source" />
+              </div>
+              <div class="commentary-block">
+                <h-block name="conversion_commentary" />
+              </div>
+            </article>
+          </div>
+        </section>
+      </main>
+    ;;
+  }
+}

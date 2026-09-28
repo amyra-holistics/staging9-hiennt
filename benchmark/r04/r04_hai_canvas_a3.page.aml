@@ -1,0 +1,472 @@
+Dashboard r04_hai_canvas_a3 {
+  title: 'Monthly Performance'
+  description: @md
+Monthly ecommerce performance slides for TheLook eCommerce.
+  ;;
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  // Slide 1 — Title
+  block title_slide: TextBlock {
+    content: @md
+# TheLook eCommerce
+## Monthly Performance Review
+
+**Executive view of sales, profitability, category mix, and operating health**
+
+_Data through the latest available month_
+    ;;
+  }
+
+  // Slide 2 — Headline KPIs
+  block kpi_heading: TextBlock {
+    content: @md
+# Headline KPIs
+### Core commercial performance for the selected reporting period
+    ;;
+  }
+
+  block headline_kpis: VizBlock {
+    label: 'Headline Performance KPIs'
+    viz: MetricSheet {
+      dataset: thelook
+
+      date_field: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      rows: [
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            label: 'Fulfilled Orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.aov)
+            label: 'Average Order Value'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+
+      settings {
+        max_column: 1
+      }
+    }
+  }
+
+  // Slide 3 — Trend
+  block trend_heading: TextBlock {
+    content: @md
+# Monthly Sales & Profit Trend
+### Net Sales and Gross Profit by order-item creation month
+    ;;
+  }
+
+  block monthly_sales_profit_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit Trend'
+    viz: CombinationChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        label: 'Order Item Created Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      y_axis {
+        label: 'Net Sales and Gross Profit'
+
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Profit'
+            ref: r(thelook.gross_profit)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // Slide 4 — Category breakdown
+  block category_heading: TextBlock {
+    content: @md
+# Category Breakdown
+### Rank categories by Net Sales, then compare profitability, volume, and returns
+    ;;
+  }
+
+  block category_performance: VizBlock {
+    label: 'Category Performance'
+    viz: DataTable {
+      dataset: thelook
+
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          format {
+            type: 'text'
+          }
+        }
+
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          uname: 'net_sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+
+        VizFieldFull {
+          ref: r(thelook.items_sold)
+          label: 'Items Sold'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'net_sales'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  // Slide 5 — Key takeaways
+  block takeaways_heading: TextBlock {
+    content: @md
+# Key Takeaways
+### Operational signals to monitor alongside commercial performance
+    ;;
+  }
+
+  block operational_takeaways: VizBlock {
+    label: 'Operational Key Takeaways'
+    viz: MetricSheet {
+      dataset: thelook
+
+      date_field: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Order Item Created Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      rows: [
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            label: 'Units in Stock'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.customers)
+            label: 'Customers'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        MetricSeries {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+
+      settings {
+        max_column: 1
+      }
+    }
+  }
+
+  block takeaways_note: TextBlock {
+    content: @md
+**How to use this slide**
+
+- Compare conversion and return rate to identify demand-quality or fulfillment risks.
+- Monitor inventory alongside sales momentum to flag potential availability constraints.
+- Use customer and session trends to distinguish traffic-driven from conversion-driven changes.
+    ;;
+  }
+
+  explicit_interactions: []
+
+  view: TabLayout {
+    tab title: CanvasLayout {
+      label: '1. Title'
+      width: 1280
+      height: 720
+      grid_size: 20
+
+      block title_slide {
+        position: pos(120, 170, 1040, 340)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab headline_kpis: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1280
+      height: 720
+      grid_size: 20
+
+      block kpi_heading {
+        position: pos(60, 40, 1160, 100)
+        layer: 1
+      }
+
+      block headline_kpis {
+        position: pos(60, 160, 1160, 500)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab trend: CanvasLayout {
+      label: '3. Trend'
+      width: 1280
+      height: 720
+      grid_size: 20
+
+      block trend_heading {
+        position: pos(60, 40, 1160, 100)
+        layer: 1
+      }
+
+      block monthly_sales_profit_trend {
+        position: pos(60, 160, 1160, 500)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab category_breakdown: CanvasLayout {
+      label: '4. Category Breakdown'
+      width: 1280
+      height: 720
+      grid_size: 20
+
+      block category_heading {
+        position: pos(60, 40, 1160, 100)
+        layer: 1
+      }
+
+      block category_performance {
+        position: pos(60, 160, 1160, 500)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab key_takeaways: CanvasLayout {
+      label: '5. Key Takeaways'
+      width: 1280
+      height: 720
+      grid_size: 20
+
+      block takeaways_heading {
+        position: pos(60, 40, 1160, 100)
+        layer: 1
+      }
+
+      block operational_takeaways {
+        position: pos(60, 160, 700, 460)
+        layer: 1
+      }
+
+      block takeaways_note {
+        position: pos(800, 180, 380, 380)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

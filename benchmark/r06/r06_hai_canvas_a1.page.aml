@@ -1,0 +1,253 @@
+// benchmark/r06/r06_hai_canvas_a1.page.aml
+
+Dashboard r06_hai_canvas_a1 {
+  title: 'Marketing Funnel: Traffic Source Performance'
+  description: 'Marketing funnel story showing session volume and purchase conversion rate by traffic source.'
+  theme: H.themes.classic
+
+  settings {
+    cache_duration: 3600
+  }
+
+  // ── Header ──────────────────────────────────────────────────────────────────
+
+  block title: TextBlock {
+    content: @md
+# Marketing Funnel Performance
+Understand which traffic sources generate reach—and which turn that reach into purchases.
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Event Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_events.created_at)
+    }
+  }
+
+  // Headline sentence assembled with a live KPI value.
+  block headline_prefix: TextBlock {
+    content: @md
+## Marketing attracted
+    ;;
+  }
+
+  block headline_sessions: VizBlock {
+    label: 'Live Sessions'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.sessions)
+        label: 'Sessions'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block headline_suffix: TextBlock {
+    content: @md
+## sessions across paid, owned, and organic traffic sources.
+    ;;
+  }
+
+  // ── Sessions section ─────────────────────────────────────────────────────────
+
+  block sessions_heading: TextBlock {
+    content: @md
+## 1. Reach: where sessions come from
+    ;;
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+### What this means
+Session volume is the **top of the marketing funnel**. Use this chart to identify the channels creating the largest pool of potential buyers.
+
+High session volume alone is not a signal of quality—compare it with conversion performance below before reallocating spend.
+    ;;
+  }
+
+  // ── Conversion section ───────────────────────────────────────────────────────
+
+  block conversion_heading: TextBlock {
+    content: @md
+## 2. Conversion: which visitors purchase
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+
+      settings {
+        x_axis_label: 'Traffic Source'
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+### What this means
+Purchase conversion rate measures the share of sessions that contain a purchase event. Sources at the top generate the **most purchase-ready traffic**.
+
+Prioritize sources that pair meaningful session scale with strong conversion. A high-converting source with little volume may be a growth opportunity; a high-volume, low-converting source may need landing-page or audience optimization.
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: [
+        'headline_sessions',
+        'sessions_by_source',
+        'conversion_by_source',
+      ]
+      field: r(thelook_events.created_at)
+    }
+  ]
+
+  view: CanvasLayout {
+    label: 'Marketing Funnel'
+    width: 1220
+    height: 1260
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block title {
+      position: pos(20, 20, 1180, 105)
+      layer: 1
+    }
+
+    block date_filter {
+      position: pos(900, 130, 300, 80)
+      layer: 1
+    }
+
+    block headline_prefix {
+      position: pos(20, 130, 310, 80)
+      layer: 1
+    }
+
+    block headline_sessions {
+      position: pos(325, 130, 210, 80)
+      layer: 1
+    }
+
+    block headline_suffix {
+      position: pos(530, 130, 360, 80)
+      layer: 1
+    }
+
+    block sessions_heading {
+      position: pos(20, 250, 1180, 60)
+      layer: 1
+    }
+
+    block sessions_by_source {
+      position: pos(20, 320, 770, 360)
+      layer: 1
+    }
+
+    block sessions_commentary {
+      position: pos(810, 320, 390, 360)
+      layer: 1
+    }
+
+    block conversion_heading {
+      position: pos(20, 730, 1180, 60)
+      layer: 1
+    }
+
+    block conversion_by_source {
+      position: pos(20, 800, 770, 360)
+      layer: 1
+    }
+
+    block conversion_commentary {
+      position: pos(810, 800, 390, 360)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

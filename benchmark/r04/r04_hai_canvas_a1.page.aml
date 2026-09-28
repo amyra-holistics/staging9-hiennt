@@ -1,0 +1,468 @@
+Dashboard r04_hai_canvas_a1 {
+  title: 'TheLook eCommerce — Monthly Performance Review'
+  description: 'A five-slide review of ecommerce sales, profitability, trends, and category performance.'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    cache_duration: 360
+  }
+
+  // Slide 1 — Title
+  block title_main: TextBlock {
+    content: @md
+# TheLook eCommerce
+## Monthly Performance Review
+
+**Benchmark R04 · September 2026**
+
+A concise executive view of realized sales, profitability, demand, and category performance.
+    ;;
+  }
+
+  block title_scope: TextBlock {
+    content: @md
+### Reporting notes
+
+- **Net Sales** and **Gross Profit** exclude cancelled and returned order items.
+- **Fulfilled Orders** represent orders with at least one item included in Net Sales.
+- Monthly results use the **order-item created month**.
+- September 2026 is a month-to-date period as of 28 September 2026.
+    ;;
+  }
+
+  // Slide 2 — Headline KPIs
+  block kpi_heading: TextBlock {
+    content: @md
+# Headline KPIs
+
+A high-level view of realized sales, profitability, order volume, and basket value.
+    ;;
+  }
+
+  block headline_kpis: VizBlock {
+    label: 'Headline KPIs'
+    settings {
+      hide_label: true
+    }
+
+    viz: MarkdownViz {
+      dataset: thelook
+
+      values: [
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'Average Order Value'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+
+      content: @md
+<style>
+  .headline-kpis {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 18px;
+    padding: 8px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .headline-kpi {
+    min-width: 0;
+    padding: 26px 22px;
+    border: 1px solid #E5E7EB;
+    border-radius: 14px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .headline-kpi-label {
+    margin-bottom: 10px;
+    color: #6B7280;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .headline-kpi-value {
+    overflow: hidden;
+    color: #111827;
+    font-size: 30px;
+    font-weight: 750;
+    line-height: 1.2;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1000px) {
+    .headline-kpis {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 520px) {
+    .headline-kpis {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="headline-kpis">
+  <div class="headline-kpi">
+    <div class="headline-kpi-label">Net Sales</div>
+    <div class="headline-kpi-value">{{ rows[0].values.`Net Sales` }}</div>
+  </div>
+
+  <div class="headline-kpi">
+    <div class="headline-kpi-label">Gross Profit</div>
+    <div class="headline-kpi-value">{{ rows[0].values.`Gross Profit` }}</div>
+  </div>
+
+  <div class="headline-kpi">
+    <div class="headline-kpi-label">Gross Margin</div>
+    <div class="headline-kpi-value">{{ rows[0].values.`Gross Margin` }}</div>
+  </div>
+
+  <div class="headline-kpi">
+    <div class="headline-kpi-label">Fulfilled Orders</div>
+    <div class="headline-kpi-value">{{ rows[0].values.`Fulfilled Orders` }}</div>
+  </div>
+
+  <div class="headline-kpi">
+    <div class="headline-kpi-label">Average Order Value</div>
+    <div class="headline-kpi-value">{{ rows[0].values.`Average Order Value` }}</div>
+  </div>
+</div>
+      ;;
+    }
+  }
+
+  // Slide 3 — Trend
+  block trend_heading: TextBlock {
+    content: @md
+# Monthly Sales & Profit Trend
+
+Track the relationship between realized sales and gross profit across the available order-item history.
+    ;;
+  }
+
+  block monthly_sales_profit_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+
+    viz: CombinationChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      y_axis {
+        series {
+          mark_type: 'line'
+
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+
+        series {
+          mark_type: 'line'
+
+          field: VizFieldFull {
+            label: 'Gross Profit'
+            ref: r(thelook.gross_profit)
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'bottom'
+        show_data_points: true
+
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // Slide 4 — Category breakdown
+  block category_heading: TextBlock {
+    content: @md
+# Category Breakdown
+
+Rank product categories by realized Net Sales. Hover over a bar to review the corresponding Gross Profit.
+    ;;
+  }
+
+  block category_performance: VizBlock {
+    label: 'Net Sales by Product Category'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // Slide 5 — Key takeaways
+  block takeaway_heading: TextBlock {
+    content: @md
+# Key Takeaways
+
+Use the previous slides to focus discussion on realized demand, profitability, and the categories with the largest commercial impact.
+    ;;
+  }
+
+  block takeaway_sales: TextBlock {
+    content: @md
+## 1. Use Net Sales as the primary commercial measure
+
+Net Sales excludes cancelled and returned items, making it the most suitable top-line measure for realized merchandise sales performance.
+    ;;
+  }
+
+  block takeaway_profit: TextBlock {
+    content: @md
+## 2. Pair scale with efficiency
+
+Review **Gross Profit** alongside **Gross Margin**. Sales growth is most valuable when profit dollars and margin quality are both maintained.
+    ;;
+  }
+
+  block takeaway_demand: TextBlock {
+    content: @md
+## 3. Separate demand from basket value
+
+**Fulfilled Orders** indicates realized demand, while **Average Order Value** distinguishes order-volume movement from changes in spend per fulfilled order.
+    ;;
+  }
+
+  block takeaway_action: TextBlock {
+    content: @md
+## 4. Prioritize the largest category opportunities
+
+Start with the top-ranked product categories, then assess whether their sales contribution is translating into proportionate gross profit.
+    ;;
+  }
+
+  explicit_interactions: []
+
+  view: TabLayout {
+    tab title_slide: CanvasLayout {
+      label: '1. Title'
+      width: 1600
+      height: 900
+      grid_size: 20
+
+      block title_main {
+        position: pos(140, 190, 1320, 310)
+        layer: 1
+      }
+
+      block title_scope {
+        position: pos(140, 580, 1040, 190)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab headline_kpis_slide: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1600
+      height: 900
+      grid_size: 20
+
+      block kpi_heading {
+        position: pos(100, 70, 1400, 150)
+        layer: 1
+      }
+
+      block headline_kpis {
+        position: pos(100, 290, 1400, 340)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab monthly_trend_slide: CanvasLayout {
+      label: '3. Monthly Trend'
+      width: 1600
+      height: 900
+      grid_size: 20
+
+      block trend_heading {
+        position: pos(100, 60, 1400, 130)
+        layer: 1
+      }
+
+      block monthly_sales_profit_trend {
+        position: pos(100, 230, 1400, 580)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab category_breakdown_slide: CanvasLayout {
+      label: '4. Category Breakdown'
+      width: 1600
+      height: 900
+      grid_size: 20
+
+      block category_heading {
+        position: pos(100, 60, 1400, 130)
+        layer: 1
+      }
+
+      block category_performance {
+        position: pos(100, 230, 1400, 580)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab key_takeaways_slide: CanvasLayout {
+      label: '5. Key Takeaways'
+      width: 1600
+      height: 900
+      grid_size: 20
+
+      block takeaway_heading {
+        position: pos(100, 60, 1400, 125)
+        layer: 1
+      }
+
+      block takeaway_sales {
+        position: pos(100, 230, 650, 220)
+        layer: 1
+      }
+
+      block takeaway_profit {
+        position: pos(850, 230, 650, 220)
+        layer: 1
+      }
+
+      block takeaway_demand {
+        position: pos(100, 510, 650, 220)
+        layer: 1
+      }
+
+      block takeaway_action {
+        position: pos(850, 510, 650, 220)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

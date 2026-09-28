@@ -1,0 +1,273 @@
+// benchmark/r06/r06_hai_html_a2.page.aml
+Dashboard r06_hai_html_a2 {
+  title: 'Marketing Funnel by Traffic Source'
+  description: @md
+    Marketing funnel story showing website sessions and purchase conversion rate by traffic source.
+  ;;
+  theme: H.themes.classic
+
+  block headline_sessions: VizBlock {
+    label: 'Marketing Sessions Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+        <style>
+          .sessions-headline-card {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            padding: 1.5rem 1.75rem;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #F8FAFC, #EFF6FF);
+            color: #0F172A;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          }
+
+          .sessions-headline-card .copy {
+            font-size: 1.1rem;
+            line-height: 1.5;
+          }
+
+          .sessions-headline-card .value {
+            color: #1D4ED8;
+            font-size: 2rem;
+            font-weight: 750;
+            letter-spacing: -0.04em;
+            white-space: nowrap;
+          }
+        </style>
+
+        <div class="sessions-headline-card">
+          <span class="copy">Marketing generated</span>
+          <span class="value">{{ rows[0].values.`Sessions` }}</span>
+          <span class="copy">website sessions.</span>
+        </div>
+      ;;
+    }
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+      ### What this shows
+
+      This view ranks acquisition sources by **unique website sessions**, including anonymous visitors.
+
+      Use it to identify where marketing is generating reach. High-volume channels are natural candidates for conversion optimization, while lower-volume sources may need additional investment only if they convert efficiently.
+    ;;
+  }
+
+  block conversion_rate_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+      ### What this shows
+
+      Purchase conversion rate is the share of sessions that include a **purchase event**.
+
+      Compare this ranking with the sessions chart above to distinguish channels that provide scale from those that bring higher-intent visitors. A source can be valuable because it drives volume, conversion efficiency, or both.
+    ;;
+  }
+
+  explicit_interactions: []
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .marketing-funnel-dashboard {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 32px;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .dashboard-header {
+          margin-bottom: 24px;
+        }
+
+        .eyebrow {
+          margin: 0 0 8px;
+          color: #2563EB;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .dashboard-header h1 {
+          margin: 0;
+          color: #0F172A;
+          font-size: 32px;
+          line-height: 1.2;
+          letter-spacing: -0.03em;
+        }
+
+        .dashboard-header p {
+          max-width: 720px;
+          margin: 10px 0 0;
+          color: #475569;
+          font-size: 16px;
+          line-height: 1.5;
+        }
+
+        .headline {
+          margin-bottom: 36px;
+        }
+
+        .section-header {
+          margin: 0 0 16px;
+          color: #0F172A;
+          font-size: 20px;
+          line-height: 1.3;
+          letter-spacing: -0.02em;
+        }
+
+        .story-row {
+          display: grid;
+          grid-template-columns: minmax(0, 2fr) minmax(260px, 0.8fr);
+          gap: 24px;
+          align-items: stretch;
+          margin-bottom: 40px;
+        }
+
+        .chart-panel,
+        .commentary-panel {
+          min-width: 0;
+          border: 1px solid #E2E8F0;
+          border-radius: 12px;
+          background: #FFFFFF;
+        }
+
+        .chart-panel {
+          padding: 8px;
+        }
+
+        .commentary-panel {
+          padding: 24px;
+          background: #F8FAFC;
+        }
+
+        @media (max-width: 800px) {
+          .marketing-funnel-dashboard {
+            padding: 20px;
+          }
+
+          .story-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+          }
+
+          .dashboard-header h1 {
+            font-size: 26px;
+          }
+        }
+      </style>
+
+      <main class="marketing-funnel-dashboard">
+        <header class="dashboard-header">
+          <p class="eyebrow">Acquisition performance</p>
+          <h1>Marketing Funnel by Traffic Source</h1>
+          <p>Follow the journey from traffic volume to purchase intent, then prioritize channels that can grow both reach and conversion.</p>
+        </header>
+
+        <section class="headline">
+          <h-block name="headline_sessions" />
+        </section>
+
+        <section>
+          <h2 class="section-header">1. Which sources create the most reach?</h2>
+          <div class="story-row">
+            <div class="chart-panel">
+              <h-block name="sessions_by_source" />
+            </div>
+            <aside class="commentary-panel">
+              <h-block name="sessions_commentary" />
+            </aside>
+          </div>
+        </section>
+
+        <section>
+          <h2 class="section-header">2. Which sources turn visits into purchases?</h2>
+          <div class="story-row">
+            <div class="chart-panel">
+              <h-block name="conversion_rate_by_source" />
+            </div>
+            <aside class="commentary-panel">
+              <h-block name="conversion_commentary" />
+            </aside>
+          </div>
+        </section>
+      </main>
+    ;;
+  }
+}

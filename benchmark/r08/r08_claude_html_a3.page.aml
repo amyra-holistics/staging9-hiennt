@@ -1,0 +1,523 @@
+Dashboard r08_claude_html_a3 {
+  title: 'CEO Monthly Sales Review'
+  description: '''
+Monthly sales review for TheLook eCommerce. Headline KPIs cover the selected review month (default: last complete month) and compare it with the previous month.
+The 13-month trend is fixed so the review month can be seen in context.
+'''
+
+  // ---------- Filters ----------
+  block f_review_month: FilterBlock {
+    label: 'Review Month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'last'
+      value: '1'
+      modifier: 'month'
+    }
+  }
+
+  block f_department: FilterBlock {
+    label: 'Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+
+  // ---------- KPIs (review month vs previous month) ----------
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Avg Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        compare_value {
+          reverse_color: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Trend (fixed last 13 complete months) ----------
+  block trend_sales_margin: VizBlock {
+    label: 'Net Sales & Gross Margin — Last 13 Complete Months'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      conditions: [
+        "thelook_order_items.created_at matches @(last 13 months)",
+      ]
+      settings {
+        legend_label: 'bottom'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // ---------- Breakdown (review month) ----------
+  block sales_by_channel: VizBlock {
+    label: 'Net Sales by Acquisition Channel (vs Previous Month)'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        pop {
+          field: r(thelook_order_items.created_at)
+          value {
+            duration: 1
+            granularity: 'month'
+          }
+        }
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block category_table: VizBlock {
+    label: 'Category Performance'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Items Sold'
+          ref: r(thelook.items_sold)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 10
+        show_row_number: true
+        single_cell_display: 'normal'
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.net_sales)
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#EFF6FF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#93C5FD'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  // The trend keeps its own 13-month window, so the review-month filter does not apply to it
+  interactions: [
+    FilterInteraction {
+      from: 'f_review_month'
+      to: [
+        CustomMapping {
+          block: 'trend_sales_margin'
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .page {
+          font-family: Inter, -apple-system, 'Segoe UI', Roboto, sans-serif;
+          background: #F5F7FA;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+          color: #1F2937;
+        }
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+        .header h1 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 700;
+        }
+        .header p {
+          margin: 4px 0 0;
+          font-size: 13px;
+          color: #6B7280;
+        }
+        .filters {
+          display: flex;
+          gap: 12px;
+        }
+        .filter {
+          width: 240px;
+          height: 72px;
+        }
+        .section-title {
+          margin: 8px 0 0;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #6B7280;
+        }
+        .kpis {
+          display: grid;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .kpi {
+          height: 130px;
+          min-width: 0;
+        }
+        .trend {
+          height: 380px;
+        }
+        .breakdown {
+          display: grid;
+          grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+          gap: 16px;
+        }
+        .panel {
+          height: 440px;
+          min-width: 0;
+        }
+        @media (max-width: 1100px) {
+          .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .breakdown { grid-template-columns: minmax(0, 1fr); }
+        }
+        @media (max-width: 640px) {
+          .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .filters { flex-direction: column; width: 100%; }
+          .filter { width: 100%; }
+        }
+      </style>
+
+      <div class="page">
+        <header class="header">
+          <div>
+            <h1>CEO Monthly Sales Review</h1>
+            <p>Review month defaults to the last complete month. KPI changes are vs the previous month. Net figures exclude cancelled and returned items.</p>
+          </div>
+          <div class="filters">
+            <div class="filter"><h-block name="f_review_month" /></div>
+            <div class="filter"><h-block name="f_department" /></div>
+          </div>
+        </header>
+
+        <h2 class="section-title">Headline — review month vs previous month</h2>
+        <section class="kpis">
+          <div class="kpi"><h-block name="kpi_net_sales" /></div>
+          <div class="kpi"><h-block name="kpi_gross_profit" /></div>
+          <div class="kpi"><h-block name="kpi_gross_margin" /></div>
+          <div class="kpi"><h-block name="kpi_orders" /></div>
+          <div class="kpi"><h-block name="kpi_aov" /></div>
+          <div class="kpi"><h-block name="kpi_return_rate" /></div>
+        </section>
+
+        <h2 class="section-title">Trend</h2>
+        <section class="trend"><h-block name="trend_sales_margin" /></section>
+
+        <h2 class="section-title">Where sales came from — review month</h2>
+        <section class="breakdown">
+          <div class="panel"><h-block name="sales_by_channel" /></div>
+          <div class="panel"><h-block name="category_table" /></div>
+        </section>
+      </div>
+    ;;
+  }
+}

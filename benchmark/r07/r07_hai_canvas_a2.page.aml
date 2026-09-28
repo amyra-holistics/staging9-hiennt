@@ -1,0 +1,353 @@
+Dashboard r07_hai_canvas_a2 {
+  title: 'Operations Dashboard'
+  description: 'Inventory availability and return-rate monitoring by distribution center, category, and product.'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'UTC'
+    cache_duration: 3600
+    autorun: true
+  }
+
+  block title: TextBlock {
+    content: @md
+# Operations Dashboard
+Monitor inventory levels and return-risk performance across distribution centers and product categories.
+    ;;
+  }
+
+  block kpi_units_in_stock: VizBlock {
+    label: 'Units in Stock'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.units_in_stock)
+        label: 'Units in Stock'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        row_limit: 1
+      }
+    }
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+    }
+  }
+
+  block interaction_guide: TextBlock {
+    content: @md
+### How to use this dashboard
+- **Click a distribution center** in the stock chart to filter the other views.
+- **Click a category** in the return-rate table to focus the hierarchy on its products.
+- In the hierarchy, **expand a distribution center** to see categories, then expand a category to inspect products.
+- Return rates **above 10%** are highlighted in red.
+    ;;
+  }
+
+  block section_inventory: TextBlock {
+    content: @md
+## Inventory availability
+    ;;
+  }
+
+  block v_stock_levels: VizBlock {
+    label: 'Units in Stock by Distribution Center and Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+      }
+      legend: VizFieldFull {
+        ref: r(thelook_inventory_items.product_category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            label: 'Units in Stock'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+          show_total_in_tooltip: true
+        }
+      }
+      settings {
+        legend_label: 'bottom'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block section_returns: TextBlock {
+    content: @md
+## Return-rate risk
+    ;;
+  }
+
+  block v_return_rate: VizBlock {
+    label: 'Return Rate by Distribution Center and Category'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Distribution Center'
+          ref: r(thelook_distribution_centers.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+          uname: 'return_rate'
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.1
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+              apply_to_row: true
+            }
+          }
+        ]
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'return_rate'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  block section_hierarchy: TextBlock {
+    content: @md
+## Distribution center → category → product detail
+    ;;
+  }
+
+  block v_operations_hierarchy: VizBlock {
+    label: 'Inventory and Return Rate Detail'
+    viz: PivotTable {
+      dataset: thelook
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_distribution_centers.name)
+          label: 'Distribution Center'
+          format {
+            type: 'text'
+          }
+          uname: 'distribution_center'
+        },
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          format {
+            type: 'text'
+          }
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: r(thelook_products.name)
+          label: 'Product Name'
+          format {
+            type: 'text'
+          }
+          uname: 'product_name'
+        },
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          label: 'Units in Stock'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_with_no_data: false
+        show_row_total: false
+        show_column_total: false
+        show_sub_total: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        frozen_columns: 1
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'distribution_center'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_name'
+            direction: 'asc'
+          },
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.1
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+        ]
+      }
+      context {
+        analysis {
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'v_stock_levels'
+      to: [
+        'kpi_units_in_stock',
+        'kpi_return_rate',
+        'v_return_rate',
+        'v_operations_hierarchy',
+      ]
+      field: r(thelook_distribution_centers.name)
+    },
+    FilterInteraction {
+      from: 'v_return_rate'
+      to: ['v_operations_hierarchy']
+      field: r(thelook_products.category)
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1220
+    height: 1510
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block title {
+      position: pos(20, 20, 1180, 80)
+      layer: 1
+    }
+
+    block kpi_units_in_stock {
+      position: pos(20, 120, 280, 130)
+      layer: 1
+    }
+
+    block kpi_return_rate {
+      position: pos(320, 120, 280, 130)
+      layer: 1
+    }
+
+    block interaction_guide {
+      position: pos(620, 120, 580, 130)
+      layer: 1
+    }
+
+    block section_inventory {
+      position: pos(20, 280, 570, 50)
+      layer: 1
+    }
+
+    block section_returns {
+      position: pos(610, 280, 590, 50)
+      layer: 1
+    }
+
+    block v_stock_levels {
+      position: pos(20, 340, 570, 420)
+      layer: 1
+    }
+
+    block v_return_rate {
+      position: pos(610, 340, 590, 420)
+      layer: 1
+    }
+
+    block section_hierarchy {
+      position: pos(20, 800, 1180, 50)
+      layer: 1
+    }
+
+    block v_operations_hierarchy {
+      position: pos(20, 860, 1180, 600)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

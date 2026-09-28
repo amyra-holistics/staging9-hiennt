@@ -1,0 +1,513 @@
+Dashboard r08_hai_html_a2 {
+  title: 'CEO Monthly Sales Review'
+  description: 'Executive monthly review of sales, profitability, fulfillment, returns, and category performance.'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+  }
+
+  block dashboard_title: TextBlock {
+    content: @md
+# CEO Monthly Sales Review
+Use the reporting-period control to focus the review, then compare results with the preceding period.
+;;
+  }
+
+  block performance_heading: TextBlock {
+    content: @md
+## Performance Trend
+;;
+  }
+
+  block drivers_heading: TextBlock {
+    content: @md
+## Sales Drivers and Operational Quality
+;;
+  }
+
+  block reporting_period: FilterBlock {
+    label: 'Reporting Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block product_department: FilterBlock {
+    label: 'Product Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block period_comparison: PopBlock {
+    label: 'Compare To'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+        label {
+          font_size: 13
+        }
+        metric_value {
+          font_size: 28
+        }
+      }
+    }
+  }
+
+  block return_rate: VizBlock {
+    label: 'Return Rate'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block monthly_sales_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Sales and Profit'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          show_total_in_tooltip: true
+        }
+      }
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'top'
+        show_data_points: false
+        connect_discontinuous_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block sales_by_category: VizBlock {
+    label: 'Top Product Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      calculation category_net_sales_rank {
+        label: 'Net Sales Rank'
+        formula: @aql rank(order: net_sales | desc());;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: 'category_net_sales_rank'
+            label: 'Rank'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      ]
+      settings {
+        row_limit: 10
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sales_by_department: VizBlock {
+    label: 'Monthly Net Sales by Product Department'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Order Item Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Product Department'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        show_data_points: false
+        connect_discontinuous_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block item_status_mix: VizBlock {
+    label: 'Daily Item Volume by Order Status'
+    viz: CombinationChart {
+      dataset: thelook
+      calculation item_volume {
+        label: 'Item Volume'
+        formula: @aql thelook_order_items | count(thelook_order_items.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Created Date'
+        transformation: 'datetrunc day'
+        format {
+          type: 'date'
+          pattern: 'LLL dd, yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(thelook_order_items.status)
+        label: 'Order Item Status'
+      }
+      y_axis {
+        label: 'Item Volume'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'item_volume'
+            label: 'Item Volume'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+          show_stack_total: true
+          show_total_in_tooltip: true
+        }
+      }
+      settings {
+        x_axis_label: 'Created Date'
+        legend_label: 'bottom'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'reporting_period'
+      to: [
+        'net_sales',
+        'gross_profit',
+        'fulfilled_orders',
+        'return_rate',
+        'monthly_sales_trend',
+        'sales_by_category',
+        'sales_by_department',
+        'item_status_mix'
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'product_department'
+      to: [
+        'net_sales',
+        'gross_profit',
+        'fulfilled_orders',
+        'return_rate',
+        'monthly_sales_trend',
+        'sales_by_category',
+        'sales_by_department',
+        'item_status_mix'
+      ]
+      field: r(thelook_products.department)
+    },
+    PopInteraction {
+      from: 'period_comparison'
+      to: [
+        'net_sales',
+        'gross_profit',
+        'fulfilled_orders',
+        'return_rate',
+        'monthly_sales_trend',
+        'sales_by_category',
+        'sales_by_department',
+        'item_status_mix'
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .ceo-dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) minmax(220px, 1fr) minmax(220px, 1fr);
+    gap: 16px;
+    margin: 20px 0 24px;
+  }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .section {
+    margin-top: 28px;
+  }
+
+  .chart-panel {
+    min-width: 0;
+  }
+
+  .chart-panel h-block {
+    display: block;
+    min-height: 360px;
+  }
+
+  .trend h-block {
+    min-height: 460px;
+  }
+
+  .two-column {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  @media (max-width: 960px) {
+    .controls,
+    .kpis,
+    .two-column {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ceo-dashboard {
+      padding: 16px;
+    }
+
+    .controls,
+    .kpis,
+    .two-column {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="ceo-dashboard">
+  <header>
+    <h-block name="dashboard_title" />
+  </header>
+
+  <section class="controls">
+    <h-block name="reporting_period" />
+    <h-block name="product_department" />
+    <h-block name="period_comparison" />
+  </section>
+
+  <section class="kpis">
+    <h-block name="net_sales" />
+    <h-block name="gross_profit" />
+    <h-block name="fulfilled_orders" />
+    <h-block name="return_rate" />
+  </section>
+
+  <section class="section">
+    <h-block name="performance_heading" />
+    <div class="chart-panel trend">
+      <h-block name="monthly_sales_trend" />
+    </div>
+  </section>
+
+  <section class="section">
+    <h-block name="drivers_heading" />
+    <div class="two-column">
+      <div class="chart-panel">
+        <h-block name="sales_by_category" />
+      </div>
+      <div class="chart-panel">
+        <h-block name="sales_by_department" />
+      </div>
+    </div>
+    <div class="chart-panel" style="margin-top: 20px;">
+      <h-block name="item_status_mix" />
+    </div>
+  </section>
+</div>
+;;
+  }
+}

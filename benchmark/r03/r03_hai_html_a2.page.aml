@@ -1,0 +1,547 @@
+// benchmark/r03/r03_hai_html_a2.page.aml
+
+Dashboard r03_hai_html_a2 {
+  title: 'thelook | Business Review'
+  description: 'Branded monthly business review for TheLook eCommerce.'
+  theme: H.themes.classic
+
+  settings {
+    autorun: true
+    cache_duration: 3600
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+
+      calculation net_sales_previous_month {
+        label: 'Net Sales Previous Month'
+        formula: @aql net_sales | relative_period(thelook_order_items.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      compare_value: VizFieldFull {
+        ref: 'net_sales_previous_month'
+        label: 'Previous Month Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      filter {
+        field: r(thelook_order_items.created_at)
+        operator: 'matches'
+        value: 'this month'
+      }
+
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+
+      calculation previous_month_orders {
+        label: 'Previous Month Orders'
+        formula: @aql total_orders | relative_period(thelook_orders.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      compare_value: VizFieldFull {
+        ref: 'previous_month_orders'
+        label: 'Previous Month Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+
+      conditions: [
+        "thelook_orders.created_at is @(this month)",
+      ]
+
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+
+      calculation average_order_value_previous_month {
+        label: 'Average Order Value Previous Month'
+        formula: @aql aov | relative_period(thelook_order_items.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      compare_value: VizFieldFull {
+        ref: 'average_order_value_previous_month'
+        label: 'Previous Month'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      conditions: [
+        "thelook_order_items.created_at is @(this month)",
+      ]
+
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+
+      calculation gross_margin_previous_month {
+        label: 'Gross Margin Previous Month'
+        formula: @aql gross_margin | relative_period(thelook_order_items.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      compare_value: VizFieldFull {
+        ref: 'gross_margin_previous_month'
+        label: 'Previous Month'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+
+      filter {
+        field: r(thelook_order_items.created_at)
+        operator: 'matches'
+        value: 'this month'
+      }
+
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  explicit_interactions: []
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+
+        :root {
+          --ink: #1B1F3B;
+          --coral: #FF6B5A;
+          --sand: #F5EFE6;
+          --teal: #1F9E8F;
+          --alert: #D64545;
+          --slate: #5B6477;
+          --white: #FFFFFF;
+          --line: rgba(27, 31, 59, 0.10);
+        }
+
+        .thelook-review {
+          min-height: 100%;
+          box-sizing: border-box;
+          padding: 28px;
+          background: var(--sand);
+          color: var(--ink);
+          font-family: 'Manrope', Arial, sans-serif;
+        }
+
+        .review-shell {
+          max-width: 1440px;
+          margin: 0 auto;
+        }
+
+        .brand-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          padding: 20px 24px;
+          background: var(--white);
+          border: 1px solid var(--line);
+          border-radius: 18px;
+          box-shadow: 0 10px 28px rgba(27, 31, 59, 0.06);
+        }
+
+        .brand-logo {
+          display: block;
+          width: 176px;
+          height: 40px;
+          flex: 0 0 auto;
+        }
+
+        .header-copy {
+          margin-left: auto;
+          text-align: right;
+        }
+
+        .header-eyebrow {
+          margin: 0 0 4px;
+          color: var(--coral);
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .header-period {
+          margin: 0;
+          color: var(--slate);
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .hero {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 24px;
+          margin: 44px 0 28px;
+        }
+
+        .hero-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0 0 10px;
+          color: var(--coral);
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .hero-eyebrow::before {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: var(--coral);
+          content: '';
+        }
+
+        .hero h1 {
+          margin: 0;
+          color: var(--ink);
+          font-size: clamp(30px, 4vw, 46px);
+          font-weight: 800;
+          letter-spacing: -0.045em;
+          line-height: 1.08;
+        }
+
+        .hero-note {
+          max-width: 360px;
+          margin: 0;
+          color: var(--slate);
+          font-size: 14px;
+          font-weight: 400;
+          line-height: 1.65;
+        }
+
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 18px;
+        }
+
+        .kpi-card {
+          position: relative;
+          min-width: 0;
+          min-height: 218px;
+          box-sizing: border-box;
+          padding: 24px;
+          overflow: hidden;
+          background: var(--white);
+          border: 1px solid var(--line);
+          border-radius: 18px;
+          box-shadow: 0 10px 28px rgba(27, 31, 59, 0.06);
+        }
+
+        .kpi-card::after {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 78px;
+          height: 78px;
+          border-radius: 0 18px 0 78px;
+          background: rgba(255, 107, 90, 0.08);
+          content: '';
+          pointer-events: none;
+        }
+
+        .kpi-heading {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          margin-bottom: 18px;
+        }
+
+        .kpi-icon {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px;
+          height: 34px;
+          flex: 0 0 auto;
+          color: var(--coral);
+          background: rgba(255, 107, 90, 0.12);
+          border-radius: 10px;
+        }
+
+        .kpi-icon svg {
+          width: 18px;
+          height: 18px;
+          stroke: currentColor;
+        }
+
+        .kpi-title {
+          color: var(--ink);
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 0.01em;
+        }
+
+        .kpi-card h-block {
+          display: block;
+          position: relative;
+          z-index: 1;
+        }
+
+        .kpi-card .dac-viz-block {
+          min-height: 0;
+          background: transparent;
+          border: 0;
+          box-shadow: none;
+        }
+
+        .kpi-card .dac-viz-block-label-container {
+          display: none;
+        }
+
+        .kpi-card .dac-viz-block,
+        .kpi-card .dac-viz-block * {
+          font-family: 'Manrope', Arial, sans-serif;
+        }
+
+        .kpi-card .dac-viz-block {
+          color: var(--ink);
+        }
+
+        .kpi-card .dac-viz-block [class*='comparison'],
+        .kpi-card .dac-viz-block [class*='compare'] {
+          font-weight: 800;
+        }
+
+        .review-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-top: 24px;
+          padding: 16px 2px 0;
+          border-top: 1px solid rgba(27, 31, 59, 0.12);
+          color: var(--slate);
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        .status-dot {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          margin-right: 7px;
+          border-radius: 999px;
+          background: var(--teal);
+        }
+
+        @media (max-width: 1080px) {
+          .kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 640px) {
+          .thelook-review {
+            padding: 16px;
+          }
+
+          .brand-header,
+          .hero,
+          .review-footer {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .header-copy {
+            margin-left: 0;
+            text-align: left;
+          }
+
+          .kpi-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+      </style>
+
+      <main class="thelook-review">
+        <div class="review-shell">
+          <header class="brand-header">
+            <img
+              class="brand-logo"
+              alt="thelook"
+              src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='40' viewBox='0 0 176 40'%3E%3Ccircle cx='18' cy='20' r='11' fill='%23FF6B5A'/%3E%3Ccircle cx='18' cy='20' r='4.5' fill='%23F5EFE6'/%3E%3Ctext x='38' y='28' font-family='Manrope, Arial, sans-serif' font-size='24' font-weight='800' letter-spacing='-0.5' fill='%231B1F3B'%3Ethelook%3C/text%3E%3C/svg%3E"
+            />
+
+            <div class="header-copy">
+              <p class="header-eyebrow">Executive reporting</p>
+              <p class="header-period">Current month performance · compared with prior month</p>
+            </div>
+          </header>
+
+          <section class="hero">
+            <div>
+              <p class="hero-eyebrow">Monthly pulse</p>
+              <h1>Business review</h1>
+            </div>
+            <p class="hero-note">
+              A focused view of commercial health, showing current-month performance and month-over-month movement.
+            </p>
+          </section>
+
+          <section class="kpi-grid" aria-label="Monthly performance KPIs">
+            <article class="kpi-card">
+              <div class="kpi-heading">
+                <span class="kpi-icon" aria-hidden="true">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 6h16M6 6l1 13h10l1-13M9 10v5M15 10v5M9 6V4h6v2" />
+                  </svg>
+                </span>
+                <span class="kpi-title">Net Sales</span>
+              </div>
+              <h-block name="kpi_net_sales"></h-block>
+            </article>
+
+            <article class="kpi-card">
+              <div class="kpi-heading">
+                <span class="kpi-icon" aria-hidden="true">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M3 4h2l2 12h10l2-8H7M9 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM17 20a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                  </svg>
+                </span>
+                <span class="kpi-title">Orders</span>
+              </div>
+              <h-block name="kpi_orders"></h-block>
+            </article>
+
+            <article class="kpi-card">
+              <div class="kpi-heading">
+                <span class="kpi-icon" aria-hidden="true">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 6h16v12H4zM4 10h16M8 15h3" />
+                  </svg>
+                </span>
+                <span class="kpi-title">Average Order Value</span>
+              </div>
+              <h-block name="kpi_aov"></h-block>
+            </article>
+
+            <article class="kpi-card">
+              <div class="kpi-heading">
+                <span class="kpi-icon" aria-hidden="true">
+                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M4 19V5M4 19h16M7 16l4-5 3 2 5-7" />
+                  </svg>
+                </span>
+                <span class="kpi-title">Gross Margin</span>
+              </div>
+              <h-block name="kpi_gross_margin"></h-block>
+            </article>
+          </section>
+
+          <footer class="review-footer">
+            <span><span class="status-dot"></span>Data refreshed automatically from TheLook eCommerce</span>
+            <span>Positive changes appear in teal; declines appear in alert red.</span>
+          </footer>
+        </div>
+      </main>
+    ;;
+  }
+}

@@ -1,0 +1,324 @@
+// benchmark/r01/r01_hai_canvas_a2.page.aml
+
+Dashboard r01_hai_canvas_a2 {
+  title: 'Executive Sales Overview'
+  description: 'Executive monitoring view of sales performance, orders, basket size, margin, and category drivers.'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block t_title: TextBlock {
+    content: @md
+# Executive Sales Overview
+
+Monitor Net Sales, orders, average order value, gross margin, and the categories driving sales.
+;;
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block t_data_note: TextBlock {
+    content: @md
+**Data source:** TheLook eCommerce (`thelook`) on `demodb`  
+**Last available order-item record:** 30 Sep 2026, 23:57 UTC
+;;
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+
+    viz: MetricKpi {
+      dataset: thelook
+
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block v_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+
+    viz: MetricKpi {
+      dataset: thelook
+
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+
+    viz: MetricKpi {
+      dataset: thelook
+
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+
+    viz: MetricKpi {
+      dataset: thelook
+
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block t_sales_trend: TextBlock {
+    content: @md
+## Monthly Sales Trend
+;;
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+
+    viz: LineChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'hidden'
+
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block t_category_drivers: TextBlock {
+    content: @md
+## Category Performance
+;;
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 10
+
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'v_net_sales',
+        'v_aov',
+        'v_gross_margin',
+        'v_monthly_net_sales',
+        'v_top_categories',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+
+    FilterInteraction {
+      from: 'f_order_date'
+      to: ['v_orders']
+      field: r(thelook_orders.created_at)
+    },
+  ]
+
+  view: CanvasLayout {
+    width: 1220
+    height: 1340
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block t_title {
+      position: pos(20, 20, 1180, 90)
+      layer: 1
+    }
+
+    block f_order_date {
+      position: pos(20, 130, 300, 70)
+      layer: 1
+    }
+
+    block t_data_note {
+      position: pos(350, 130, 850, 70)
+      layer: 1
+    }
+
+    block v_net_sales {
+      position: pos(20, 220, 280, 150)
+      layer: 1
+    }
+
+    block v_orders {
+      position: pos(320, 220, 280, 150)
+      layer: 1
+    }
+
+    block v_aov {
+      position: pos(620, 220, 280, 150)
+      layer: 1
+    }
+
+    block v_gross_margin {
+      position: pos(920, 220, 280, 150)
+      layer: 1
+    }
+
+    block t_sales_trend {
+      position: pos(20, 400, 1180, 50)
+      layer: 1
+    }
+
+    block v_monthly_net_sales {
+      position: pos(20, 460, 1180, 370)
+      layer: 1
+    }
+
+    block t_category_drivers {
+      position: pos(20, 860, 1180, 50)
+      layer: 1
+    }
+
+    block v_top_categories {
+      position: pos(20, 920, 1180, 390)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

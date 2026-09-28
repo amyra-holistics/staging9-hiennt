@@ -1,0 +1,500 @@
+Dashboard r08_hai_canvas_a2 {
+  title: 'CEO Monthly Sales Review'
+  description: @md
+Monthly sales performance review for executive monitoring. Use the controls to set the review period, compare against a prior period, and focus on a customer country or product category.
+;;
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  // ---- TITLE & CONTROLS
+
+  block title: TextBlock {
+    content: @md
+# CEO Monthly Sales Review
+
+Monitor net sales, profitability, order value, growth trends, market concentration, and product-return risk.
+;;
+  }
+
+  block f_date: FilterBlock {
+    label: 'Sales Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_country: FilterBlock {
+    label: 'Customer Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block c_pop: PopBlock {
+    label: 'Period Comparison'
+  }
+
+  // ---- EXECUTIVE KPI ROW
+
+  block k_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+  }
+
+  block k_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+  }
+
+  block k_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+      }
+    }
+  }
+
+  block k_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+      }
+    }
+  }
+
+  // ---- SALES TREND
+
+  block h_trend: TextBlock {
+    content: @md
+## Sales and profitability trend
+
+How are net sales and gross profit moving across the selected period?
+;;
+  }
+
+  block v_monthly_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Order Item Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // ---- PERFORMANCE DRIVERS
+
+  block h_drivers: TextBlock {
+    content: @md
+## Performance drivers
+
+Which products and markets contribute the most net sales?
+;;
+  }
+
+  block v_sales_by_category: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_sales_by_country: VizBlock {
+    label: 'Net Sales by Customer Country'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Customer Country'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ---- CUSTOMER & PRODUCT RISK
+
+  block h_risk: TextBlock {
+    content: @md
+## Return-risk watchlist
+
+Which categories have the highest return rates in the selected period?
+;;
+  }
+
+  block v_return_rate: VizBlock {
+    label: 'Return Rate by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // ---- DASHBOARD INTERACTIONS
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        'k_net_sales',
+        'k_gross_profit',
+        'k_gross_margin',
+        'k_aov',
+        'v_monthly_trend',
+        'v_sales_by_category',
+        'v_sales_by_country',
+        'v_return_rate',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+
+    FilterInteraction {
+      from: 'f_country'
+      to: [
+        'k_net_sales',
+        'k_gross_profit',
+        'k_gross_margin',
+        'k_aov',
+        'v_monthly_trend',
+        'v_sales_by_category',
+        'v_sales_by_country',
+        'v_return_rate',
+      ]
+      field: r(thelook_users.country)
+    },
+
+    FilterInteraction {
+      from: 'f_category'
+      to: [
+        'k_net_sales',
+        'k_gross_profit',
+        'k_gross_margin',
+        'k_aov',
+        'v_monthly_trend',
+        'v_sales_by_category',
+        'v_sales_by_country',
+        'v_return_rate',
+      ]
+      field: r(thelook_products.category)
+    },
+
+    PopInteraction {
+      from: 'c_pop'
+      to: [
+        'k_net_sales',
+        'k_gross_profit',
+        'k_gross_margin',
+        'k_aov',
+        'v_monthly_trend',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+  ]
+
+  // ---- CANVAS LAYOUT
+
+  view: CanvasLayout {
+    label: 'Monthly Sales Review'
+    width: 1240
+    height: 1660
+    margin: 20
+    grid_size: 20
+
+    block title {
+      position: pos(20, 20, 1200, 100)
+      layer: 1
+    }
+
+    block f_date {
+      position: pos(20, 140, 280, 80)
+      layer: 1
+    }
+
+    block f_country {
+      position: pos(320, 140, 280, 80)
+      layer: 1
+    }
+
+    block f_category {
+      position: pos(620, 140, 280, 80)
+      layer: 1
+    }
+
+    block c_pop {
+      position: pos(920, 140, 300, 80)
+      layer: 1
+    }
+
+    block k_net_sales {
+      position: pos(20, 240, 285, 150)
+      layer: 1
+    }
+
+    block k_gross_profit {
+      position: pos(325, 240, 285, 150)
+      layer: 1
+    }
+
+    block k_gross_margin {
+      position: pos(630, 240, 285, 150)
+      layer: 1
+    }
+
+    block k_aov {
+      position: pos(935, 240, 285, 150)
+      layer: 1
+    }
+
+    block h_trend {
+      position: pos(20, 420, 1200, 70)
+      layer: 1
+    }
+
+    block v_monthly_trend {
+      position: pos(20, 500, 1200, 380)
+      layer: 1
+    }
+
+    block h_drivers {
+      position: pos(20, 910, 1200, 70)
+      layer: 1
+    }
+
+    block v_sales_by_category {
+      position: pos(20, 990, 590, 360)
+      layer: 1
+    }
+
+    block v_sales_by_country {
+      position: pos(630, 990, 590, 360)
+      layer: 1
+    }
+
+    block h_risk {
+      position: pos(20, 1380, 1200, 70)
+      layer: 1
+    }
+
+    block v_return_rate {
+      position: pos(20, 1460, 1200, 360)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

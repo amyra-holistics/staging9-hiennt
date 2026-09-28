@@ -1,0 +1,194 @@
+Dashboard r06_hai_canvas_a2 {
+  title: 'Marketing Funnel by Traffic Source'
+  description: 'Marketing acquisition and purchase conversion performance by traffic source.'
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block title: TextBlock {
+    content: @md
+      # Marketing Funnel
+      Compare traffic-source reach with purchase conversion efficiency.
+    ;;
+  }
+
+  block headline: VizBlock {
+    label: 'Marketing Funnel Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+        <div style="padding: 1rem 1.25rem; border: 1px solid #E5E7EB; border-radius: 10px; background: #FFFFFF; color: #1F2937; font-size: 1rem; line-height: 1.5;">
+          Marketing has generated <strong>{{ rows[0].values.`Sessions` }}</strong> sessions at a <strong>{{ rows[0].values.`Purchase Conversion Rate` }}</strong> purchase conversion rate.
+        </div>
+      ;;
+    }
+  }
+
+  block sessions_section: TextBlock {
+    content: @md
+      ## 1. Where does traffic come from?
+    ;;
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+      ### Commentary
+      Use this ranking to understand **reach**. Sources at the top are the biggest contributors to the marketing funnel and merit monitoring for traffic-volume changes.
+    ;;
+  }
+
+  block conversion_section: TextBlock {
+    content: @md
+      ## 2. Which sources turn visits into purchases?
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+      ### Commentary
+      Use this ranking to understand **efficiency**. Compare it with session volume: high-converting sources with limited traffic may be scaling opportunities, while high-volume sources with weaker conversion may need landing-page or targeting improvements.
+    ;;
+  }
+
+  explicit_interactions: []
+
+  view: CanvasLayout {
+    width: 1220
+    height: 1120
+    margin: 20
+    auto_expand_vertically: true
+
+    block title {
+      position: pos(20, 20, 1180, 80)
+      layer: 1
+    }
+
+    block headline {
+      position: pos(20, 120, 1180, 100)
+      layer: 1
+    }
+
+    block sessions_section {
+      position: pos(20, 250, 1180, 60)
+      layer: 1
+    }
+
+    block sessions_by_source {
+      position: pos(20, 330, 780, 310)
+      layer: 1
+    }
+
+    block sessions_commentary {
+      position: pos(830, 330, 370, 310)
+      layer: 1
+    }
+
+    block conversion_section {
+      position: pos(20, 680, 1180, 60)
+      layer: 1
+    }
+
+    block conversion_by_source {
+      position: pos(20, 760, 780, 310)
+      layer: 1
+    }
+
+    block conversion_commentary {
+      position: pos(830, 760, 370, 310)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

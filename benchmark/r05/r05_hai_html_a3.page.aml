@@ -1,0 +1,717 @@
+Dashboard r05_hai_html_a3 {
+  title: 'Finance Report'
+  description: @md
+    Printable A4 finance report for @Dataset:thelook, including Net Sales, COGS, Gross Profit,
+    and Gross Margin by product department and category.
+  ;;
+
+  settings {
+    autorun_on_open: true
+  }
+
+  block period_filter: FilterBlock {
+    label: 'Reporting Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block finance_summary: VizBlock {
+    label: 'Financial Summary'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 1
+        show_row_number: false
+        show_row_with_no_data: false
+        wrap_header_text: false
+        wrap_cell_text: false
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block department_financials: VizBlock {
+    label: 'Financial Performance by Department'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format {
+            type: 'text'
+          }
+          uname: 'thelook_products_department_1'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_department_1'
+            direction: 'asc'
+          },
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block category_financials: VizBlock {
+    label: 'Financial Performance by Category'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        show_row_number: false
+        show_sum_row: false
+        show_average_row: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'period_filter'
+      to: [
+        'finance_summary',
+        'department_financials',
+        'category_financials',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root {
+          --paper: #ffffff;
+          --ink: #152033;
+          --navy: #173b63;
+          --blue: #2e6f9e;
+          --pale-blue: #edf4f9;
+          --rule: #cdd7e1;
+          --muted: #607184;
+          --page-width: 210mm;
+          --page-height: 297mm;
+          --page-margin: 15mm;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
+        body {
+          margin: 0;
+          color: var(--ink);
+          background: #e8edf2;
+          font-family: Arial, Helvetica, sans-serif;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .report-page {
+          position: relative;
+          width: var(--page-width);
+          min-height: var(--page-height);
+          margin: 12mm auto;
+          padding: var(--page-margin);
+          overflow: hidden;
+          background: var(--paper);
+          box-shadow: 0 3mm 10mm rgba(19, 39, 59, 0.16);
+        }
+
+        .page-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 10mm;
+          padding-bottom: 5mm;
+          border-bottom: 2px solid var(--navy);
+        }
+
+        .brand-kicker,
+        .section-number,
+        .toc-label,
+        .definitions-term {
+          color: var(--blue);
+          font-size: 7.5pt;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .report-title {
+          margin: 2mm 0 0;
+          color: var(--navy);
+          font-size: 27pt;
+          font-weight: 700;
+          letter-spacing: -0.04em;
+          line-height: 1;
+        }
+
+        .report-subtitle {
+          margin: 2.5mm 0 0;
+          color: var(--muted);
+          font-size: 9.5pt;
+          line-height: 1.4;
+        }
+
+        .period-control {
+          width: 67mm;
+          padding: 2mm 0;
+        }
+
+        .period-caption {
+          margin: 0 0 1.5mm;
+          color: var(--muted);
+          font-size: 7pt;
+          font-weight: 700;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .cover-body {
+          display: flex;
+          min-height: 215mm;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 18mm 0 12mm;
+        }
+
+        .cover-intro {
+          max-width: 135mm;
+        }
+
+        .cover-intro h2 {
+          margin: 0 0 5mm;
+          color: var(--navy);
+          font-size: 19pt;
+          letter-spacing: -0.02em;
+        }
+
+        .cover-intro p {
+          max-width: 122mm;
+          color: var(--muted);
+          font-size: 10.5pt;
+          line-height: 1.6;
+        }
+
+        .summary-panel {
+          margin-top: 8mm;
+          padding: 6mm;
+          border-top: 4px solid var(--blue);
+          background: var(--pale-blue);
+        }
+
+        .summary-panel h3,
+        .section-heading h2 {
+          margin: 0;
+          color: var(--navy);
+          font-size: 16pt;
+          letter-spacing: -0.02em;
+        }
+
+        .summary-panel p,
+        .section-heading p {
+          margin: 1.5mm 0 0;
+          color: var(--muted);
+          font-size: 9pt;
+          line-height: 1.45;
+        }
+
+        .summary-table {
+          margin-top: 4mm;
+        }
+
+        .toc {
+          margin-top: 12mm;
+          padding-top: 6mm;
+          border-top: 1px solid var(--rule);
+        }
+
+        .toc h3 {
+          margin: 0 0 4mm;
+          color: var(--navy);
+          font-size: 12pt;
+        }
+
+        .toc-list {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 2.5mm 9mm;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .toc-list a {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 2.5mm 0;
+          border-bottom: 1px solid var(--rule);
+          color: var(--ink);
+          font-size: 9.5pt;
+          text-decoration: none;
+        }
+
+        .toc-list a:hover {
+          color: var(--blue);
+        }
+
+        .toc-page {
+          color: var(--muted);
+          font-size: 8pt;
+        }
+
+        .section-page {
+          display: flex;
+          min-height: calc(var(--page-height) - (2 * var(--page-margin)));
+          flex-direction: column;
+        }
+
+        .section-heading {
+          padding-bottom: 5mm;
+          border-bottom: 2px solid var(--navy);
+        }
+
+        .section-content {
+          flex: 1;
+          padding-top: 7mm;
+        }
+
+        .financial-table {
+          width: 100%;
+        }
+
+        .definition-list {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 6mm 10mm;
+          margin-top: 8mm;
+        }
+
+        .definition {
+          min-height: 36mm;
+          padding: 5mm;
+          border: 1px solid var(--rule);
+          border-top: 3px solid var(--blue);
+          background: #fbfcfd;
+        }
+
+        .definition h3 {
+          margin: 1.5mm 0 2mm;
+          color: var(--navy);
+          font-size: 12pt;
+        }
+
+        .definition p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 9pt;
+          line-height: 1.5;
+        }
+
+        .methodology {
+          margin-top: 8mm;
+          padding: 5mm;
+          border-left: 4px solid var(--blue);
+          background: var(--pale-blue);
+        }
+
+        .methodology h3 {
+          margin: 0 0 2mm;
+          color: var(--navy);
+          font-size: 10pt;
+        }
+
+        .methodology p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 8.5pt;
+          line-height: 1.5;
+        }
+
+        .page-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 6mm;
+          margin-top: auto;
+          padding-top: 5mm;
+          border-top: 1px solid var(--rule);
+          color: var(--muted);
+          font-size: 7.5pt;
+        }
+
+        .footer-period {
+          max-width: 80mm;
+          text-align: right;
+        }
+
+        .page-break {
+          break-before: page;
+          page-break-before: always;
+        }
+
+        @page {
+          size: A4 portrait;
+          margin: 0;
+        }
+
+        @media print {
+          body {
+            background: var(--paper);
+          }
+
+          .report-page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0;
+            box-shadow: none;
+            break-after: page;
+            page-break-after: always;
+          }
+
+          .report-page:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+
+          .section-page,
+          .summary-panel,
+          .financial-table,
+          .definition {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+        }
+
+        @media screen and (max-width: 850px) {
+          .report-page {
+            width: 100%;
+            min-height: auto;
+            margin: 0;
+            padding: 7vw;
+            box-shadow: none;
+          }
+
+          .page-header,
+          .toc-list,
+          .definition-list {
+            display: block;
+          }
+
+          .period-control {
+            width: 100%;
+            margin-top: 5mm;
+          }
+
+          .toc-list li,
+          .definition {
+            margin-bottom: 4mm;
+          }
+        }
+      </style>
+
+      <main>
+        <section class="report-page" id="cover">
+          <header class="page-header">
+            <div>
+              <div class="brand-kicker">TheLook eCommerce</div>
+              <h1 class="report-title">Finance Report</h1>
+              <p class="report-subtitle">Net sales, cost of goods sold, and gross profit analysis.</p>
+            </div>
+            <div class="period-control">
+              <p class="period-caption">Reporting period</p>
+              <h-block name="period_filter" />
+            </div>
+          </header>
+
+          <div class="cover-body">
+            <div class="cover-intro">
+              <div class="section-number">Management reporting</div>
+              <h2>Financial performance at a glance</h2>
+              <p>
+                This report presents realized merchandise performance for the selected reporting
+                period. Net Sales and COGS exclude cancelled and returned order items.
+              </p>
+
+              <div class="summary-panel">
+                <div class="section-number">01 / Executive summary</div>
+                <h3>Profitability summary</h3>
+                <p>Headline financial measures for the selected reporting period.</p>
+                <div class="summary-table">
+                  <h-block name="finance_summary" />
+                </div>
+              </div>
+            </div>
+
+            <nav class="toc" aria-label="Table of contents">
+              <div class="toc-label">Contents</div>
+              <h3>Report sections</h3>
+              <ol class="toc-list">
+                <li><a href="#cover"><span>Executive Summary</span><span class="toc-page">01</span></a></li>
+                <li><a href="#department"><span>Department Performance</span><span class="toc-page">02</span></a></li>
+                <li><a href="#category"><span>Category Performance</span><span class="toc-page">03</span></a></li>
+                <li><a href="#definitions"><span>Metric Definitions</span><span class="toc-page">04</span></a></li>
+              </ol>
+            </nav>
+          </div>
+
+          <footer class="page-footer">
+            <span>Confidential management report</span>
+            <span>Page 1</span>
+          </footer>
+        </section>
+
+        <section class="report-page page-break" id="department">
+          <div class="section-page">
+            <header class="page-header">
+              <div>
+                <div class="section-number">02 / Department performance</div>
+                <h2 class="report-title">Department Financials</h2>
+                <p class="report-subtitle">Net Sales, COGS, Gross Profit, and Gross Margin by product department.</p>
+              </div>
+              <div class="period-control">
+                <p class="period-caption">Reporting period</p>
+                <h-block name="period_filter" />
+              </div>
+            </header>
+
+            <div class="section-content">
+              <div class="financial-table">
+                <h-block name="department_financials" />
+              </div>
+            </div>
+
+            <footer class="page-footer">
+              <span>Department Financials</span>
+              <span class="footer-period">Reporting period selected above · Page 2</span>
+            </footer>
+          </div>
+        </section>
+
+        <section class="report-page page-break" id="category">
+          <div class="section-page">
+            <header class="page-header">
+              <div>
+                <div class="section-number">03 / Category performance</div>
+                <h2 class="report-title">Category Financials</h2>
+                <p class="report-subtitle">Net Sales, COGS, Gross Profit, and Gross Margin by product category.</p>
+              </div>
+              <div class="period-control">
+                <p class="period-caption">Reporting period</p>
+                <h-block name="period_filter" />
+              </div>
+            </header>
+
+            <div class="section-content">
+              <div class="financial-table">
+                <h-block name="category_financials" />
+              </div>
+            </div>
+
+            <footer class="page-footer">
+              <span>Category Financials</span>
+              <span class="footer-period">Reporting period selected above · Page 3</span>
+            </footer>
+          </div>
+        </section>
+
+        <section class="report-page page-break" id="definitions">
+          <div class="section-page">
+            <header class="page-header">
+              <div>
+                <div class="section-number">04 / Reference</div>
+                <h2 class="report-title">Metric Definitions</h2>
+                <p class="report-subtitle">Definitions used throughout this finance report.</p>
+              </div>
+              <div class="period-control">
+                <p class="period-caption">Reporting period</p>
+                <h-block name="period_filter" />
+              </div>
+            </header>
+
+            <div class="section-content">
+              <div class="definition-list">
+                <article class="definition">
+                  <div class="definitions-term">Metric</div>
+                  <h3>Net Sales</h3>
+                  <p>
+                    Sum of order-item sale prices, excluding items with a status of
+                    <strong>Cancelled</strong> or <strong>Returned</strong>.
+                  </p>
+                </article>
+
+                <article class="definition">
+                  <div class="definitions-term">Metric</div>
+                  <h3>COGS</h3>
+                  <p>
+                    Sum of product cost for order items included in Net Sales. Cancelled
+                    and returned items are excluded.
+                  </p>
+                </article>
+
+                <article class="definition">
+                  <div class="definitions-term">Metric</div>
+                  <h3>Gross Profit</h3>
+                  <p>
+                    Net Sales less COGS. This report measures merchandise gross profit
+                    and does not include operating expenses, fulfillment costs, or taxes.
+                  </p>
+                </article>
+
+                <article class="definition">
+                  <div class="definitions-term">Metric</div>
+                  <h3>Gross Margin</h3>
+                  <p>
+                    Gross Profit divided by Net Sales. The ratio is displayed as a
+                    percentage and is null where Net Sales is zero.
+                  </p>
+                </article>
+              </div>
+
+              <div class="methodology">
+                <h3>Reporting methodology</h3>
+                <p>
+                  The reporting-period control filters order items by their created-at date.
+                  Department and category are sourced from the related product record.
+                  Use the dashboard Export action to create the final PDF; the A4 page styling,
+                  page breaks, header, footer, and selected period are retained in the export.
+                </p>
+              </div>
+            </div>
+
+            <footer class="page-footer">
+              <span>Metric Definitions</span>
+              <span class="footer-period">Reporting period selected above · Page 4</span>
+            </footer>
+          </div>
+        </section>
+      </main>
+    ;;
+  }
+}

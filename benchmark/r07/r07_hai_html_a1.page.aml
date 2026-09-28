@@ -1,0 +1,376 @@
+Dashboard r07_hai_html_a1 {
+  title: 'Operations Dashboard'
+  description: 'Inventory availability and return-rate monitoring by distribution center, category, and product.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    cache_duration: 3600
+  }
+
+  block dashboard_title: TextBlock {
+    content: @md
+# Operations Dashboard
+
+Monitor inventory coverage and return quality across distribution centers. Click a distribution center bar to cross-filter the dashboard. Expand a distribution center in the detail table to inspect categories, then expand a category to view products.
+;;
+  }
+
+  block stock_kpi: VizBlock {
+    label: 'Units in Stock'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.units_in_stock)
+        label: 'Units in Stock'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block return_rate_status: VizBlock {
+    label: 'Return Rate Threshold'
+    viz: DataTable {
+      dataset: thelook
+
+      calculation return_rate_threshold {
+        label: 'Return Rate Threshold'
+        formula: @aql return_rate * 0 + 0.10;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation return_rate_status {
+        label: 'Return Rate Status'
+        formula: @aql case(
+          when: not(return_rate < return_rate_threshold),
+          then: 'At or Above Threshold',
+          else: 'Within Threshold'
+        );;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+
+      fields: [
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Overall Return Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'return_rate_threshold'
+          label: 'Threshold'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'return_rate_status'
+          label: 'Status'
+          format {
+            type: 'text'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 10
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 0.10
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0.10
+              }
+              text_color: '#15803D'
+              background_color: '#DCFCE7'
+            }
+          },
+          ConditionalFormat {
+            ref: 'return_rate_status'
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'At or Above Threshold'
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+          ConditionalFormat {
+            ref: 'return_rate_status'
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: 'Within Threshold'
+              }
+              text_color: '#15803D'
+              background_color: '#DCFCE7'
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  block stock_by_distribution_center: VizBlock {
+    label: 'Stock Level by Distribution Center'
+    viz: BarChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            label: 'Units in Stock'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block inventory_returns_detail: VizBlock {
+    label: 'Inventory and Return Rate by Distribution Center'
+    viz: PivotTable {
+      dataset: thelook
+
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_distribution_centers.name)
+          label: 'Distribution Center'
+          uname: 'distribution_center'
+        },
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: r(thelook_products.name)
+          label: 'Product Name'
+          uname: 'product_name'
+        }
+      ]
+
+      values: [
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          label: 'Units in Stock'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 100
+        show_row_total: false
+        show_column_total: false
+        show_sub_total: true
+        wrap_header_text: true
+        wrap_cell_text: false
+        frozen_columns: 1
+
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 0.10
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0.10
+              }
+              text_color: '#166534'
+              background_color: '#DCFCE7'
+            }
+          }
+        ]
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'distribution_center'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_name'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: []
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .ops-dashboard {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 24px;
+    background: #F8FAFC;
+  }
+
+  .hero {
+    margin-bottom: 20px;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) minmax(460px, 2fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .section {
+    margin-top: 24px;
+  }
+
+  .section-heading {
+    margin: 0 0 12px;
+    color: #0F172A;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .section-note {
+    margin: 0 0 16px;
+    color: #475569;
+    font-size: 14px;
+  }
+
+  .card {
+    min-width: 0;
+    padding: 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  .detail-card {
+    padding: 16px;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    background: #FFFFFF;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+
+  @media (max-width: 800px) {
+    .ops-dashboard {
+      padding: 16px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="ops-dashboard">
+  <div class="hero">
+    <h-block name="dashboard_title" />
+  </div>
+
+  <div class="kpi-grid">
+    <div class="card">
+      <h-block name="stock_kpi" />
+    </div>
+    <div class="card">
+      <h-block name="return_rate_status" />
+    </div>
+  </div>
+
+  <section class="section">
+    <h2 class="section-heading">Stock Levels by Distribution Center</h2>
+    <p class="section-note">
+      Select a bar to cross-filter the detail view to that distribution center.
+    </p>
+    <div class="card">
+      <h-block name="stock_by_distribution_center" />
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-heading">Inventory and Return Quality Detail</h2>
+    <p class="section-note">
+      Expand distribution centers to see categories, then expand categories to drill into individual products. Return rates at or above 10% are flagged red.
+    </p>
+    <div class="detail-card">
+      <h-block name="inventory_returns_detail" />
+    </div>
+  </section>
+</div>
+;;
+  }
+}

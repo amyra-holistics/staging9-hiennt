@@ -1,0 +1,431 @@
+Dashboard r07_hai_html_a2 {
+  title: 'Operations Dashboard'
+  description: @md
+Monitor stock availability and product returns across distribution centers. Select a distribution center from the stock chart to filter the dashboard, expand a center in the pivot to view its categories, and select a category to inspect its products.
+;;
+
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block heading: TextBlock {
+    content: @md
+# Operations Dashboard
+
+Monitor available inventory and return-rate risk across the fulfillment network.
+;;
+  }
+
+  block instructions: TextBlock {
+    content: @md
+**How to use this dashboard:** Select a distribution center in **Stock Level by Distribution Center** to filter the remaining blocks. Expand a distribution center in the pivot table to see its categories. Select a category in **Return Rate Threshold Check** to drill into its products.
+;;
+  }
+
+  block v_stock_by_center: VizBlock {
+    label: 'Stock Level by Distribution Center'
+    description: @md
+Available inventory units by distribution center. Select a bar to filter the dashboard.
+;;
+
+    viz: CombinationChart {
+      dataset: thelook
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        series {
+          mark_type: 'bar'
+
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            label: 'Units in Stock'
+
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_return_threshold: VizBlock {
+    label: 'Return Rate Threshold Check'
+    description: @md
+Categories above the **10% return-rate threshold** are flagged in red. Select a category to view its products below.
+;;
+
+    viz: DataTable {
+      dataset: thelook
+
+      calculation return_rate_vs_10pct {
+        label: 'Return Rate vs 10%'
+        formula: @aql return_rate - 0.10;;
+        calc_type: 'measure'
+        data_type: 'number'
+
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+
+          format {
+            type: 'text'
+          }
+
+          uname: 'thelook_products_category_1'
+        },
+
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+
+          uname: 'custom_return_rate_1'
+        },
+
+        VizFieldFull {
+          ref: 'return_rate_vs_10pct'
+          label: 'Return Rate vs 10%'
+
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 100
+        show_row_number: true
+
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.10
+              }
+
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+
+            format: SingleFormat {
+              condition {
+                operator: 'less_than_equal'
+                value: 0.10
+              }
+
+              text_color: '#166534'
+              background_color: '#DCFCE7'
+            }
+          }
+        ]
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_return_rate_1'
+            direction: 'desc'
+          },
+
+          KeyBasedSortSetting {
+            key: 'thelook_products_category_1'
+            direction: 'asc'
+          }
+        ]
+
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_center_category: VizBlock {
+    label: 'Inventory and Returns by Distribution Center'
+    description: @md
+Expand each distribution center to inspect category-level units in stock and return rate.
+;;
+
+    viz: PivotTable {
+      dataset: thelook
+
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_distribution_centers.name)
+          label: 'Distribution Center'
+          uname: 'distribution_center'
+        },
+
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          uname: 'product_category'
+        }
+      ]
+
+      values: [
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          label: 'Units In Stock'
+
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+
+      settings {
+        show_sub_total: true
+        pagination_size: 100
+        wrap_header_text: true
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'distribution_center'
+            direction: 'asc'
+          },
+
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  block v_product_detail: VizBlock {
+    label: 'Product Operations Drill-Down'
+    description: @md
+Select a category in the return-rate table to narrow this product list.
+;;
+
+    viz: DataTable {
+      dataset: thelook
+
+      fields: [
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(thelook_products.category)
+
+          format {
+            type: 'text'
+          }
+
+          uname: 'thelook_products_category_1'
+        },
+
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(thelook_products.name)
+
+          format {
+            type: 'text'
+          }
+
+          uname: 'thelook_products_name_1'
+        },
+
+        VizFieldFull {
+          label: 'Units In Stock'
+          ref: r(thelook.units_in_stock)
+
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 100
+        show_row_number: true
+
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_category_1'
+            direction: 'asc'
+          },
+
+          KeyBasedSortSetting {
+            key: 'thelook_products_name_1'
+            direction: 'asc'
+          }
+        ]
+
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'v_stock_by_center'
+      to: ['v_return_threshold', 'v_center_category', 'v_product_detail']
+    },
+
+    FilterInteraction {
+      from: 'v_return_threshold'
+      to: ['v_center_category', 'v_product_detail']
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .operations-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 8px;
+  }
+
+  .header {
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+
+  .guidance {
+    border-left: 4px solid #2563eb;
+    background: #eff6ff;
+    border-radius: 6px;
+    padding: 4px 16px;
+  }
+
+  .section-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    gap: 20px;
+    align-items: stretch;
+  }
+
+  .detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .card {
+    min-width: 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #ffffff;
+    padding: 8px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  @media (max-width: 900px) {
+    .overview-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<div class="operations-dashboard">
+  <header class="header">
+    <h-block name="heading"></h-block>
+  </header>
+
+  <aside class="guidance">
+    <h-block name="instructions"></h-block>
+  </aside>
+
+  <section class="overview-grid">
+    <div class="card">
+      <h-block name="v_stock_by_center"></h-block>
+    </div>
+
+    <div class="card">
+      <h-block name="v_return_threshold"></h-block>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <h2 class="section-title">Distribution Center Detail</h2>
+
+    <div class="card full-width">
+      <h-block name="v_center_category"></h-block>
+    </div>
+  </section>
+
+  <section class="detail-section">
+    <h2 class="section-title">Product Drill-Down</h2>
+
+    <div class="card full-width">
+      <h-block name="v_product_detail"></h-block>
+    </div>
+  </section>
+</div>
+;;
+  }
+}

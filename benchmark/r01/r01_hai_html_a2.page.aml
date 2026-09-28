@@ -1,0 +1,338 @@
+Dashboard r01_hai_html_a2 {
+  title: 'Executive Sales Overview'
+  description: 'Executive sales performance overview for TheLook eCommerce.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Item Created Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Created Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Product Category'
+        legend_label: 'hidden'
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        'v_net_sales',
+        'v_orders',
+        'v_aov',
+        'v_gross_margin',
+        'v_monthly_net_sales',
+        'v_top_categories',
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .r01-dashboard {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 28px;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .r01-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 24px;
+          margin-bottom: 24px;
+        }
+
+        .r01-title {
+          margin: 0;
+          color: #172033;
+          font-size: 30px;
+          font-weight: 700;
+          letter-spacing: -0.03em;
+        }
+
+        .r01-subtitle {
+          margin: 8px 0 0;
+          color: #667085;
+          font-size: 14px;
+        }
+
+        .r01-filter {
+          width: min(100%, 320px);
+          flex: 0 0 320px;
+        }
+
+        .r01-kpis {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 28px;
+        }
+
+        .r01-kpi {
+          min-height: 142px;
+          padding: 4px;
+          border: 1px solid #e7eaf0;
+          border-radius: 12px;
+          background: #ffffff;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        }
+
+        .r01-section-heading {
+          margin: 0 0 14px;
+          color: #172033;
+          font-size: 18px;
+          font-weight: 650;
+          letter-spacing: -0.01em;
+        }
+
+        .r01-chart {
+          min-height: 420px;
+          padding: 6px;
+          border: 1px solid #e7eaf0;
+          border-radius: 12px;
+          background: #ffffff;
+          box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+        }
+
+        .r01-footer {
+          margin-top: 24px;
+          padding-top: 16px;
+          border-top: 1px solid #e7eaf0;
+          color: #667085;
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        @media (max-width: 960px) {
+          .r01-kpis {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 640px) {
+          .r01-dashboard {
+            padding: 18px;
+          }
+
+          .r01-header {
+            flex-direction: column;
+          }
+
+          .r01-filter {
+            width: 100%;
+            flex-basis: auto;
+          }
+
+          .r01-kpis {
+            grid-template-columns: 1fr;
+          }
+
+          .r01-title {
+            font-size: 25px;
+          }
+        }
+      </style>
+
+      <main class="r01-dashboard">
+        <header class="r01-header">
+          <div>
+            <h1 class="r01-title">Executive Sales Overview</h1>
+            <p class="r01-subtitle">Monitor sales performance, order economics, and category contribution.</p>
+          </div>
+          <div class="r01-filter">
+            <h-block name="f_order_date" />
+          </div>
+        </header>
+
+        <section class="r01-kpis" aria-label="Sales KPIs">
+          <div class="r01-kpi">
+            <h-block name="v_net_sales" />
+          </div>
+          <div class="r01-kpi">
+            <h-block name="v_orders" />
+          </div>
+          <div class="r01-kpi">
+            <h-block name="v_aov" />
+          </div>
+          <div class="r01-kpi">
+            <h-block name="v_gross_margin" />
+          </div>
+        </section>
+
+        <section>
+          <h2 class="r01-section-heading">Monthly Net Sales Trend</h2>
+          <div class="r01-chart">
+            <h-block name="v_monthly_net_sales" />
+          </div>
+        </section>
+
+        <section style="margin-top: 28px;">
+          <h2 class="r01-section-heading">Top 10 Categories by Net Sales</h2>
+          <div class="r01-chart">
+            <h-block name="v_top_categories" />
+          </div>
+        </section>
+
+        <footer class="r01-footer">
+          <strong>Data source:</strong> TheLook eCommerce dataset (<code>thelook</code>).&nbsp;
+          <strong>Last updated:</strong> reflects the most recent successful dashboard query and available warehouse data.
+        </footer>
+      </main>
+    ;;
+  }
+}

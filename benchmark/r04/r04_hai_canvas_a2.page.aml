@@ -1,0 +1,646 @@
+Dashboard r04_hai_canvas_a2 {
+  title: 'Monthly Performance Review'
+  description: '''
+Five-slide monthly performance deck for TheLook eCommerce:
+headline KPIs, trend, category performance, and decision takeaways.
+'''
+  theme: H.themes.classic
+
+  settings {
+    timezone: 'Etc/UTC'
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  // Slide 1 — Title
+  block s1_title: TextBlock {
+    content: @md
+# Monthly Performance Review
+
+## TheLook eCommerce
+
+**Performance deck**  
+Sales, profitability, product-category mix, and operating signals.
+
+<sub>Net Sales excludes Cancelled and Returned order items. Gross Profit equals Net Sales less COGS.</sub>
+;;
+  }
+
+  block s1_scope: TextBlock {
+    content: @md
+### What this deck answers
+
+1. **How is the business performing?** — headline sales, profit, volume, and service KPIs  
+2. **How is performance moving over time?** — monthly Net Sales and Gross Profit trend  
+3. **Which product categories matter most?** — revenue, profit, margin, and volume by category  
+4. **Where should the team focus?** — margin, order value, and return-rate signals
+;;
+  }
+
+  // Slide 2 — Headline KPIs
+  block s2_title: TextBlock {
+    content: @md
+# Headline KPIs
+
+## Overall commercial and operating performance
+;;
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block s2_note: TextBlock {
+    content: @md
+### KPI definitions
+
+- **Net Sales**: Sale price of fulfilled order items, excluding Cancelled and Returned items.
+- **Gross Profit**: Net Sales less product COGS.
+- **Gross Margin**: Gross Profit as a percentage of Net Sales.
+- **Return Rate**: Returned items as a percentage of all order items.
+;;
+  }
+
+  // Slide 3 — Trend
+  block s3_title: TextBlock {
+    content: @md
+# Monthly Trend
+
+## Net Sales and Gross Profit over time
+;;
+  }
+
+  block monthly_sales_profit_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      y_axis {
+        label: 'Gross Profit'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+
+      settings {
+        legend_label: 'top'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block s3_readout: TextBlock {
+    content: @md
+### How to read this slide
+
+- **Columns** show monthly Net Sales.
+- **Line** shows monthly Gross Profit.
+- Review whether profit keeps pace with sales growth; a widening gap can indicate margin pressure.
+- Use the category slide to identify the product mix behind material changes.
+;;
+  }
+
+  // Slide 4 — Category breakdown
+  block s4_title: TextBlock {
+    content: @md
+# Category Breakdown
+
+## Where Net Sales and profit are generated
+;;
+  }
+
+  block category_net_sales: VizBlock {
+    label: 'Top 10 Product Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format {
+          type: 'text'
+        }
+      }
+
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block category_performance_table: VizBlock {
+    label: 'Category Performance Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+          uname: 'thelook_products_category_1'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_net_sales_1'
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Items Sold'
+          ref: r(thelook.items_sold)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_net_sales_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'thelook_products_category_1'
+            direction: 'asc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  // Slide 5 — Key takeaways
+  block s5_title: TextBlock {
+    content: @md
+# Key Takeaways
+
+## Focus the next monthly performance review on value, margin, and post-purchase quality
+;;
+  }
+
+  block s5_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block s5_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block s5_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block s5_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block s5_actions: TextBlock {
+    content: @md
+### Decision prompts
+
+| Focus area | What to review | Suggested action |
+|---|---|---|
+| **Growth quality** | Is Gross Profit keeping pace with Net Sales? | Prioritize categories that grow sales without diluting margin. |
+| **Product mix** | Which high-sales categories have weaker Gross Margin? | Review promotion depth, supplier cost, and pricing. |
+| **Basket value** | Is Average Order Value increasing with fulfilled-order volume? | Test bundles, cross-sell placement, and free-shipping thresholds. |
+| **Post-purchase quality** | Is Return Rate concentrated in particular categories? | Investigate fit, product information, quality, and fulfillment drivers. |
+;;
+  }
+
+  explicit_interactions: []
+
+  view: TabLayout {
+    tab slide_1: CanvasLayout {
+      label: '1. Title'
+      width: 1600
+      height: 900
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block s1_title {
+        position: pos(100, 150, 1400, 330)
+        layer: 1
+      }
+
+      block s1_scope {
+        position: pos(100, 560, 1400, 210)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab slide_2: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1600
+      height: 900
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block s2_title {
+        position: pos(80, 50, 1440, 110)
+        layer: 1
+      }
+
+      block kpi_net_sales {
+        position: pos(80, 210, 450, 180)
+        layer: 1
+      }
+
+      block kpi_gross_profit {
+        position: pos(575, 210, 450, 180)
+        layer: 1
+      }
+
+      block kpi_gross_margin {
+        position: pos(1070, 210, 450, 180)
+        layer: 1
+      }
+
+      block kpi_fulfilled_orders {
+        position: pos(80, 440, 450, 180)
+        layer: 1
+      }
+
+      block kpi_aov {
+        position: pos(575, 440, 450, 180)
+        layer: 1
+      }
+
+      block kpi_return_rate {
+        position: pos(1070, 440, 450, 180)
+        layer: 1
+      }
+
+      block s2_note {
+        position: pos(80, 680, 1440, 140)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab slide_3: CanvasLayout {
+      label: '3. Trend'
+      width: 1600
+      height: 900
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block s3_title {
+        position: pos(80, 40, 1440, 100)
+        layer: 1
+      }
+
+      block monthly_sales_profit_trend {
+        position: pos(80, 160, 1440, 520)
+        layer: 1
+      }
+
+      block s3_readout {
+        position: pos(80, 710, 1440, 140)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab slide_4: CanvasLayout {
+      label: '4. Category Breakdown'
+      width: 1600
+      height: 900
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block s4_title {
+        position: pos(80, 40, 1440, 100)
+        layer: 1
+      }
+
+      block category_net_sales {
+        position: pos(80, 160, 700, 650)
+        layer: 1
+      }
+
+      block category_performance_table {
+        position: pos(820, 160, 700, 650)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+
+    tab slide_5: CanvasLayout {
+      label: '5. Key Takeaways'
+      width: 1600
+      height: 900
+      grid_size: 20
+      auto_expand_vertically: false
+
+      block s5_title {
+        position: pos(80, 40, 1440, 110)
+        layer: 1
+      }
+
+      block s5_margin {
+        position: pos(80, 190, 330, 170)
+        layer: 1
+      }
+
+      block s5_aov {
+        position: pos(450, 190, 330, 170)
+        layer: 1
+      }
+
+      block s5_return_rate {
+        position: pos(820, 190, 330, 170)
+        layer: 1
+      }
+
+      block s5_fulfilled_orders {
+        position: pos(1190, 190, 330, 170)
+        layer: 1
+      }
+
+      block s5_actions {
+        position: pos(80, 420, 1440, 350)
+        layer: 1
+      }
+
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

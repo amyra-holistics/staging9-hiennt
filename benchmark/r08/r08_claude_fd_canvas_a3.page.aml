@@ -1,52 +1,27 @@
 Dashboard r08_claude_fd_canvas_a3 {
   title: 'CEO Monthly Sales Review'
-  description: 'Monthly sales review for the CEO: headline KPIs vs. prior month, 24-month trend, and where the month came from.'
+  description: 'Monthly sales review for the CEO: headline KPIs vs the prior month, 13-month trend, and where sales came from.'
 
-  // ---------- Header ----------
-  block header: TextBlock {
+  block t_header: TextBlock {
     content: @md
-## CEO Monthly Sales Review
-<span style="color:#5B6B7F">TheLook eCommerce · Net figures exclude cancelled and returned items · KPI deltas compare the selected month with the month before</span>
+# CEO Monthly Sales Review
+Net sales exclude Cancelled and Returned items. KPI changes compare the selected month with the month before.
 ;;
   }
 
-  // ---------- Filters ----------
   block f_month: FilterBlock {
     label: 'Review Month'
     type: 'field'
     source: FieldFilterSource {
-      dataset: thelook
+      dataset: 'thelook'
       field: r(thelook_order_items.created_at)
     }
     default {
-      operator: 'last'
-      value: 1
-      modifier: 'month'
-      options {
-        include_current_period: false
-      }
+      operator: 'matches'
+      value: 'last month'
     }
   }
 
-  block f_category: FilterBlock {
-    label: 'Product Category'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: thelook
-      field: r(thelook_products.category)
-    }
-  }
-
-  block f_country: FilterBlock {
-    label: 'Customer Country'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: thelook
-      field: r(thelook_users.country)
-    }
-  }
-
-  // ---------- KPIs (selected month vs. previous month) ----------
   block k_net_sales: VizBlock {
     label: 'Net Sales'
     viz: MetricKpi {
@@ -56,20 +31,14 @@ Dashboard r08_claude_fd_canvas_a3 {
         label: 'Net Sales'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '[$$]#,###0'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.net_sales)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -91,20 +60,14 @@ Dashboard r08_claude_fd_canvas_a3 {
         label: 'Gross Profit'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '[$$]#,###0'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.gross_profit)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -126,20 +89,14 @@ Dashboard r08_claude_fd_canvas_a3 {
         label: 'Gross Margin'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0%'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.gross_margin)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -161,20 +118,14 @@ Dashboard r08_claude_fd_canvas_a3 {
         label: 'Fulfilled Orders'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.fulfilled_orders)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -193,23 +144,17 @@ Dashboard r08_claude_fd_canvas_a3 {
       dataset: thelook
       value: VizFieldFull {
         ref: r(thelook.aov)
-        label: 'Avg. Order Value'
+        label: 'Average Order Value'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '[$$]#,###0.00'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.aov)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -231,20 +176,14 @@ Dashboard r08_claude_fd_canvas_a3 {
         label: 'Return Rate'
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.0%'
         }
       }
-      compare_value: VizFieldFull {
-        ref: r(thelook.return_rate)
-        label: 'vs. previous month'
-        analytic: PeriodOverPeriodComparison {
-          time_dimension: r(thelook_order_items.created_at)
-          display: 'value'
-          comparison_period: '1 month'
-        }
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value {
+          duration: 1
+          granularity: 'month'
         }
       }
       settings {
@@ -260,15 +199,15 @@ Dashboard r08_claude_fd_canvas_a3 {
     }
   }
 
-  // ---------- Trend (ignores the month filter: always the last 24 complete months) ----------
   block v_trend: VizBlock {
-    label: 'Net Sales & Gross Margin — Last 24 Complete Months'
+    label: 'Net Sales & Gross Margin, Last 13 Complete Months'
+    description: 'Not affected by the Review Month filter.'
     viz: CombinationChart {
       dataset: thelook
       filter {
         field: r(thelook_order_items.created_at)
         operator: 'last'
-        value: 24
+        value: 13
         modifier: 'month'
         options {
           include_current_period: false
@@ -276,7 +215,6 @@ Dashboard r08_claude_fd_canvas_a3 {
       }
       x_axis: VizFieldFull {
         ref: r(thelook_order_items.created_at)
-        label: 'Month'
         transformation: 'datetrunc month'
         format {
           type: 'date'
@@ -289,13 +227,14 @@ Dashboard r08_claude_fd_canvas_a3 {
           mark_type: 'column'
           field: VizFieldFull {
             ref: r(thelook.net_sales)
+            label: 'Net Sales'
             format {
               type: 'number'
-              pattern: 'inherited'
+              pattern: '[$$]#,###0'
             }
           }
           settings {
-            color: '#2F5D8A'
+            color: '#255DD4'
           }
         }
       }
@@ -305,13 +244,14 @@ Dashboard r08_claude_fd_canvas_a3 {
           mark_type: 'line'
           field: VizFieldFull {
             ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
             format {
               type: 'number'
-              pattern: 'inherited'
+              pattern: '#,###0.0%'
             }
           }
           settings {
-            color: '#E07A2E'
+            color: '#E27712'
           }
         }
         settings {
@@ -323,7 +263,6 @@ Dashboard r08_claude_fd_canvas_a3 {
       settings {
         legend_label: 'top'
         show_data_points: true
-        row_limit: 100
         sort: LineFamilySort {
           type: 'xaxis'
           direction: 'asc'
@@ -332,123 +271,52 @@ Dashboard r08_claude_fd_canvas_a3 {
     }
   }
 
-  // ---------- Where the month came from ----------
+  block v_department: VizBlock {
+    label: 'Net Sales by Department'
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.department)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        }
+        settings {
+          point {
+            value: 'Women'
+            color: '#255DD4'
+          }
+          point {
+            value: 'Men'
+            color: '#18A59E'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        show_total: true
+        show_percentage: true
+        legend_label: 'bottom'
+      }
+    }
+  }
+
   block v_category: VizBlock {
-    label: 'Net Sales by Category'
-    viz: BarChart {
-      dataset: thelook
-      x_axis: VizFieldFull {
-        ref: r(thelook_products.category)
-        label: 'Category'
-        format {
-          type: 'text'
-        }
-      }
-      y_axis {
-        series {
-          field: VizFieldFull {
-            ref: r(thelook.net_sales)
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#2F5D8A'
-          }
-        }
-      }
-      settings {
-        legend_label: 'hidden'
-        row_limit: 12
-        sort: LineFamilySort {
-          type: 'yaxis'
-          direction: 'desc'
-        }
-      }
-    }
-  }
-
-  block v_country: VizBlock {
-    label: 'Net Sales by Country (Top 10)'
-    viz: BarChart {
-      dataset: thelook
-      x_axis: VizFieldFull {
-        ref: r(thelook_users.country)
-        label: 'Country'
-        format {
-          type: 'text'
-        }
-      }
-      y_axis {
-        series {
-          field: VizFieldFull {
-            ref: r(thelook.net_sales)
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#2F5D8A'
-          }
-        }
-      }
-      settings {
-        legend_label: 'hidden'
-        row_limit: 10
-        sort: LineFamilySort {
-          type: 'yaxis'
-          direction: 'desc'
-        }
-      }
-    }
-  }
-
-  block v_channel: VizBlock {
-    label: 'Net Sales by Acquisition Channel'
-    viz: BarChart {
-      dataset: thelook
-      x_axis: VizFieldFull {
-        ref: r(thelook_users.traffic_source)
-        label: 'Traffic Source'
-        format {
-          type: 'text'
-        }
-      }
-      y_axis {
-        series {
-          field: VizFieldFull {
-            ref: r(thelook.net_sales)
-            format {
-              type: 'number'
-              pattern: 'inherited'
-            }
-          }
-          settings {
-            color: '#2F5D8A'
-          }
-        }
-      }
-      settings {
-        legend_label: 'hidden'
-        row_limit: 10
-        sort: LineFamilySort {
-          type: 'yaxis'
-          direction: 'desc'
-        }
-      }
-    }
-  }
-
-  block v_top_products: VizBlock {
-    label: 'Top 10 Products by Net Sales'
+    label: 'Category Performance'
     viz: DataTable {
       dataset: thelook
       fields: [
         VizFieldFull {
-          ref: r(thelook_products.name)
-          label: 'Product'
+          ref: r(thelook_products.category)
           format {
             type: 'text'
           }
@@ -458,36 +326,97 @@ Dashboard r08_claude_fd_canvas_a3 {
           label: 'Net Sales'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '[$$]#,###0'
           }
         },
         VizFieldFull {
-          ref: r(thelook.items_sold)
-          label: 'Units'
+          ref: r(thelook.net_sales)
+          label: 'vs Prior Month'
+          uname: 'net_sales_mom'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###0.0%'
+          }
+          analytic: PeriodOverPeriodComparison {
+            time_dimension: r(thelook_order_items.created_at)
+            display: 'percent_change'
+            comparison_period: '1 month'
           }
         },
         VizFieldFull {
           ref: r(thelook.gross_margin)
-          label: 'Margin'
+          label: 'Gross Margin'
           format {
             type: 'number'
-            pattern: 'inherited'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.items_sold)
+          label: 'Items Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
           }
         }
       ]
       settings {
-        show_row_number: true
-        row_limit: 10
-        pagination_size: 10
         sorts: [
           IndexBasedSortSetting {
             field_index: 1
             direction: 'desc'
           }
         ]
+        pagination_size: 30
+        show_sum_row: false
+        row_limit: 100
+      }
+    }
+  }
+
+  block v_country: VizBlock {
+    label: 'Top 10 Countries by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+          settings {
+            color: '#255DD4'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          direction: 'desc'
+        }
       }
     }
   }
@@ -506,54 +435,45 @@ Dashboard r08_claude_fd_canvas_a3 {
 
   view: CanvasLayout {
     label: 'Monthly Review'
-    width: 1280
-    height: 1140
+    width: 1400
+    height: 1100
     grid_size: 20
     auto_expand_vertically: true
-    block header {
-      position: pos(20, 20, 1240, 80)
+    block t_header {
+      position: pos(20, 20, 1020, 80)
     }
     block f_month {
-      position: pos(20, 110, 300, 80)
-    }
-    block f_category {
-      position: pos(340, 110, 300, 80)
-    }
-    block f_country {
-      position: pos(660, 110, 300, 80)
+      position: pos(1060, 20, 320, 80)
     }
     block k_net_sales {
-      position: pos(20, 210, 190, 130)
+      position: pos(20, 120, 210, 130)
     }
     block k_gross_profit {
-      position: pos(230, 210, 190, 130)
+      position: pos(250, 120, 210, 130)
     }
     block k_gross_margin {
-      position: pos(440, 210, 190, 130)
+      position: pos(480, 120, 210, 130)
     }
     block k_orders {
-      position: pos(650, 210, 190, 130)
+      position: pos(710, 120, 210, 130)
     }
     block k_aov {
-      position: pos(860, 210, 190, 130)
+      position: pos(940, 120, 210, 130)
     }
     block k_return_rate {
-      position: pos(1070, 210, 190, 130)
+      position: pos(1170, 120, 210, 130)
     }
     block v_trend {
-      position: pos(20, 360, 800, 380)
+      position: pos(20, 270, 900, 380)
+    }
+    block v_department {
+      position: pos(940, 270, 440, 380)
     }
     block v_category {
-      position: pos(840, 360, 420, 380)
+      position: pos(20, 670, 800, 420)
     }
     block v_country {
-      position: pos(20, 760, 400, 360)
-    }
-    block v_channel {
-      position: pos(440, 760, 360, 360)
-    }
-    block v_top_products {
-      position: pos(820, 760, 440, 360)
+      position: pos(840, 670, 540, 420)
     }
     mobile {
       mode: 'auto'

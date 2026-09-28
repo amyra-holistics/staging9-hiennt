@@ -1,0 +1,242 @@
+Dashboard r06_hai_canvas_a3 {
+  title: 'Marketing Funnel Story'
+  description: 'Traffic-source performance across sessions and purchase conversion.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    cache_duration: 3600
+  }
+
+  block title: TextBlock {
+    content: @md
+      # Marketing Funnel Story
+
+      Track which traffic sources generate the most sessions and turn those visits into purchases.
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Event Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_events.created_at)
+    }
+  }
+
+  block funnel_headline: VizBlock {
+    label: 'Marketing Funnel Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+      content: @md
+        <style>
+          .marketing-headline-card {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 2rem 2.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            background: #FFFFFF;
+            color: #1F2937;
+            font-size: 1.5rem;
+            line-height: 1.5;
+          }
+
+          .marketing-headline-card strong {
+            color: #111827;
+            font-weight: 700;
+          }
+        </style>
+
+        <div class="marketing-headline-card">
+          Marketing generated <strong>{{ rows[0].values.`Sessions` }}</strong> sessions, converting <strong>{{ rows[0].values.`Purchase Conversion Rate` }}</strong> into purchases.
+        </div>
+      ;;
+    }
+  }
+
+  block sessions_heading: TextBlock {
+    content: @md
+      ## 1. Where does marketing reach come from?
+    ;;
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+      ### Commentary
+
+      This view ranks acquisition sources by **unique website sessions**. Use it to identify where marketing is generating reach, then compare it with the conversion chart below before prioritizing spend.
+
+      A source with high session volume is valuable for awareness, but it needs a strong conversion rate to translate into purchases.
+    ;;
+  }
+
+  block conversion_heading: TextBlock {
+    content: @md
+      ## 2. Which sources turn visits into purchases?
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+      ### Commentary
+
+      This chart measures the share of sessions that include a **purchase event**. Prioritize sources that pair meaningful traffic volume with above-average conversion.
+
+      Review low-converting, high-volume sources for landing-page relevance, targeting quality, or campaign-message alignment.
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: [
+        'funnel_headline',
+        'sessions_by_source',
+        'conversion_by_source'
+      ]
+      field: r(thelook_events.created_at)
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1280
+    height: 1180
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block title {
+      position: pos(40, 30, 1200, 90)
+      layer: 1
+    }
+
+    block date_filter {
+      position: pos(960, 130, 280, 80)
+      layer: 1
+    }
+
+    block funnel_headline {
+      position: pos(40, 130, 880, 120)
+      layer: 1
+    }
+
+    block sessions_heading {
+      position: pos(40, 285, 1200, 55)
+      layer: 1
+    }
+
+    block sessions_by_source {
+      position: pos(40, 350, 780, 350)
+      layer: 1
+    }
+
+    block sessions_commentary {
+      position: pos(850, 350, 390, 350)
+      layer: 1
+    }
+
+    block conversion_heading {
+      position: pos(40, 750, 1200, 55)
+      layer: 1
+    }
+
+    block conversion_by_source {
+      position: pos(40, 815, 780, 350)
+      layer: 1
+    }
+
+    block conversion_commentary {
+      position: pos(850, 815, 390, 350)
+      layer: 1
+    }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

@@ -1,0 +1,296 @@
+Dashboard r01_claude_fd_canvas_a3 {
+  title: 'Executive Sales Overview'
+  description: 'Net Sales, Orders, AOV and Gross Margin for TheLook eCommerce, with monthly trend and top categories.'
+
+  block title: TextBlock {
+    content: @md
+      # Executive Sales Overview
+      Net sales performance for TheLook eCommerce. Net Sales exclude Cancelled and Returned items.
+    ;;
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+    }
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_orders.created_at)
+    }
+    default {
+      operator: 'last'
+      value: '12'
+      modifier: 'month'
+      options {
+        include_current_period: true
+      }
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'AOV'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: LineChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        show_data_points: false
+      }
+    }
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block kpi_last_order: VizBlock {
+    label: 'Latest order in data'
+    viz: MetricKpi {
+      dataset: thelook
+      calculation latest_order_at {
+        label: 'Latest order in data'
+        formula: @aql max(thelook_orders.created_at) ;;
+        calc_type: 'measure'
+        data_type: 'datetime'
+      }
+      value: VizFieldFull {
+        ref: 'latest_order_at'
+        format {
+          type: 'datetime'
+          pattern: 'LLL dd, yyyy HH:mm'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        metric_value {
+          font_size: 16
+        }
+        label {
+          font_size: 12
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block footer: TextBlock {
+    content: @md
+      **Data source:** TheLook eCommerce dataset (`thelook`, demodb). Orders are dated by order created date; the Order Date filter applies to every chart except the latest-order note.<br/>
+      **Last updated:** the tile on the right shows the most recent order timestamp in the data.
+    ;;
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: [
+        CustomMapping {
+          block: 'kpi_last_order'
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1200
+    height: 820
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 820, 80)
+    }
+    block f_order_date {
+      position: pos(880, 20, 300, 80)
+    }
+    block kpi_net_sales {
+      position: pos(20, 120, 275, 120)
+    }
+    block kpi_orders {
+      position: pos(315, 120, 275, 120)
+    }
+    block kpi_aov {
+      position: pos(610, 120, 275, 120)
+    }
+    block kpi_gross_margin {
+      position: pos(905, 120, 275, 120)
+    }
+    block v_monthly_net_sales {
+      position: pos(20, 260, 700, 440)
+    }
+    block v_top_categories {
+      position: pos(740, 260, 440, 440)
+    }
+    block footer {
+      position: pos(20, 720, 880, 80)
+    }
+    block kpi_last_order {
+      position: pos(920, 720, 260, 80)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: H.themes.vanilla
+}

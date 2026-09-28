@@ -1,0 +1,1040 @@
+Dashboard r02_claude_fd_html_a1 {
+  title: 'Sales Performance'
+  description: 'TheLook sales performance across Overview, Products, Customers and Geography tabs. Filters apply to every tab.'
+
+  // ---------- Shared filters ----------
+  block f_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block f_category: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_department: FilterBlock {
+    label: 'Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  // ---------- KPIs ----------
+  block k_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_items_sold: VizBlock {
+    label: 'Items Sold'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.items_sold)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_cogs: VizBlock {
+    label: 'COGS'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.cogs)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_return_rate: VizBlock {
+    label: 'Return Rate'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_buyers: VizBlock {
+    label: 'Buying Customers'
+    viz: MetricKpi {
+      dataset: thelook
+      calculation buyers {
+        label: 'Buying Customers'
+        formula: @aql count_distinct(thelook_orders.user_id) | where(thelook_order_items.status not in ['Cancelled', 'Returned']);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'buyers'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_sales_per_buyer: VizBlock {
+    label: 'Net Sales per Customer'
+    viz: MetricKpi {
+      dataset: thelook
+      calculation sales_per_buyer {
+        label: 'Net Sales per Customer'
+        formula: @aql safe_divide(net_sales,count_distinct(thelook_orders.user_id) | where(thelook_order_items.status not in ['Cancelled', 'Returned']));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'sales_per_buyer'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block k_countries: VizBlock {
+    label: 'Countries Sold To'
+    viz: MetricKpi {
+      dataset: thelook
+      calculation countries {
+        label: 'Countries Sold To'
+        formula: @aql count_distinct(thelook_users.country) | where(thelook_order_items.status not in ['Cancelled', 'Returned']);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'countries'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Overview ----------
+  block v_ov_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: LineChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        label: 'Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'bottom'
+        show_data_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_ov_department: VizBlock {
+    label: 'Net Sales by Department'
+    viz: PieChart {
+      dataset: thelook
+      legend: r(thelook_products.department)
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_percentage: true
+        show_total: true
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_ov_yearly: VizBlock {
+    label: 'Yearly Summary'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_order_items.created_at)
+          transformation: 'datetrunc year'
+          label: 'Year'
+          format {
+            type: 'date'
+            pattern: 'yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 50
+        pagination_size: 25
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 0
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Products ----------
+  block v_pr_category: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_pr_returns: VizBlock {
+    label: 'Return Rate by Category'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_pr_brands: VizBlock {
+    label: 'Top Brands'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.brand)
+          label: 'Brand'
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.items_sold)
+          label: 'Items Sold'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 25
+        pagination_size: 25
+        show_row_number: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Customers ----------
+  block v_cu_buyers_trend: VizBlock {
+    label: 'Monthly Buying Customers'
+    viz: LineChart {
+      dataset: thelook
+      calculation buyers {
+        label: 'Buying Customers'
+        formula: @aql count_distinct(thelook_orders.user_id) | where(thelook_order_items.status not in ['Cancelled', 'Returned']);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        label: 'Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: 'buyers'
+            label: 'Buying Customers'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'bottom'
+        show_data_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_cu_traffic: VizBlock {
+    label: 'Net Sales by Traffic Source'
+    viz: PieChart {
+      dataset: thelook
+      legend: r(thelook_users.traffic_source)
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_percentage: true
+        show_total: true
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_cu_top: VizBlock {
+    label: 'Top Customers'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.first_name)
+          label: 'First Name'
+        },
+        VizFieldFull {
+          ref: r(thelook_users.last_name)
+          label: 'Last Name'
+        },
+        VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Country'
+        },
+        VizFieldFull {
+          ref: r(thelook_users.traffic_source)
+          label: 'Traffic Source'
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 25
+        pagination_size: 25
+        show_row_number: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 5
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Geography ----------
+  block v_ge_map: VizBlock {
+    label: 'Net Sales by Country'
+    viz: FilledMap {
+      dataset: thelook
+      location {
+        field: r(thelook_users.country)
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        color_scale: 'vertical'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_ge_countries: VizBlock {
+    label: 'Top 10 Countries by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Country'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_ge_states: VizBlock {
+    label: 'Top States'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Country'
+        },
+        VizFieldFull {
+          ref: r(thelook_users.state)
+          label: 'State'
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        row_limit: 25
+        pagination_size: 25
+        show_row_number: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 2
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .sp, .sp * { box-sizing: border-box; }
+        .sp {
+          --ink: #1f1d1a;
+          --muted: #6b665e;
+          --line: #e4dfd6;
+          --paper: #f7f4ee;
+          --card: #ffffff;
+          --accent: #b4441c;
+          min-height: 100%;
+          padding: 28px 32px 40px;
+          background: var(--paper);
+          color: var(--ink);
+          font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+        }
+        .sp-head {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 16px 32px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--line);
+        }
+        .sp-eyebrow {
+          margin: 0 0 6px;
+          font-size: 11px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--accent);
+          font-weight: 600;
+        }
+        .sp-title {
+          margin: 0;
+          font-size: 28px;
+          line-height: 1.1;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+        }
+        .sp-sub { margin: 6px 0 0; font-size: 13px; color: var(--muted); }
+        .sp-filters {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(170px, 1fr));
+          gap: 10px;
+          flex: 1 1 640px;
+          max-width: 860px;
+        }
+        .sp-filter { height: 64px; }
+
+        .sp-body { display: flex; flex-direction: column; }
+        .sp-tabs {
+          order: -1;
+          display: flex;
+          gap: 4px;
+          margin: 18px 0 22px;
+          padding: 4px;
+          width: fit-content;
+          background: #ece7de;
+          border-radius: 10px;
+        }
+        .sp-tab {
+          padding: 8px 18px;
+          border-radius: 7px;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--muted);
+          text-decoration: none;
+        }
+        .sp-tab:hover { color: var(--ink); }
+        #overview:target ~ .sp-tabs a[href="#overview"],
+        #products:target ~ .sp-tabs a[href="#products"],
+        #customers:target ~ .sp-tabs a[href="#customers"],
+        #geography:target ~ .sp-tabs a[href="#geography"],
+        .sp-body:not(:has(.sp-panel:target)) .sp-tabs a[href="#overview"] {
+          background: var(--card);
+          color: var(--ink);
+          font-weight: 600;
+          box-shadow: 0 1px 2px rgba(31, 29, 26, 0.12);
+        }
+
+        .sp-panel { display: none; }
+        .sp-panel:target,
+        .sp-body:not(:has(.sp-panel:target)) #overview { display: block; }
+
+        .sp-kpis {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .sp-row {
+          display: grid;
+          grid-template-columns: 7fr 5fr;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .sp-card {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          padding: 16px 18px 12px;
+          display: flex;
+          flex-direction: column;
+        }
+        .sp-card h3 {
+          margin: 0 0 8px;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+        .sp-kpi { border-top: 3px solid var(--accent); }
+        .sp-kpi .sp-slot { height: 64px; }
+        .sp-chart .sp-slot { height: 320px; }
+        .sp-table .sp-slot { height: 400px; }
+
+        @media (max-width: 1000px) {
+          .sp-kpis { grid-template-columns: repeat(2, 1fr); }
+          .sp-row { grid-template-columns: 1fr; }
+          .sp-filters { grid-template-columns: repeat(2, 1fr); }
+        }
+      </style>
+
+      <div class="sp">
+        <header class="sp-head">
+          <div>
+            <p class="sp-eyebrow">TheLook eCommerce</p>
+            <h1 class="sp-title">Sales Performance</h1>
+            <p class="sp-sub">Net sales exclude cancelled and returned items. Filters apply to every tab.</p>
+          </div>
+          <div class="sp-filters">
+            <div class="sp-filter"><h-block name="f_date" /></div>
+            <div class="sp-filter"><h-block name="f_category" /></div>
+            <div class="sp-filter"><h-block name="f_department" /></div>
+            <div class="sp-filter"><h-block name="f_country" /></div>
+          </div>
+        </header>
+
+        <div class="sp-body">
+          <section class="sp-panel" id="overview">
+            <div class="sp-kpis">
+              <div class="sp-card sp-kpi"><h3>Net Sales</h3><div class="sp-slot"><h-block name="k_net_sales" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Gross Profit</h3><div class="sp-slot"><h-block name="k_gross_profit" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Gross Margin</h3><div class="sp-slot"><h-block name="k_gross_margin" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Average Order Value</h3><div class="sp-slot"><h-block name="k_aov" /></div></div>
+            </div>
+            <div class="sp-row">
+              <div class="sp-card sp-chart"><h3>Monthly Net Sales &amp; Gross Profit</h3><div class="sp-slot"><h-block name="v_ov_trend" /></div></div>
+              <div class="sp-card sp-chart"><h3>Net Sales by Department</h3><div class="sp-slot"><h-block name="v_ov_department" /></div></div>
+            </div>
+            <div class="sp-card sp-table"><h3>Yearly Summary</h3><div class="sp-slot"><h-block name="v_ov_yearly" /></div></div>
+          </section>
+
+          <section class="sp-panel" id="products">
+            <div class="sp-kpis">
+              <div class="sp-card sp-kpi"><h3>Items Sold</h3><div class="sp-slot"><h-block name="k_items_sold" /></div></div>
+              <div class="sp-card sp-kpi"><h3>COGS</h3><div class="sp-slot"><h-block name="k_cogs" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Gross Margin</h3><div class="sp-slot"><h-block name="k_gross_margin" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Return Rate</h3><div class="sp-slot"><h-block name="k_return_rate" /></div></div>
+            </div>
+            <div class="sp-row">
+              <div class="sp-card sp-chart"><h3>Top 10 Categories by Net Sales</h3><div class="sp-slot"><h-block name="v_pr_category" /></div></div>
+              <div class="sp-card sp-chart"><h3>Highest Return Rate Categories</h3><div class="sp-slot"><h-block name="v_pr_returns" /></div></div>
+            </div>
+            <div class="sp-card sp-table"><h3>Top Brands</h3><div class="sp-slot"><h-block name="v_pr_brands" /></div></div>
+          </section>
+
+          <section class="sp-panel" id="customers">
+            <div class="sp-kpis">
+              <div class="sp-card sp-kpi"><h3>Buying Customers</h3><div class="sp-slot"><h-block name="k_buyers" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Fulfilled Orders</h3><div class="sp-slot"><h-block name="k_orders" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Net Sales per Customer</h3><div class="sp-slot"><h-block name="k_sales_per_buyer" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Average Order Value</h3><div class="sp-slot"><h-block name="k_aov" /></div></div>
+            </div>
+            <div class="sp-row">
+              <div class="sp-card sp-chart"><h3>Monthly Buying Customers</h3><div class="sp-slot"><h-block name="v_cu_buyers_trend" /></div></div>
+              <div class="sp-card sp-chart"><h3>Net Sales by Traffic Source</h3><div class="sp-slot"><h-block name="v_cu_traffic" /></div></div>
+            </div>
+            <div class="sp-card sp-table"><h3>Top Customers</h3><div class="sp-slot"><h-block name="v_cu_top" /></div></div>
+          </section>
+
+          <section class="sp-panel" id="geography">
+            <div class="sp-kpis">
+              <div class="sp-card sp-kpi"><h3>Net Sales</h3><div class="sp-slot"><h-block name="k_net_sales" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Countries Sold To</h3><div class="sp-slot"><h-block name="k_countries" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Buying Customers</h3><div class="sp-slot"><h-block name="k_buyers" /></div></div>
+              <div class="sp-card sp-kpi"><h3>Net Sales per Customer</h3><div class="sp-slot"><h-block name="k_sales_per_buyer" /></div></div>
+            </div>
+            <div class="sp-row">
+              <div class="sp-card sp-chart"><h3>Net Sales by Country</h3><div class="sp-slot"><h-block name="v_ge_map" /></div></div>
+              <div class="sp-card sp-chart"><h3>Top 10 Countries by Net Sales</h3><div class="sp-slot"><h-block name="v_ge_countries" /></div></div>
+            </div>
+            <div class="sp-card sp-table"><h3>Top States</h3><div class="sp-slot"><h-block name="v_ge_states" /></div></div>
+          </section>
+
+          <nav class="sp-tabs">
+            <a class="sp-tab" href="#overview">Overview</a>
+            <a class="sp-tab" href="#products">Products</a>
+            <a class="sp-tab" href="#customers">Customers</a>
+            <a class="sp-tab" href="#geography">Geography</a>
+          </nav>
+        </div>
+      </div>
+    ;;
+  }
+}

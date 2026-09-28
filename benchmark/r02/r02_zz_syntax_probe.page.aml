@@ -1,0 +1,93 @@
+Dashboard r02_zz_syntax_probe {
+  title: 'probe'
+  block f_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+  block h: TextBlock {
+    content: @md
+## Sales Performance · Overview
+Net sales text.
+;;
+    theme: BlockTheme {
+      background { bg_color: '#16243D' }
+      text { font_color: '#FFFFFF' }
+      border { border_width: 0 border_radius: 10 }
+    }
+  }
+  block k: VizBlock {
+    label: 'k'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue { duration: 1 granularity: 'year' }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+        label { font_size: 13 font_color: '#5B6472' }
+        metric_value { font_size: 30 font_color: '#16243D' }
+        compare_value { reverse_color: true }
+      }
+    }
+  }
+  view: TabLayout {
+    label: 'x'
+    tab a: CanvasLayout {
+      label: 'A'
+      width: 1240
+      height: 400
+      grid_size: 20
+      auto_expand_vertically: true
+      block h { position: pos(0, 0, 300, 60) }
+      block f_date { position: pos(0, 80, 300, 80) }
+      block k { position: pos(0, 180, 300, 120) }
+      mobile { mode: 'auto' }
+    }
+    tab b: CanvasLayout {
+      label: 'B'
+      width: 1240
+      height: 400
+      block f_date { position: pos(0, 80, 300, 80) }
+    }
+  }
+  theme: PageTheme {
+    title: 'Sales Performance'
+    background { bg_color: '#F3F5F8' }
+    canvas {
+      background { bg_color: '#F3F5F8' }
+      border { border_width: 0 }
+      shadow: 'none'
+    }
+    block {
+      label { font_size: 14 font_weight: 'semibold' font_color: '#16243D' }
+      text { font_size: 13 font_color: '#374151' }
+      background { bg_color: '#FFFFFF' }
+      border { border_width: 1 border_color: '#E2E6EC' border_radius: 10 border_style: 'solid' }
+      padding: 14
+      shadow: 'none'
+    }
+    viz {
+      table {
+        general { font_size: 12 banding_color: '#F8FAFC' border_color: '#E2E6EC' }
+        header { bg_color: '#F3F5F8' font_weight: 'semibold' font_color: '#16243D' }
+      }
+    }
+  }
+}

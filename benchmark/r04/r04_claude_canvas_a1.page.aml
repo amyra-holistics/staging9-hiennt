@@ -1,0 +1,607 @@
+Dashboard r04_claude_canvas_a1 {
+  title: 'Monthly Performance Review'
+  description: 'Five 16:9 slides summarising TheLook eCommerce performance for the reporting month.'
+
+  // ---------- Shared ----------
+  block f_month: FilterBlock {
+    label: 'Reporting month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'last'
+      value: '1'
+      modifier: 'month'
+    }
+  }
+
+  // ---------- Slide 1: Title ----------
+  block t_title: TextBlock {
+    content: @md
+<br/>
+<br/>
+
+###### THELOOK ECOMMERCE
+
+# Monthly Performance Review
+
+#### Sales, orders, margin and category mix for the reporting month
+
+<br/>
+
+Use the **Reporting month** filter below to change the month. It defaults to the last complete month.
+    ;;
+    theme {
+      background {
+        bg_color: '#0F172A'
+      }
+      text {
+        font_color: '#F8FAFC'
+      }
+      padding: 80
+    }
+  }
+
+  // ---------- Slide 2: Headline KPIs ----------
+  block t_kpi_header: TextBlock {
+    content: @md
+## Headline KPIs
+Reporting month vs. the previous month
+    ;;
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_return_rate: VizBlock {
+    label: 'Return Rate'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'center'
+        metric_value {
+          font_size: 44
+        }
+        compare_value {
+          reverse_color: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Slide 3: Trend ----------
+  block t_trend_header: TextBlock {
+    content: @md
+## 12-month trend
+Net Sales (columns) and Gross Margin (line) for the last 12 complete months
+    ;;
+  }
+
+  block v_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Margin'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#F59E0B'
+          }
+        }
+        settings {
+          alignment: 'right'
+          axis_min: 0
+          axis_max: 1
+        }
+      }
+      conditions: [
+        "thelook_order_items.created_at matches @(last 12 months)",
+      ]
+      settings {
+        legend_label: 'top'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Slide 4: Category breakdown ----------
+  block t_category_header: TextBlock {
+    content: @md
+## Category breakdown
+Where the reporting month's sales came from
+    ;;
+  }
+
+  block v_category_top: VizBlock {
+    label: 'Top 10 categories by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      filter {
+        field: r(thelook_products.category)
+        operator: 'top'
+        value: 10
+        options {
+          rank_by {
+            field: r(thelook.net_sales)
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_category_table: VizBlock {
+    label: 'All categories vs. previous month'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Category'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.items_sold)
+          label: 'Items Sold'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pop: VizPopSettings {
+          field: r(thelook_order_items.created_at)
+          show_growth_rate: true
+          value {
+            duration: 1
+            granularity: 'month'
+          }
+        }
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        pagination_size: 30
+        row_limit: 100
+      }
+    }
+  }
+
+  // ---------- Slide 5: Key takeaways ----------
+  block t_takeaways_header: TextBlock {
+    content: @md
+## Key takeaways
+August 2026 vs. July 2026
+    ;;
+  }
+
+  block t_takeaways: TextBlock {
+    content: @md
+### What happened
+
+1. **Strong month for sales.** Net Sales reached **$41.0K**, up **27%** on July ($32.3K).
+2. **Growth came from more orders, not bigger baskets.** Fulfilled orders rose **26%** (372 to 470), while AOV was flat at **$87** (+0.5%).
+3. **Margin held steady.** Gross Margin stayed at **52.1%** (July: 52.2%), so the extra sales turned into extra profit.
+4. **Fewer returns.** Return Rate fell to **10.3%**, from 13.6% in July.
+5. **Category mix shifted.** Jeans ($3.6K), Outerwear & Coats ($3.6K) and Suits & Sport Coats ($3.5K, +43%) led. Accessories, Pants & Capris and Sleep & Lounge each added about $1.0K to $1.5K. Active fell 28%.
+    ;;
+  }
+
+  block t_next_steps: TextBlock {
+    content: @md
+### What to watch
+
+- **September is ahead of pace.** Net Sales month-to-date is already about $60K, above all of August.
+- **Active** is the one sizeable category that shrank. Check stock and promotions.
+- **AOV is flat.** Bundles or cross-sell could raise basket size on top of order growth.
+- **Keep an eye on returns.** Check whether the lower return rate holds.
+
+<br/>
+
+*These notes were written from August 2026 data. Update them each month; the charts on the other slides update automatically.*
+    ;;
+    theme {
+      background {
+        bg_color: '#F1F5F9'
+      }
+      border {
+        border_radius: 8
+      }
+      padding: 24
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_month'
+      to: [
+        CustomMapping {
+          block: 'v_trend'
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  view: TabLayout {
+    label: 'Slides'
+
+    tab slide_1: CanvasLayout {
+      label: '1. Title'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block t_title {
+        position: pos(0, 0, 1280, 720)
+        layer: 0
+      }
+      block f_month {
+        position: pos(80, 560, 320, 80)
+        layer: 1
+      }
+    }
+
+    tab slide_2: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block t_kpi_header {
+        position: pos(40, 30, 880, 90)
+      }
+      block f_month {
+        position: pos(940, 40, 300, 80)
+      }
+      block v_net_sales {
+        position: pos(40, 160, 380, 240)
+      }
+      block v_orders {
+        position: pos(450, 160, 380, 240)
+      }
+      block v_aov {
+        position: pos(860, 160, 380, 240)
+      }
+      block v_gross_profit {
+        position: pos(40, 430, 380, 240)
+      }
+      block v_gross_margin {
+        position: pos(450, 430, 380, 240)
+      }
+      block v_return_rate {
+        position: pos(860, 430, 380, 240)
+      }
+    }
+
+    tab slide_3: CanvasLayout {
+      label: '3. Trend'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block t_trend_header {
+        position: pos(40, 30, 1200, 90)
+      }
+      block v_trend {
+        position: pos(40, 140, 1200, 540)
+      }
+    }
+
+    tab slide_4: CanvasLayout {
+      label: '4. Category breakdown'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block t_category_header {
+        position: pos(40, 30, 880, 90)
+      }
+      block f_month {
+        position: pos(940, 40, 300, 80)
+      }
+      block v_category_top {
+        position: pos(40, 140, 560, 540)
+      }
+      block v_category_table {
+        position: pos(620, 140, 620, 540)
+      }
+    }
+
+    tab slide_5: CanvasLayout {
+      label: '5. Key takeaways'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block t_takeaways_header {
+        position: pos(40, 30, 1200, 90)
+      }
+      block t_takeaways {
+        position: pos(40, 140, 740, 540)
+      }
+      block t_next_steps {
+        position: pos(800, 140, 440, 540)
+      }
+    }
+  }
+
+  theme: H.themes.vanilla
+}

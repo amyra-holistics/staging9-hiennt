@@ -1,0 +1,227 @@
+Dashboard r06_claude_fd_html_a2 {
+  title: 'Marketing Funnel: Where Sessions Come From and How They Convert'
+  description: 'Website sessions and purchase conversion rate by traffic source, TheLook eCommerce.'
+
+  block headline: VizBlock {
+    label: 'Headline'
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+        }
+      ]
+      content: @md
+        <div style="font-family: Georgia, 'Times New Roman', serif; font-size: 30px; line-height: 1.3; color: #1C1B19; font-weight: 400;">
+          <span style="color: #B4441C; font-weight: 700;">{{ rows[0].values.`Sessions`.formatted }}</span> sessions reached the store, and
+          <span style="color: #B4441C; font-weight: 700;">{{ rows[0].values.`Purchase Conversion Rate`.formatted }}</span> of them ended in a purchase.
+        </div>
+      ;;
+    }
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by traffic source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#B4441C'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_note: TextBlock {
+    content: @md
+      ### Email and Adwords bring the crowd
+
+      **Email** is the largest source, at roughly 45% of all sessions. **Adwords** comes second with about 30%.
+
+      **Facebook**, **YouTube** and **Organic** together bring in the remaining quarter.
+
+      Reach depends on two channels. A slowdown in Email sends or Adwords spend would cut site traffic sharply.
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase conversion rate by traffic source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+          settings {
+            color: '#3D5A6C'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+          axis_min: 0
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_note: TextBlock {
+    content: @md
+      ### Every channel converts about the same
+
+      Conversion stays in a narrow band of about 26.5% to 27% across sources. **Organic** is at the top but is also the smallest channel.
+
+      Traffic quality looks consistent across sources. Growth comes from **more sessions**, not from moving budget toward a "better converting" channel.
+
+      To find real funnel gains, look at the steps inside the session (product view, cart, purchase), not at the source.
+    ;;
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .page {
+          background: #F6F3EE;
+          color: #1C1B19;
+          padding: 40px 48px 56px;
+          font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+          min-height: 100%;
+          box-sizing: border-box;
+        }
+        .kicker {
+          font-size: 12px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: #7A726A;
+          margin: 0 0 12px;
+        }
+        .hero {
+          border-bottom: 2px solid #1C1B19;
+          padding-bottom: 20px;
+          margin-bottom: 36px;
+          max-width: 1100px;
+        }
+        .hero-block {
+          height: 110px;
+        }
+        .step {
+          display: grid;
+          grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+          gap: 32px;
+          align-items: stretch;
+          margin-bottom: 40px;
+        }
+        .step-num {
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: 13px;
+          color: #B4441C;
+          letter-spacing: 0.08em;
+          margin-bottom: 8px;
+        }
+        .chart {
+          background: #FFFFFF;
+          border: 1px solid #E4DED5;
+          border-radius: 6px;
+          height: 380px;
+          overflow: hidden;
+        }
+        .note {
+          border-left: 3px solid #B4441C;
+          padding: 4px 0 4px 20px;
+          min-height: 380px;
+        }
+        .note.cool {
+          border-left-color: #3D5A6C;
+        }
+        .footer {
+          font-size: 12px;
+          color: #7A726A;
+          border-top: 1px solid #E4DED5;
+          padding-top: 14px;
+        }
+      </style>
+
+      <div class="page">
+        <header class="hero">
+          <p class="kicker">TheLook eCommerce &middot; Marketing funnel</p>
+          <div class="hero-block">
+            <h-block name="headline" />
+          </div>
+        </header>
+
+        <div class="step-num">01 &mdash; REACH</div>
+        <section class="step">
+          <div class="chart">
+            <h-block name="sessions_by_source" />
+          </div>
+          <aside class="note">
+            <h-block name="sessions_note" />
+          </aside>
+        </section>
+
+        <div class="step-num">02 &mdash; CONVERSION</div>
+        <section class="step">
+          <div class="chart">
+            <h-block name="conversion_by_source" />
+          </div>
+          <aside class="note cool">
+            <h-block name="conversion_note" />
+          </aside>
+        </section>
+
+        <p class="footer">Sessions = distinct website sessions, including anonymous ones. Conversion = share of sessions with a purchase event. Commentary reflects data as of September 2026.</p>
+      </div>
+    ;;
+  }
+}

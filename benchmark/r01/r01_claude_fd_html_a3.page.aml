@@ -1,0 +1,354 @@
+Dashboard r01_claude_fd_html_a3 {
+  title: 'Executive Sales Overview'
+  description: 'Headline sales KPIs, monthly Net Sales trend and top categories for TheLook eCommerce.'
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: ref('thelook_orders', 'created_at')
+    }
+    default {
+      operator: 'matches'
+      value: 'last 12 months'
+    }
+  }
+
+  block v_kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'AOV'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    description: 'Net Sales by order month. Excludes Cancelled and Returned items.'
+    viz: LineChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#1F4E79'
+          }
+        }
+      }
+      settings {
+        x_axis_label: ''
+        legend_label: 'hidden'
+        show_data_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    description: 'Product categories ranked by Net Sales in the selected period.'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#1F4E79'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        x_axis_label: ''
+        legend_label: 'hidden'
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .xs {
+          --ink: #14213d;
+          --muted: #5f6b7a;
+          --line: #e3e0d8;
+          --paper: #f7f5f0;
+          --card: #ffffff;
+          --accent: #1f4e79;
+          --gap: 16px;
+          background: var(--paper);
+          color: var(--ink);
+          padding: 28px 32px 20px;
+          font-family: Inter, 'Segoe UI', Helvetica, Arial, sans-serif;
+          min-height: 100%;
+          box-sizing: border-box;
+        }
+        .xs * { box-sizing: border-box; }
+
+        .xs-head {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          padding-bottom: 18px;
+          margin-bottom: 20px;
+          border-bottom: 2px solid var(--ink);
+        }
+        .xs-eyebrow {
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--accent);
+          margin: 0 0 6px;
+        }
+        .xs-title {
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: 30px;
+          font-weight: 400;
+          line-height: 1.1;
+          margin: 0;
+        }
+        .xs-sub {
+          font-size: 13px;
+          color: var(--muted);
+          margin: 6px 0 0;
+        }
+        .xs-filter {
+          width: 280px;
+          min-height: 64px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .xs-kpis {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: var(--gap);
+          margin-bottom: var(--gap);
+        }
+        .xs-kpi {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-top: 3px solid var(--accent);
+          border-radius: 4px;
+          padding: 8px 12px 12px;
+          display: flex;
+          flex-direction: column;
+          min-height: 150px;
+        }
+        .xs-kpi-body {
+          flex: 1;
+          min-height: 100px;
+          display: flex;
+          flex-direction: column;
+        }
+        .xs-kpi-note {
+          font-size: 11.5px;
+          color: var(--muted);
+          border-top: 1px dashed var(--line);
+          padding: 8px 4px 0;
+          margin: 0;
+        }
+
+        .xs-charts {
+          display: grid;
+          grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+          gap: var(--gap);
+        }
+        .xs-chart {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 4px;
+          padding: 8px;
+          min-height: 420px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .xs-foot {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 8px 24px;
+          margin-top: 20px;
+          padding-top: 12px;
+          border-top: 1px solid var(--line);
+          font-size: 12px;
+          color: var(--muted);
+        }
+        .xs-foot strong { color: var(--ink); font-weight: 600; }
+
+        @media (max-width: 1000px) {
+          .xs-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .xs-charts { grid-template-columns: 1fr; }
+          .xs-head { flex-direction: column; align-items: stretch; }
+          .xs-filter { width: 100%; }
+        }
+      </style>
+
+      <div class="xs">
+        <header class="xs-head">
+          <div>
+            <p class="xs-eyebrow">TheLook eCommerce &middot; Executive</p>
+            <h1 class="xs-title">Sales Overview</h1>
+            <p class="xs-sub">All figures follow the Order Date filter (default: last 12 months).</p>
+          </div>
+          <div class="xs-filter">
+            <h-block name="f_order_date" />
+          </div>
+        </header>
+
+        <section class="xs-kpis">
+          <div class="xs-kpi">
+            <div class="xs-kpi-body"><h-block name="v_kpi_net_sales" /></div>
+            <p class="xs-kpi-note">Sale price, excluding Cancelled and Returned items</p>
+          </div>
+          <div class="xs-kpi">
+            <div class="xs-kpi-body"><h-block name="v_kpi_orders" /></div>
+            <p class="xs-kpi-note">All orders placed, every status</p>
+          </div>
+          <div class="xs-kpi">
+            <div class="xs-kpi-body"><h-block name="v_kpi_aov" /></div>
+            <p class="xs-kpi-note">Net Sales per fulfilled order</p>
+          </div>
+          <div class="xs-kpi">
+            <div class="xs-kpi-body"><h-block name="v_kpi_gross_margin" /></div>
+            <p class="xs-kpi-note">(Net Sales &minus; product cost) &divide; Net Sales</p>
+          </div>
+        </section>
+
+        <section class="xs-charts">
+          <div class="xs-chart"><h-block name="v_monthly_net_sales" /></div>
+          <div class="xs-chart"><h-block name="v_top_categories" /></div>
+        </section>
+
+        <footer class="xs-foot">
+          <span><strong>Data source:</strong> TheLook eCommerce dataset (demodb) &middot; order items, orders and products</span>
+          <span><strong>Last updated:</strong> 27 Sep 2026 (latest order data loaded) &middot; dates by order creation date</span>
+        </footer>
+      </div>
+    ;;
+  }
+}

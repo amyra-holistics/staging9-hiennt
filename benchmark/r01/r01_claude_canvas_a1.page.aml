@@ -1,0 +1,215 @@
+Dashboard r01_claude_canvas_a1 {
+  title: 'Executive Sales Overview'
+  description: 'Headline sales KPIs, monthly Net Sales trend and top categories for TheLook eCommerce.'
+
+  block title: TextBlock {
+    content: @md
+      # Executive Sales Overview
+      TheLook eCommerce · Net Sales exclude Cancelled and Returned items
+    ;;
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_orders.created_at)
+    }
+    default {
+      operator: 'last'
+      value: '12'
+      modifier: 'month'
+      options {
+        include_current_period: true
+      }
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: LineChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(thelook_orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        row_limit: 5000
+        show_data_points: true
+      }
+    }
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block note: TextBlock {
+    content: @md
+      **Data source:** TheLook eCommerce dataset (`thelook`) on the `demodb` data source, loaded from CSV imports (orders, order items, products).
+      **Last updated:** 27 Sep 2026 (latest CSV import). Dates are filtered on order creation date; AOV = Net Sales ÷ fulfilled orders; Orders count every status.
+    ;;
+  }
+
+  view: CanvasLayout {
+    label: 'Overview'
+    width: 1300
+    height: 740
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 900, 80)
+    }
+    block f_order_date {
+      position: pos(940, 20, 340, 80)
+    }
+    block kpi_net_sales {
+      position: pos(20, 120, 300, 120)
+    }
+    block kpi_orders {
+      position: pos(340, 120, 300, 120)
+    }
+    block kpi_aov {
+      position: pos(660, 120, 300, 120)
+    }
+    block kpi_gross_margin {
+      position: pos(980, 120, 300, 120)
+    }
+    block v_monthly_net_sales {
+      position: pos(20, 260, 740, 380)
+    }
+    block v_top_categories {
+      position: pos(780, 260, 500, 380)
+    }
+    block note {
+      position: pos(20, 660, 1260, 60)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: H.themes.vanilla
+}

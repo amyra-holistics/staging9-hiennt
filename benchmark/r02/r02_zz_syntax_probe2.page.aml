@@ -1,0 +1,36 @@
+Dashboard r02_zz_syntax_probe2 {
+  title: 'probe2'
+  block pie: VizBlock {
+    label: 'pie'
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Department'
+        format { type: 'text' }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format { type: 'number' pattern: 'inherited' }
+        }
+        settings {
+          point { value: 'Women' color: '#2A5BD7' }
+          point { value: 'Men' color: '#14A38B' }
+        }
+      }
+      settings {
+        display_as_donut: true
+        show_total: true
+        show_percentage: true
+        legend_label: 'bottom'
+      }
+    }
+  }
+  view: CanvasLayout {
+    width: 800
+    height: 400
+    block pie { position: pos(0, 0, 300, 300) }
+  }
+}

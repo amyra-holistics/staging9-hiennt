@@ -1,0 +1,570 @@
+Dashboard r07_claude_html_a1 {
+  title: 'Operations: Stock & Returns'
+  description: 'Units in stock and return rate by distribution center and category, with return rate flagged against a 10% threshold.'
+
+  // KPIs
+
+  block kpi_units: VizBlock {
+    label: 'Units in Stock'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.units_in_stock)
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_flagged_categories: VizBlock {
+    label: 'Categories Above 10% Returns'
+    viz: MetricKpi {
+      dataset: thelook
+      calculation flagged_categories {
+        label: 'Categories Above 10% Returns'
+        formula: @aql thelook_products | group(thelook_products.category) | filter(return_rate > 0.1) | count(thelook_products.category) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'flagged_categories'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+      }
+    }
+  }
+
+  // Distribution centers (click to filter everything else)
+
+  block v_dc_stock: VizBlock {
+    label: 'Units in Stock by Distribution Center'
+    description: 'Click a distribution center to filter the rest of the dashboard.'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#2F6FDB'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_dc_return: VizBlock {
+    label: 'Return Rate by Distribution Center vs 10% Threshold'
+    description: 'Click a distribution center to filter the rest of the dashboard.'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_distribution_centers.name)
+        label: 'Distribution Center'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Return Rate'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+          settings {
+            color: '#8A94A6'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: ConstantVizField {
+            value: 0.1
+            label: '10% Threshold'
+            format {
+              type: 'number'
+              pattern: '#,###0%'
+            }
+          }
+          settings {
+            color: '#D93F3F'
+            line_style: 'dashed'
+          }
+        }
+        settings {
+          axis_min: 0
+        }
+      }
+      settings {
+        legend_label: 'top'
+        show_data_points: false
+      }
+    }
+  }
+
+  // Distribution center > category (expand a DC to see its categories)
+
+  block v_dc_category: VizBlock {
+    label: 'Distribution Center › Category'
+    description: 'Expand a distribution center to see its categories. Return rates above 10% are flagged in red.'
+    viz: PivotTable {
+      dataset: thelook
+      calculation return_flag {
+        label: 'Flag'
+        formula: @aql case(when: return_rate > 0.1, then: '▲ Above 10%', else: 'OK') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_distribution_centers.name)
+          label: 'Distribution Center'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Category'
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'return_flag'
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_sub_total: true
+        frozen_columns: 2
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.units_in_stock)
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#FFFFFF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#9DBDF2'
+              }
+            }
+          },
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.1
+              }
+              text_color: '#B42318'
+              background_color: '#FDE8E8'
+            }
+          },
+          ConditionalFormat {
+            ref: 'return_flag'
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: '▲ Above 10%'
+              }
+              text_color: '#B42318'
+              background_color: '#FDE8E8'
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  // Categories (click to drill into products)
+
+  block v_category: VizBlock {
+    label: 'Stock & Return Rate by Category'
+    description: 'Click a category to drill into its products.'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Units in Stock'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.units_in_stock)
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+          settings {
+            color: '#2F6FDB'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_category_return: VizBlock {
+    label: 'Return Rate by Category vs 10% Threshold'
+    description: 'Click a category to drill into its products.'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Return Rate'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+          settings {
+            color: '#8A94A6'
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: ConstantVizField {
+            value: 0.1
+            label: '10% Threshold'
+            format {
+              type: 'number'
+              pattern: '#,###0%'
+            }
+          }
+          settings {
+            color: '#D93F3F'
+            line_style: 'dashed'
+          }
+        }
+        settings {
+          axis_min: 0
+        }
+      }
+      settings {
+        legend_label: 'top'
+        show_data_points: false
+        sort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_products: VizBlock {
+    label: 'Products'
+    description: 'Filtered by the selected distribution center and category.'
+    viz: DataTable {
+      dataset: thelook
+      calculation return_flag {
+        label: 'Flag'
+        formula: @aql case(when: return_rate > 0.1, then: '▲ Above 10%', else: 'OK') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.name)
+          label: 'Product'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook_products.brand)
+          label: 'Brand'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Category'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.units_in_stock)
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'return_flag'
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 25
+        show_row_number: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 3
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: r(thelook.units_in_stock)
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#FFFFFF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#9DBDF2'
+              }
+            }
+          },
+          ConditionalFormat {
+            ref: r(thelook.return_rate)
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0.1
+              }
+              text_color: '#B42318'
+              background_color: '#FDE8E8'
+            }
+          },
+          ConditionalFormat {
+            ref: 'return_flag'
+            format: SingleFormat {
+              condition {
+                operator: 'is'
+                value: '▲ Above 10%'
+              }
+              text_color: '#B42318'
+              background_color: '#FDE8E8'
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'v_dc_stock'
+      to: ['kpi_units', 'kpi_return_rate', 'kpi_flagged_categories', 'v_dc_return', 'v_dc_category', 'v_category', 'v_category_return', 'v_products']
+    },
+    FilterInteraction {
+      from: 'v_dc_return'
+      to: ['kpi_units', 'kpi_return_rate', 'kpi_flagged_categories', 'v_dc_stock', 'v_dc_category', 'v_category', 'v_category_return', 'v_products']
+    },
+    FilterInteraction {
+      from: 'v_category'
+      to: ['v_products']
+    },
+    FilterInteraction {
+      from: 'v_category_return'
+      to: ['v_products']
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .ops {
+          font-family: Inter, -apple-system, 'Segoe UI', sans-serif;
+          background: #F5F7FA;
+          color: #1F2937;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+        .ops-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
+        .ops-header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+        .ops-header p { margin: 4px 0 0; color: #6B7280; font-size: 13px; }
+        .ops-legend { display: flex; gap: 16px; font-size: 12px; color: #4B5563; }
+        .ops-legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .swatch { width: 12px; height: 12px; border-radius: 2px; display: inline-block; }
+        .section-title {
+          margin: 8px 0 0;
+          font-size: 12px;
+          font-weight: 600;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          color: #6B7280;
+        }
+        .row { display: grid; gap: 16px; }
+        .kpis { grid-template-columns: repeat(3, 1fr); }
+        .halves { grid-template-columns: 1fr 1fr; }
+        .card {
+          background: #FFFFFF;
+          border: 1px solid #E5E7EB;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        .kpi { height: 120px; }
+        .chart { height: 380px; }
+        .tall { height: 560px; }
+        .products { height: 520px; }
+        @media (max-width: 900px) {
+          .kpis, .halves { grid-template-columns: 1fr; }
+        }
+      </style>
+
+      <div class="ops">
+        <header class="ops-header">
+          <div>
+            <h1>Operations: Stock &amp; Returns</h1>
+            <p>Click a distribution center to filter the dashboard. Click a category to drill into its products.</p>
+          </div>
+          <div class="ops-legend">
+            <span><i class="swatch" style="background:#2F6FDB"></i>Units in stock</span>
+            <span><i class="swatch" style="background:#8A94A6"></i>Return rate</span>
+            <span><i class="swatch" style="background:#D93F3F"></i>10% threshold / flagged</span>
+          </div>
+        </header>
+
+        <div class="row kpis">
+          <div class="card kpi"><h-block name="kpi_units" /></div>
+          <div class="card kpi"><h-block name="kpi_return_rate" /></div>
+          <div class="card kpi"><h-block name="kpi_flagged_categories" /></div>
+        </div>
+
+        <h2 class="section-title">Distribution centers</h2>
+        <div class="row halves">
+          <div class="card chart"><h-block name="v_dc_stock" /></div>
+          <div class="card chart"><h-block name="v_dc_return" /></div>
+        </div>
+
+        <h2 class="section-title">Distribution center › category</h2>
+        <div class="card tall"><h-block name="v_dc_category" /></div>
+
+        <h2 class="section-title">Categories</h2>
+        <div class="row halves">
+          <div class="card tall"><h-block name="v_category" /></div>
+          <div class="card tall"><h-block name="v_category_return" /></div>
+        </div>
+
+        <h2 class="section-title">Products</h2>
+        <div class="card products"><h-block name="v_products" /></div>
+      </div>
+    ;;
+  }
+}

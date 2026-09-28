@@ -1,0 +1,641 @@
+Dashboard r03_claude_fd_canvas_a2 {
+  title: 'TheLook Business Review'
+  description: 'Branded monthly business review: Net Sales, Orders, AOV and Gross Margin for the last complete month, with month-over-month change.'
+
+  // Branded header: logo, title and the review period (last complete month vs the month before)
+  block header: VizBlock {
+    label: 'Header'
+    viz: MarkdownViz {
+      dataset: thelook
+      calculation period_cur {
+        label: 'Current Month'
+        formula: @aql max(thelook_orders.created_at) | where(thelook_orders.created_at matches @(last month)) ;;
+        calc_type: 'measure'
+        data_type: 'datetime'
+      }
+      calculation period_prev {
+        label: 'Prior Month'
+        formula: @aql max(thelook_orders.created_at) | where(thelook_orders.created_at matches @(2 months ago)) ;;
+        calc_type: 'measure'
+        data_type: 'datetime'
+      }
+      values: [
+        VizFieldFull {
+          ref: 'period_cur'
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: 'period_prev'
+          format {
+            type: 'date'
+            pattern: 'LLLL yyyy'
+          }
+        }
+      ]
+      content: @md
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+  .tl-hdr {
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 0 36px;
+    background: #1B1F3B;
+    border-radius: 18px;
+    font-family: 'Manrope', Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+  }
+  .tl-hdr::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    top: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 36px solid rgba(255, 107, 90, 0.14);
+  }
+  .tl-hdr__logo {
+    flex: none;
+    display: flex;
+    align-items: center;
+    background: #F5EFE6;
+    border-radius: 12px;
+    padding: 10px 16px 10px 10px;
+  }
+  .tl-hdr__logo img { display: block; height: 40px; width: 176px; }
+  .tl-hdr__titles { flex: 1; min-width: 0; }
+  .tl-hdr__eyebrow {
+    color: #FF6B5A;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+  .tl-hdr__title {
+    color: #F5EFE6;
+    font-weight: 800;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .tl-hdr__period {
+    flex: none;
+    position: relative;
+    z-index: 1;
+    text-align: right;
+    border-left: 3px solid #FF6B5A;
+    padding-left: 18px;
+  }
+  .tl-hdr__period-main {
+    color: #F5EFE6;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .tl-hdr__period-sub {
+    color: rgba(245, 239, 230, 0.7);
+    font-weight: 400;
+    font-size: 13px;
+    margin-top: 2px;
+  }
+</style>
+<div class="tl-hdr">
+  <div class="tl-hdr__logo">
+    <img alt="thelook" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='176' height='40' viewBox='0 0 176 40'%3E%3Ccircle cx='18' cy='20' r='11' fill='%23FF6B5A'/%3E%3Ccircle cx='18' cy='20' r='4.5' fill='%23F5EFE6'/%3E%3Ctext x='38' y='28' font-family='Manrope, Arial, sans-serif' font-size='24' font-weight='800' letter-spacing='-0.5' fill='%231B1F3B'%3Ethelook%3C/text%3E%3C/svg%3E" />
+  </div>
+  <div class="tl-hdr__titles">
+    <p class="tl-hdr__eyebrow">Monthly Business Review</p>
+    <h1 class="tl-hdr__title">Sales performance at a glance</h1>
+  </div>
+  <div class="tl-hdr__period">
+    <div class="tl-hdr__period-main">{{ rows[0].values.`Current Month`.formatted }}</div>
+    <div class="tl-hdr__period-sub">compared with {{ rows[0].values.`Prior Month`.formatted }}</div>
+  </div>
+</div>
+      ;;
+      settings {
+        row_limit: 1
+      }
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    theme: BlockTheme {
+      padding: 0
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_radius: 18
+      }
+      shadow: 'none'
+    }
+  }
+
+  // KPI cards: last complete month value, MoM change badge and prior month value
+  block kpi_cards: VizBlock {
+    label: 'KPI Cards'
+    viz: MarkdownViz {
+      dataset: thelook
+      calculation ns_cur {
+        label: 'NS Current'
+        formula: @aql net_sales | where(thelook_orders.created_at matches @(last month)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ns_prev {
+        label: 'NS Prior'
+        formula: @aql net_sales | where(thelook_orders.created_at matches @(2 months ago)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ns_chg {
+        label: 'NS Change'
+        formula: @aql abs(safe_divide(ns_cur - ns_prev, ns_prev)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation ns_dir {
+        label: 'NS Direction'
+        formula: @aql case(when: ns_cur > ns_prev, then: 'up', when: ns_cur < ns_prev, then: 'down', else: 'flat') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation or_cur {
+        label: 'OR Current'
+        formula: @aql total_orders | where(thelook_orders.created_at matches @(last month)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation or_prev {
+        label: 'OR Prior'
+        formula: @aql total_orders | where(thelook_orders.created_at matches @(2 months ago)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation or_chg {
+        label: 'OR Change'
+        formula: @aql abs(safe_divide(or_cur - or_prev, or_prev)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation or_dir {
+        label: 'OR Direction'
+        formula: @aql case(when: or_cur > or_prev, then: 'up', when: or_cur < or_prev, then: 'down', else: 'flat') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation aov_cur {
+        label: 'AOV Current'
+        formula: @aql aov | where(thelook_orders.created_at matches @(last month)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation aov_prev {
+        label: 'AOV Prior'
+        formula: @aql aov | where(thelook_orders.created_at matches @(2 months ago)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation aov_chg {
+        label: 'AOV Change'
+        formula: @aql abs(safe_divide(aov_cur - aov_prev, aov_prev)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation aov_dir {
+        label: 'AOV Direction'
+        formula: @aql case(when: aov_cur > aov_prev, then: 'up', when: aov_cur < aov_prev, then: 'down', else: 'flat') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      calculation gm_cur {
+        label: 'GM Current'
+        formula: @aql gross_margin | where(thelook_orders.created_at matches @(last month)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gm_prev {
+        label: 'GM Prior'
+        formula: @aql gross_margin | where(thelook_orders.created_at matches @(2 months ago)) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      // Margin change is shown in percentage points
+      calculation gm_chg {
+        label: 'GM Change'
+        formula: @aql abs(gm_cur - gm_prev) * 100 ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gm_dir {
+        label: 'GM Direction'
+        formula: @aql case(when: gm_cur > gm_prev, then: 'up', when: gm_cur < gm_prev, then: 'down', else: 'flat') ;;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      values: [
+        VizFieldFull {
+          ref: 'ns_cur'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'ns_prev'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'ns_chg'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'ns_dir'
+        },
+        VizFieldFull {
+          ref: 'or_cur'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'or_prev'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'or_chg'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'or_dir'
+        },
+        VizFieldFull {
+          ref: 'aov_cur'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: 'aov_prev'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: 'aov_chg'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'aov_dir'
+        },
+        VizFieldFull {
+          ref: 'gm_cur'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'gm_prev'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: 'gm_chg'
+          format {
+            type: 'number'
+            pattern: '#,###0.0'
+          }
+        },
+        VizFieldFull {
+          ref: 'gm_dir'
+        }
+      ]
+      content: @md
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+  .tl-kpis {
+    box-sizing: border-box;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 20px;
+    font-family: 'Manrope', Arial, sans-serif;
+  }
+  .tl-kpi {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid rgba(27, 31, 59, 0.08);
+    border-top: 4px solid #FF6B5A;
+    border-radius: 16px;
+    padding: 20px 22px;
+  }
+  .tl-kpi__top { display: flex; align-items: center; gap: 12px; }
+  .tl-kpi__icon {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: #1B1F3B;
+  }
+  .tl-kpi__icon img { display: block; width: 22px; height: 22px; }
+  .tl-kpi__label {
+    color: #5B6477;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .tl-kpi__value {
+    color: #1B1F3B;
+    font-weight: 800;
+    font-size: 36px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 22px 0 18px;
+  }
+  .tl-kpi__foot {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .tl-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .tl-badge--up { background: rgba(31, 158, 143, 0.12); color: #1F9E8F; }
+  .tl-badge--down { background: rgba(214, 69, 69, 0.12); color: #D64545; }
+  .tl-badge--flat { background: rgba(91, 100, 119, 0.12); color: #5B6477; }
+  .tl-badge--up::before { content: '\25B2'; font-size: 9px; }
+  .tl-badge--down::before { content: '\25BC'; font-size: 9px; }
+  .tl-badge--flat::before { content: '\25CF'; font-size: 8px; }
+  .tl-kpi__prior { color: #5B6477; font-weight: 400; font-size: 12px; }
+</style>
+<div class="tl-kpis">
+  <div class="tl-kpi">
+    <div class="tl-kpi__top">
+      <span class="tl-kpi__icon"><img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF6B5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2v20'/%3E%3Cpath d='M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6'/%3E%3C/svg%3E" /></span>
+      <span class="tl-kpi__label">Net Sales</span>
+    </div>
+    <div class="tl-kpi__value">{{ rows[0].values.`NS Current`.formatted }}</div>
+    <div class="tl-kpi__foot">
+      <span class="tl-badge tl-badge--{{ rows[0].values.`NS Direction`.raw }}">{{ rows[0].values.`NS Change`.formatted }} MoM</span>
+      <span class="tl-kpi__prior">vs {{ rows[0].values.`NS Prior`.formatted }} prior month</span>
+    </div>
+  </div>
+  <div class="tl-kpi">
+    <div class="tl-kpi__top">
+      <span class="tl-kpi__icon"><img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF6B5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z'/%3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M16 10a4 4 0 0 1-8 0'/%3E%3C/svg%3E" /></span>
+      <span class="tl-kpi__label">Orders</span>
+    </div>
+    <div class="tl-kpi__value">{{ rows[0].values.`OR Current`.formatted }}</div>
+    <div class="tl-kpi__foot">
+      <span class="tl-badge tl-badge--{{ rows[0].values.`OR Direction`.raw }}">{{ rows[0].values.`OR Change`.formatted }} MoM</span>
+      <span class="tl-kpi__prior">vs {{ rows[0].values.`OR Prior`.formatted }} prior month</span>
+    </div>
+  </div>
+  <div class="tl-kpi">
+    <div class="tl-kpi__top">
+      <span class="tl-kpi__icon"><img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF6B5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z'/%3E%3Cpath d='M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8'/%3E%3Cpath d='M12 17.5v-11'/%3E%3C/svg%3E" /></span>
+      <span class="tl-kpi__label">Avg Order Value</span>
+    </div>
+    <div class="tl-kpi__value">{{ rows[0].values.`AOV Current`.formatted }}</div>
+    <div class="tl-kpi__foot">
+      <span class="tl-badge tl-badge--{{ rows[0].values.`AOV Direction`.raw }}">{{ rows[0].values.`AOV Change`.formatted }} MoM</span>
+      <span class="tl-kpi__prior">vs {{ rows[0].values.`AOV Prior`.formatted }} prior month</span>
+    </div>
+  </div>
+  <div class="tl-kpi">
+    <div class="tl-kpi__top">
+      <span class="tl-kpi__icon"><img alt="" src="data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FF6B5A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.21 15.89A10 10 0 1 1 8 2.83'/%3E%3Cpath d='M22 12A10 10 0 0 0 12 2v10z'/%3E%3C/svg%3E" /></span>
+      <span class="tl-kpi__label">Gross Margin</span>
+    </div>
+    <div class="tl-kpi__value">{{ rows[0].values.`GM Current`.formatted }}</div>
+    <div class="tl-kpi__foot">
+      <span class="tl-badge tl-badge--{{ rows[0].values.`GM Direction`.raw }}">{{ rows[0].values.`GM Change`.formatted }} pts MoM</span>
+      <span class="tl-kpi__prior">vs {{ rows[0].values.`GM Prior`.formatted }} prior month</span>
+    </div>
+  </div>
+</div>
+      ;;
+      settings {
+        row_limit: 1
+      }
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+    theme: BlockTheme {
+      padding: 0
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+      shadow: 'none'
+    }
+  }
+
+  // Supporting trend: last 12 complete months
+  block sales_trend: VizBlock {
+    label: 'Net Sales and Gross Margin, last 12 complete months'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#1B1F3B'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#FF6B5A'
+          }
+        }
+        settings {
+          alignment: 'right'
+          axis_min: 0
+        }
+      }
+      conditions: [
+        "thelook_orders.created_at matches @(last 12 complete months)",
+      ]
+      settings {
+        legend_label: 'bottom'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block footnote: TextBlock {
+    content: @md
+<p style="font-family: 'Manrope', Arial, sans-serif; color: #5B6477; font-size: 12px; margin: 0;">
+<b style="color: #1B1F3B; font-weight: 600;">Definitions.</b> Periods compare the last complete calendar month with the month before. Net Sales exclude Cancelled and Returned items. AOV is Net Sales per fulfilled order. Gross Margin is (Net Sales &minus; COGS) / Net Sales; its change is shown in percentage points. Orders count every status.
+</p>
+    ;;
+    settings {
+      hide_controls: true
+    }
+    theme: BlockTheme {
+      padding: 0
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+      shadow: 'none'
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'Business Review'
+    width: 1200
+    height: 890
+    grid_size: 10
+    auto_expand_vertically: true
+    block header {
+      position: pos(30, 30, 1140, 130)
+    }
+    block kpi_cards {
+      position: pos(30, 180, 1140, 190)
+    }
+    block sales_trend {
+      position: pos(30, 390, 1140, 400)
+    }
+    block footnote {
+      position: pos(30, 810, 1140, 50)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  // TheLook brand kit: Ink #1B1F3B, Coral #FF6B5A, Sand #F5EFE6, Slate #5B6477; Manrope 400/600/800
+  theme: PageTheme {
+    background {
+      bg_color: '#F5EFE6'
+    }
+    canvas {
+      background {
+        bg_color: '#F5EFE6'
+      }
+      border {
+        border_width: 0
+      }
+      shadow: 'none'
+    }
+    block {
+      label {
+        font_family: 'Manrope, Arial, sans-serif'
+        font_size: 16
+        font_color: '#1B1F3B'
+        font_weight: 'extrabold'
+      }
+      text {
+        font_family: 'Manrope, Arial, sans-serif'
+        font_color: '#5B6477'
+        font_weight: 'normal'
+      }
+      background {
+        bg_color: '#FFFFFF'
+      }
+      border {
+        border_width: 1
+        border_color: '#E8E1D6'
+        border_radius: 16
+        border_style: 'solid'
+      }
+      padding: 20
+      shadow: 'none'
+    }
+    custom_css: @css
+      @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+      .dac-viz-block-label { font-family: 'Manrope', Arial, sans-serif; font-weight: 800; letter-spacing: -0.01em; }
+    ;;
+  }
+}

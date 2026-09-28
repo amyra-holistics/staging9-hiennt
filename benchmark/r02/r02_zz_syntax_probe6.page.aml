@@ -1,0 +1,26 @@
+Dashboard r02_zz_syntax_probe6 {
+  title: 'probe6'
+  block tbl: VizBlock {
+    label: 'tbl'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Country'
+          format { type: 'text' }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format { type: 'number' pattern: 'inherited' }
+        }
+      ]
+    }
+  }
+  view: CanvasLayout {
+    width: 400
+    height: 400
+    block tbl { position: pos(0, 0, 300, 300) }
+  }
+}

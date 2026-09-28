@@ -1,0 +1,271 @@
+Dashboard r06_claude_fd_html_a1 {
+  title: 'Marketing Funnel: Where Sessions Come From and How They Convert'
+  description: 'Website sessions and purchase conversion by traffic source, with commentary.'
+
+  block headline: VizBlock {
+    label: 'Headline'
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+        <style>
+          .hl { font-family: Georgia, 'Times New Roman', serif; color: #1c2430; padding: 4px 2px; }
+          .hl-kicker { font-family: system-ui, sans-serif; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #8a6a3d; margin-bottom: 10px; }
+          .hl-text { font-size: 30px; line-height: 1.3; }
+          .hl-num { font-weight: 700; color: #2f5d8a; white-space: nowrap; }
+          .hl-num.rate { color: #b5602f; }
+        </style>
+        <div class="hl">
+          <div class="hl-kicker">Marketing funnel · all traffic sources</div>
+          <div class="hl-text">
+            Of <span class="hl-num">{{ rows[0].values.`Sessions` }}</span> website sessions,
+            <span class="hl-num rate">{{ rows[0].values.`Purchase Conversion Rate` }}</span> ended in a purchase.
+          </div>
+        </div>
+      ;;
+    }
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2F5D8A'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_note: TextBlock {
+    content: @md
+      <div class="note">
+      <div class="note-step">01 · Reach</div>
+      <h3>Email and Adwords bring most of the traffic</h3>
+
+      Email is the biggest source, at roughly **45%** of all sessions. Adwords adds about **30%**. Facebook and YouTube each bring about 10%. Organic brings about 5%.
+
+      Three quarters of all sessions come from two channels. A change in email volume or search ad budget will move total traffic more than any other lever.
+      </div>
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#B5602F'
+          }
+        }
+        settings {
+          axis_min: 0
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_note: TextBlock {
+    content: @md
+      <div class="note">
+      <div class="note-step">02 · Convert</div>
+      <h3>Every source converts at about the same rate</h3>
+
+      Conversion rates fall in a narrow band, from about **26.5% to 27%**. Organic is at the top of that band and Email and Adwords are at the bottom, but the gap is under half a point.
+
+      The source of a session does not change how likely it is to buy. So each channel adds revenue in line with its session count, and **volume, not traffic quality, is what separates the channels**.
+      </div>
+    ;;
+  }
+
+  block funnel_stages: VizBlock {
+    label: 'Sessions Reaching Each Funnel Stage'
+    viz: FunnelChart {
+      dataset: thelook
+      legend: r(thelook_events.event_type)
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      conditions: [
+        "thelook_events.event_type in ['product', 'cart', 'purchase']",
+      ]
+      settings {
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'inside'
+        sort: 'desc'
+      }
+    }
+  }
+
+  block funnel_note: TextBlock {
+    content: @md
+      <div class="note">
+      <div class="note-step">03 · Close</div>
+      <h3>The cart is where most buyers drop out</h3>
+
+      Every session views a product. About **63%** add something to the cart. Only about **42% of carts** turn into a purchase.
+
+      Checkout loses more sessions than product discovery does. Because conversion is flat across sources, fixes to cart and checkout will lift every channel at the same time.
+      </div>
+    ;;
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .story {
+          max-width: 1180px;
+          margin: 0 auto;
+          padding: 32px 28px 48px;
+          background: #fbf9f5;
+          font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+          color: #1c2430;
+        }
+        .story-head {
+          border-bottom: 2px solid #1c2430;
+          padding-bottom: 20px;
+          margin-bottom: 8px;
+          height: 150px;
+        }
+        .chapter {
+          display: grid;
+          grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+          gap: 28px;
+          align-items: stretch;
+          padding: 28px 0;
+          border-bottom: 1px solid #e4ddd1;
+        }
+        .chapter:last-child { border-bottom: none; }
+        .chart {
+          height: 340px;
+          background: #ffffff;
+          border: 1px solid #e4ddd1;
+          border-radius: 6px;
+        }
+        .commentary {
+          min-height: 340px;
+          border-left: 3px solid #c9b48f;
+          padding-left: 20px;
+        }
+        .note { font-size: 15px; line-height: 1.6; color: #3a4452; }
+        .note h3 {
+          font-family: Georgia, 'Times New Roman', serif;
+          font-size: 22px;
+          line-height: 1.25;
+          color: #1c2430;
+          margin: 6px 0 12px;
+        }
+        .note-step {
+          font-size: 11px;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+          color: #8a6a3d;
+          font-weight: 600;
+        }
+        .note strong { color: #1c2430; }
+        @media (max-width: 860px) {
+          .chapter { grid-template-columns: 1fr; }
+          .commentary { min-height: 0; }
+        }
+      </style>
+
+      <main class="story">
+        <header class="story-head">
+          <h-block name="headline" />
+        </header>
+
+        <section class="chapter">
+          <div class="chart"><h-block name="sessions_by_source" /></div>
+          <aside class="commentary"><h-block name="sessions_note" /></aside>
+        </section>
+
+        <section class="chapter">
+          <div class="chart"><h-block name="conversion_by_source" /></div>
+          <aside class="commentary"><h-block name="conversion_note" /></aside>
+        </section>
+
+        <section class="chapter">
+          <div class="chart"><h-block name="funnel_stages" /></div>
+          <aside class="commentary"><h-block name="funnel_note" /></aside>
+        </section>
+      </main>
+    ;;
+  }
+}

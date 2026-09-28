@@ -1,0 +1,746 @@
+Dashboard r05_claude_fd_html_a3 {
+  title: 'Finance Report: Net Sales, COGS & Gross Profit'
+  description: 'Printable A4 finance report: Net Sales, COGS and Gross Profit by department and category. Export via the dashboard menu, Export > PDF.'
+
+  // ---------------------------------------------------------------------------
+  // Controls
+  // ---------------------------------------------------------------------------
+  block f_period: FilterBlock {
+    label: 'Reporting period (order item created date)'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'last'
+      value: '12'
+      modifier: 'month'
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Period labels: one per page header and one per page footer
+  // (the actual first and last order dates inside the selected period)
+  // ---------------------------------------------------------------------------
+  block p1_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p1_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+  block p2_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p2_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+  block p3_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p3_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+  block p4_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p4_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+  block p5_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p5_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+  block p6_hdr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'right', metric_value { font_size: 12 } }
+    }
+    theme { padding: 0 }
+  }
+  block p6_ftr_period: VizBlock {
+    label: 'Period'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation period {
+        label: 'Period'
+        formula: @aql concat(date_format(min(thelook_order_items.created_at), "%b %d, %Y"), " – ", date_format(max(thelook_order_items.created_at), "%b %d, %Y"));;
+        calc_type: 'measure'
+        data_type: 'text'
+      }
+      value: VizFieldFull { ref: 'period', label: 'Period', format { type: 'text' } }
+      settings { display_mode: 'single', alignment: 'center', metric_value { font_size: 10 } }
+    }
+    theme { padding: 0 }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Page 1: headline KPIs
+  // ---------------------------------------------------------------------------
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull { ref: r(thelook.net_sales), label: 'Net Sales', format { type: 'number', pattern: 'inherited' } }
+      settings { display_mode: 'single', alignment: 'left', metric_value { font_size: 26 } }
+    }
+  }
+  block kpi_cogs: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull { ref: r(thelook.cogs), label: 'COGS', format { type: 'number', pattern: 'inherited' } }
+      settings { display_mode: 'single', alignment: 'left', metric_value { font_size: 26 } }
+    }
+  }
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull { ref: r(thelook.gross_profit), label: 'Gross Profit', format { type: 'number', pattern: 'inherited' } }
+      settings { display_mode: 'single', alignment: 'left', metric_value { font_size: 26 } }
+    }
+  }
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true, hide_controls: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull { ref: r(thelook.gross_margin), label: 'Gross Margin', format { type: 'number', pattern: 'inherited' } }
+      settings { display_mode: 'single', alignment: 'left', metric_value { font_size: 26 } }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Section 1: by department
+  // ---------------------------------------------------------------------------
+  block dept_chart: VizBlock {
+    label: 'Net Sales, COGS and Gross Profit by Department'
+    settings { hide_label: true, hide_controls: true }
+    viz: ColumnChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Department'
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number', pattern: 'inherited' }
+          }
+          settings { color: '#1F3A5F' }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.cogs)
+            label: 'COGS'
+            format { type: 'number', pattern: 'inherited' }
+          }
+          settings { color: '#B8C4D3' }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format { type: 'number', pattern: 'inherited' }
+          }
+          settings { color: '#2E8B6E' }
+        }
+        settings { show_data_label_by: 'value' }
+      }
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort { type: 'xaxis', direction: 'asc' }
+      }
+    }
+  }
+
+  block dept_table: VizBlock {
+    label: 'Department P&L'
+    settings { hide_label: true, hide_controls: true }
+    viz: PivotTable {
+      dataset: thelook
+      rows: [
+        VizFieldFull { ref: r(thelook_products.department), label: 'Department', format { type: 'text' } }
+      ]
+      values: [
+        VizFieldFull { ref: r(thelook.net_sales), label: 'Net Sales', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.cogs), label: 'COGS', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_profit), label: 'Gross Profit', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_margin), label: 'Gross Margin', format { type: 'number', pattern: 'inherited' } }
+      ]
+      settings {
+        show_row_total: true
+        row_limit: 100
+        sorts: [
+          IndexBasedSortSetting { field_index: 0, direction: 'asc' }
+        ]
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Section 2: by category (both departments)
+  // ---------------------------------------------------------------------------
+  block cat_gp_chart: VizBlock {
+    label: 'Gross Profit by Category'
+    settings { hide_label: true, hide_controls: true }
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format { type: 'text' }
+      }
+      legend: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Department'
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format { type: 'number', pattern: 'inherited' }
+          }
+          settings {
+            point { value: 'Men', color: '#1F3A5F' }
+            point { value: 'Women', color: '#C8963E' }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+          show_stack_total: true
+          show_total_in_tooltip: true
+        }
+      }
+      settings {
+        legend_label: 'top'
+        row_limit: 100
+        sort: LineFamilySort { type: 'yaxis', field_index: 0, direction: 'desc' }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sections 3 and 4: category detail per department
+  // ---------------------------------------------------------------------------
+  block men_cat_table: VizBlock {
+    label: 'Men: Category P&L'
+    settings { hide_label: true, hide_controls: true }
+    viz: PivotTable {
+      dataset: thelook
+      filter {
+        field: r(thelook_products.department)
+        operator: 'is'
+        value: 'Men'
+      }
+      rows: [
+        VizFieldFull { ref: r(thelook_products.category), label: 'Category', format { type: 'text' } }
+      ]
+      values: [
+        VizFieldFull { ref: r(thelook.net_sales), label: 'Net Sales', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.cogs), label: 'COGS', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_profit), label: 'Gross Profit', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_margin), label: 'Gross Margin', format { type: 'number', pattern: 'inherited' } }
+      ]
+      settings {
+        show_row_total: true
+        row_limit: 100
+        sorts: [
+          IndexBasedSortSetting { field_index: 1, direction: 'desc' }
+        ]
+      }
+    }
+  }
+
+  block women_cat_table: VizBlock {
+    label: 'Women: Category P&L'
+    settings { hide_label: true, hide_controls: true }
+    viz: PivotTable {
+      dataset: thelook
+      filter {
+        field: r(thelook_products.department)
+        operator: 'is'
+        value: 'Women'
+      }
+      rows: [
+        VizFieldFull { ref: r(thelook_products.category), label: 'Category', format { type: 'text' } }
+      ]
+      values: [
+        VizFieldFull { ref: r(thelook.net_sales), label: 'Net Sales', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.cogs), label: 'COGS', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_profit), label: 'Gross Profit', format { type: 'number', pattern: 'inherited' } },
+        VizFieldFull { ref: r(thelook.gross_margin), label: 'Gross Margin', format { type: 'number', pattern: 'inherited' } }
+      ]
+      settings {
+        show_row_total: true
+        row_limit: 100
+        sorts: [
+          IndexBasedSortSetting { field_index: 1, direction: 'desc' }
+        ]
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Layout: six A4 pages
+  // ---------------------------------------------------------------------------
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root {
+          --page-w: 210mm;
+          --page-h: 297mm;
+          --margin-x: 16mm;
+          --ink: #16202c;
+          --navy: #1F3A5F;
+          --brass: #C8963E;
+          --muted: #6b7684;
+          --rule: #d9dee5;
+          --paper: #ffffff;
+          --desk: #e9e6df;
+          --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+          --sans: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .report { background: var(--desk); padding: 10mm 0; font-family: var(--sans); color: var(--ink); }
+        .report h-block { display: block; width: 100%; height: 100%; }
+
+        .page {
+          position: relative;
+          box-sizing: border-box;
+          width: var(--page-w);
+          height: var(--page-h);
+          margin: 0 auto 10mm;
+          padding: 0 var(--margin-x);
+          background: var(--paper);
+          box-shadow: 0 2px 14px rgba(22, 32, 44, 0.16);
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        /* Running header */
+        .pg-header {
+          flex: 0 0 auto;
+          height: 18mm;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          padding-bottom: 2.5mm;
+          border-bottom: 1.5pt solid var(--navy);
+        }
+        .pg-header .brand { font-size: 8.5pt; letter-spacing: 0.14em; text-transform: uppercase; color: var(--navy); font-weight: 600; }
+        .pg-header .brand span { color: var(--muted); font-weight: 400; }
+        .pg-header .period { display: flex; align-items: center; gap: 2mm; }
+        .pg-header .period .lbl { font-size: 7.5pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+        .pg-header .period .val { width: 62mm; height: 7mm; }
+
+        /* Running footer */
+        .pg-footer {
+          flex: 0 0 auto;
+          height: 14mm;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          border-top: 0.75pt solid var(--rule);
+          font-size: 7.5pt;
+          color: var(--muted);
+        }
+        .pg-footer .mid { display: flex; align-items: center; gap: 1.5mm; }
+        .pg-footer .mid .val { width: 54mm; height: 6mm; }
+        .pg-footer .right { text-align: right; font-variant-numeric: tabular-nums; }
+
+        .pg-body { flex: 1 1 auto; min-height: 0; padding-top: 7mm; display: flex; flex-direction: column; }
+
+        /* Section typography */
+        .eyebrow { font-size: 8pt; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brass); font-weight: 600; margin: 0 0 1.5mm; }
+        h1.title { font-family: var(--serif); font-weight: 600; font-size: 30pt; line-height: 1.08; margin: 0 0 3mm; color: var(--ink); }
+        h2.sec { font-family: var(--serif); font-weight: 600; font-size: 19pt; line-height: 1.15; margin: 0 0 2mm; color: var(--ink); }
+        h3.sub { font-size: 8.5pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--navy); font-weight: 600; margin: 6mm 0 2mm; padding-bottom: 1.2mm; border-bottom: 0.75pt solid var(--rule); }
+        p.lede { font-size: 9.5pt; line-height: 1.5; color: #3a4552; margin: 0 0 3mm; max-width: 150mm; }
+        .note { font-size: 7.5pt; color: var(--muted); margin-top: 2mm; }
+
+        /* Cover */
+        .cover-top { padding: 10mm 0 6mm; border-bottom: 0.75pt solid var(--rule); }
+        .filter-box { margin-top: 5mm; width: 92mm; height: 20mm; }
+        .kpis { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 0.75pt solid var(--rule); }
+        .kpi { padding: 4mm 3mm 3mm 0; border-right: 0.75pt solid var(--rule); }
+        .kpi + .kpi { padding-left: 4mm; }
+        .kpi:last-child { border-right: 0; }
+        .kpi .lbl { font-size: 7.5pt; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+        .kpi .val { height: 16mm; }
+        .kpi .eq { font-size: 7pt; color: var(--muted); }
+
+        .toc { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+        .toc li { border-bottom: 0.5pt dotted #b9c1cb; }
+        .toc a { display: flex; align-items: baseline; gap: 3mm; padding: 2.6mm 0; text-decoration: none; color: var(--ink); }
+        .toc a:hover .t { color: var(--navy); text-decoration: underline; }
+        .toc .n { font-family: var(--serif); color: var(--brass); font-size: 12pt; width: 8mm; }
+        .toc .t { font-family: var(--serif); font-size: 12pt; flex: 1; }
+        .toc .d { font-size: 8pt; color: var(--muted); flex: 2; }
+        .toc .p { font-size: 9pt; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+        .screen-only { margin-top: auto; margin-bottom: 4mm; padding: 3mm 4mm; background: #f4f1ea; border-left: 2pt solid var(--brass); font-size: 8pt; color: #4b5563; }
+
+        /* Content frames */
+        .frame { width: 100%; }
+        .h-dept-chart { height: 92mm; }
+        .h-dept-table { height: 36mm; }
+        .h-cat-chart { flex: 1 1 auto; min-height: 0; }
+        .h-cat-table { flex: 1 1 auto; min-height: 0; }
+
+        /* Definitions */
+        dl.defs { margin: 2mm 0 0; }
+        dl.defs .row { display: grid; grid-template-columns: 38mm 1fr; gap: 5mm; padding: 3.2mm 0; border-bottom: 0.5pt solid var(--rule); break-inside: avoid; }
+        dl.defs dt { font-family: var(--serif); font-size: 11.5pt; font-weight: 600; color: var(--ink); }
+        dl.defs dd { margin: 0; font-size: 9pt; line-height: 1.5; color: #3a4552; }
+        dl.defs code { font-family: Consolas, "SFMono-Regular", Menlo, monospace; font-size: 8pt; background: #f3f5f8; padding: 0.3mm 1.2mm; border-radius: 2px; color: var(--navy); }
+
+        @page { size: A4 portrait; margin: 0; }
+        @media print {
+          .report { background: none; padding: 0; }
+          .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+          .page:last-child { page-break-after: auto; break-after: auto; }
+          .screen-only { display: none; }
+        }
+      </style>
+
+      <div class="report">
+
+        <!-- ============================ PAGE 1: COVER ============================ -->
+        <section class="page" id="cover">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· Finance Report</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p1_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <div class="cover-top">
+              <p class="eyebrow">Gross margin report</p>
+              <h1 class="title">Net Sales, COGS<br/>&amp; Gross Profit</h1>
+              <p class="lede">Profitability of TheLook's product range by department and category. All figures exclude Cancelled and Returned order items. Dates follow the order item created date.</p>
+              <div class="filter-box"><h-block name="f_period" /></div>
+            </div>
+
+            <div class="kpis">
+              <div class="kpi"><div class="lbl">Net Sales</div><div class="val"><h-block name="kpi_net_sales" /></div></div>
+              <div class="kpi"><div class="lbl">COGS</div><div class="val"><h-block name="kpi_cogs" /></div></div>
+              <div class="kpi"><div class="lbl">Gross Profit</div><div class="val"><h-block name="kpi_gross_profit" /></div></div>
+              <div class="kpi"><div class="lbl">Gross Margin</div><div class="val"><h-block name="kpi_gross_margin" /></div></div>
+            </div>
+
+            <h3 class="sub">Contents</h3>
+            <ol class="toc">
+              <li><a href="#sec-department"><span class="n">1</span><span class="t">Results by department</span><span class="d">Net Sales, COGS and Gross Profit for Men and Women</span><span class="p">p. 2</span></a></li>
+              <li><a href="#sec-category"><span class="n">2</span><span class="t">Gross Profit by category</span><span class="d">All categories, split by department</span><span class="p">p. 3</span></a></li>
+              <li><a href="#sec-men"><span class="n">3</span><span class="t">Men: category detail</span><span class="d">Category P&amp;L with department total</span><span class="p">p. 4</span></a></li>
+              <li><a href="#sec-women"><span class="n">4</span><span class="t">Women: category detail</span><span class="d">Category P&amp;L with department total</span><span class="p">p. 5</span></a></li>
+              <li><a href="#sec-definitions"><span class="n">5</span><span class="t">Metric definitions</span><span class="d">How each figure in this report is calculated</span><span class="p">p. 6</span></a></li>
+            </ol>
+
+            <div class="screen-only">To print or save this report, choose <b>Export &gt; PDF</b> from the dashboard menu. Each sheet is sized to A4 portrait and starts on a new page.</div>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p1_ftr_period" /></div></div>
+            <div class="right">Page 1 of 6</div>
+          </footer>
+        </section>
+
+        <!-- ======================= PAGE 2: BY DEPARTMENT ======================== -->
+        <section class="page" id="sec-department">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· 1 · Results by department</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p2_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <p class="eyebrow">Section 1</p>
+            <h2 class="sec">Results by department</h2>
+            <p class="lede">Net Sales, cost of goods sold and resulting Gross Profit for each department. The table's total row re-aggregates the metrics, so Gross Margin is the blended rate, not a sum.</p>
+            <h3 class="sub">Net Sales, COGS and Gross Profit</h3>
+            <div class="frame h-dept-chart"><h-block name="dept_chart" /></div>
+            <h3 class="sub">Department P&amp;L</h3>
+            <div class="frame h-dept-table"><h-block name="dept_table" /></div>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p2_ftr_period" /></div></div>
+            <div class="right">Page 2 of 6</div>
+          </footer>
+        </section>
+
+        <!-- ======================== PAGE 3: BY CATEGORY ========================= -->
+        <section class="page" id="sec-category">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· 2 · Gross Profit by category</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p3_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <p class="eyebrow">Section 2</p>
+            <h2 class="sec">Gross Profit by category</h2>
+            <p class="lede">Gross Profit for every product category, stacked by department and ranked by total. Categories sold by only one department show a single segment.</p>
+            <div class="frame h-cat-chart"><h-block name="cat_gp_chart" /></div>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p3_ftr_period" /></div></div>
+            <div class="right">Page 3 of 6</div>
+          </footer>
+        </section>
+
+        <!-- ========================= PAGE 4: MEN DETAIL ========================= -->
+        <section class="page" id="sec-men">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· 3 · Men: category detail</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p4_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <p class="eyebrow">Section 3</p>
+            <h2 class="sec">Men: category detail</h2>
+            <p class="lede">Net Sales, COGS, Gross Profit and Gross Margin for each Men's category, ranked by Net Sales. The total row equals the Men row in Section 1.</p>
+            <div class="frame h-cat-table"><h-block name="men_cat_table" /></div>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p4_ftr_period" /></div></div>
+            <div class="right">Page 4 of 6</div>
+          </footer>
+        </section>
+
+        <!-- ======================== PAGE 5: WOMEN DETAIL ======================== -->
+        <section class="page" id="sec-women">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· 4 · Women: category detail</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p5_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <p class="eyebrow">Section 4</p>
+            <h2 class="sec">Women: category detail</h2>
+            <p class="lede">Net Sales, COGS, Gross Profit and Gross Margin for each Women's category, ranked by Net Sales. The total row equals the Women row in Section 1.</p>
+            <div class="frame h-cat-table"><h-block name="women_cat_table" /></div>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p5_ftr_period" /></div></div>
+            <div class="right">Page 5 of 6</div>
+          </footer>
+        </section>
+
+        <!-- ======================== PAGE 6: DEFINITIONS ========================= -->
+        <section class="page" id="sec-definitions">
+          <header class="pg-header">
+            <div class="brand">TheLook eCommerce <span>· 5 · Metric definitions</span></div>
+            <div class="period"><span class="lbl">Period</span><div class="val"><h-block name="p6_hdr_period" /></div></div>
+          </header>
+          <div class="pg-body">
+            <p class="eyebrow">Section 5</p>
+            <h2 class="sec">Metric definitions</h2>
+            <p class="lede">Every figure in this report comes from the governed metrics in the TheLook eCommerce dataset. The grain is the order item.</p>
+            <dl class="defs">
+              <div class="row">
+                <dt>Net Sales</dt>
+                <dd>Sum of order item sale price, excluding items with status Cancelled or Returned.<br/><code>sum(sale_price) where status not in (Cancelled, Returned)</code></dd>
+              </div>
+              <div class="row">
+                <dt>COGS</dt>
+                <dd>Cost of goods sold: the product cost of the order items counted in Net Sales, so revenue and cost cover the same items.<br/><code>sum(products.cost) where status not in (Cancelled, Returned)</code></dd>
+              </div>
+              <div class="row">
+                <dt>Gross Profit</dt>
+                <dd>Net Sales minus COGS.<br/><code>Net Sales − COGS</code></dd>
+              </div>
+              <div class="row">
+                <dt>Gross Margin</dt>
+                <dd>Gross Profit as a share of Net Sales. Totals and subtotals are recalculated from the totals, not summed or averaged across rows.<br/><code>Gross Profit ÷ Net Sales</code></dd>
+              </div>
+              <div class="row">
+                <dt>Department</dt>
+                <dd>The product's department (Men or Women), taken from the product master.</dd>
+              </div>
+              <div class="row">
+                <dt>Category</dt>
+                <dd>The product's merchandise category, such as Jeans or Outerwear &amp; Coats. Some category names exist in only one department.</dd>
+              </div>
+              <div class="row">
+                <dt>Period</dt>
+                <dd>The date range selected in the Reporting period filter, applied to the order item created date. The default is the last 12 complete months. Page headers and footers show the first and last order dates in that range.</dd>
+              </div>
+            </dl>
+          </div>
+          <footer class="pg-footer">
+            <div>TheLook eCommerce · Finance Report</div>
+            <div class="mid">Period: <div class="val"><h-block name="p6_ftr_period" /></div></div>
+            <div class="right">Page 6 of 6</div>
+          </footer>
+        </section>
+
+      </div>
+    ;;
+  }
+
+  theme: H.themes.vanilla.extend({
+    block {
+      background { bg_color: 'transparent' }
+      border { border_width: 0 }
+      shadow: 'none'
+    }
+    viz {
+      table {
+        general { font_size: 11, banding_color: '#f6f7f9', border_color: '#d9dee5' }
+        header { bg_color: '#1F3A5F', font_color: '#ffffff', font_weight: 'semibold', font_size: 11 }
+      }
+    }
+  })
+}

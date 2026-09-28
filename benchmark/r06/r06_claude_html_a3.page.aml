@@ -1,0 +1,249 @@
+Dashboard r06_claude_html_a3 {
+  title: 'Marketing Funnel Story'
+  description: 'Where website sessions come from, how far they get through the funnel, and how well each traffic source converts to a purchase.'
+
+  block f_date: FilterBlock {
+    label: 'Event Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_events.created_at)
+    }
+  }
+
+  block headline: VizBlock {
+    label: 'Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      content: @md
+        <div style="font-size: 22px; line-height: 1.45; color: #0F172A;">
+          TheLook drew <strong style="color: #2563EB;">{{ rows[0].values.`Sessions`.formatted }}</strong> website sessions, and <strong style="color: #2563EB;">{{ rows[0].values.`Purchase Conversion Rate`.formatted }}</strong> of them ended in a purchase.
+        </div>
+      ;;
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block v_funnel: VizBlock {
+    label: 'Sessions by Funnel Stage'
+    viz: FunnelChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_events.event_type)
+        label: 'Stage'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      conditions: [
+        "thelook_events.event_type in ['product', 'cart', 'purchase']",
+      ]
+      settings {
+        sort: 'desc'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'inside'
+      }
+    }
+  }
+
+  block t_funnel: TextBlock {
+    content: @md
+      #### The funnel
+
+      Every session views a product, so the **product** stage is the full top of the funnel.
+
+      The biggest drop happens **before the cart**. More than a third of sessions leave without adding anything.
+
+      Once a shopper has a cart, a little over two in five go on to buy. Cart-to-purchase is the second lever to work on.
+    ;;
+  }
+
+  block v_sessions: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: ColumnChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block t_sessions: TextBlock {
+    content: @md
+      #### Where traffic comes from
+
+      **Email** is the largest source by a wide margin, and **Adwords** is second. Together they bring in about three out of four sessions.
+
+      Facebook and YouTube each bring in about a third of Adwords' volume. **Organic** is the smallest source.
+
+      Traffic depends heavily on two channels. A dip in email sends or paid search budget would show up straight away in total sessions.
+    ;;
+  }
+
+  block v_cvr: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: ColumnChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Purchase Conversion Rate'
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#0F766E'
+          }
+        }
+        settings {
+          axis_min: 0
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block t_cvr: TextBlock {
+    content: @md
+      #### How well each source converts
+
+      Conversion is **almost flat across sources**. Every channel lands within about half a point of the others.
+
+      **Organic** and **Facebook** convert slightly better, but they are small. **Email** and **Adwords** sit at the bottom of a very narrow range.
+
+      Traffic quality does not differ much by channel. Growing volume in any channel should grow purchases about proportionally.
+    ;;
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .page { max-width: 1200px; margin: 0 auto; padding: 24px 28px 40px; font-family: Inter, system-ui, sans-serif; color: #0F172A; }
+        .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 8px; }
+        .top h1 { font-size: 26px; font-weight: 700; margin: 0; }
+        .top p { margin: 4px 0 0; color: #64748B; font-size: 14px; }
+        .filter { width: 260px; height: 72px; }
+        .headline { height: 96px; margin: 16px 0 24px; padding: 4px 8px; border-left: 4px solid #2563EB; background: #F8FAFC; border-radius: 6px; }
+        .row { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .chart { height: 360px; background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 8px; }
+        .note { min-height: 360px; background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 8px; }
+        .step { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #64748B; margin: 28px 0 8px; }
+        @media (max-width: 900px) {
+          .row { grid-template-columns: 1fr; }
+          .note { min-height: 0; }
+          .top { flex-direction: column; align-items: flex-start; }
+        }
+      </style>
+
+      <div class="page">
+        <div class="top">
+          <div>
+            <h1>Marketing Funnel Story</h1>
+            <p>Website sessions from TheLook clickstream: where they come from and how many end in a purchase.</p>
+          </div>
+          <div class="filter"><h-block name="f_date" /></div>
+        </div>
+
+        <div class="headline"><h-block name="headline" /></div>
+
+        <div class="step">1 · The funnel</div>
+        <div class="row">
+          <div class="chart"><h-block name="v_funnel" /></div>
+          <div class="note"><h-block name="t_funnel" /></div>
+        </div>
+
+        <div class="step">2 · Where sessions come from</div>
+        <div class="row">
+          <div class="chart"><h-block name="v_sessions" /></div>
+          <div class="note"><h-block name="t_sessions" /></div>
+        </div>
+
+        <div class="step">3 · Which sources convert</div>
+        <div class="row">
+          <div class="chart"><h-block name="v_cvr" /></div>
+          <div class="note"><h-block name="t_cvr" /></div>
+        </div>
+      </div>
+    ;;
+  }
+}

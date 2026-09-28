@@ -1,0 +1,755 @@
+Dashboard r04_claude_fd_html_a3 {
+  title: 'Monthly Performance Slides'
+  description: 'Five 16:9 slides reviewing one month of TheLook eCommerce sales: title, headline KPIs, trend, category breakdown and key takeaways.'
+  owner: 'thinh.nt@holistics.io'
+
+  // ---------- Slide 1: reporting month ----------
+  block f_month: FilterBlock {
+    label: 'Reporting month'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'last month'
+    }
+  }
+
+  // ---------- Slide 2: headline KPIs (vs previous month) ----------
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: true
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: true
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: true
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: true
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: false
+      }
+      settings {
+        display_mode: 'compare_by_number'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+        show_growth_rate: false
+      }
+      settings {
+        display_mode: 'compare_by_number'
+        alignment: 'left'
+        label {
+          font_size: 14
+        }
+        metric_value {
+          font_size: 40
+        }
+        compare_value {
+          reverse_color: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Slide 3: trend (trailing 13 complete months, not tied to the month filter) ----------
+  block trend_sales: VizBlock {
+    label: 'Net Sales and Fulfilled Orders, trailing 13 months'
+    viz: CombinationChart {
+      dataset: thelook
+      filter {
+        field: r(thelook_order_items.created_at)
+        operator: 'last'
+        value: 13
+        modifier: 'month'
+      }
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#1F5F5B'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Fulfilled Orders'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            label: 'Fulfilled Orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#C8553D'
+            line_interpolation: 'smooth'
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        legend_label: 'top'
+        show_data_points: true
+        row_limit: 100
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // ---------- Slide 4: category breakdown ----------
+  block cat_bar: VizBlock {
+    label: 'Net Sales by Category'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#1F5F5B'
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        row_limit: 12
+        sort: LineFamilySort {
+          type: 'yaxis'
+          direction: 'desc'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block cat_table: VizBlock {
+    label: 'Category scorecard'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Category'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'vs Prev. Month'
+          analytic: PeriodOverPeriodComparison {
+            time_dimension: r(thelook_order_items.created_at)
+            display: 'percent_change'
+            comparison_period: '1 month'
+          }
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 12
+        show_row_number: false
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  interactions: [
+    FilterInteraction {
+      from: 'f_month'
+      to: [
+        CustomMapping {
+          block: 'trend_sales'
+          disabled: true
+        }
+      ]
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .mp {
+          --paper: #F4F1EA;
+          --card: #FFFFFF;
+          --ink: #1B1F23;
+          --muted: #6A6F75;
+          --rule: #DAD4C8;
+          --teal: #1F5F5B;
+          --teal-soft: #E3EDEB;
+          --rust: #C8553D;
+          font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+          color: var(--ink);
+          background: #E7E2D8;
+          padding: 24px;
+          min-height: 100%;
+          box-sizing: border-box;
+        }
+        .mp *, .mp *::before, .mp *::after { box-sizing: border-box; }
+        .mp .sans { font-family: "Inter", "Segoe UI", system-ui, sans-serif; }
+
+        /* Slides: one visible at a time via :target, slide 1 by default */
+        .mp .slide {
+          display: none;
+          position: relative;
+          width: 100%;
+          max-width: 1280px;
+          margin: 0 auto;
+          aspect-ratio: 16 / 9;
+          background: var(--paper);
+          box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 12px 32px rgba(40,30,10,.10);
+          padding: 44px 56px 64px;
+          flex-direction: column;
+          overflow: hidden;
+          animation: mp-in .35s ease-out;
+        }
+        .mp .slide:target { display: flex; }
+        .mp:not(:has(.slide:target)) #mp-1 { display: flex; }
+        @keyframes mp-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        /* Slide chrome */
+        .mp .kicker {
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+          font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+          color: var(--teal); font-weight: 600; margin: 0 0 10px;
+        }
+        .mp h2 {
+          font-size: 34px; line-height: 1.15; font-weight: 600;
+          margin: 0 0 6px; letter-spacing: -.01em;
+        }
+        .mp .sub {
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+          font-size: 14px; color: var(--muted); margin: 0 0 24px;
+        }
+        .mp .body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+        .mp .foot {
+          position: absolute; left: 56px; right: 56px; bottom: 20px;
+          display: flex; align-items: center; justify-content: space-between;
+          border-top: 1px solid var(--rule); padding-top: 12px;
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+          font-size: 12px; color: var(--muted);
+        }
+        .mp .nav { display: flex; align-items: center; gap: 14px; }
+        .mp .nav a { color: var(--ink); text-decoration: none; font-weight: 600; }
+        .mp .nav a:hover { color: var(--teal); }
+        .mp .nav .off { color: var(--rule); font-weight: 600; }
+        .mp .dots { display: flex; gap: 6px; }
+        .mp .dots a {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: var(--rule); display: block;
+        }
+        .mp .dots a.on { background: var(--teal); }
+
+        /* Slide 1: title */
+        .mp .title-grid {
+          flex: 1; display: grid; grid-template-columns: 1.35fr 1fr; gap: 56px; align-items: end;
+        }
+        .mp .title-grid h1 {
+          font-size: 76px; line-height: .98; font-weight: 600; letter-spacing: -.025em; margin: 0;
+        }
+        .mp .title-grid h1 em { font-style: italic; color: var(--teal); font-weight: 500; }
+        .mp .lede {
+          font-size: 19px; line-height: 1.5; color: #3C4146; margin: 22px 0 0; max-width: 34em;
+        }
+        .mp .title-side { display: flex; flex-direction: column; gap: 20px; }
+        .mp .filter-card {
+          background: var(--card); border: 1px solid var(--rule); border-radius: 6px;
+          padding: 14px 16px 6px; min-height: 96px;
+        }
+        .mp .agenda { list-style: none; margin: 0; padding: 0; counter-reset: ag; }
+        .mp .agenda li {
+          counter-increment: ag; border-top: 1px solid var(--rule);
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif; font-size: 14px;
+        }
+        .mp .agenda li:last-child { border-bottom: 1px solid var(--rule); }
+        .mp .agenda a {
+          display: flex; gap: 14px; padding: 10px 2px; color: var(--ink); text-decoration: none;
+        }
+        .mp .agenda a::before {
+          content: "0" counter(ag, decimal); color: var(--teal); font-weight: 600; min-width: 22px;
+        }
+        .mp .agenda a:hover { color: var(--teal); }
+        .mp .title-rule {
+          position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--teal);
+        }
+
+        /* Slide 2: KPIs */
+        .mp .kpis {
+          flex: 1; min-height: 0;
+          display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 1fr 1fr; gap: 16px;
+        }
+        .mp .kpi {
+          background: var(--card); border: 1px solid var(--rule); border-radius: 6px;
+          padding: 10px 14px; display: flex; min-height: 0;
+        }
+        .mp .kpi.lead { border-top: 4px solid var(--teal); }
+        .mp .kpi > * { flex: 1; min-width: 0; }
+
+        /* Chart frames */
+        .mp .frame {
+          background: var(--card); border: 1px solid var(--rule); border-radius: 6px;
+          padding: 12px; display: flex; min-height: 0;
+        }
+        .mp .frame > * { flex: 1; min-width: 0; }
+        .mp .trend { flex: 1; }
+        .mp .cats {
+          flex: 1; min-height: 0; display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px;
+        }
+        .mp .note {
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif; font-size: 12px; color: var(--muted);
+          margin-top: 10px;
+        }
+
+        /* Slide 5: takeaways */
+        .mp .takeaways {
+          flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px 28px;
+          align-content: start;
+        }
+        .mp .tk { border-top: 2px solid var(--ink); padding-top: 14px; }
+        .mp .tk .n {
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+          font-size: 12px; font-weight: 600; letter-spacing: .12em; color: var(--teal);
+        }
+        .mp .tk h3 { font-size: 22px; line-height: 1.2; font-weight: 600; margin: 6px 0 8px; }
+        .mp .tk p {
+          font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+          font-size: 14px; line-height: 1.55; color: #3C4146; margin: 0;
+        }
+        .mp .tk.watch { border-top-color: var(--rust); }
+        .mp .tk.watch .n { color: var(--rust); }
+
+        @media (max-width: 900px) {
+          .mp { padding: 8px; }
+          .mp .slide { aspect-ratio: auto; min-height: 640px; padding: 28px 24px 64px; }
+          .mp .foot { left: 24px; right: 24px; }
+          .mp .title-grid, .mp .cats, .mp .takeaways { grid-template-columns: 1fr; }
+          .mp .title-grid h1 { font-size: 48px; }
+          .mp .kpis { grid-template-columns: 1fr 1fr; grid-template-rows: none; grid-auto-rows: 130px; }
+          .mp .trend, .mp .cats .frame { min-height: 360px; }
+        }
+      </style>
+
+      <div class="mp">
+
+        <!-- 1. Title -->
+        <section class="slide" id="mp-1">
+          <div class="title-rule"></div>
+          <div class="title-grid">
+            <div>
+              <p class="kicker">TheLook eCommerce &middot; Monthly business review</p>
+              <h1>Monthly<br/><em>performance</em></h1>
+              <p class="lede">
+                How the month closed on sales, profit and order volume, how it compares with the
+                prior month, and which categories moved the result.
+              </p>
+            </div>
+            <div class="title-side">
+              <div class="filter-card"><h-block name="f_month" /></div>
+              <ol class="agenda">
+                <li><a href="#mp-2">Headline KPIs</a></li>
+                <li><a href="#mp-3">13-month trend</a></li>
+                <li><a href="#mp-4">Category breakdown</a></li>
+                <li><a href="#mp-5">Key takeaways</a></li>
+              </ol>
+            </div>
+          </div>
+          <div class="foot">
+            <span>Net figures exclude cancelled and returned items</span>
+            <div class="nav">
+              <span class="off">&larr;</span>
+              <div class="dots"><a class="on" href="#mp-1"></a><a href="#mp-2"></a><a href="#mp-3"></a><a href="#mp-4"></a><a href="#mp-5"></a></div>
+              <span>01 / 05</span>
+              <a href="#mp-2">&rarr;</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. Headline KPIs -->
+        <section class="slide" id="mp-2">
+          <p class="kicker">02 &middot; Headline KPIs</p>
+          <h2>The month at a glance</h2>
+          <p class="sub">Reporting month vs the previous month. Margin and return rate show the change in percentage points.</p>
+          <div class="body">
+            <div class="kpis">
+              <div class="kpi lead"><h-block name="kpi_net_sales" /></div>
+              <div class="kpi lead"><h-block name="kpi_gross_profit" /></div>
+              <div class="kpi lead"><h-block name="kpi_orders" /></div>
+              <div class="kpi"><h-block name="kpi_aov" /></div>
+              <div class="kpi"><h-block name="kpi_gross_margin" /></div>
+              <div class="kpi"><h-block name="kpi_return_rate" /></div>
+            </div>
+          </div>
+          <div class="foot">
+            <span>TheLook eCommerce &middot; Monthly performance</span>
+            <div class="nav">
+              <a href="#mp-1">&larr;</a>
+              <div class="dots"><a href="#mp-1"></a><a class="on" href="#mp-2"></a><a href="#mp-3"></a><a href="#mp-4"></a><a href="#mp-5"></a></div>
+              <span>02 / 05</span>
+              <a href="#mp-3">&rarr;</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Trend -->
+        <section class="slide" id="mp-3">
+          <p class="kicker">03 &middot; Trend</p>
+          <h2>Sales and order volume over time</h2>
+          <p class="sub">Net Sales (columns) and Fulfilled Orders (line), trailing 13 complete months. This chart ignores the reporting-month filter.</p>
+          <div class="body">
+            <div class="frame trend"><h-block name="trend_sales" /></div>
+          </div>
+          <div class="foot">
+            <span>TheLook eCommerce &middot; Monthly performance</span>
+            <div class="nav">
+              <a href="#mp-2">&larr;</a>
+              <div class="dots"><a href="#mp-1"></a><a href="#mp-2"></a><a class="on" href="#mp-3"></a><a href="#mp-4"></a><a href="#mp-5"></a></div>
+              <span>03 / 05</span>
+              <a href="#mp-4">&rarr;</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. Category breakdown -->
+        <section class="slide" id="mp-4">
+          <p class="kicker">04 &middot; Category breakdown</p>
+          <h2>Where the month's sales came from</h2>
+          <p class="sub">Top 12 categories by Net Sales in the reporting month, with change vs the previous month and gross margin.</p>
+          <div class="body">
+            <div class="cats">
+              <div class="frame"><h-block name="cat_bar" /></div>
+              <div class="frame"><h-block name="cat_table" /></div>
+            </div>
+          </div>
+          <div class="foot">
+            <span>TheLook eCommerce &middot; Monthly performance</span>
+            <div class="nav">
+              <a href="#mp-3">&larr;</a>
+              <div class="dots"><a href="#mp-1"></a><a href="#mp-2"></a><a href="#mp-3"></a><a class="on" href="#mp-4"></a><a href="#mp-5"></a></div>
+              <span>04 / 05</span>
+              <a href="#mp-5">&rarr;</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. Key takeaways (written for the August 2026 close) -->
+        <section class="slide" id="mp-5">
+          <p class="kicker">05 &middot; Key takeaways &middot; August 2026 close</p>
+          <h2>What to remember from August</h2>
+          <p class="sub">Analyst notes for the August 2026 close. Update this slide each month; the charts on slides 2 to 4 refresh automatically.</p>
+          <div class="body">
+            <div class="takeaways">
+              <div class="tk">
+                <span class="n">01 &middot; GROWTH</span>
+                <h3>Best month on record: $41.0K net sales, +27% MoM</h3>
+                <p>Net sales rose from $32.3K in July and are 2.6&times; August 2025 ($16.0K). Gross profit grew in step to $21.4K (+27%).</p>
+              </div>
+              <div class="tk">
+                <span class="n">02 &middot; DRIVER</span>
+                <h3>Growth came from volume, not basket size</h3>
+                <p>Fulfilled orders climbed 26% to 470, while average order value held flat at $87 (+0.5%). More customers ordering, not bigger orders.</p>
+              </div>
+              <div class="tk">
+                <span class="n">03 &middot; MIX</span>
+                <h3>Accessories, Pants &amp; Capris and Suits led the gains</h3>
+                <p>Accessories (+$1.5K), Pants &amp; Capris (+$1.3K) and Suits &amp; Sport Coats (+$1.0K) added the most. Jeans and Outerwear remain the largest categories at about $3.6K each.</p>
+              </div>
+              <div class="tk watch">
+                <span class="n">04 &middot; WATCH</span>
+                <h3>Margin steady; Active and Jeans slipped</h3>
+                <p>Gross margin held at 52.1%, and the return rate eased to 10.3% from 13.6%. Active fell 28% (-$0.6K) and Jeans 6%; both are worth a look before the autumn range.</p>
+              </div>
+            </div>
+          </div>
+          <div class="foot">
+            <span>TheLook eCommerce &middot; Monthly performance</span>
+            <div class="nav">
+              <a href="#mp-4">&larr;</a>
+              <div class="dots"><a href="#mp-1"></a><a href="#mp-2"></a><a href="#mp-3"></a><a href="#mp-4"></a><a class="on" href="#mp-5"></a></div>
+              <span>05 / 05</span>
+              <span class="off">&rarr;</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    ;;
+  }
+
+  theme: PageTheme {
+    background {
+      bg_color: '#E7E2D8'
+    }
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+      padding: 0
+    }
+  }
+
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 360
+  }
+}

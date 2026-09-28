@@ -1,0 +1,175 @@
+Dashboard r06_claude_canvas_a3 {
+  title: 'Marketing Funnel: Traffic Sources'
+  description: 'Where website sessions come from and how well each traffic source converts to a purchase.'
+
+  block title: TextBlock {
+    content: @md
+      # Marketing Funnel: Traffic Sources
+      Website sessions and purchase conversion by acquisition channel (TheLook clickstream events).
+    ;;
+  }
+
+  block headline: VizBlock {
+    label: 'Headline'
+    settings {
+      hide_label: true
+    }
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Purchase Conversion Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      content: @md
+        <div style="padding: 0.75rem 1rem; font-size: 1.4rem; line-height: 1.4; color: #111827;">
+          Our site has drawn <strong>{{ rows[0].values.`Sessions` }}</strong> sessions, and
+          <strong>{{ rows[0].values.`Purchase Conversion Rate` }}</strong> of them ended in a purchase.
+        </div>
+      ;;
+    }
+  }
+
+  block v_sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#255DD4'
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+        row_limit: 5000
+      }
+    }
+  }
+
+  block t_sessions_commentary: TextBlock {
+    content: @md
+      ### Where traffic comes from
+      **Email is the largest channel**, bringing in roughly 45% of all sessions, with **Adwords** a clear second at about 30%.
+
+      Facebook and YouTube each contribute around a tenth of traffic, and **Organic is the smallest** source by a wide margin.
+
+      Paid and owned channels (Email, Adwords) drive about three quarters of site visits, so the funnel depends heavily on them.
+    ;;
+  }
+
+  block v_conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Purchase Conversion Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#18A59E'
+          }
+        }
+        settings {
+          axis_min: 0
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+        row_limit: 5000
+      }
+    }
+  }
+
+  block t_conversion_commentary: TextBlock {
+    content: @md
+      ### How well each source converts
+      Conversion is **remarkably flat across channels**: every source converts roughly a quarter of its sessions, within about half a percentage point of each other.
+
+      Organic edges ahead slightly, but on the smallest volume, so the gap is not meaningful.
+
+      **Takeaway:** channel choice changes *how many* visitors arrive, not *how likely* they are to buy. Growth comes from scaling volume in the big channels, while lifting conversion needs on-site work.
+    ;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1200
+    height: 920
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 1160, 80)
+    }
+    block headline {
+      position: pos(20, 100, 1160, 80)
+    }
+    block v_sessions_by_source {
+      position: pos(20, 200, 740, 340)
+    }
+    block t_sessions_commentary {
+      position: pos(780, 200, 400, 340)
+    }
+    block v_conversion_by_source {
+      position: pos(20, 560, 740, 340)
+    }
+    block t_conversion_commentary {
+      position: pos(780, 560, 400, 340)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: H.themes.vanilla
+}

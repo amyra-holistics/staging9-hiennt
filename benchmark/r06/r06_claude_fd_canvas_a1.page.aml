@@ -1,0 +1,173 @@
+Dashboard r06_claude_fd_canvas_a1 {
+  title: 'Marketing Funnel: Traffic Sources'
+  description: 'Where website sessions come from, and how well each traffic source converts them into purchases.'
+
+  block headline: VizBlock {
+    label: 'Headline'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.sessions)
+          label: 'Sessions'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.purchase_conversion_rate)
+          label: 'Conversion Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+      content: @md
+<div style="font-family: inherit; padding: 4px 8px;">
+  <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280; margin-bottom: 6px;">Marketing funnel · all traffic sources</div>
+  <div style="font-size: 26px; line-height: 1.35; color: #111827; font-weight: 500;">
+    Across <strong style="color: #2F5BEA;">{{ rows[0].values.`Sessions` }}</strong> website sessions,
+    <strong style="color: #0F8A7E;">{{ rows[0].values.`Conversion Rate` }}</strong> ended in a purchase. Traffic sources differ a lot in volume, but hardly at all in conversion.
+  </div>
+</div>
+      ;;
+    }
+    settings {
+      hide_label: true
+      hide_controls: true
+    }
+  }
+
+  block sessions_by_source: VizBlock {
+    label: 'Sessions by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2F5BEA'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block sessions_commentary: TextBlock {
+    content: @md
+<div style="padding: 4px 6px; color: #374151; font-size: 14px; line-height: 1.55;">
+  <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #2F5BEA; font-weight: 600; margin-bottom: 8px;">Volume</div>
+  <p style="font-size: 18px; color: #111827; font-weight: 600; margin: 0 0 10px;">Email and Adwords bring in three out of every four sessions.</p>
+  <p style="margin: 0 0 8px;">Email is the largest source, with roughly 45% of all sessions. Adwords is second at about 30%.</p>
+  <p style="margin: 0 0 8px;">Facebook and YouTube each bring about a tenth of the traffic. Organic search is the smallest source at around 5%.</p>
+  <p style="margin: 0; color: #6B7280;">Traffic depends heavily on two channels, so a drop in either one would show up quickly in total sessions.</p>
+</div>
+    ;;
+  }
+
+  block conversion_by_source: VizBlock {
+    label: 'Purchase Conversion Rate by Traffic Source'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_events.traffic_source)
+        label: 'Traffic Source'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.purchase_conversion_rate)
+            label: 'Conversion Rate'
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+          settings {
+            color: '#0F8A7E'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.sessions)
+            label: 'Sessions'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        sort: LineFamilySort {
+          type: 'tooltip'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block conversion_commentary: TextBlock {
+    content: @md
+<div style="padding: 4px 6px; color: #374151; font-size: 14px; line-height: 1.55;">
+  <div style="font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #0F8A7E; font-weight: 600; margin-bottom: 8px;">Conversion</div>
+  <p style="font-size: 18px; color: #111827; font-weight: 600; margin: 0 0 10px;">Every source converts at almost exactly the same rate.</p>
+  <p style="margin: 0 0 8px;">All five sources convert between about 26.5% and 27%. Sources are listed in the same order as the volume chart above, so you can compare the two directly.</p>
+  <p style="margin: 0 0 8px;">Organic and Facebook are slightly ahead, but only by a fraction of a point, which is too small to count as a real difference in quality.</p>
+  <p style="margin: 0; color: #6B7280;">Because conversion is so even, growth will come from adding more traffic, not from shifting budget toward sources that seem to convert better.</p>
+</div>
+    ;;
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1200
+    height: 880
+    grid_size: 20
+    auto_expand_vertically: true
+    block headline {
+      position: pos(20, 20, 1160, 120)
+    }
+    block sessions_by_source {
+      position: pos(20, 160, 760, 340)
+    }
+    block sessions_commentary {
+      position: pos(800, 160, 380, 340)
+    }
+    block conversion_by_source {
+      position: pos(20, 520, 760, 340)
+    }
+    block conversion_commentary {
+      position: pos(800, 520, 380, 340)
+    }
+  }
+}

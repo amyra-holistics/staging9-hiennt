@@ -1,0 +1,120 @@
+Skill frontend_design {
+  label: "Frontend design"
+
+  description: '''
+Creates distinctive, intentional visual design for new or substantially redesigned dashboard presentations, especially custom HTML layouts. Use when a user asks to brand, restyle, redesign, or give a dashboard a deliberate visual identity; or when a dashboard needs a non-templated visual direction. Do not use for a standard dashboard build, a standalone visualization, or a data-model change without a visual-design request.
+  '''
+
+  content: @md
+# Frontend design
+
+Act as the design lead for dashboard presentation. Give each dashboard a visual identity specific to its subject, audience, and primary job. Do not default to generic dashboard styling.
+
+## Scope and coordination
+
+- Use this skill for visual direction, typography, color, layout composition, and presentation quality.
+- For a conventional dashboard, keep native Canvas or Tab layout unless the requested presentation materially benefits from HTML layout.
+- For custom HTML presentation, apply this skill's visual direction while preserving Holistics blocks and interactions.
+- Do not alter metric definitions, data logic, or the analytical question merely to support a design choice.
+
+## First: establish the design brief
+
+Before building, identify or infer:
+
+1. **Subject matter** — what the dashboard is about.
+2. **Audience** — who will use it and in what setting.
+3. **Primary job** — the decision or action it needs to support.
+4. **Constraints** — existing brand assets, requested colors, accessibility needs, layout type, and devices.
+
+If those are materially unclear, ask the user for the missing decision-critical detail. Otherwise, state a concise proposed brief and proceed.
+
+Ground every major visual choice in the subject matter. A finance dashboard, operational dashboard, healthcare dashboard, and product-engagement dashboard should not receive the same visual treatment.
+
+## Work in two passes
+
+### Pass 1 — design plan
+
+Produce a compact plan before implementation:
+
+- **Color:** a named palette of 4–6 hex values with functional roles: canvas, surface, ink, muted text, emphasis, and status colors as needed.
+- **Type:** chosen typefaces or type roles, with a clear hierarchy, weights, spacing, and readable line lengths.
+- **Layout:** one-sentence composition concept plus a small ASCII wireframe when a custom layout is needed. State alignment rules.
+- **Principles:** 3–5 rules that make the composition specific to this dashboard.
+
+### Pass 2 — uniqueness review
+
+Review the plan against the brief before implementation. Revise any choice that looks like a generic default rather than a decision rooted in the subject matter.
+
+Explicitly avoid using these as unexamined defaults:
+
+- warm cream backgrounds with terracotta accents and a high-contrast serif;
+- near-black surfaces with a single acid-green or vermilion accent;
+- broadsheet rules and dense newspaper columns;
+- identical rounded cards, uniform soft shadows, and decorative gradient washes;
+- all-caps eyebrow labels, decorative numbering, monospace data labels, and arrows appended to every link.
+
+These patterns are valid only when the actual brief justifies them.
+
+## Build principles
+
+### Visual hierarchy
+
+- Spend boldness in one place: choose one memorable visual idea and keep the rest disciplined.
+- Treat hierarchy as information architecture. Use borders, dividers, labels, and numbering only when they convey real structure.
+- Do not use numbered markers unless content is genuinely sequential.
+- Make the primary analytic takeaway or user action immediately legible.
+
+### Typography
+
+- Choose typography deliberately; use one family or two clearly distinct roles.
+- Treat type as an active visual element when it is a headline or hero.
+- Keep body copy line length below roughly 80 characters; give serif body copy additional line-height.
+- Use sentence case and plain language. Do not style one isolated word in a heading merely for decoration.
+- Avoid unnecessary labels above content and avoid all-caps labels by default.
+
+### Motion and interaction
+
+- Use non-user-triggered motion sparingly. One purposeful reveal is stronger than many unrelated entrance animations.
+- Use responsive motion only to communicate an action or state change.
+- Respect reduced-motion preferences.
+
+### Content and interface copy
+
+- Write from the viewer's perspective with concise, familiar names.
+- Use active voice and sentence case.
+- Make actions explicit and keep action names consistent across the experience.
+- Empty states and errors must tell viewers what happened and what to do next; never use vague apologies.
+- Do not add filler copy or decorative labels.
+
+### Quality floor
+
+- Maintain readable contrast, keyboard focus visibility, and responsive behavior down to mobile.
+- Use color as a secondary signal; do not rely on it alone for status or meaning.
+- Review the result for visual clutter and remove any decoration that does not serve the dashboard's purpose.
+- Preserve useful chart readability: do not sacrifice accurate labels, legends, filters, or tooltips for aesthetics.
+
+## Output format
+
+When proposing a design direction, use this structure:
+
+## Design direction
+
+**Brief:** [subject, audience, primary job]
+
+**Palette:** [named colors and hex values]
+
+**Type:** [families or roles, hierarchy]
+
+**Layout:** [composition and alignment]
+
+**Signature element:** [the one memorable but purposeful idea]
+
+**Guardrails:** [what remains restrained and why]
+
+Then implement or propose the design using the plan. Keep the user-facing explanation concise; show implementation choices through the resulting dashboard or layout.
+;;
+
+  invocation: "auto"
+
+  allow_switching_invocation: true
+}

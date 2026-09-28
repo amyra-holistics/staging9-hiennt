@@ -1,10 +1,9 @@
 Skill frontend_design {
   label: "Frontend design"
-
-  description: '''
-Creates distinctive, intentional visual design for new or substantially redesigned dashboard presentations, especially custom HTML layouts. Use when a user asks to brand, restyle, redesign, or give a dashboard a deliberate visual identity; or when a dashboard needs a non-templated visual direction. Do not use for a standard dashboard build, a standalone visualization, or a data-model change without a visual-design request.
-  '''
-
+  description: "Creates distinctive, intentional visual design for new or substantially redesigned dashboard presentations, especially custom HTML layouts. Use when a user asks to brand, restyle, redesign, or give a dashboard a deliberate visual identity; or when a dashboard needs a non-templated visual direction. Do not use for a standard dashboard build, a standalone visualization, or a data-model change without a visual-design request."
+  invocation: "auto"
+  allow_switching_invocation: true
+  
   content: @md
 # Frontend design
 
@@ -113,8 +112,4 @@ When proposing a design direction, use this structure:
 
 Then implement or propose the design using the plan. Keep the user-facing explanation concise; show implementation choices through the resulting dashboard or layout.
 ;;
-
-  invocation: "auto"
-
-  allow_switching_invocation: true
 }

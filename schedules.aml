@@ -3,5 +3,35 @@ const schedules = [
     cron: '0 9 * * *'
     run_as: 'nhi.ty@holistics.io'
     targets: [daily_homestay_performance_summary]
+  },
+
+  AiSchedule {
+    cron: '0 7 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t14_weekly_revenue_tiers]
+  },
+
+  AiSchedule {
+    cron: '0 9 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa5_t00_weekly_category_revenue]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa6_r05_contact_cleanup]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa6_r11_notify_owner]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [qa6_r20_west_account_summary]
   }
 ]

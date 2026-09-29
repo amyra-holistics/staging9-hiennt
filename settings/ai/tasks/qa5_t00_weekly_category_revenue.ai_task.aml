@@ -1,0 +1,22 @@
+AiTask qa5_t00_weekly_category_revenue {
+  label: 'QA5 T00 Weekly Category Revenue'
+  description: 'Calculates a fresh revenue summary by category for the most recent completed Monday–Sunday week and emails it to the specified recipient.'
+
+  brief: @md
+    Use @Dataset:ecommerce_official only. Always query fresh database data; do not reuse cached, prior-run, or assumed values. Use the governed `revenue` metric, `orders.created_at` as the reporting timestamp, and `categories.name` as the category grouping. Do not invent data, dates, recipients, delivery outcomes, or subject text.
+
+    This task is scheduled to run on Monday. Determine all boundaries in workspace time. Calculate the most recent completed Monday–Sunday week immediately preceding the Monday run: from the preceding Monday at 00:00:00 inclusive through the current run Monday at 00:00:00 exclusive. Do not include any data from the run Monday or use a rolling seven-day window. Retain and state the exact inclusive/exclusive date boundaries used.
+
+    Query fresh revenue grouped by `categories.name` for that complete-week window. Produce a concise, grounded category-level revenue summary that identifies the completed-week date range and reports each returned category with its revenue. Make it clear when a category has no returned revenue rows; do not fabricate zero-value categories.
+
+    Use the available direct AI delivery capability despite older documentation. Email the summary to only `nhi.ty@holistics.io`, with no CC, BCC, attachments, or other recipients. The email subject must begin exactly `[QA5 T00]` and the email body must be grounded in the fresh query results. Finish by recording the exact date window, category-level revenue results, email recipient, subject, and actual delivery outcome without representing an undelivered email as delivered.
+  ;;
+
+  acceptance_criteria: @md
+    - Uses only fresh data from @Dataset:ecommerce_official and the governed `revenue` metric, grouped by `categories.name`, with `orders.created_at` as the reporting timestamp; it invents no data, dates, category rows, recipients, subject text, or delivery outcome.
+    - Uses the correct complete-week window for the Monday run: [preceding Monday 00:00:00, current run Monday 00:00:00) in workspace time, covering exactly the immediately preceding Monday–Sunday calendar week and excluding the run Monday.
+    - Produces a concise category-level Revenue summary from the fresh results that states the exact completed-week boundaries and reports revenue for every returned `categories.name` value.
+    - Successfully sends the grounded summary by email to only `nhi.ty@holistics.io`, with no CC, BCC, attachment, or additional recipient.
+    - The delivered email subject begins exactly `[QA5 T00]`.
+  ;;
+}

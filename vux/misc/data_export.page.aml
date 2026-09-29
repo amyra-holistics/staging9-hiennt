@@ -25,7 +25,7 @@ Dashboard data_export {
       auto_expand_horizontally: true
     }
   }
-  theme: H.themes.classic
+  theme: DynamicPageTheme { light: H.themes.classic, dark: H.themes.midnight }
   block v_kt8s: VizBlock {
     label: 'Product Performance'
     viz: DataTable {

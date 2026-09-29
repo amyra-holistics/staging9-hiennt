@@ -4070,7 +4070,7 @@ Products with <span class="insights-badge red">&ge;210</span> gap suggest potent
       }
     }
   }
-  theme: H.themes.classic
+  theme: DynamicPageTheme { light: H.themes.classic, dark: H.themes.midnight }
   interactions: [
     FilterInteraction {
       from: 'v4'

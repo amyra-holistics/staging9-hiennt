@@ -1,0 +1,283 @@
+Dashboard homestay_admin_landing {
+  title: 'Homestay Admin Landing'
+  description: 'Homestay operations landing page for inventory, booking records, calendar pricing, amenities, and room discovery.'
+
+  theme: PageTheme {
+    block {
+      background { bg_color: 'transparent' }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      shadow: 'none'
+      padding: 0
+    }
+  }
+
+  // Validation evidence: executed successfully as Viz:76a664a1817e3dd2ebddbd2a1456badc
+  // on 2026-09-25. Execution returned 1 result row: total_listing = 7403; errors = null.
+  block total_listings: VizBlock {
+    label: 'Total Listings'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      value: VizFieldFull {
+        ref: r(homestay_dataset.total_listing)
+        label: 'Total Listings'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block recorded_booking_nights: VizBlock {
+    label: 'Recorded Booking Nights'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      calculation recorded_booking_nights {
+        label: 'Recorded Booking Nights'
+        formula: @aql homestay_bookings | sum(homestay_bookings.nights);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'recorded_booking_nights'
+        label: 'Recorded booking nights'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  // VALIDATED: execute_viz completed successfully on 2026-09-25; errors: null.
+  // Verified result: 23,691 total listing places (inventory capacity, not actual guests).
+  block guest_capacity: VizBlock {
+    label: 'Guest Capacity'
+    viz: MetricKpi {
+      dataset: homestay_dataset
+      calculation guest_capacity {
+        label: 'Guest capacity'
+        formula: @aql homestay_listings | sum(homestay_listings.accommodates);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'guest_capacity'
+        label: 'Guest capacity'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block inventory_mix: VizBlock {
+    label: 'Inventory Mix'
+    viz: CombinationChart {
+      dataset: homestay_dataset
+
+      calculation listing_inventory_count {
+        label: 'Listing Inventory Count'
+        formula: @aql homestay_listings | count(homestay_listings.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      x_axis: VizFieldFull {
+        ref: r(homestay_listings.property_type)
+        label: 'Property Type'
+      }
+
+      legend: VizFieldFull {
+        ref: r(homestay_listings.room_type)
+        label: 'Room Type'
+      }
+
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'listing_inventory_count'
+            label: 'Listing Inventory Count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+        settings {
+          stack_series_by: 'value'
+        }
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block customer_room_catalogue: VizBlock {
+    label: 'Room Catalogue'
+    viz: DataTable {
+      dataset: homestay_dataset
+      fields: [
+        VizFieldFull { label: 'Listing ID' ref: r(homestay_listings.id) uname: 'listing_id' format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { label: 'Listing Name' ref: r(homestay_listings.name) format { type: 'text' } },
+        VizFieldFull { label: 'Property Type' ref: r(homestay_listings.property_type) format { type: 'text' } },
+        VizFieldFull { label: 'Room Type' ref: r(homestay_listings.room_type) format { type: 'text' } },
+        VizFieldFull { label: 'Accommodates' ref: r(homestay_listings.accommodates) format { type: 'number' pattern: '#,###0' } },
+        VizFieldFull { label: 'Beds' ref: r(homestay_listings.beds) format { type: 'number' pattern: '#,###0' } },
+        VizFieldFull { label: 'Bedrooms' ref: r(homestay_listings.bedrooms) format { type: 'number' pattern: '#,###0' } },
+        VizFieldFull { label: 'Bathrooms' ref: r(homestay_listings.bathrooms) format { type: 'number' pattern: '#,###0' } },
+        VizFieldFull { label: 'Nightly Listing Price' ref: r(homestay_listings.price) format { type: 'number' pattern: '[$$]#,###0.00' } },
+        VizFieldFull { label: 'Neighbourhood' ref: r(homestay_neighbourhoods.neighbourhood) format { type: 'text' } },
+        VizFieldFull { label: 'State' ref: r(homestay_neighbourhoods.state) format { type: 'text' } },
+        VizFieldFull { label: 'Market' ref: r(homestay_neighbourhoods.market) format { type: 'text' } },
+        VizFieldFull { label: 'Country' ref: r(homestay_neighbourhoods.country) format { type: 'text' } }
+      ]
+      settings { pagination_size: 100 show_row_number: true wrap_header_text: true sorts: [KeyBasedSortSetting { key: 'listing_id' direction: 'asc' }] }
+    }
+  }
+
+  block average_monthly_calendar_price_trend: VizBlock {
+    label: 'Average Monthly Calendar Price Trend'
+    viz: CombinationChart {
+      dataset: homestay_dataset
+      calculation average_calendar_price {
+        label: 'Average Calendar Price'
+        formula: @aql homestay_calendar | avg(homestay_calendar.price);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull { ref: r(homestay_calendar.date) label: 'Month' transformation: 'datetrunc month' format { type: 'date' pattern: 'LLL yyyy' } }
+      y_axis { series { mark_type: 'line' field: VizFieldFull { ref: 'average_calendar_price' label: 'Average Calendar Price' format { type: 'number' pattern: '[$$]#,###0.00' } } } }
+      settings { sort: LineFamilySort { type: 'xaxis' direction: 'asc' } }
+    }
+  }
+
+  block top_amenities_by_distinct_listing_count: VizBlock {
+    label: 'Amenities by Distinct Listing Count'
+    viz: DataTable {
+      dataset: homestay_dataset
+      calculation distinct_listing_count {
+        label: 'Distinct Listing Count'
+        formula: @aql homestay_listing_amenities | count_distinct(homestay_listing_amenities.listing_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull { ref: r(homestay_listing_amenities.amenity) label: 'Amenity' uname: 'amenity' format { type: 'text' } },
+        VizFieldFull { ref: 'distinct_listing_count' label: 'Distinct Listing Count' uname: 'distinct_listing_count' format { type: 'number' pattern: '#,###0' } }
+      ]
+      settings { pagination_size: 100 show_row_number: true wrap_header_text: true sorts: [KeyBasedSortSetting { key: 'distinct_listing_count' direction: 'desc' }, KeyBasedSortSetting { key: 'amenity' direction: 'asc' }] }
+    }
+  }
+
+  block room_catalogue_neighbourhood_filter: FilterBlock {
+    label: 'Neighbourhood'
+    type: 'field'
+    source: FieldFilterSource { dataset: 'homestay_dataset' field: r(homestay_neighbourhoods.neighbourhood) }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+
+  block room_catalogue_property_type_filter: FilterBlock {
+    label: 'Property type'
+    type: 'field'
+    source: FieldFilterSource { dataset: 'homestay_dataset' field: r(homestay_listings.property_type) }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+
+  block room_catalogue_room_type_filter: FilterBlock {
+    label: 'Room type'
+    type: 'field'
+    source: FieldFilterSource { dataset: 'homestay_dataset' field: r(homestay_listings.room_type) }
+    default { operator: 'matches' value: '$H_NIL$' }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'room_catalogue_neighbourhood_filter'
+      to: ['customer_room_catalogue']
+      field: r(homestay_neighbourhoods.neighbourhood)
+    },
+    FilterInteraction {
+      from: 'room_catalogue_property_type_filter'
+      to: ['customer_room_catalogue']
+      field: r(homestay_listings.property_type)
+    },
+    FilterInteraction {
+      from: 'room_catalogue_room_type_filter'
+      to: ['customer_room_catalogue']
+      field: r(homestay_listings.room_type)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .homestay-admin-landing { --ink:#05264c; --muted:#5c6e85; --accent:#259b6c; --navy:#06213f; --surface:#f5f8fa; --border:#e1e7ee; max-width:1440px; margin:0 auto; padding:20px; color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,sans-serif; }
+        .homestay-admin-landing *, .homestay-admin-landing *::before, .homestay-admin-landing *::after { box-sizing:border-box; }
+        .homestay-admin-landing a { color:inherit; text-decoration:none; }
+        .homestay-admin-landing__hero { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(260px,.7fr); gap:28px; align-items:center; min-height:260px; padding:40px; overflow:hidden; border-radius:10px; background:var(--navy); color:#fff; }
+        .homestay-admin-landing__hero h1 { margin:0; font-size:clamp(32px,5vw,56px); letter-spacing:-.04em; line-height:1.04; }
+        .homestay-admin-landing__hero p { max-width:650px; color:#d7e1ea; line-height:1.6; }
+        .homestay-admin-landing__nav { display:flex; flex-wrap:wrap; gap:8px; }
+        .homestay-admin-landing__nav a { padding:8px 12px; border:1px solid #1a4a80; border-radius:999px; font-size:13px; font-weight:700; }
+        .homestay-admin-landing__media { position:relative; min-height:180px; }
+        .homestay-admin-landing__media::before, .homestay-admin-landing__media::after { content:''; position:absolute; display:block; border-radius:50%; }
+        .homestay-admin-landing__media::before { width:130px; height:130px; top:10px; right:25px; background:var(--accent); }
+        .homestay-admin-landing__media::after { width:92px; height:92px; bottom:5px; right:120px; border:18px solid #b7ead4; }
+        .homestay-admin-landing__section { margin-top:28px; scroll-margin-top:20px; }
+        .homestay-admin-landing__head { display:flex; justify-content:space-between; gap:20px; align-items:end; margin-bottom:14px; }
+        .homestay-admin-landing__head h2 { margin:0; font-size:26px; }
+        .homestay-admin-landing__head p { max-width:540px; margin:0; color:var(--muted); text-align:right; }
+        .homestay-admin-landing__eyebrow { margin:0 0 5px; color:var(--accent); font-size:12px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; }
+        .homestay-admin-landing__hero .homestay-admin-landing__eyebrow { color:#b7ead4; }
+        .homestay-admin-landing__grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+        .homestay-admin-landing__two { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr); gap:16px; }
+        .homestay-admin-landing__card { min-width:0; overflow:hidden; border:1px solid var(--border); border-radius:10px; background:#fff; }
+        .homestay-admin-landing__label { display:block; padding:16px 18px 0; color:var(--muted); font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+        .homestay-admin-landing__live { min-width:0; }
+        .homestay-admin-landing__live--kpi { height:130px; padding:8px 18px 18px; }
+        .homestay-admin-landing__live--chart { height:360px; padding:6px 12px 14px; }
+        .homestay-admin-landing__live--table { height:410px; padding:6px 12px 14px; }
+        .homestay-admin-landing__claim { margin:10px 18px 16px; padding:10px 12px; border-left:3px solid var(--accent); background:var(--surface); color:var(--muted); font-size:13px; }
+        .homestay-admin-landing__note { padding:26px; border:1px solid var(--border); border-radius:10px; background:var(--surface); }
+        @media (max-width:900px) { .homestay-admin-landing__hero, .homestay-admin-landing__two { grid-template-columns:minmax(0,1fr); } .homestay-admin-landing__media { display:none; } .homestay-admin-landing__grid { grid-template-columns:minmax(0,1fr); } .homestay-admin-landing__head { display:block; } .homestay-admin-landing__head p { margin-top:8px; text-align:left; } }
+        @media (max-width:560px) { .homestay-admin-landing { padding:12px; } .homestay-admin-landing__hero { min-height:0; padding:28px 22px; } .homestay-admin-landing__live--chart { height:310px; } .homestay-admin-landing__live--table { height:360px; } }
+      </style>
+      <main class="homestay-admin-landing">
+        <header id="hero" class="homestay-admin-landing__hero">
+          <div><p class="homestay-admin-landing__eyebrow">Homestay administration</p><h1>Make every room easier to run.</h1><p>A focused view of inventory, recorded reservation demand, pricing history, amenities, and the room catalogue.</p><nav class="homestay-admin-landing__nav" aria-label="Page sections"><a href="#overview">Overview</a><a href="#administration">Administration</a><a href="#find-a-room">Find a room</a></nav></div>
+          <div class="homestay-admin-landing__media" aria-hidden="true"></div>
+        </header>
+        <section id="overview" class="homestay-admin-landing__section"><div class="homestay-admin-landing__head"><div><p class="homestay-admin-landing__eyebrow">Overview</p><h2>Inventory at a glance</h2></div><p>Live KPIs summarize the recorded listing inventory and booking workload.</p></div><div class="homestay-admin-landing__grid">
+          <article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Listings</span><div class="homestay-admin-landing__live homestay-admin-landing__live--kpi"><h-block name="total_listings" /></div></article>
+          <article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Recorded nights</span><div class="homestay-admin-landing__live homestay-admin-landing__live--kpi"><h-block name="recorded_booking_nights" /></div></article>
+          <article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Guest capacity</span><div class="homestay-admin-landing__live homestay-admin-landing__live--kpi"><h-block name="guest_capacity" /></div></article>
+        </div></section>
+        <section id="administration" class="homestay-admin-landing__section"><div class="homestay-admin-landing__head"><div><p class="homestay-admin-landing__eyebrow">Administration</p><h2>Manage the inventory signal</h2></div><p>Review mix, calendar price history, and amenities coverage.</p></div><div class="homestay-admin-landing__two">
+          <article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Property and room mix</span><div class="homestay-admin-landing__live homestay-admin-landing__live--chart"><h-block name="inventory_mix" /></div></article>
+          <article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Calendar price trend</span><div class="homestay-admin-landing__live homestay-admin-landing__live--chart"><h-block name="average_monthly_calendar_price_trend" /></div><p class="homestay-admin-landing__claim">Calendar price data does not include availability information.</p></article>
+        </div><div class="homestay-admin-landing__two" style="margin-top:16px;"><article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Amenities coverage</span><div class="homestay-admin-landing__live homestay-admin-landing__live--table"><h-block name="top_amenities_by_distinct_listing_count" /></div></article><aside class="homestay-admin-landing__note"><p class="homestay-admin-landing__eyebrow">Operational note</p><h3>Review the recorded room setup.</h3><p>Use the catalogue to review room type, capacity, beds, price, and location fields.</p></aside></div></section>
+        <section id="find-a-room" class="homestay-admin-landing__section"><div class="homestay-admin-landing__head"><div><p class="homestay-admin-landing__eyebrow">Find a room</p><h2>Browse the room catalogue</h2></div><p>Searchable listing detail for matching an inventory record to configuration and location.</p></div><article class="homestay-admin-landing__card"><span class="homestay-admin-landing__label">Room catalogue</span><div class="homestay-admin-landing__live homestay-admin-landing__live--table"><h-block name="customer_room_catalogue" /></div></article><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px;" aria-label="Room catalogue filters"><div class="homestay-admin-landing__card" style="padding:12px;"><h-block name="room_catalogue_neighbourhood_filter" /></div><div class="homestay-admin-landing__card" style="padding:12px;"><h-block name="room_catalogue_property_type_filter" /></div><div class="homestay-admin-landing__card" style="padding:12px;"><h-block name="room_catalogue_room_type_filter" /></div></div></section>
+      </main>
+    ;;
+  }
+}

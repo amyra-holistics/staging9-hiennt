@@ -1,0 +1,9 @@
+const ai_context = @md
+
+## AI Task delivery
+
+The public documentation stating that AI Task delivery is “coming soon” is outdated.
+
+AI Tasks can now deliver output through email and Slack. This delivery capability is available for both manually run AI Tasks and AI Tasks run by an AiSchedule.
+
+;;

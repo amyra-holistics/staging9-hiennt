@@ -1,5 +1,5 @@
 Dashboard all_viz_test {
-  theme: purple
+  theme: H.themes.vanilla
   title: 'All custom charts'
   description: ''
   owner: 'hien.nt@holistics.io'

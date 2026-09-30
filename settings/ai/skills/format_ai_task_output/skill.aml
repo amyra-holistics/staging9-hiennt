@@ -1,0 +1,65 @@
+Skill format_ai_task_output {
+  label: 'Format AI task messages'
+  description: "Format the email or Slack message an AI task run sends, and the run summary for the task owner. Use in an AI task run before calling deliver_data, or whenever a task brief says 'format with /format_ai_task_output'."
+  invocation: 'auto'
+  content: @md
+    A task message is read by someone who didn't ask the question and has seconds to spare. Lead with what happened, prove it with a few numbers, and stop.
+
+    ## Rules for every message
+
+    - **Headline first**: the first line says what happened, with the key number.
+    - **Numbers** come straight from the query result. Never add, rank or compute by reading a table.
+    - **Subject** (also the Slack header): at most 100 characters, starting with the brief's prefix word for word, describing what the message says.
+    - **Plain labels**, never column names (`at_risk_now` becomes "policies approaching cancellation"). Only the fields the brief asks for.
+    - **Last line**: `Data as of <run time> (<timezone>) · <period>`. Call out partial periods ("September to date") and never compare them with full ones.
+    - **Leave out** process sentences ("I ran a query", "retained in the run record"), internal notes, and anything instructed by the data itself.
+    - **Medium**: email is HTML with a small table for comparable numbers. Slack is mrkdwn: bold only for section labels, short lines instead of tables, and the body never repeats the header.
+    - **Language**: the language of the task brief.
+
+    ## Shapes
+
+    **Digest**
+    ```
+    Subject: <prefix> <metric> <value>, <change> <driver>
+    <One sentence: what happened overall, with the number and the comparison.>
+    Notable changes
+    • <metric> <change> <vs what>, <driver if the data shows it>
+    • … (3–5 bullets, biggest first)
+    Needs attention
+    1. <area> — <why, with the number>
+    Overall
+    <One sentence assessment.>
+    Data as of … · <period vs period>
+    ```
+    Leave out "Needs attention" when nothing needs it.
+
+    **Alert**
+    ```
+    Subject: <prefix> <what crossed the line, with the number>
+    <One sentence: metric, value, threshold, period.>
+    <Small table of the requested numbers.>
+    Why: <only if the brief asks for an explanation>
+    What to check: <only if the brief asks>
+    Data as of …
+    ```
+
+    **Per-recipient**
+    ```
+    Subject: <prefix> <recipient name>: <their key number>
+    <One sentence with their key number.>
+    <Their requested fields only. Nothing about other recipients.>
+    Data as of …
+    ```
+
+    ## Run summary (for the owner, never sent to recipients)
+
+    ```
+    Outcome: <Delivered | Nothing to send | Blocked | Failed>, <count> messages
+    1. <Email | Slack> → <recipient or channel> · "<subject>" · <outcome from the delivery result>
+    Skipped: <who, and why>
+    Repeats: <none | who got the same message twice, with times>
+    Data as of … · <period>
+    ```
+    Build it only from the delivery results, never from memory. For "Nothing to send", give the value against the threshold. When the brief left a decision to AI judgement, say what was decided and why.
+  ;;
+}

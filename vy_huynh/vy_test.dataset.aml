@@ -1,3 +1,4 @@
+@tag('1️⃣ Trust/Endorsed', '2️⃣ Status/Active')
 Dataset vy_test {
   label: '[Demo] Ecommerce (Official)'
   description: ''
@@ -13,9 +14,9 @@ Dataset vy_test {
     hidden: false
     description: "Calculates the percentage of total orders represented by the current context, by dividing the total number of orders by the total number of orders across all records"
     definition: @aql total_orders * 1.0 / total_orders_across_all;;
-    format: "#,###0.0\%"	
+    format: "#,###0.0\%"
   }
-      metric total_orders {
+  metric total_orders {
     label: "Total Orders"
     type: "number"
     hidden: false
@@ -40,10 +41,10 @@ Dataset vy_test {
   }
 
   metric dynamic_metric {
-  label: 'Dynamic Metric'
-  type: 'number'
-  description: "Depending on the selection, this metric outputs total users, total products, total orders, percent of total, average order value, or revenue"
-  definition: @aql
+    label: 'Dynamic Metric'
+    type: 'number'
+    description: "Depending on the selection, this metric outputs total users, total products, total orders, percent of total, average order value, or revenue"
+    definition: @aql
     case(
       when: 'total users' in param_model_nam.metric_selections
       , then: ecommerce_users.total_users
@@ -64,4 +65,5 @@ Dataset vy_test {
       , then: order_master.revenue
     )
     ;;
-  }}
+  }
+}

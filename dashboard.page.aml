@@ -380,5 +380,5 @@ Dashboard dashboard {
       ]
     }
   ]
-  theme: H.themes.charcoal
+  theme: H.themes.classic
 }

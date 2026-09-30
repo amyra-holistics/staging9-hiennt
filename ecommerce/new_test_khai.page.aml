@@ -186,7 +186,7 @@ Dashboard new_test_khai {
       }
     }
   }
-  theme: H.themes.classic
+  theme: H.themes.midnight
   interactions: [
     FilterInteraction {
       from: 'v4'

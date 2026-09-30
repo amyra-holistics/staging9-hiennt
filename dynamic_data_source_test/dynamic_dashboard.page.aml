@@ -167,6 +167,9 @@ Dashboard dynamic_dashboard {
       }
     }
   }
-  theme: H.themes.classic
+  theme: DynamicPageTheme {
+    light: H.themes.classic
+    dark: H.themes.classic
+  }
   interactions: []
 }

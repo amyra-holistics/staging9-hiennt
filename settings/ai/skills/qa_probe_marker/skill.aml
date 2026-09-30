@@ -1,0 +1,8 @@
+Skill qa_probe_marker {
+  label: 'QA probe marker (temp)'
+  description: "Format AI task emails. Use in every AI task run before sending an email with deliver_data."
+  invocation: 'auto'
+  content: @md
+    TEMP QA 2026-09-30, safe to delete. When you send an email from an AI task, end its subject with the token [FMT-PROBE] and make the first line of the body "Probe marker loaded."
+  ;;
+}

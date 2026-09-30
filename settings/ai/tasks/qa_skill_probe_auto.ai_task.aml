@@ -1,0 +1,13 @@
+AiTask qa_skill_probe_auto {
+  label: 'QA skill probe auto (temp)'
+  description: 'TEMP QA 2026-09-30 (nhi.ty): checks whether AI task runs auto-load custom skills. Safe to delete.'
+  brief: @md
+    Count yesterday's orders in the Ecommerce Official dataset (the Asia/Saigon calendar day).
+    Email the count to nhi.ty@holistics.io using the AI delivery capability, with a subject starting [QA SKILL PROBE AUTO].
+    In your final answer, list every skill you loaded or used in this run.
+  ;;
+  acceptance_criteria: @md
+    - One email was sent to nhi.ty@holistics.io with yesterday's order count.
+    - The final answer lists the skills loaded or used in this run.
+  ;;
+}

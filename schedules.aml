@@ -3,17 +3,5 @@ const schedules = [
     cron: '0 9 * * *'
     run_as: 'nhi.ty@holistics.io'
     targets: [daily_homestay_performance_summary]
-  },
-
-  AiSchedule {
-    cron: '0 8 * * 1'
-    run_as: 'nhi.ty@holistics.io'
-    targets: [qa7_s1_august_revenue_slack]
-  },
-
-  AiSchedule {
-    cron: '0 8 * * 1'
-    run_as: 'nhi.ty@holistics.io'
-    targets: [qa7_s2_top_countries_slack]
   }
 ]

@@ -583,30 +583,33 @@ Dashboard sales_performance {
     }
   }
   block v_xsw2: VizBlock {
-    label: 'Avg Daily Order Count copy'
+    label: 'Total Revenue'
     viz: MetricKpi {
       dataset: ecommerce_official
-      calculation avg_daily_order_count {
-        label: 'Avg Daily Order Count copy'
-        formula: @aql unique(orders.created_at | day())
-  | select(daily_order_count: orders | count_distinct(orders.id))
-  | avg(daily_order_count);;
+      calculation h_pop__revenue {
+        label: 'Prior Month Revenue'
+        formula: @aql revenue | relative_period(orders.created_at, interval(-1 month));;
         calc_type: 'measure'
         data_type: 'number'
       }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: 'Last 30 days'
+      }
       value: VizFieldFull {
-        label: 'Avg Daily Order Count copy'
-        ref: 'avg_daily_order_count'
+        label: 'Total Revenue'
+        ref: r(ecommerce_official.revenue)
         format {
           type: 'number'
-          pattern: '#,###'
+          pattern: '[$$]#,###0'
         }
       }
-      compare_value: VizPopSettings {
-        field: r(orders.created_at)
-        value: RelativePopValue {
-          duration: 1
-          granularity: 'month'
+      compare_value: VizFieldFull {
+        ref: 'h_pop__revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
         }
       }
       settings {
@@ -625,37 +628,37 @@ Dashboard sales_performance {
     tab view_1: CanvasLayout {
       label: 'Orders'
       width: 960
-      height: 1020
+      height: 1000
       grid_size: 20
       auto_expand_vertically: true
       block f_country_copy {
-        position: pos(340, 20, 260, 80)
+        position: pos(380, 20, 260, 80)
       }
       block f_created_at_copy {
         position: pos(680, 20, 260, 80)
       }
       block v_buf1 {
-        position: pos(20, 620, 420, 380)
+        position: pos(20, 600, 420, 380)
       }
       block v_0dy0 {
-        position: pos(460, 620, 480, 380)
+        position: pos(460, 600, 480, 380)
       }
       block v_i897 {
-        position: pos(20, 120, 260, 120)
+        position: pos(380, 100, 260, 120)
       }
       block t_x46v {
         position: pos(20, 20, 320, 60)
       }
       block v_hj49 {
-        position: pos(20, 260, 920, 340)
+        position: pos(20, 240, 920, 340)
         layer: 1
       }
       block v_rqda {
-        position: pos(340, 120, 260, 120)
+        position: pos(680, 100, 260, 120)
         layer: 1
       }
       block v_xsw2 {
-        position: pos(680, 120, 260, 120)
+        position: pos(20, 100, 320, 120)
         layer: 1
       }
       mobile {

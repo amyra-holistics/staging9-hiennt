@@ -1,7 +1,7 @@
 Dashboard sales_performance {
   title: 'Sales Performance'
   description: ''
-  owner: 'di.hoang@holistics.io'
+  owner: 'phuong.nl@holistics.io'
   theme: H.themes.vanilla
   block f_country_copy: FilterBlock {
     label: 'Country'

@@ -1,0 +1,25 @@
+AiTask weekly_daily_sales_trend_anomaly_analysis {
+  label: 'Weekly Daily Sales Trend Anomaly Analysis'
+  description: 'Refreshes and analyzes the daily order-count series in @VizBlock:sales_performance.v_hj49, investigates statistically detected anomalies, and writes a concise executive readout.'
+
+  brief: @md
+    Analyze daily order-count anomalies for @VizBlock:sales_performance.v_hj49 in @Dashboard:sales_performance.
+
+    **Fresh source and baseline:** Refresh @VizBlock:sales_performance.v_hj49 before analysis; never reuse a cached result or prior-run value. Confirm that the source is daily distinct order count. Inspect enough contiguous daily history to establish a defensible baseline—use at least 8 completed weeks when available, extending the date query beyond the dashboard's active window if needed. State the actual baseline date range and the method or threshold used to flag an observation as statistically unusual. If insufficient history or missing days prevent a defensible baseline, say so and do not label any day anomalous.
+
+    **Analysis period and detection:** Define the latest complete analysis period as the most recently ended full calendar week in the source timezone; exclude any incomplete current day or week. State its exact dates and determine whether it contains any detected daily order-count anomalies. For each detected day, report its date, observed count, expected or baseline value/range when available, and whether it is unusually high or low. If none are detected, explicitly say that no statistically detected daily anomalies occurred in the latest complete week and stop after the executive summary—do not perform or imply a driver analysis.
+
+    **Conditional driver analysis:** Only when one or more anomalies are detected, use @Dataset:ecommerce_official to compare each anomalous day with the relevant baseline or comparable days. Analyze order-count contributions through business-relevant supported dimensions, beginning with country (`countries.name`) and order status (`orders.status`); add another supported dimension only when it materially clarifies the result. Quantify the largest contributing segments where data supports it. Describe these as observed contribution evidence, not proof of root cause. Do not infer operational, customer, market, or causal explanations without direct evidence.
+
+    **Executive output:** Write a compact, scannable executive summary with: data coverage and baseline; the latest complete week's detection outcome; anomaly details and conditional segment evidence; and a clear uncertainty/data-quality note. Clearly distinguish statistical detection from observed segment contribution and from unproven causality. Every number and claim must be traceable to freshly refreshed source or follow-up dataset results. Do not invent data, labels, thresholds, drivers, or causal explanations.
+  ;;
+
+  acceptance_criteria: @md
+    - The task refreshes and inspects @VizBlock:sales_performance.v_hj49, confirms the daily distinct-order-count measure, and grounds every reported result in fresh data.
+    - It uses at least 8 completed weeks of contiguous daily history when available, states the actual baseline date range and anomaly-detection method or threshold, and explicitly reports insufficient history or missing-day limitations when applicable.
+    - It defines and states the exact dates of the latest completed calendar week, excludes incomplete periods, and states whether that period contains statistically detected daily order-count anomalies.
+    - For each detected anomaly, it reports the date, observed daily count, direction, and expected/baseline comparator when available. When no anomaly is detected, it explicitly says so and does not conduct or imply driver analysis.
+    - Driver analysis occurs only if anomalies are detected and uses supported dimensions in @Dataset:ecommerce_official—country (`countries.name`) and status (`orders.status`) when available—to quantify observed segment contributions. It never presents contribution evidence as proven causality.
+    - The final executive summary is concise and clearly separates statistical detection, observed driver evidence, uncertainty, and unproven causal interpretation. It contains no stale values, invented data, or unsupported causal claims.
+  ;;
+}

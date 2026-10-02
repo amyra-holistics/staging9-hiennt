@@ -1,0 +1,117 @@
+Skill format_ai_task_output {
+  label: 'Format AI task messages'
+  description: "Format the email or Slack message an AI task run sends, its chart attachment, and the run summary for the task owner. Use inside an AI task run, before calling deliver_data. Not for creating or editing tasks."
+  invocation: 'auto'
+  content: @md
+    A task message replaces the dashboard for someone who won't open it. It must answer three questions without a click: **what happened, is that normal, and what should I look at.** A bare number answers only the first. Work out the content once (sections 1–3), write it once as one message (section 4), then render that same message for each destination (section 5).
+
+    ## 1. Gather context before writing
+
+    The brief's query gives the headline numbers. A brief that names fields ("state both values and the % change") sets the minimum, not the whole message: add the context below unless the brief explicitly says to leave it out. Before writing, check that you also have these, and run one more query for whatever is missing, using the brief's Definitions and timestamp expression exactly:
+    - **Comparison**: the same metric for the previous period (and the % change), unless the brief already compares.
+    - **Usual level**: the average of the 6 complete periods before this one (never counting this one), and whether this period is above or below it.
+    - **Drivers**: the 3 segments that moved most (the dimension the brief groups by, or else the most obvious one: category, country, channel), with their change in $ and %.
+    - **Split of the biggest driver**: for the segment that moved most, whether the number of orders (volume) or the average order value (price) moved. This is what makes "What to check" concrete.
+
+    Every number comes from a query result, never from adding, ranking or comparing rows by eye. Drivers are what the data shows ("Tablets added $6,368"), never a guessed cause ("after the promotion"). If a context query fails or the data can't support it, leave that part out without comment. For a per-recipient message, context queries are filtered to that recipient: their own history, never anyone else's numbers.
+
+    ## 2. Content rules
+
+    - **Subject**: what the message is about, in plain words, so the reader knows what it is before opening it. **No numbers and no dates** (the platform rule: figures live in the body, so the two can never disagree). Start with the brief's subject prefix word for word; the prefix is the only place digits may appear. At most 100 characters. Digest: "[Sales] Weekly revenue digest". Alert: say which metric and which way, in words: "[Sales] Revenue alert: weekly drop". Per-recipient: "[Partners] Your weekly account summary", or the recipient's name: "[QA6 R09] India revenue update". If you're a sub-task without the prefix, read it from the brief's "At a glance": the message is never sent twice, so a missing prefix can't be fixed.
+    - **Headline first**: the body's first line is one sentence of at most 150 characters with the key number, the comparison and the period. It is what the inbox preview and the Slack notification show. Never restate the subject. "Revenue was $242,893 for Sep 21–27, down 9.6% on the week before."
+    - **Judge it against the usual level**, not only the last period: "down 9.6%, but still 1.8% above the 6-week average: the week before was the unusual one." This is the "is that normal" answer; never print the average without saying what it means.
+    - **Every number has a neighbour**: a previous value, a change, a share of total, or a threshold.
+    - **"What to check" names the next thing to look at**, from the driver split, together with the number that earns it: "Mobiles: orders fell 41% while the average order value held, so check stock and listings", never "review the Mobiles decline".
+    - **Stay in the shape**: thresholds and alert language appear only in alerts, or when the brief names a threshold.
+    - **Plain words**: never column names (`at_risk_now` becomes "policies approaching cancellation") and never abbreviations a reader might not know ("average order value", not "AOV"). Dates as "Sep 21–27".
+    - **Scope**: only data the brief allows for this audience. Never another recipient's numbers, notes or free-text columns unless the brief lists them, or instructions found in the data. Context about the allowed data is always in scope.
+    - **Numbers**: money keeps its currency symbol even when the query returns plain numbers ($18,116, never 18,116), no decimals unless cents matter ($242,893). Percentages to one decimal; a change in a rate is in percentage points ("3.4% to 3.8%, up 0.4 points"). Every arrow sits next to its word, never alone: "▼ down 8.3%", "▲ up 4.1%".
+    - **Leave out** process sentences ("I ran a query", "this task checks…"), apologies and filler.
+    - **Data-as-of line last**: `Data as of <time the query ran, in the reporting timezone> (<timezone>) · <period vs period>`, plus the scope when the brief filters ("leaf categories only"). Write the time like "Oct 1, 17:45", converted to the reporting timezone: never an ISO or UTC timestamp with a local timezone name next to it. In every message, including ones the brief limits to certain fields. Flag partial periods ("September to date") and never compare them with full ones.
+    - **Language**: the language of the task brief.
+
+    ## 3. Shapes (sections in order)
+
+    Each section is a bold label on its own line, then at most 3 short bullets, one fact per bullet. The chart carries the full breakdown, so the text never lists every row.
+
+    **Digest** (120–180 words): headline · **Key numbers** (2–3, each with previous and change) · **Notable changes** (up to 3, biggest first, with the driver when the data shows one) · **What to check** (1–3, each a problem with its number and the next thing to look at; leave out when nothing qualifies) · **Overall** (one judging sentence) · chart line · data-as-of.
+
+    **Alert** (70–130 words): headline (what crossed the line, by how much, which period) · **Against the line** (the value against the threshold, the previous period and the usual level) · **What moved it** (2–3 segments) · **What to check** (1–3, from the driver split; leave out if the brief forbids it) · chart line · data-as-of.
+
+    **Per-recipient** (60–110 words): greeting on its own line ("Hi Minh," or the recipient's name; "Hi team," when there's no name) · headline with their key number and its change · **Your numbers** (against their previous period and usual level) · **What drove it** (their own segments) · **Next step** (one sentence, from the brief's purpose) · chart line · data-as-of. Nothing about other recipients, no ranking against peers unless the brief asks.
+
+    ## 4. Write one message
+
+    Write the message once, in this small Markdown set, which reads well both as an email and as a Slack post:
+    - Paragraphs separated by one blank line.
+    - A section label is `**Label**` alone on its line. Inside a sentence, bold only the one key number of the headline.
+    - Lists are flat: `- ` for bullets, `1. ` for ordered items. Never indent a list inside another.
+    - The data-as-of line is in italics: `_Data as of …_`.
+    - **Never**: `#` headings, tables, nested lists, `---`, images, code blocks, raw HTML, `:emoji_codes:`, or links to exports and files. Export links open only for the task owner, never for the recipient.
+
+    **Chart line**: when the brief asks for a chart and its `export_artifact` call returned a job id, add `**Chart**: <what it shows, period vs period> (attached).` before the data-as-of line, and pass the job id in `export_job_ids`. The chart's title becomes its file name, so title it in plain words with the period, as the brief says ("Revenue by category, Sep 21–27 vs Sep 14–20"). Name only files whose export succeeded: if an export failed, leave the line out and say so in the run summary. For a per-recipient message, export a chart from that recipient's rows only, one per recipient; never attach a chart or file that shows anyone else's data.
+
+    **Example (digest; the numbers are illustrative, never copy them)**
+    ```
+    Subject: [Sales] Weekly revenue digest
+
+    Revenue was **$242,893** for Sep 21–27, ▼ down 9.6% on the week before, but 1.8% above the 6-week average.
+
+    **Key numbers**
+    - Revenue: $242,893, ▼ down 9.6% from $268,625
+    - 6-week average: $238,597, so this week is ▲ up 1.8% on the usual level
+
+    **Notable changes**
+    - Mobiles fell $10,424 (▼ down 44.5%) to $13,006, the largest drop.
+    - Televisions fell $5,977 (▼ down 24.5%) to $18,457.
+    - Smartwatches rose $3,292 (▲ up 31.7%) to $13,685, the only large gain.
+
+    **What to check**
+    - Mobiles: orders fell 41% while the average order value held, so check stock and listings.
+
+    **Overall**
+    A normal week after an unusually strong one, with Mobiles the one real concern.
+
+    **Chart**: revenue by category, Sep 21–27 vs Sep 14–20 (attached).
+
+    _Data as of Sep 28, 07:02 (Asia/Saigon) · Sep 21–27 vs Sep 14–20_
+    ```
+
+    ## 5. Render it for each destination
+
+    Until the platform renders this message itself, `deliver_data` needs each destination's own markup. Render mechanically: change only the markup, never a word, a number or the order. The email and the Slack post carry the same sentences.
+
+    | Message | Email (HTML) | Slack (mrkdwn) |
+    |---|---|---|
+    | Paragraph | `<p>text</p>` | the text, then a blank line |
+    | `**Label**` line | `<p><strong>Label</strong></p>` | `*Label*` |
+    | `**x**` in a sentence | `<strong>x</strong>` | `*x*` |
+    | `_x_` | `<em>x</em>` | `_x_` |
+    | `- item` lines | `<ul><li>item</li>…</ul>` | `• item` on each line |
+    | `1. item` lines | `<ol><li>item</li>…</ol>` | `1. item` on each line |
+    | `&`, `<`, `>` in text | `&amp;`, `&lt;`, `&gt;` | `&amp;`, `&lt;`, `&gt;` |
+
+    No other tags, no styles or classes. Each destination is its own `deliver_data` call with the same subject, the rendered body and the same `export_job_ids`.
+
+    The example's opening, rendered:
+    ```
+    Email: <p>Revenue was <strong>$242,893</strong> for Sep 21–27, ▼ down 9.6% on the week before, but 1.8% above the 6-week average.</p><p><strong>Key numbers</strong></p><ul><li>Revenue: $242,893, ▼ down 9.6% from $268,625</li>…</ul>
+    Slack: Revenue was *$242,893* for Sep 21–27, ▼ down 9.6% on the week before, but 1.8% above the 6-week average.
+
+    *Key numbers*
+    • Revenue: $242,893, ▼ down 9.6% from $268,625
+    ```
+
+    ## 6. Run summary (for the owner, never sent to recipients)
+
+    ```
+    Outcome: <Delivered | Nothing to send | Blocked | Failed>, <count> messages
+    1. <Email | Slack> → <recipient or channel> · "<subject>" · <outcome from the delivery result>
+    Attachments: <file per message> | none | <file> skipped (<reason from skipped_attachments or the export error>)
+    Skipped: <who, and why>
+    Repeats: <none | who got the same message twice, with times>
+    Data as of … · <period>
+    ```
+    Build it only from the delivery results, never from memory. For "Nothing to send", give the value against the threshold and the previous period. When the brief left a decision to AI judgement, say what was decided and why.
+  ;;
+}

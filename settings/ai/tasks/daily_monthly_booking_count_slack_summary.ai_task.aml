@@ -1,0 +1,24 @@
+AiTask daily_monthly_booking_count_slack_summary {
+  label: 'Daily Monthly Booking Count Slack Summary'
+  description: 'Creates a fresh summary of booking counts by check-in month from @Dashboard:homestay_performance_statement and posts it to #hoa every day.'
+
+  brief: @md
+    Review the **Monthly Booking Count by Check-in Month** visualization in @Dashboard:homestay_performance_statement. Run it with fresh data, then write a concise Slack-ready summary of booking counts by check-in month.
+
+    Include:
+    - The check-in month range represented and booking count for each available month.
+    - The highest- and lowest-booking months, including their counts. Treat ties explicitly.
+    - A short trend observation only when supported by the monthly series; do not infer causes.
+
+    Deliver the completed summary to the Slack channel #hoa using the available AI delivery capability. Use a clear title and compact bullets. Do not attach a dashboard export unless it is necessary to communicate the result.
+
+  ;;
+
+  acceptance_criteria: @md
+    - The summary is based on a fresh execution of the Monthly Booking Count by Check-in Month visualization in @Dashboard:homestay_performance_statement.
+    - It reports the available check-in months and their booking counts accurately, and identifies the highest- and lowest-booking month or tied months with their counts.
+    - Any trend statement is supported by the monthly series and does not assert an unsupported cause.
+    - A concise, readable version of the completed summary is delivered to Slack channel #hoa via the available AI delivery capability.
+    - No values, trends, or delivery status are invented.
+  ;;
+}

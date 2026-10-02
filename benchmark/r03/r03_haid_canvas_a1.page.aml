@@ -1,0 +1,369 @@
+Dashboard r03_haid_canvas_a1 {
+  title: 'TheLook Business Review'
+  description: @md
+    Monthly business review for TheLook sales performance. Use Date Range and Brand to focus the report; period comparison shows month-over-month growth.
+  ;;
+
+  theme: PageTheme {
+    background {
+      bg_color: '#F5EFE6'
+    }
+    canvas {
+      border {
+        border_color: '#F5EFE6'
+        border_style: 'none'
+        border_width: 0
+        border_radius: 16
+      }
+      shadow: 'none'
+      background {
+        bg_color: '#F5EFE6'
+      }
+    }
+    block {
+      text {
+        font_size: 14
+        font_color: '#1B1F3B'
+        font_family: 'Manrope'
+        font_weight: 'normal'
+      }
+      label {
+        font_size: 14
+        font_color: '#5B6477'
+        font_family: 'Manrope'
+        font_weight: 'semibold'
+      }
+      border {
+        border_color: '#F5EFE6'
+        border_style: 'solid'
+        border_width: 1
+        border_radius: 12
+      }
+      shadow: 'sm'
+      padding: 16
+      background {
+        bg_color: '#FFFFFF'
+      }
+    }
+    viz {
+      metric_kpi {
+        alignment: 'center'
+        label {
+          font_color: '#5B6477'
+          font_family: 'Manrope'
+          font_weight: 'semibold'
+        }
+        value {
+          font_color: '#1B1F3B'
+          font_family: 'Manrope'
+          font_weight: 'bold'
+        }
+        trend {
+          positive {
+            text {
+              font_color: '#1F9E8F'
+              font_family: 'Manrope'
+              font_weight: 'bold'
+            }
+            background {
+              bg_color: '#F5EFE6'
+            }
+          }
+          negative {
+            text {
+              font_color: '#D64545'
+              font_family: 'Manrope'
+              font_weight: 'bold'
+            }
+            background {
+              bg_color: '#F5EFE6'
+            }
+          }
+          neutral {
+            text {
+              font_color: '#5B6477'
+              font_family: 'Manrope'
+            }
+            background {
+              bg_color: '#F5EFE6'
+            }
+          }
+        }
+      }
+      table {
+        general {
+          font_color: '#1B1F3B'
+          font_family: 'Manrope'
+          hover_color: '#F5EFE6'
+          banding_color: '#F5EFE6'
+          grid_color: '#F5EFE6'
+          border_color: '#F5EFE6'
+        }
+      }
+    }
+  }
+
+  block header: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: '#1B1F3B'
+      }
+      border {
+        border_color: '#1B1F3B'
+        border_style: 'solid'
+        border_width: 1
+        border_radius: 16
+      }
+      shadow: 'none'
+      padding: 0
+    }
+    content: @md
+      <div style="height:100%;display:flex;align-items:center;justify-content:space-between;padding:20px 28px;background:#1B1F3B;border-radius:16px;font-family:Manrope,Arial,sans-serif;box-sizing:border-box;">
+        <div style="display:flex;align-items:center;gap:16px;">
+          <img alt="TheLook" style="height:38px;width:auto;display:block;" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='178' height='42' viewBox='0 0 178 42'%3E%3Crect width='42' height='42' rx='12' fill='%23FF6B5A'/%3E%3Cpath d='M12 13h18v5H23v12h-5V18h-6z' fill='%23F5EFE6'/%3E%3Ctext x='52' y='29' font-family='Manrope,Arial,sans-serif' font-size='25' font-weight='700' fill='%23F5EFE6'%3ETheLook%3C/text%3E%3C/svg%3E" />
+          <div style="width:1px;height:32px;background:#5B6477;"></div>
+          <div>
+            <div style="color:#F5EFE6;font-size:22px;font-weight:700;line-height:1.15;">Business Review</div>
+            <div style="color:#F5EFE6;font-size:12px;opacity:.84;margin-top:3px;">Commercial performance at a glance</div>
+          </div>
+        </div>
+        <div style="color:#FF6B5A;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Monthly pulse</div>
+      </div>
+    ;;
+  }
+
+  block date_range: FilterBlock {
+    label: 'Date Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block brand_filter: FilterBlock {
+    label: 'Brand'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.brand)
+    }
+  }
+
+  block month_comparison: PopBlock {
+    label: 'Compare with'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block net_sales: VizBlock {
+    label: '💰 Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: '💰 Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block total_orders: VizBlock {
+    label: '🛍️ Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: '🛍️ Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block aov: VizBlock {
+    label: '🧾 AOV'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: '🧾 AOV'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block gross_margin: VizBlock {
+    label: '📈 Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: '📈 Gross Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block category_net_sales: VizBlock {
+    label: 'Net Sales by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_range'
+      to: ['net_sales', 'total_orders', 'aov', 'gross_margin', 'monthly_net_sales', 'category_net_sales']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'brand_filter'
+      to: ['net_sales', 'total_orders', 'aov', 'gross_margin', 'monthly_net_sales', 'category_net_sales']
+      field: r(thelook_products.brand)
+    },
+    FilterInteraction {
+      from: 'date_range'
+      to: ['brand_filter']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'brand_filter'
+      to: ['date_range']
+      disabled: true
+    },
+    PopInteraction {
+      from: 'month_comparison'
+      to: ['net_sales', 'total_orders', 'aov', 'gross_margin', 'monthly_net_sales']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Business Review'
+      width: 1220
+      height: 1200
+      grid_size: 20
+      block header { position: pos(20, 20, 1180, 120) layer: 1 }
+      block date_range { position: pos(20, 160, 380, 100) layer: 1 }
+      block brand_filter { position: pos(420, 160, 380, 100) layer: 1 }
+      block month_comparison { position: pos(820, 160, 380, 100) layer: 1 }
+      block net_sales { position: pos(20, 280, 280, 120) layer: 1 }
+      block total_orders { position: pos(320, 280, 280, 120) layer: 1 }
+      block aov { position: pos(620, 280, 280, 120) layer: 1 }
+      block gross_margin { position: pos(920, 280, 280, 120) layer: 1 }
+      block monthly_net_sales { position: pos(20, 420, 1180, 360) layer: 1 }
+      block category_net_sales { position: pos(20, 800, 1180, 380) layer: 1 }
+      mobile {
+        mode: 'auto'
+      }
+    }
+  }
+}

@@ -1,0 +1,209 @@
+Dashboard r01_haid_canvas_a3 {
+  title: 'Executive Sales Dashboard'
+  theme: H.themes.classic
+
+  block t_title: TextBlock {
+    content: @md
+# Executive Sales Dashboard
+Monitor sales performance over a viewer-selected order-item date range.
+;;
+  }
+
+  block f_created_at: FilterBlock {
+    label: 'Order Item Created At'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_total_orders: VizBlock {
+    label: 'Total Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Total Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block t_trend: TextBlock {
+    content: @md
+## Monthly Net Sales Trend
+;;
+  }
+
+  block v_monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block t_categories: TextBlock {
+    content: @md
+## Top Product Categories by Net Sales
+;;
+  }
+
+  block v_top_categories: VizBlock {
+    label: 'Top 10 Product Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block t_note: TextBlock {
+    content: @md
+> **Data note:** Source: `demodb`. The dataset does not expose a freshness timestamp, so this dashboard cannot report data recency.
+;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_created_at'
+      to: [
+        'v_net_sales',
+        'v_total_orders',
+        'v_aov',
+        'v_gross_margin',
+        'v_monthly_net_sales',
+        'v_top_categories'
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 1480
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block t_title { position: pos(20, 20, 1180, 100) layer: 1 }
+      block f_created_at { position: pos(20, 140, 280, 100) layer: 1 }
+
+      block v_net_sales { position: pos(20, 260, 280, 120) layer: 1 }
+      block v_total_orders { position: pos(320, 260, 280, 120) layer: 1 }
+      block v_aov { position: pos(620, 260, 280, 120) layer: 1 }
+      block v_gross_margin { position: pos(920, 260, 280, 120) layer: 1 }
+
+      block t_trend { position: pos(20, 400, 1180, 80) layer: 1 }
+      block v_monthly_net_sales { position: pos(20, 500, 1180, 360) layer: 1 }
+
+      block t_categories { position: pos(20, 880, 1180, 80) layer: 1 }
+      block v_top_categories { position: pos(20, 980, 1180, 360) layer: 1 }
+      block t_note { position: pos(20, 1360, 1180, 100) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+  }
+}

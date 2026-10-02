@@ -1,0 +1,710 @@
+Dashboard r05_haidfd_canvas_a3 {
+  title: 'Finance Closebook'
+  description: @md
+A six-page PDF-ready monthly management closebook for sales, gross profit, margins, product profitability, and return-rate exceptions.
+;;
+
+  block rpt_cover: TextBlock {
+    content: @md
+# Finance Closebook
+
+**Monthly management closebook**
+
+Use the **Reporting period** control to set the close range. The KPI comparison is the immediately preceding month; Page 3 supplies monthly context. Export only after all pages have loaded.
+;;
+  }
+
+  block period_selector: FilterBlock {
+    label: 'Reporting period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.net_sales)
+    label: 'Net Sales'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value: RelativePopValue {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_profit)
+    label: 'Gross Profit'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_margin)
+    label: 'Gross Margin'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.fulfilled_orders)
+    label: 'Fulfilled Orders'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.aov)
+    label: 'Average Order Value'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.return_rate)
+    label: 'Return Rate'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    value: RelativePopValue {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+  }
+}
+  }
+
+  block chart_monthly_pnl: VizBlock {
+    label: 'Monthly P&L'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Item Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    series {
+      mark_type: 'column'
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    series {
+      mark_type: 'column'
+      field: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  settings {
+    legend_label: 'bottom'
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block chart_monthly_margin: VizBlock {
+    label: 'Monthly Gross Margin'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Item Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  settings {
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block chart_dept_profit: VizBlock {
+    label: 'Gross Profit by Department'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_products.department)
+    label: 'Product Department'
+  }
+  y_axis {
+    series {
+      mark_type: 'bar'
+      field: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  tooltips: [
+    VizTooltip {
+      field: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  ]
+  settings {
+    legend_label: 'hidden'
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block table_category_margin: VizBlock {
+    label: 'Category Profitability Ledger'
+    viz: DataTable {
+  dataset: thelook
+  fields: [
+    VizFieldFull {
+      label: 'Department'
+      ref: r(thelook_products.department)
+      format {
+        type: 'text'
+      }
+      uname: 'thelook_products_department_1'
+    },
+    VizFieldFull {
+      label: 'Category'
+      ref: r(thelook_products.category)
+      format {
+        type: 'text'
+      }
+      uname: 'thelook_products_category_1'
+    },
+    VizFieldFull {
+      label: 'Net Sales'
+      ref: r(thelook.net_sales)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_net_sales_1'
+    },
+    VizFieldFull {
+      label: 'COGS'
+      ref: r(thelook.cogs)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_cogs_1'
+    },
+    VizFieldFull {
+      label: 'Gross Profit'
+      ref: r(thelook.gross_profit)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_gross_profit_1'
+    },
+    VizFieldFull {
+      label: 'Gross Margin'
+      ref: r(thelook.gross_margin)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_gross_margin_1'
+    },
+    VizFieldFull {
+      label: 'Fulfilled Orders'
+      ref: r(thelook.fulfilled_orders)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_fulfilled_orders_1'
+    },
+    VizFieldFull {
+      label: 'Average Order Value'
+      ref: r(thelook.aov)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_aov_1'
+    },
+    VizFieldFull {
+      label: 'Return Rate'
+      ref: r(thelook.return_rate)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'custom_return_rate_1'
+    }
+  ]
+  settings {
+    pagination_size: 10
+    show_row_number: true
+    row_limit: 10
+    wrap_header_text: true
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'custom_net_sales_1'
+        direction: 'desc'
+      },
+      KeyBasedSortSetting {
+        key: 'thelook_products_department_1'
+        direction: 'asc'
+      },
+      KeyBasedSortSetting {
+        key: 'thelook_products_category_1'
+        direction: 'asc'
+      }
+    ]
+  }
+}
+  }
+
+  block chart_return_by_dept: VizBlock {
+    label: 'Return Rate by Department'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_products.department)
+    label: 'Product Department'
+  }
+  y_axis {
+    series {
+      mark_type: 'bar'
+      field: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  settings {
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block table_return_exceptions: VizBlock {
+    label: 'Return Exceptions Ledger'
+    viz: DataTable {
+  dataset: thelook
+  fields: [
+    VizFieldFull {
+      ref: r(thelook_products.department)
+      label: 'Department'
+      format {
+        type: 'text'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook_products.category)
+      label: 'Category'
+      format {
+        type: 'text'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.return_rate)
+      label: 'Return Rate'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'return_rate'
+    },
+    VizFieldFull {
+      ref: r(thelook.net_sales)
+      label: 'Net Sales'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'net_sales'
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_profit)
+      label: 'Gross Profit'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_margin)
+      label: 'Gross Margin'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    }
+  ]
+  settings {
+    pagination_size: 10
+    show_row_number: true
+    row_limit: 10
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'return_rate'
+        direction: 'desc'
+      },
+      KeyBasedSortSetting {
+        key: 'net_sales'
+        direction: 'desc'
+      }
+    ]
+    wrap_header_text: true
+    wrap_cell_text: false
+  }
+}
+  }
+
+  block rpt_notes: TextBlock {
+    content: @md
+## Metric definitions and close notes
+
+- **Net Sales** — sale price of order items, excluding `Cancelled` and `Returned` items.
+- **COGS** — product cost of the items counted in Net Sales.
+- **Gross Profit** — Net Sales less COGS.
+- **Gross Margin** — Gross Profit divided by Net Sales.
+- **Fulfilled Orders** — distinct orders with at least one item counted in Net Sales.
+- **Average Order Value** — Net Sales divided by Fulfilled Orders.
+- **Return Rate** — returned order items divided by all order items.
+
+**Accounting-date basis.** This closebook uses `thelook_order_items.created_at` throughout. Return Rate is assigned to the original sale period, not `returned_at`.
+
+**Limitations.** The semantic layer has no finance-approved budget/plan, tax, shipping cost, discount, operating expense, inventory valuation, or margin target. These are intentionally excluded. Blank financial values are undefined, not zero.
+
+**Source.** TheLook eCommerce semantic dataset. Confirm USD presentation and the selected reporting period with Finance before external distribution.
+;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'period_selector'
+      to: [
+        'kpi_net_sales',
+        'kpi_gross_profit',
+        'kpi_gross_margin',
+        'kpi_fulfilled_orders',
+        'kpi_aov',
+        'kpi_return_rate',
+        'chart_monthly_pnl',
+        'chart_monthly_margin',
+        'chart_dept_profit',
+        'table_category_margin',
+        'chart_return_by_dept',
+        'table_return_exceptions'
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  :root {
+    --paper: #F8FAFC;
+    --ink: #14283A;
+    --slate: #5E7182;
+    --rule: #C9D4DC;
+    --signal: #147A86;
+    --risk: #B64B3C;
+    --soft-signal: #DDEFF0;
+  }
+  * { box-sizing: border-box; }
+  body { background: #e7edf1; color: var(--ink); font-family: "IBM Plex Sans", Arial, sans-serif; }
+  .a4-page {
+    position: relative;
+    width: 210mm;
+    min-height: 297mm;
+    margin: 0 auto 9mm;
+    padding: 14mm 15mm 13mm;
+    overflow: hidden;
+    background: var(--paper);
+    page-break-after: always;
+    break-after: page;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .a4-page:last-child { page-break-after: auto; break-after: auto; }
+  .page-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.25pt solid var(--ink); padding-bottom: 3mm; margin-bottom: 4mm; }
+  .page-head .title { font-family: "Source Serif 4", Georgia, serif; font-size: 18pt; font-weight: 600; }
+  .page-head .period { color: var(--slate); font-size: 8pt; }
+  .close-tab { position: absolute; right: 0; top: 24mm; writing-mode: vertical-rl; background: var(--signal); color: white; padding: 4mm 2mm; font-size: 7pt; letter-spacing: .08em; }
+  .page-foot { position: absolute; left: 15mm; right: 15mm; bottom: 5mm; display: flex; justify-content: space-between; border-top: .5pt solid var(--rule); padding-top: 2mm; color: var(--slate); font-size: 7pt; }
+  .cover { padding-top: 30mm; }
+  .cover-title { font-family: "Source Serif 4", Georgia, serif; font-size: 30pt; line-height: 1.08; margin: 0 0 3mm; }
+  .cover-subtitle { color: var(--slate); font-size: 11pt; max-width: 90mm; }
+  .toc { display: grid; grid-template-columns: 1fr auto; gap: 3mm 8mm; margin: 15mm 0; padding-top: 5mm; border-top: .5pt solid var(--rule); font-size: 10pt; }
+  .toc a { color: var(--ink); text-decoration: none; border-bottom: .5pt solid transparent; }
+  .toc a:hover { border-bottom-color: var(--signal); }
+  .section-title { font-family: "Source Serif 4", Georgia, serif; font-size: 20pt; margin: 0 0 2mm; }
+  .section-note { margin: 0 0 4mm; color: var(--slate); font-size: 8pt; line-height: 1.45; }
+  .block-slot { overflow: hidden; min-width: 0; }
+  .control-slot { width: 76mm; margin: 10mm 0 7mm; }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5mm; }
+  .kpi-grid .block-slot { height: 43mm; border-top: 1.25pt solid var(--ink); padding-top: 2mm; }
+  .chart-tall { height: 127mm; }
+  .chart-short { height: 56mm; }
+  .two-col { display: grid; grid-template-columns: 42% 58%; gap: 5mm; height: 166mm; }
+  .return-chart { height: 68mm; }
+  .return-table { height: 122mm; }
+  .notes { font-size: 9pt; line-height: 1.45; }
+  .notes h2 { font-family: "Source Serif 4", Georgia, serif; font-size: 17pt; margin: 0 0 4mm; }
+  .notes ul { padding-left: 5mm; margin: 3mm 0; }
+  @media print {
+    body { background: white; }
+    .a4-page { margin: 0; }
+  }
+</style>
+
+<section class="a4-page cover" id="cover">
+  <div class="close-tab">CLOSEBOOK · 01</div>
+  <div class="page-head"><span class="title">Finance Closebook</span><span class="period">Reporting period set by control</span></div>
+  <div class="block-slot"><h-block name="rpt_cover" /></div>
+  <div class="control-slot"><h-block name="period_selector" /></div>
+  <nav class="toc" aria-label="Table of contents">
+    <a href="#cover">01&nbsp;&nbsp;Cover &amp; contents</a><span>01</span>
+    <a href="#close-summary">02&nbsp;&nbsp;Close summary</a><span>02</span>
+    <a href="#monthly-pnl">03&nbsp;&nbsp;Monthly P&amp;L</a><span>03</span>
+    <a href="#portfolio">04&nbsp;&nbsp;Portfolio profitability</a><span>04</span>
+    <a href="#returns">05&nbsp;&nbsp;Returns &amp; exceptions</a><span>05</span>
+    <a href="#methodology">06&nbsp;&nbsp;Methodology</a><span>06</span>
+  </nav>
+  <p class="section-note">PDF workflow: select the close period, wait for all blocks to load, then use Export → PDF.</p>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected above</span><span>01 / 06</span></footer>
+</section>
+
+<section class="a4-page" id="close-summary">
+  <div class="close-tab">CLOSE SUMMARY · 02</div>
+  <div class="page-head"><span class="title">Close summary</span><span class="period">Reporting period set by control</span></div>
+  <p class="section-note">Current close values; KPI comparison is the immediately preceding month.</p>
+  <div class="kpi-grid">
+    <div class="block-slot"><h-block name="kpi_net_sales" /></div>
+    <div class="block-slot"><h-block name="kpi_gross_profit" /></div>
+    <div class="block-slot"><h-block name="kpi_gross_margin" /></div>
+    <div class="block-slot"><h-block name="kpi_fulfilled_orders" /></div>
+    <div class="block-slot"><h-block name="kpi_aov" /></div>
+    <div class="block-slot"><h-block name="kpi_return_rate" /></div>
+  </div>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected in cover control</span><span>02 / 06</span></footer>
+</section>
+
+<section class="a4-page" id="monthly-pnl">
+  <div class="close-tab">MONTHLY P&amp;L · 03</div>
+  <div class="page-head"><span class="title">Monthly P&amp;L</span><span class="period">Reporting period set by control</span></div>
+  <p class="section-note">Net Sales and COGS are columns; Gross Profit is the line. Measures exclude Cancelled and Returned order items.</p>
+  <div class="block-slot chart-tall"><h-block name="chart_monthly_pnl" /></div>
+  <p class="section-note">Gross Margin is Gross Profit divided by Net Sales. No target line is shown because no Finance-approved margin target exists in the semantic layer.</p>
+  <div class="block-slot chart-short"><h-block name="chart_monthly_margin" /></div>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected in cover control</span><span>03 / 06</span></footer>
+</section>
+
+<section class="a4-page" id="portfolio">
+  <div class="close-tab">PORTFOLIO · 04</div>
+  <div class="page-head"><span class="title">Portfolio profitability</span><span class="period">Reporting period set by control</span></div>
+  <p class="section-note">Department profit ranking and the ten highest-Net-Sales department/category combinations.</p>
+  <div class="two-col">
+    <div class="block-slot"><h-block name="chart_dept_profit" /></div>
+    <div class="block-slot"><h-block name="table_category_margin" /></div>
+  </div>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected in cover control</span><span>04 / 06</span></footer>
+</section>
+
+<section class="a4-page" id="returns">
+  <div class="close-tab">RETURNS · 05</div>
+  <div class="page-head"><span class="title">Returns &amp; exceptions</span><span class="period">Reporting period set by control</span></div>
+  <p class="section-note">Return Rate is returned order items divided by all order items, attributed to the original item creation date.</p>
+  <div class="block-slot return-chart"><h-block name="chart_return_by_dept" /></div>
+  <p class="section-note">Exception ledger is limited to ten category groups, sorted by Return Rate then Net Sales. It identifies exposure; it does not label return rate as lost revenue.</p>
+  <div class="block-slot return-table"><h-block name="table_return_exceptions" /></div>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected in cover control</span><span>05 / 06</span></footer>
+</section>
+
+<section class="a4-page" id="methodology">
+  <div class="close-tab">METHODOLOGY · 06</div>
+  <div class="page-head"><span class="title">Methodology &amp; close notes</span><span class="period">Reporting period set by control</span></div>
+  <div class="block-slot notes"><h-block name="rpt_notes" /></div>
+  <footer class="page-foot"><span>Finance Closebook · reporting period selected in cover control</span><span>06 / 06</span></footer>
+</section>
+;;
+  }
+}

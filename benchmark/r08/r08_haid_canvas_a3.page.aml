@@ -1,0 +1,332 @@
+Dashboard r08_haid_canvas_a3 {
+  title: 'CEO Monthly Sales Review'
+  description: @md
+A monthly executive view of sales performance, profitability, demand, and returns. Use the controls to focus the review by sales date, product category, or customer country.
+  ;;
+  theme: H.themes.classic
+
+  block t_title: TextBlock {
+    content: @md
+# CEO Monthly Sales Review
+Track commercial performance, profitability, and portfolio health. All controls apply across the dashboard; period comparison applies to the headline KPIs and monthly trend.
+    ;;
+  }
+
+  block f_sales_date: FilterBlock {
+    label: 'Sales Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_product_category: FilterBlock {
+    label: 'Product Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block f_customer_country: FilterBlock {
+    label: 'Customer Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block p_period_comparison: PopBlock {
+    label: 'Compare To'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block t_trend: TextBlock {
+    content: @md
+## Sales and Profit Trend
+Monthly net sales and gross profit reveal the direction and scale of financial performance.
+    ;;
+  }
+
+  block v_monthly_sales_profit: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+        settings { show_total_in_tooltip: true }
+      }
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'top'
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block t_drivers: TextBlock {
+    content: @md
+## Sales Drivers
+Compare net sales concentration across product categories and customer countries.
+    ;;
+  }
+
+  block v_sales_by_category: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull { ref: r(thelook_products.category) label: 'Product Category' }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
+    }
+  }
+
+  block v_sales_by_country: VizBlock {
+    label: 'Net Sales by Customer Country'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull { ref: r(thelook_users.country) label: 'Customer Country' }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
+    }
+  }
+
+  block t_health: TextBlock {
+    content: @md
+## Portfolio Health
+Identify the best-selling products and product categories with the highest return rates.
+    ;;
+  }
+
+  block v_top_products: VizBlock {
+    label: 'Top Products by Net Sales'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull { label: 'Product Name' ref: r(thelook_products.name) format { type: 'text' } },
+        VizFieldFull { label: 'Product Category' ref: r(thelook_products.category) format { type: 'text' } },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format { type: 'number' pattern: 'inherited' }
+          uname: 'net_sales'
+        },
+      ]
+      settings {
+        pagination_size: 10
+        show_row_number: true
+        sorts: [KeyBasedSortSetting { key: 'net_sales' direction: 'desc' }]
+        row_limit: 10
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_return_rate_by_category: VizBlock {
+    label: 'Return Rate by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_sales_date'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_fulfilled_orders', 'v_return_rate', 'v_monthly_sales_profit', 'v_sales_by_category', 'v_sales_by_country', 'v_top_products', 'v_return_rate_by_category']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_product_category'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_fulfilled_orders', 'v_return_rate', 'v_monthly_sales_profit', 'v_sales_by_category', 'v_sales_by_country', 'v_top_products', 'v_return_rate_by_category']
+      field: r(thelook_products.category)
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_fulfilled_orders', 'v_return_rate', 'v_monthly_sales_profit', 'v_sales_by_category', 'v_sales_by_country', 'v_top_products', 'v_return_rate_by_category']
+      field: r(thelook_users.country)
+    },
+    FilterInteraction {
+      from: 'f_sales_date'
+      to: ['f_product_category', 'f_customer_country']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'f_product_category'
+      to: ['f_sales_date', 'f_customer_country']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: ['f_sales_date', 'f_product_category']
+      disabled: true
+    },
+    PopInteraction {
+      from: 'p_period_comparison'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_fulfilled_orders', 'v_return_rate', 'v_monthly_sales_profit']
+      field: r(thelook_order_items.created_at)
+    },
+  ]
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Monthly Review'
+      width: 1220
+      height: 1780
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block t_title { position: pos(20, 20, 1180, 100) layer: 1 }
+      block f_sales_date { position: pos(20, 140, 280, 100) layer: 1 }
+      block f_product_category { position: pos(320, 140, 280, 100) layer: 1 }
+      block f_customer_country { position: pos(620, 140, 280, 100) layer: 1 }
+      block p_period_comparison { position: pos(920, 140, 280, 100) layer: 1 }
+
+      block v_net_sales { position: pos(20, 260, 220, 120) layer: 1 }
+      block v_gross_profit { position: pos(260, 260, 220, 120) layer: 1 }
+      block v_gross_margin { position: pos(500, 260, 220, 120) layer: 1 }
+      block v_fulfilled_orders { position: pos(740, 260, 220, 120) layer: 1 }
+      block v_return_rate { position: pos(980, 260, 220, 120) layer: 1 }
+
+      block t_trend { position: pos(20, 400, 1180, 60) layer: 1 }
+      block v_monthly_sales_profit { position: pos(20, 480, 1180, 360) layer: 1 }
+
+      block t_drivers { position: pos(20, 860, 1180, 60) layer: 1 }
+      block v_sales_by_category { position: pos(20, 940, 580, 360) layer: 1 }
+      block v_sales_by_country { position: pos(620, 940, 580, 360) layer: 1 }
+
+      block t_health { position: pos(20, 1320, 1180, 60) layer: 1 }
+      block v_top_products { position: pos(20, 1400, 580, 360) layer: 1 }
+      block v_return_rate_by_category { position: pos(620, 1400, 580, 360) layer: 1 }
+
+      mobile { mode: 'auto' }
+    }
+  }
+}

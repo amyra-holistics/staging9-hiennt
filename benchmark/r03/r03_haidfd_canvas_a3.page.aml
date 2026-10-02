@@ -1,0 +1,255 @@
+Dashboard r03_haidfd_canvas_a3 {
+  title: 'Commerce Review'
+  description: @md
+    A focused commerce performance review with viewer-controlled date, department, country, and period comparisons.
+  ;;
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+
+  block header: TextBlock {
+    content: @md
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+        .r03-header { font-family: 'Manrope', Arial, sans-serif; background: #1C2321; border-radius: 14px; box-sizing: border-box; color: #F6F0E6; display: flex; align-items: center; justify-content: space-between; min-height: 112px; padding: 24px 28px; }
+        .r03-brand { display: flex; align-items: center; gap: 14px; }
+        .r03-brand img { display: block; height: 44px; width: 44px; }
+        .r03-title { font-size: 27px; font-weight: 800; letter-spacing: -0.04em; line-height: 1.1; margin: 0; }
+        .r03-subtitle { color: #CFC5B8; font-size: 13px; font-weight: 500; margin: 6px 0 0; }
+        .r03-key { color: #F6F0E6; font-size: 12px; line-height: 1.5; text-align: right; }
+        .r03-key span { display: inline-block; border-radius: 999px; height: 8px; margin: 0 5px 1px 12px; width: 8px; }
+        .r03-key .good { background: #1B8C7A; }
+        .r03-key .alert { background: #E7735A; }
+      </style>
+      <div class="r03-header">
+        <div class="r03-brand">
+          <img alt="Commerce review mark" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23E7735A'/%3E%3Cpath d='M13 14h7v7h8v-7h7v20h-7v-7h-8v7h-7z' fill='%231C2321'/%3E%3C/svg%3E" />
+          <div><p class="r03-title">Commerce review</p><p class="r03-subtitle">A clear read on sales, demand, and margin</p></div>
+        </div>
+        <div class="r03-key"><span class="good"></span>Favorable motion <span class="alert"></span>Watch unfavorable motion<br />Comparison arrows retain platform colors</div>
+      </div>
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block department_filter: FilterBlock {
+    label: 'Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+
+  block customer_country_filter: FilterBlock {
+    label: 'Customer Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block period_comparison: PopBlock {
+    label: 'Compare period'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block net_sales_icon: TextBlock {
+    content: @md
+      <div style="font-family:Manrope,Arial,sans-serif;display:flex;justify-content:flex-end;"><span style="align-items:center;background:#E4F4F0;border-radius:9px;color:#1B8C7A;display:inline-flex;font-size:18px;font-weight:800;height:34px;justify-content:center;width:34px;">$</span></div>
+    ;;
+  }
+
+  block orders_icon: TextBlock {
+    content: @md
+      <div style="font-family:Manrope,Arial,sans-serif;display:flex;justify-content:flex-end;"><span style="align-items:center;background:#FDEAE5;border-radius:9px;color:#E7735A;display:inline-flex;font-size:18px;font-weight:800;height:34px;justify-content:center;width:34px;">□</span></div>
+    ;;
+  }
+
+  block aov_icon: TextBlock {
+    content: @md
+      <div style="font-family:Manrope,Arial,sans-serif;display:flex;justify-content:flex-end;"><span style="align-items:center;background:#E4F4F0;border-radius:9px;color:#1B8C7A;display:inline-flex;font-size:18px;font-weight:800;height:34px;justify-content:center;width:34px;">↗</span></div>
+    ;;
+  }
+
+  block gross_margin_icon: TextBlock {
+    content: @md
+      <div style="font-family:Manrope,Arial,sans-serif;display:flex;justify-content:flex-end;"><span style="align-items:center;background:#FDEAE5;border-radius:9px;color:#E7735A;display:inline-flex;font-size:18px;font-weight:800;height:34px;justify-content:center;width:34px;">%</span></div>
+    ;;
+  }
+
+  block net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'left'
+        label { font_size: 14 }
+        metric_value { font_size: 32 }
+      }
+    }
+  }
+
+  block orders: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block aov: VizBlock {
+    label: 'AOV'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings {
+        alignment: 'left'
+        label { font_size: 14 font_color: '#64748B' }
+        metric_value { font_size: 32 font_color: '#0F172A' }
+      }
+    }
+  }
+
+  block gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block net_sales_by_department: VizBlock {
+    label: 'Net Sales by Department'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Department'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: ['net_sales', 'orders', 'aov', 'gross_margin', 'monthly_net_sales', 'net_sales_by_department']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'department_filter'
+      to: ['net_sales', 'orders', 'aov', 'gross_margin', 'monthly_net_sales', 'net_sales_by_department']
+      field: r(thelook_products.department)
+    },
+    FilterInteraction {
+      from: 'customer_country_filter'
+      to: ['net_sales', 'orders', 'aov', 'gross_margin', 'monthly_net_sales', 'net_sales_by_department']
+      field: r(thelook_users.country)
+    },
+    PopInteraction {
+      from: 'period_comparison'
+      to: ['net_sales', 'orders', 'aov', 'gross_margin']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1220
+    height: 910
+    grid_size: 20
+    block header { position: pos(20, 20, 1180, 120) layer: 1 }
+    block date_filter { position: pos(20, 160, 280, 100) layer: 1 }
+    block department_filter { position: pos(320, 160, 280, 100) layer: 1 }
+    block customer_country_filter { position: pos(620, 160, 280, 100) layer: 1 }
+    block period_comparison { position: pos(920, 160, 280, 100) layer: 1 }
+    block net_sales { position: pos(20, 280, 280, 160) layer: 1 }
+    block orders { position: pos(320, 280, 280, 160) layer: 1 }
+    block aov { position: pos(620, 280, 280, 160) layer: 1 }
+    block gross_margin { position: pos(920, 280, 280, 160) layer: 1 }
+    block net_sales_icon { position: pos(240, 296, 44, 44) layer: 2 }
+    block orders_icon { position: pos(540, 296, 44, 44) layer: 2 }
+    block aov_icon { position: pos(840, 296, 44, 44) layer: 2 }
+    block gross_margin_icon { position: pos(1140, 296, 44, 44) layer: 2 }
+    block monthly_net_sales { position: pos(20, 460, 760, 420) layer: 1 }
+    block net_sales_by_department { position: pos(800, 460, 400, 420) layer: 1 }
+    mobile { mode: 'auto' }
+  }
+}

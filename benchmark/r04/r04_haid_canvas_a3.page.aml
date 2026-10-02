@@ -1,0 +1,421 @@
+Dashboard r04_haid_canvas_a3 {
+  title: 'Monthly Performance Dashboard'
+  description: @md
+    A five-slide executive performance dashboard covering headline KPIs, monthly trend, category performance, and a rolling 12-month takeaway.
+  ;;
+  theme: H.themes.classic
+
+  // Slide 1 — title
+  block s1_title: TextBlock {
+    content: @md
+      # Monthly Performance Dashboard
+    ;;
+  }
+  block s1_intro: TextBlock {
+    content: @md
+      ## Executive sales and profitability review
+
+      Use the next slides to review headline performance, follow the monthly sales and profit trend, compare categories, and read the rolling 12-month summary.
+    ;;
+  }
+  block s1_scope: TextBlock {
+    content: @md
+      **Dataset:** TheLook &nbsp; • &nbsp; **Reporting focus:** Net Sales, Gross Profit, Average Order Value, and Return Rate
+    ;;
+  }
+
+  // Slide 2 — headline KPIs
+  block s2_title: TextBlock {
+    content: @md
+      # Headline KPIs
+
+      Select a date range to update all four headline measures.
+    ;;
+  }
+  block f_kpi_date: FilterBlock {
+    label: 'KPI Date Range'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block v_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block s2_note: TextBlock {
+    content: @md
+      **Metric definitions:** Net Sales excludes cancelled and returned order items; Gross Profit is Net Sales less cost of goods sold; AOV is Net Sales per fulfilled order; Return Rate is returned order items divided by all order items.
+    ;;
+  }
+
+  // Slide 3 — monthly trend
+  block s3_title: TextBlock {
+    content: @md
+      # Monthly Net Sales and Gross Profit Trend
+
+      Select a date range to focus the monthly series. Hover points to compare sales and profit for a month.
+    ;;
+  }
+  block f_trend_date: FilterBlock {
+    label: 'Trend Date Range'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block v_monthly_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Sales Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Sales Performance'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Sales Month'
+        legend_label: 'bottom'
+        show_data_points: false
+        connect_discontinuous_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // Slide 4 — category breakdown
+  block s4_title: TextBlock {
+    content: @md
+      # Category Performance Breakdown
+
+      Select a date range to rank product categories by Net Sales and compare their Gross Profit.
+    ;;
+  }
+  block f_category_date: FilterBlock {
+    label: 'Category Date Range'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block v_category_performance: VizBlock {
+    label: 'Net Sales and Gross Profit by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Sales and Profit'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  // Slide 5 — takeaways
+  block s5_title: TextBlock {
+    content: @md
+      # Key Takeaways
+
+      **Rolling 12-month view:** This slide intentionally uses its own last-12-month condition and is not affected by the date controls on the KPI, trend, or category slides.
+    ;;
+  }
+  block v_takeaways: VizBlock {
+    label: 'Rolling 12-Month Sales Executive Takeaway'
+    settings { hide_label: true }
+    viz: MarkdownViz {
+      dataset: thelook
+      rows: [
+        VizFieldFull {
+          ref: r(thelook_order_items.created_at)
+          label: 'Sales Month'
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+          uname: 'sales_month'
+        },
+      ]
+      values: [
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      conditions: [
+        "thelook_order_items.created_at matches @(last 12 months)",
+      ]
+      content: @md
+        <style>
+          .sales-executive-card { max-width: 1200px; padding: 1.5rem; border: 1px solid #E5E7EB; border-radius: 12px; background: #FFFFFF; color: #1F2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+          .sales-executive-card h2 { margin: 0; color: #111827; font-size: 1.2rem; line-height: 1.4; }
+          .subtitle { margin: 0.35rem 0 1.2rem; color: #6B7280; font-size: 0.875rem; }
+          .latest-month { padding: 1rem 1.1rem; border-left: 4px solid #2563EB; border-radius: 8px; background: #F8FAFC; }
+          .eyebrow { color: #475569; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+          .latest-month-name { margin: 0.2rem 0 0.85rem; color: #111827; font-size: 1.05rem; font-weight: 700; }
+          .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.75rem; }
+          .metric { padding: 0.75rem; border: 1px solid #E5E7EB; border-radius: 8px; background: #FFFFFF; }
+          .metric-label { color: #6B7280; font-size: 0.72rem; }
+          .metric-value { margin-top: 0.2rem; color: #111827; font-size: 1rem; font-weight: 700; }
+          .takeaways { margin: 1.15rem 0 0; padding-left: 1.2rem; color: #374151; font-size: 0.9rem; line-height: 1.55; }
+          .takeaways li + li { margin-top: 0.5rem; }
+          @media (max-width: 680px) { .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        </style>
+
+        <div class="sales-executive-card">
+          <h2>12-Month Sales Executive Takeaway</h2>
+          <p class="subtitle">Monthly series based on <strong>Order Items Created at</strong>.</p>
+          <div class="latest-month">
+            <div class="eyebrow">Most recent month</div>
+            <div class="latest-month-name">{{ rows[0].`Sales Month` }}</div>
+            <div class="metrics">
+              <div class="metric"><div class="metric-label">Net Sales</div><div class="metric-value">{{ rows[0].values.`Net Sales` }}</div></div>
+              <div class="metric"><div class="metric-label">Gross Profit</div><div class="metric-value">{{ rows[0].values.`Gross Profit` }}</div></div>
+              <div class="metric"><div class="metric-label">Gross Margin</div><div class="metric-value">{{ rows[0].values.`Gross Margin` }}</div></div>
+              <div class="metric"><div class="metric-label">Fulfilled Orders</div><div class="metric-value">{{ rows[0].values.`Fulfilled Orders` }}</div></div>
+            </div>
+          </div>
+          <ul class="takeaways">
+            <li><strong>Sales and profit trend:</strong> Net sales moved from {{ rows[11].values.`Net Sales` }} in {{ rows[11].`Sales Month` }} to {{ rows[0].values.`Net Sales` }} in {{ rows[0].`Sales Month` }}, with latest gross profit at {{ rows[0].values.`Gross Profit` }}.</li>
+            <li><strong>Margin and demand:</strong> Latest gross margin was {{ rows[0].values.`Gross Margin` }} across {{ rows[0].values.`Fulfilled Orders` }} fulfilled orders, pairing profitability with order volume in the monthly view.</li>
+          </ul>
+        </div>
+      ;;
+      settings {
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'sales_month'
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_kpi_date'
+      to: ['v_net_sales', 'v_gross_profit', 'v_aov', 'v_return_rate']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_trend_date'
+      to: ['v_monthly_trend']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_category_date'
+      to: ['v_category_performance']
+      field: r(thelook_order_items.created_at)
+    },
+  ]
+
+  view: TabLayout {
+    tab title: CanvasLayout {
+      label: '1. Title'
+      width: 1600
+      height: 900
+      grid_size: 20
+      block s1_title { position: pos(120, 240, 1360, 140) layer: 1 }
+      block s1_intro { position: pos(120, 420, 1360, 180) layer: 1 }
+      block s1_scope { position: pos(120, 660, 1360, 100) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab kpis: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1600
+      height: 900
+      grid_size: 20
+      block s2_title { position: pos(80, 60, 1440, 140) layer: 1 }
+      block f_kpi_date { position: pos(80, 230, 360, 100) layer: 1 }
+      block v_net_sales { position: pos(80, 390, 330, 180) layer: 1 }
+      block v_gross_profit { position: pos(450, 390, 330, 180) layer: 1 }
+      block v_aov { position: pos(820, 390, 330, 180) layer: 1 }
+      block v_return_rate { position: pos(1190, 390, 330, 180) layer: 1 }
+      block s2_note { position: pos(80, 650, 1440, 120) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab trend: CanvasLayout {
+      label: '3. Monthly Trend'
+      width: 1600
+      height: 900
+      grid_size: 20
+      block s3_title { position: pos(80, 40, 1440, 140) layer: 1 }
+      block f_trend_date { position: pos(80, 210, 360, 100) layer: 1 }
+      block v_monthly_trend { position: pos(80, 350, 1440, 470) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab category: CanvasLayout {
+      label: '4. Category Breakdown'
+      width: 1600
+      height: 900
+      grid_size: 20
+      block s4_title { position: pos(80, 40, 1440, 140) layer: 1 }
+      block f_category_date { position: pos(80, 210, 360, 100) layer: 1 }
+      block v_category_performance { position: pos(80, 350, 1440, 470) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab takeaways: CanvasLayout {
+      label: '5. Key Takeaways'
+      width: 1600
+      height: 900
+      grid_size: 20
+      block s5_title { position: pos(80, 60, 1440, 160) layer: 1 }
+      block v_takeaways { position: pos(180, 280, 1240, 500) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

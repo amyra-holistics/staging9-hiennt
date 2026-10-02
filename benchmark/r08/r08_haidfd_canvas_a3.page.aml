@@ -1,0 +1,391 @@
+Dashboard r08_haidfd_canvas_a3 {
+  title: 'Sales Review'
+  description: @md
+    Review sales performance across the selected period, product categories, and customer countries.
+  ;;
+  theme: H.themes.classic
+
+  // Header and dashboard controls
+  block header: TextBlock {
+    content: @md
+      # Sales Review
+
+      Use the controls below to focus the review on a sales period, product category, and customer country. All dashboard blocks follow these selections; the headline sales metrics and trend also respond to Compare to.
+    ;;
+  }
+
+  block sales_period: FilterBlock {
+    label: 'Sales period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block product_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block customer_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block compare_to: PopBlock {
+    label: 'Compare to'
+  }
+
+  // Sales health headline metrics
+  block overview_heading: TextBlock {
+    content: @md
+      ## Sales overview
+
+      Review sales, profit, margin, and fulfilled order volume alongside the selected comparison period.
+    ;;
+  }
+
+  block net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block trend_heading: TextBlock {
+    content: @md
+      ## Sales trend
+
+      Track sales performance over the selected period and compare it with the chosen prior period.
+    ;;
+  }
+
+  block monthly_net_sales_trend: VizBlock {
+    label: 'Monthly Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        label: 'Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block product_heading: TextBlock {
+    content: @md
+      ## Product performance
+
+      Identify the categories and products contributing most to sales.
+    ;;
+  }
+
+  block category_net_sales_ranking: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block customer_heading: TextBlock {
+    content: @md
+      ## Customer geography
+
+      Compare sales performance across customer countries.
+    ;;
+  }
+
+  block net_sales_by_customer_country: VizBlock {
+    label: 'Net Sales by Customer Country'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Customer Country'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block detail_heading: TextBlock {
+    content: @md
+      ## Sales detail
+
+      Use this section to review the underlying order-item records after identifying an area to investigate.
+    ;;
+  }
+
+  block top_products_detail: VizBlock {
+    label: 'Top Products Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(thelook_products.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Fulfilled Orders'
+          ref: r(thelook.fulfilled_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      conditions: [
+        "net_sales > 0",
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        single_cell_display: 'normal'
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          },
+        ]
+      }
+    }
+  }
+
+  // Keep filter suggestion lists independent while mapping each filter to every sales viz.
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'sales_period'
+      to: ['net_sales', 'gross_profit', 'gross_margin', 'fulfilled_orders', 'monthly_net_sales_trend', 'category_net_sales_ranking', 'net_sales_by_customer_country', 'top_products_detail']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'sales_period'
+      to: ['product_category', 'customer_country']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'product_category'
+      to: ['net_sales', 'gross_profit', 'gross_margin', 'fulfilled_orders', 'monthly_net_sales_trend', 'category_net_sales_ranking', 'net_sales_by_customer_country', 'top_products_detail']
+      field: r(thelook_products.category)
+    },
+    FilterInteraction {
+      from: 'product_category'
+      to: ['sales_period', 'customer_country']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'customer_country'
+      to: ['net_sales', 'gross_profit', 'gross_margin', 'fulfilled_orders', 'monthly_net_sales_trend', 'category_net_sales_ranking', 'net_sales_by_customer_country', 'top_products_detail']
+      field: r(thelook_users.country)
+    },
+    FilterInteraction {
+      from: 'customer_country'
+      to: ['sales_period', 'product_category']
+      disabled: true
+    },
+    PopInteraction {
+      from: 'compare_to'
+      to: ['net_sales', 'gross_profit', 'gross_margin', 'fulfilled_orders', 'monthly_net_sales_trend']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1220
+    height: 2020
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block header               { position: pos(20, 20, 1180, 120) layer: 1 }
+    block sales_period         { position: pos(20, 160, 280, 100) layer: 1 }
+    block product_category     { position: pos(320, 160, 280, 100) layer: 1 }
+    block customer_country     { position: pos(620, 160, 280, 100) layer: 1 }
+    block compare_to           { position: pos(920, 160, 280, 100) layer: 1 }
+
+    block overview_heading     { position: pos(20, 280, 1180, 100) layer: 1 }
+    block net_sales            { position: pos(20, 400, 280, 160) layer: 1 }
+    block gross_profit         { position: pos(320, 400, 280, 160) layer: 1 }
+    block gross_margin         { position: pos(620, 400, 280, 160) layer: 1 }
+    block fulfilled_orders     { position: pos(920, 400, 280, 160) layer: 1 }
+
+    block trend_heading        { position: pos(20, 580, 1180, 100) layer: 1 }
+    block monthly_net_sales_trend { position: pos(20, 700, 1180, 280) layer: 1 }
+
+    block product_heading                { position: pos(20, 1000, 580, 100) layer: 1 }
+    block customer_heading               { position: pos(620, 1000, 580, 100) layer: 1 }
+    block category_net_sales_ranking     { position: pos(20, 1120, 580, 280) layer: 1 }
+    block net_sales_by_customer_country  { position: pos(620, 1120, 580, 280) layer: 1 }
+
+    block detail_heading                 { position: pos(20, 1420, 1180, 100) layer: 1 }
+    block top_products_detail            { position: pos(20, 1540, 1180, 360) layer: 1 }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

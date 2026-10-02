@@ -1,0 +1,498 @@
+Dashboard r08_haidfd_html_a2 {
+  title: 'Retail Ledger — Monthly Sales Review'
+  description: @md
+CEO monthly sales review: a concise view of realized sales, gross profit, margin, and order value. Use the controls to set the reporting period and segment the view by customer country or product category.
+;;
+
+  block t_masthead: TextBlock {
+    content: @md
+<div class="rl-masthead-copy">
+  <p class="rl-kicker">Retail Ledger</p>
+  <h1>Monthly sales review</h1>
+  <p>Realized trading performance at a glance.</p>
+</div>
+;;
+  }
+
+  block t_overview: TextBlock {
+    content: @md
+<div class="rl-section-copy">
+  <h2>Overview</h2>
+  <p>Core measures reflect fulfilled merchandise: Net Sales and Gross Profit exclude cancelled and returned items.</p>
+</div>
+;;
+  }
+
+  block f_date: FilterBlock {
+    label: 'Sales period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block p_compare: PopBlock {
+    label: 'Compare period'
+  }
+
+  block d_grain: DateDrillBlock {
+    label: 'Trend grain'
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block t_momentum: TextBlock {
+    content: @md
+<div class="rl-section-copy rl-section-copy--momentum">
+  <h2>Sales momentum</h2>
+  <p>Track Net Sales and Gross Profit together; adjust the date drill to inspect the pace at a different reporting grain.</p>
+</div>
+;;
+  }
+
+  block v_sales_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Sales'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Profit'
+            ref: r(thelook.gross_profit)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+        legend_label: 'bottom'
+      }
+    }
+  }
+
+  block t_drivers: TextBlock {
+    content: @md
+<div class="rl-section-copy rl-section-copy--drivers">
+  <h2>Performance drivers</h2>
+  <p>Start with where sales concentrate. Compare category and country rankings to see which parts of the business are carrying the result.</p>
+</div>
+;;
+  }
+
+  block v_category_net_sales: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_country_net_sales: VizBlock {
+    label: 'Net Sales by Customer Country'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.country)
+        label: 'Country'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block t_risk: TextBlock {
+    content: @md
+<div class="rl-risk-copy">
+  <h3>Return risk</h3>
+  <p>High return rates are not a verdict, but they show where we should inspect product fit, pricing, or fulfilment before the next review.</p>
+</div>
+;;
+  }
+
+  block v_category_return_rate: VizBlock {
+    label: 'Return Rate by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_category_performance: VizBlock {
+    label: 'Category Performance Ledger'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          uname: 'thelook_products_category_1'
+        },
+        r(thelook.net_sales),
+        r(thelook.gross_profit),
+        r(thelook.gross_margin),
+        r(thelook.aov),
+        r(thelook.return_rate),
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_category_1'
+            direction: 'asc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_aov', 'v_sales_trend', 'v_category_net_sales', 'v_country_net_sales', 'v_category_return_rate', 'v_category_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_country'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_aov', 'v_sales_trend', 'v_category_net_sales', 'v_country_net_sales', 'v_category_return_rate', 'v_category_performance']
+      field: r(thelook_users.country)
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_aov', 'v_sales_trend', 'v_category_net_sales', 'v_country_net_sales', 'v_category_return_rate', 'v_category_performance']
+      field: r(thelook_products.category)
+    },
+    PopInteraction {
+      from: 'p_compare'
+      to: ['v_net_sales', 'v_gross_profit', 'v_gross_margin', 'v_aov', 'v_sales_trend', 'v_category_net_sales', 'v_country_net_sales', 'v_category_return_rate', 'v_category_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    DateDrillInteraction {
+      from: 'd_grain'
+      to: ['v_sales_trend']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<div class="retail-ledger">
+  <style>
+    .retail-ledger, .retail-ledger * { box-sizing: border-box; }
+    .retail-ledger {
+      --ink: #172334;
+      --ink-muted: #607080;
+      --navy: #13253e;
+      --navy-deep: #0b1728;
+      --paper: #f6f3ed;
+      --card: #fffdf8;
+      --line: #d9d4ca;
+      --accent: #b87535;
+      --accent-pale: #efe2d1;
+      color: var(--ink);
+      background: var(--paper);
+      font-family: Georgia, 'Times New Roman', serif;
+      padding: clamp(16px, 3vw, 42px);
+    }
+    .retail-ledger .rl-shell { max-width: 1440px; margin: 0 auto; }
+    .retail-ledger .rl-masthead {
+      background: linear-gradient(125deg, var(--navy-deep), var(--navy));
+      color: #f8f4eb;
+      border-bottom: 4px solid var(--accent);
+      padding: clamp(28px, 5vw, 60px);
+    }
+    .retail-ledger .rl-masthead-copy p { margin: 0; }
+    .retail-ledger .rl-kicker {
+      color: #d9b58a;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .retail-ledger .rl-masthead h1 {
+      font-size: clamp(32px, 5vw, 60px);
+      font-weight: 400;
+      letter-spacing: -.035em;
+      line-height: 1;
+      margin: 14px 0 12px;
+    }
+    .retail-ledger .rl-masthead-copy > p:last-child { color: #cad2dc; font-size: 17px; }
+    .retail-ledger .rl-body { padding: clamp(24px, 4vw, 52px) clamp(4px, 1vw, 14px) 0; }
+    .retail-ledger .rl-section-copy { border-top: 1px solid var(--line); padding-top: 18px; margin-bottom: 20px; }
+    .retail-ledger .rl-section-copy h2 { font-size: 28px; font-weight: 400; letter-spacing: -.02em; margin: 0 0 6px; }
+    .retail-ledger .rl-section-copy p { color: var(--ink-muted); font-size: 15px; line-height: 1.5; margin: 0; max-width: 760px; }
+    .retail-ledger .rl-controls {
+      display: grid;
+      grid-template-columns: minmax(180px, 1.2fr) repeat(4, minmax(155px, 1fr));
+      gap: 10px;
+      margin: 24px 0 18px;
+    }
+    .retail-ledger .rl-control {
+      background: rgba(255, 253, 248, .72);
+      border: 1px solid var(--line);
+      min-width: 0;
+      padding: 4px 8px;
+    }
+    .retail-ledger .rl-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .retail-ledger .rl-kpi {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--accent);
+      min-width: 0;
+      padding: 8px;
+    }
+    .retail-ledger .rl-momentum { margin-top: 46px; }
+    .retail-ledger .rl-section-copy--momentum { margin-bottom: 16px; }
+    .retail-ledger .rl-trend {
+      background: var(--card);
+      border: 1px solid var(--line);
+      min-height: 440px;
+      padding: 12px;
+    }
+    .retail-ledger .rl-drivers { margin-top: 46px; }
+    .retail-ledger .rl-section-copy--drivers { margin-bottom: 16px; }
+    .retail-ledger .rl-driver-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .retail-ledger .rl-driver-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      min-height: 380px;
+      min-width: 0;
+      padding: 12px;
+    }
+    .retail-ledger .rl-driver-card--risk { border-top: 3px solid var(--accent); }
+    .retail-ledger .rl-driver-card--table { min-height: 380px; }
+    .retail-ledger .rl-risk-copy { border-bottom: 1px solid var(--line); margin-bottom: 12px; padding: 2px 2px 12px; }
+    .retail-ledger .rl-risk-copy h3 { font-size: 21px; font-weight: 400; letter-spacing: -.01em; margin: 0 0 4px; }
+    .retail-ledger .rl-risk-copy p { color: var(--ink-muted); font-size: 14px; line-height: 1.45; margin: 0; }
+    .retail-ledger h-block { display: block; min-width: 0; }
+    @media (max-width: 1050px) {
+      .retail-ledger .rl-controls { grid-template-columns: repeat(3, minmax(180px, 1fr)); }
+      .retail-ledger .rl-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 680px) {
+      .retail-ledger { padding: 10px; }
+      .retail-ledger .rl-body { padding: 28px 0 0; }
+      .retail-ledger .rl-controls, .retail-ledger .rl-kpis, .retail-ledger .rl-driver-grid { grid-template-columns: 1fr; }
+      .retail-ledger .rl-trend { min-height: 360px; padding: 6px; }
+      .retail-ledger .rl-driver-card { min-height: 340px; padding: 6px; }
+    }
+  </style>
+
+  <main class="rl-shell">
+    <header class="rl-masthead"><h-block name="t_masthead" /></header>
+    <div class="rl-body">
+      <section aria-label="Overview">
+        <h-block name="t_overview" />
+        <div class="rl-controls" aria-label="Review controls">
+          <div class="rl-control"><h-block name="f_date" /></div>
+          <div class="rl-control"><h-block name="f_country" /></div>
+          <div class="rl-control"><h-block name="f_category" /></div>
+          <div class="rl-control"><h-block name="p_compare" /></div>
+          <div class="rl-control"><h-block name="d_grain" /></div>
+        </div>
+        <div class="rl-kpis">
+          <div class="rl-kpi"><h-block name="v_net_sales" /></div>
+          <div class="rl-kpi"><h-block name="v_gross_profit" /></div>
+          <div class="rl-kpi"><h-block name="v_gross_margin" /></div>
+          <div class="rl-kpi"><h-block name="v_aov" /></div>
+        </div>
+      </section>
+      <section class="rl-momentum" aria-label="Sales momentum">
+        <h-block name="t_momentum" />
+        <div class="rl-trend"><h-block name="v_sales_trend" /></div>
+      </section>
+      <section class="rl-drivers" aria-label="Performance drivers and return risk">
+        <h-block name="t_drivers" />
+        <div class="rl-driver-grid">
+          <div class="rl-driver-card"><h-block name="v_category_net_sales" /></div>
+          <div class="rl-driver-card"><h-block name="v_country_net_sales" /></div>
+          <div class="rl-driver-card rl-driver-card--risk">
+            <h-block name="t_risk" />
+            <h-block name="v_category_return_rate" />
+          </div>
+          <div class="rl-driver-card rl-driver-card--table"><h-block name="v_category_performance" /></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+;;
+  }
+}

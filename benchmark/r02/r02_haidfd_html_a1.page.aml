@@ -1,0 +1,498 @@
+Dashboard r02_haidfd_html_a1 {
+  title: 'The Look — Retail Edit'
+  description: @md
+A retail performance edit for merchandising, customer, and market review. Use the filter rail to narrow the reporting period, product department, or customer country.
+;;
+
+  block f_item_date: FilterBlock {
+    label: 'Item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_product_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+
+  block f_customer_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+  }
+
+  block v_overview_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_overview_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_overview_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block v_overview_sales_trend: VizBlock {
+    label: 'Net Sales by Month'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block v_overview_return_rate: VizBlock {
+    label: 'Return Rate by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' }
+      }
+    }
+  }
+
+  block v_products_department_sales: VizBlock {
+    label: 'Net Sales by Department'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Product Department'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' }
+      }
+    }
+  }
+
+  block v_products_detail: VizBlock {
+    label: 'Product Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull { label: 'Department' ref: r(thelook_products.department) format { type: 'text' } uname: 'thelook_products_department_1' },
+        VizFieldFull { label: 'Product Name' ref: r(thelook_products.name) format { type: 'text' } uname: 'thelook_products_name_1' },
+        VizFieldFull { label: 'Brand' ref: r(thelook_products.brand) format { type: 'text' } uname: 'thelook_products_brand_1' },
+        VizFieldFull { label: 'Category' ref: r(thelook_products.category) format { type: 'text' } uname: 'thelook_products_category_1' },
+        VizFieldFull { label: 'SKU' ref: r(thelook_products.sku) format { type: 'text' } uname: 'thelook_products_sku_1' },
+        VizFieldFull { label: 'Net Sales' ref: r(thelook.net_sales) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { label: 'Items Sold' ref: r(thelook.items_sold) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { label: 'Gross Profit' ref: r(thelook.gross_profit) format { type: 'number' pattern: 'inherited' } },
+        VizFieldFull { label: 'Return Rate' ref: r(thelook.return_rate) format { type: 'number' pattern: 'inherited' } }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting { key: 'thelook_products_department_1' direction: 'asc' },
+          KeyBasedSortSetting { key: 'thelook_products_name_1' direction: 'asc' },
+          KeyBasedSortSetting { key: 'thelook_products_brand_1' direction: 'asc' },
+          KeyBasedSortSetting { key: 'thelook_products_category_1' direction: 'asc' },
+          KeyBasedSortSetting { key: 'thelook_products_sku_1' direction: 'asc' }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_customers_sales_source: VizBlock {
+    label: 'Net Sales by Traffic Source'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.traffic_source)
+        label: 'Customer Traffic Source'
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' }
+      }
+    }
+  }
+
+  block v_customers_sales_age: VizBlock {
+    label: 'Net Sales by Customer Age'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.age)
+        label: 'Customer Age'
+        format { type: 'number' pattern: '#,###' }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'xaxis' direction: 'asc' }
+      }
+    }
+  }
+
+  block v_geo_country_sales: VizBlock {
+    label: 'Net Sales by Country'
+    viz: FilledMap {
+      dataset: thelook
+      location {
+        field: VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Customer Country'
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format { type: 'number' pattern: 'inherited' }
+      }
+    }
+  }
+
+  block v_geo_city_sales: VizBlock {
+    label: 'Net Sales by City'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_users.city)
+        label: 'Customer City'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_item_date'
+      to: [
+        'v_overview_net_sales',
+        'v_overview_orders',
+        'v_overview_profit',
+        'v_overview_sales_trend',
+        'v_overview_return_rate',
+        'v_products_department_sales',
+        'v_products_detail',
+        'v_customers_sales_source',
+        'v_customers_sales_age',
+        'v_geo_country_sales',
+        'v_geo_city_sales'
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_product_department'
+      to: [
+        'v_overview_net_sales',
+        'v_overview_orders',
+        'v_overview_profit',
+        'v_overview_sales_trend',
+        'v_overview_return_rate',
+        'v_products_department_sales',
+        'v_products_detail',
+        'v_customers_sales_source',
+        'v_customers_sales_age',
+        'v_geo_country_sales',
+        'v_geo_city_sales'
+      ]
+      field: r(thelook_products.department)
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: [
+        'v_overview_net_sales',
+        'v_overview_orders',
+        'v_overview_profit',
+        'v_overview_sales_trend',
+        'v_overview_return_rate',
+        'v_products_department_sales',
+        'v_products_detail',
+        'v_customers_sales_source',
+        'v_customers_sales_age',
+        'v_geo_country_sales',
+        'v_geo_city_sales'
+      ]
+      field: r(thelook_users.country)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root {
+          --ink: #101b35;
+          --navy: #17264b;
+          --paper: #faf9f5;
+          --line: #c9cdd5;
+          --muted: #667089;
+          --cobalt: #1e4fbf;
+          --soft-blue: #edf2ff;
+        }
+        .retail-edit {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 28px 34px 64px;
+          color: var(--ink);
+          background: var(--paper);
+          font-family: Inter, Arial, sans-serif;
+        }
+        .retail-edit * { box-sizing: border-box; }
+        .masthead {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 28px;
+          align-items: end;
+          padding-bottom: 22px;
+          border-bottom: 3px solid var(--ink);
+        }
+        .kicker, .section-index {
+          margin: 0 0 8px;
+          color: var(--cobalt);
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: .08em;
+        }
+        .masthead h1, .section-title {
+          margin: 0;
+          font-family: Georgia, 'Times New Roman', serif;
+          font-weight: 600;
+          color: var(--ink);
+        }
+        .masthead h1 { font-size: clamp(38px, 5vw, 68px); line-height: .94; letter-spacing: -.035em; }
+        .dek { max-width: 620px; margin: 14px 0 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+        .tab-input { position: absolute; inline-size: 1px; block-size: 1px; opacity: 0; }
+        .tab-nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+        .tab-nav label { color: var(--ink); cursor: pointer; font-size: 14px; font-weight: 700; padding: 7px 10px; border-bottom: 2px solid transparent; }
+        .tab-nav label:hover { color: var(--cobalt); }
+        #tab-overview:checked ~ .masthead label[for="tab-overview"],
+        #tab-products:checked ~ .masthead label[for="tab-products"],
+        #tab-customers:checked ~ .masthead label[for="tab-customers"],
+        #tab-geography:checked ~ .masthead label[for="tab-geography"] { color: var(--cobalt); border-color: var(--cobalt); }
+        #tab-overview:focus-visible ~ .masthead label[for="tab-overview"],
+        #tab-products:focus-visible ~ .masthead label[for="tab-products"],
+        #tab-customers:focus-visible ~ .masthead label[for="tab-customers"],
+        #tab-geography:focus-visible ~ .masthead label[for="tab-geography"] { outline: 2px solid var(--cobalt); outline-offset: 2px; }
+        .tab-panel { display: none; }
+        #tab-overview:checked ~ .tab-panels #panel-overview,
+        #tab-products:checked ~ .tab-panels #panel-products,
+        #tab-customers:checked ~ .tab-panels #panel-customers,
+        #tab-geography:checked ~ .tab-panels #panel-geography { display: block; }
+        .filter-rail {
+          display: grid;
+          grid-template-columns: 150px repeat(3, minmax(0, 1fr));
+          gap: 14px;
+          align-items: center;
+          margin: 20px 0 48px;
+          padding: 14px 0;
+          border-top: 1px solid var(--line);
+          border-bottom: 1px solid var(--line);
+        }
+        .filter-rail__label { color: var(--muted); font-size: 13px; line-height: 1.35; }
+        .filter-rail h-block, .kpi-row h-block, .data-grid h-block, .feature h-block { min-width: 0; }
+        .section { scroll-margin-top: 20px; margin-top: 58px; }
+        .section-head { display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 18px; align-items: baseline; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+        .section-title { font-size: clamp(27px, 3vw, 40px); line-height: 1; letter-spacing: -.025em; }
+        .section-note { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+        .kpi-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+        .kpi-row h-block { padding: 16px 20px 14px; }
+        .kpi-row h-block + h-block { border-left: 1px solid var(--line); }
+        .feature { margin-top: 26px; padding: 22px 0 6px; border-top: 1px solid var(--line); }
+        .data-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+        .detail { margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line); }
+        .geo-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 28px; }
+        .section h-block { display: block; }
+        @media (max-width: 820px) {
+          .retail-edit { padding: 20px 18px 42px; }
+          .masthead, .section-head, .filter-rail, .geo-grid { grid-template-columns: 1fr; }
+          .tab-nav { justify-content: flex-start; }
+          .kpi-row, .data-grid { grid-template-columns: 1fr; }
+          .kpi-row h-block + h-block { border-left: 0; border-top: 1px solid var(--line); }
+        }
+      </style>
+
+      <main class="retail-edit">
+        <input class="tab-input" type="radio" name="retail-edit-tabs" id="tab-overview" checked />
+        <input class="tab-input" type="radio" name="retail-edit-tabs" id="tab-products" />
+        <input class="tab-input" type="radio" name="retail-edit-tabs" id="tab-customers" />
+        <input class="tab-input" type="radio" name="retail-edit-tabs" id="tab-geography" />
+
+        <header class="masthead">
+          <div>
+            <p class="kicker">THE LOOK / MERCHANDISING DESK</p>
+            <h1>Retail Edit</h1>
+            <p class="dek">An editorial read of retail performance, from the sales line to the places and people shaping demand.</p>
+          </div>
+          <nav class="tab-nav" aria-label="Report sections">
+            <label for="tab-overview">Overview</label>
+            <label for="tab-products">Products</label>
+            <label for="tab-customers">Customers</label>
+            <label for="tab-geography">Geography</label>
+          </nav>
+        </header>
+
+        <aside class="filter-rail" aria-label="Global filters">
+          <div class="filter-rail__label">Refine the entire edit by time, department, or country.</div>
+          <h-block name="f_item_date" />
+          <h-block name="f_product_department" />
+          <h-block name="f_customer_country" />
+        </aside>
+
+        <div class="tab-panels">
+          <section id="panel-overview" class="section tab-panel" aria-labelledby="tab-overview">
+            <div class="section-head">
+              <p class="section-index">01 / Overview</p>
+              <div><h2 class="section-title">The sales line</h2><p class="section-note">A concise read on value, fulfilled demand, and margin before moving into the edit.</p></div>
+            </div>
+            <div class="kpi-row">
+              <h-block name="v_overview_net_sales" />
+              <h-block name="v_overview_orders" />
+              <h-block name="v_overview_profit" />
+            </div>
+            <div class="feature"><h-block name="v_overview_sales_trend" /></div>
+            <div class="feature"><h-block name="v_overview_return_rate" /></div>
+          </section>
+
+          <section id="panel-products" class="section tab-panel" aria-labelledby="tab-products">
+            <div class="section-head">
+              <p class="section-index">02 / Products</p>
+              <div><h2 class="section-title">The merchandise edit</h2><p class="section-note">Compare department contribution, then move directly to the product-level roster.</p></div>
+            </div>
+            <div class="data-grid"><h-block name="v_products_department_sales" /></div>
+            <div class="detail"><h-block name="v_products_detail" /></div>
+          </section>
+
+          <section id="panel-customers" class="section tab-panel" aria-labelledby="tab-customers">
+            <div class="section-head">
+              <p class="section-index">03 / Customers</p>
+              <div><h2 class="section-title">Who responds</h2><p class="section-note">Read commercial demand through acquisition source and customer age.</p></div>
+            </div>
+            <div class="data-grid">
+              <h-block name="v_customers_sales_source" />
+              <h-block name="v_customers_sales_age" />
+            </div>
+          </section>
+
+          <section id="panel-geography" class="section tab-panel" aria-labelledby="tab-geography">
+            <div class="section-head">
+              <p class="section-index">04 / Geography</p>
+              <div><h2 class="section-title">Where demand lands</h2><p class="section-note">A market view from country reach down to the city sales ranking.</p></div>
+            </div>
+            <div class="geo-grid">
+              <h-block name="v_geo_country_sales" />
+              <h-block name="v_geo_city_sales" />
+            </div>
+          </section>
+        </div>
+      </main>
+    ;;
+  }
+}

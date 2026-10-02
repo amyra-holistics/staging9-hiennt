@@ -1,0 +1,294 @@
+Dashboard r05_haid_canvas_a2 {
+  title: 'Finance Print Pack'
+  description: @md
+    Print-oriented finance report with financial summary, department and category detail, and metric definitions.
+  ;;
+  theme: H.themes.classic
+
+  // Reused on every portrait-style report page.
+  block report_header: TextBlock {
+    content: @md
+      # Finance Print Pack
+      **Reporting period:** set it with the Date filter. **Print guidance:** print each tab separately in portrait orientation at 100% scale.
+    ;;
+  }
+
+  // Reused on every portrait-style report page.
+  block report_footer: TextBlock {
+    content: @md
+      ---
+      Finance Print Pack · The selected order-item created-at period applies to every financial visual. Print one tab per page for a clean A4-style pack.
+    ;;
+  }
+
+  block f_reporting_period: FilterBlock {
+    label: 'Reporting Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block p1_contents: TextBlock {
+    content: @md
+      ## Table of Contents
+
+      1. [Financial Summary](#financial-summary)
+      2. [Department and Category Detail](#department-and-category-detail)
+      3. [Metric Definitions](#metric-definitions)
+
+      Use the **Reporting Period** filter to set the report window before printing. The selected period is applied consistently to all KPIs and detail tables.
+    ;;
+  }
+
+  block p1_financial_summary: TextBlock {
+    content: @md
+      ## Financial Summary
+
+      Net Sales and COGS are shown alongside Gross Profit and Gross Margin for the selected period.
+    ;;
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block v_cogs: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' alignment: 'center' }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format { type: 'number' pattern: 'inherited' }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block p2_detail_intro: TextBlock {
+    content: @md
+      ## Department and Category Detail
+
+      Review the selected period’s net sales, cost of goods sold, and gross profit by department and category.
+    ;;
+  }
+
+  block p2_department_heading: TextBlock {
+    content: @md
+      ### Department Performance
+    ;;
+  }
+
+  block v_department_finance: VizBlock {
+    label: 'Department Finance Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format { type: 'text' }
+          uname: 'thelook_products_department_1'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format { type: 'number' pattern: 'inherited' }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_department_1'
+            direction: 'asc'
+          },
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block p2_category_heading: TextBlock {
+    content: @md
+      ### Category Performance
+    ;;
+  }
+
+  block v_category_finance: VizBlock {
+    label: 'Category Finance Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Category'
+          format { type: 'text' }
+          uname: 'thelook_products_category'
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          ref: r(thelook.cogs)
+          label: 'COGS'
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format { type: 'number' pattern: 'inherited' }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_category'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+
+  block p3_definitions: TextBlock {
+    content: @md
+      ## Metric Definitions
+
+      | Metric | Definition |
+      | --- | --- |
+      | **Net Sales** | Sale price of order items, excluding Cancelled and Returned items. |
+      | **COGS** | Product cost of order items counted in Net Sales. |
+      | **Gross Profit** | Net Sales minus COGS. |
+      | **Gross Margin** | Gross Profit as a share of Net Sales. |
+
+      **Scope note:** this report is at the order-item sales grain. Its reporting-period filter uses `thelook_order_items.created_at`.
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_reporting_period'
+      to: [
+        'v_net_sales',
+        'v_cogs',
+        'v_gross_profit',
+        'v_gross_margin',
+        'v_department_finance',
+        'v_category_finance',
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+
+  view: TabLayout {
+    tab financial_summary: CanvasLayout {
+      label: '1. Financial Summary'
+      width: 820
+      height: 1160
+      grid_size: 20
+      block report_header { position: pos(20, 20, 780, 110) layer: 1 }
+      block f_reporting_period { position: pos(20, 150, 380, 100) layer: 1 }
+      block p1_contents { position: pos(20, 270, 780, 220) layer: 1 }
+      block p1_financial_summary { position: pos(20, 510, 780, 100) layer: 1 }
+      block v_net_sales { position: pos(20, 630, 380, 150) layer: 1 }
+      block v_cogs { position: pos(420, 630, 380, 150) layer: 1 }
+      block v_gross_profit { position: pos(20, 800, 380, 150) layer: 1 }
+      block v_gross_margin { position: pos(420, 800, 380, 150) layer: 1 }
+      block report_footer { position: pos(20, 1020, 780, 100) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab finance_detail: CanvasLayout {
+      label: '2. Finance Detail'
+      width: 820
+      height: 1160
+      grid_size: 20
+      block report_header { position: pos(20, 20, 780, 110) layer: 1 }
+      block f_reporting_period { position: pos(20, 150, 380, 100) layer: 1 }
+      block p2_detail_intro { position: pos(20, 270, 780, 100) layer: 1 }
+      block p2_department_heading { position: pos(20, 390, 780, 70) layer: 1 }
+      block v_department_finance { position: pos(20, 480, 780, 180) layer: 1 }
+      block p2_category_heading { position: pos(20, 680, 780, 70) layer: 1 }
+      block v_category_finance { position: pos(20, 770, 780, 240) layer: 1 }
+      block report_footer { position: pos(20, 1020, 780, 100) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab metric_definitions: CanvasLayout {
+      label: '3. Metric Definitions'
+      width: 820
+      height: 1160
+      grid_size: 20
+      block report_header { position: pos(20, 20, 780, 110) layer: 1 }
+      block f_reporting_period { position: pos(20, 150, 380, 100) layer: 1 }
+      block p3_definitions { position: pos(20, 270, 780, 480) layer: 1 }
+      block report_footer { position: pos(20, 1020, 780, 100) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

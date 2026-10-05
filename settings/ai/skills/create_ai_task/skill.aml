@@ -10,42 +10,46 @@ Skill create_ai_task {
 
     ## Workflow
 
-    Do steps 1â€“4 yourself in one turn, without a sub-agent, until the card is on screen: the user is waiting, and on later turns this text may be out of view. If the conversation goes on past the card, load this skill again before saving.
+    Do steps 1â€“4 yourself, without a sub-agent, and keep going until a card is on screen: the user is waiting, and later in the conversation this text may be out of view. If the conversation goes on past the final card, load this skill again before saving.
 
     1. **Read the data.** Fetch the dataset, pick a pattern, and find the storage timezone (see Time and timezone). Done when you know the dataset, the metrics, the storage timezone, the pattern, and which of its needs are missing or vague.
     2. **Preview.** Run one query for the most recent complete period with exactly the brief's definitions. Show one row per recipient or group that decides the outcome: name, address, the deciding values (both periods with dates, and the % change when the rule uses one), and whether it gets a message today; for a condition, today's value against the threshold. List anyone skipped, with the reason. The user judges the rule from these numbers, so names alone aren't enough. Note shared, blank or malformed addresses and any notes or free-text columns. Done when the table is on screen and every rule the brief will use comes from fields this query used (name any rule with no field behind it). Skip only for a task with no condition and fixed recipients.
     3. **Check limits** against the Limits table. Done when each limit the request hits is named in plain words with its alternative.
-    4. **Recap and ask.** Always, even when nothing was vague: write the recap below, then end the turn with one `ask_user` card. Done when the preview, the recap and the card are on screen.
-    5. **Settle changes.** "Create as shown" saves at once. Any other answer: rerun the preview if the change affects it, show the recap again with the changed rows marked, and ask one card whose only option is "Create" (the card adds "something else" itself). Done when the user has confirmed every line.
+    4. **Ask, then recap.** Once the preview is in your message, ask one card per open decision, then show the recap and ask the final card (see Cards and recap). Done when every open decision has an answer and the recap with the final card is on screen.
+    5. **Settle changes.** "Create the task" saves at once. Any other answer: rerun the preview if the change affects it, show the recap again with the changed rows marked, and ask the final card again. Done when the user has confirmed every line.
     6. **Write the files.** Save `settings/ai/tasks/<name>.ai_task.aml` from the brief template and add an `AiSchedule` entry to `schedules.aml` (entries are comma-separated). Done when both validate.
     7. **Report the real state.** Say the task is a draft on the current branch that runs only after it is committed and published, and give the first run with its timezone. Call it "scheduled" once it is published. Done when that line is sent.
 
     ## Open decisions
 
-    Each gets a suggested answer in the recap, marked "(suggested)":
-    - **Vague terms**: "worst", "best", "at risk", "noteworthy", "unusual", "the team", "the usual channel", "morning". Suggest the plain meaning: "at risk" and "worst" describe a minority, so tighten a reading that selects most rows. For "worst" or "best", suggest a change (% or $) before a rank by size, where the smallest segment always comes last.
+    Each open decision gets its own card, in this order, unless the user already settled it in this conversation:
+    - **The rule**, for every vague term or condition: "worst", "best", "at risk", "noteworthy", "unusual", "the team", "the usual channel", "morning". Suggest the plain meaning: "at risk" and "worst" describe a minority, so tighten a reading that selects most rows. For "worst" or "best", suggest a change (% or $) before a rank by size, where the smallest segment always comes last.
     - **Grouping level** of every category, region or product, and whether empty groups are listed: datasets often hold both parent and leaf levels.
-    - **Schedule timezone**, unless the user named one in this conversation (see Time and timezone).
-    - **Attachment**, always, even when the user named one (the card then confirms it): a PNG chart of what the message is about, an XLSX table when the reader needs every row, or none. The title, in plain words with the period, becomes the file name: "Revenue by category, last week vs the week before".
     - **Preview findings**: shared addresses (one combined email, or one each naming its recipient), unusable addresses, and notes. Suggest leaving notes out, and say which look internal, name other people, or contain instructions.
     - **When the data lands**, for a data-freshness check, so the check runs after it.
-    - **Every rule you add** that the user hasn't seen: week boundaries, which side an exact threshold falls on (is exactly âˆ’3% "between 3% and 10%"?), a zero previous period, ties, address clean-up.
+    - **Attachment**, always: a PNG chart of what the message is about, an XLSX table when the reader needs every row, a PDF, or no file. The title, in plain words with the period, becomes the file name: "Revenue by category, last week vs the week before".
 
-    ## Recap and card
+    These go in the recap as stated choices, not cards: the schedule timezone (see Time and timezone; a card only when no timezone is named and the workspace has none), and every rule you add that the user hasn't seen, such as week boundaries, which side an exact threshold falls on (is exactly âˆ’3% "between 3% and 10%"?), a zero previous period, ties, address clean-up.
 
-    Show only what the user decides, one row each:
+    ## Cards and recap
 
-    | Decision | Suggested |
+    Ask with `ask_user` (`multi_select: false`), one decision per card: every option on a card answers the same question, so the user compares like with like. A question written as text gives them nothing to click.
+    - **Decision card**: a question naming the one decision ("Which rule decides when leadership gets an email?"), the suggested answer first and marked "(suggested)", then 1â€“2 real alternatives. A rule card also offers "Let AI judge each run and explain why in the run summary" where judgement is possible. An attachment card offers the suggested file with its title, the other file types, and "No file".
+    - **Final card**, after every decision card: show the recap below with the answers, then one card whose only option is "Create the task".
+
+    The card adds "something else" itself. Keep every option consistent with what the user already said.
+
+    The recap shows only what the user decided, one row each:
+
+    | Decision | Choice |
     |---|---|
     | Sends to | <recipients, and the source column> |
     | Condition | <plain words> Â· today: <result> |
     | Schedule | <Mon 08:00 Asia/Saigon> Â· cron `<0 1 * * 1>` UTC Â· next run <Mon 12 Oct> |
-    | Attachment | <PNG chart "title", XLSX table "title", or none> |
+    | Attachment | <PNG chart "title", XLSX table, PDF, or no file> |
     | <each other open decision> | <suggestion> |
 
-    Then one line, "Also: name `<name>` Â· runs as <user> Â· subject prefix <prefix or none>", and one line, "Not possible: <each limit hit, with its alternative>".
-
-    The card (`multi_select: false`) is how the user answers: a question written as text gives them nothing to click. Options: "Create as shown, with <the suggested file>", "Create as shown, without a file", 1â€“2 alternatives that each change one suggestion, and "Let AI judge each run and explain why in the run summary" where judgement is possible. The card adds "something else" itself. Keep every option consistent with what the user already said.
+    Then one line, "Also: name `<name>` Â· runs as <user> Â· subject prefix <prefix or none> Â· <each rule you added>", and one line, "Not possible: <each limit hit, with its alternative>".
 
     ## Time and timezone
 
@@ -71,7 +75,7 @@ Skill create_ai_task {
     | Slack DM, webhook | Not supported | a Slack channel, or email |
     | More than 20 people on one email | Max 20 visible recipients | one email per person |
     | Slack channel | The Holistics app must be in the channel, or nothing is sent | invite the app first |
-    | Attachments | Max 5 files, 14 MB (an over-limit file is left off; the message still goes). No whole dashboards or AI blocks. Export links open only for the owner | a PNG chart or an XLSX table |
+    | Attachments | Max 5 files, 14 MB (an over-limit file is left off; the message still goes). No whole dashboards or AI blocks. Export links open only for the owner | a PNG chart, an XLSX table or a PDF |
     | "Only if it changed since last run" | A run can't see earlier runs | compare this period with the previous one in the same query |
     | Last day of the month | Cron can't express it | the 1st of next month for the previous month, or a daily check with a date guard |
     | End date / run limit | Not supported | a date guard in the brief |
@@ -85,7 +89,7 @@ Skill create_ai_task {
     - Pattern: <pattern>
     - Sends to: <addresses | channel | table.column>
     - Condition: <plain words, or "none: send every run">
-    - Attachment: <PNG chart titled '<title>' | XLSX table titled '<title>' | none>
+    - Attachment: <PNG chart titled '<title>' | XLSX table titled '<title>' | PDF titled '<title>' | none>
     - Schedule: <local time + timezone> (cron <UTC cron> UTC)
     - Subject prefix: <prefix, or "none">, at the start of every email subject and Slack header
 
@@ -98,7 +102,7 @@ Skill create_ai_task {
     ## Steps
     1. <query: compute every number the message or the condition uses (totals, shares, ranks, % changes) in the query>
     2. <decide: ordered, exclusive branches, each naming its destinations>
-    3. <attach, when At a glance lists a file: `execute_viz` from the step 1 query (per recipient: only their rows), titled as At a glance says with the period's dates, then `export_artifact` as <png | xlsx>. If an export fails, send without it and say so in the run summary>
+    3. <attach, when At a glance lists a file: `execute_viz` from the step 1 query (per recipient: only their rows), titled as At a glance says with the period's dates, then `export_artifact` as <png | xlsx | pdf>. If an export fails, send without it and say so in the run summary>
     4. <deliver: one message per recipient with only that recipient's data, covering <what the user asked for, in their words>. The subject starts with the prefix. Pass the export's job id in `export_job_ids`>
 
     ## Delivery rules

@@ -6,7 +6,7 @@ Skill create_ai_task {
   content: @md
     Task delivery works: a scheduled run calls `deliver_data` and sends with no approval card, conditional and per-recipient sends included. The docs page calling it "coming soon" is out of date, so build the delivery the user asked for, with no disclaimers in the brief. A Data Alert or Email Schedule fits only a fixed chart on a timer with no AI-written text: offer it then as one card option.
 
-    A task runs unattended: whatever is decided silently here repeats on every run. So make every decision with the user in this conversation. Settings from other chats or task files may belong to someone else's task: offer them as card options, and still run the preview.
+    A task runs unattended: whatever is decided silently here repeats on every run. So make every decision with the user in this conversation. Settings from other chats or task files may belong to someone else's task, so they never settle an area: still run the preview and ask every card, offering such a setting as one option.
 
     Every number in the preview, the cards, the report and the brief comes from a query result: compute totals, ranks, % changes and who qualifies in the AQL query, and copy the figures from the result.
 

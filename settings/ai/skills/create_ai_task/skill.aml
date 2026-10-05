@@ -12,14 +12,14 @@ Skill create_ai_task {
 
     ## Workflow
 
-    Do the steps yourself, without a sub-agent, and keep going until a card or the report is on screen: the user is waiting, and later in the conversation this text may be out of view. If the conversation goes on after a card, load this skill again before saving.
+    Do the steps yourself, without a sub-agent, and keep going until a card is on screen: the user is waiting, and later in the conversation this text may be out of view. A reply with no tool call ends your turn, so whenever you write text and the user still has something to answer, send the text and the `ask_user` call in the same reply. If the conversation goes on after a card, load this skill again before saving.
 
     1. **Read the request and the data.** Fetch the dataset, pick a pattern, and find the storage timezone (see Time and timezone). Done when you know the dataset, the metrics, the storage timezone, the pattern, and which areas below the request leaves unclear.
     2. **Check limits first.** Compare the request with the Limits table. When it needs something a task can't do, stop there: say in one line what can't be done and why, then call `ask_user` with the ways that do work (the Offer column), the closest one first and marked "(recommended)", and "Don't create the task" as the last option. One limit per card. Create nothing until the user picks a way that works. Done when every part of the request is something a task can do. After the preview, check again for limits that depend on the data, such as more than 20 people on one email.
     3. **Preview.** Run one query for the most recent complete period with exactly the brief's definitions. Show one row per recipient or group that decides the outcome: name, address, the deciding values (both periods with dates, and the % change when the rule uses one), and whether it gets a message today; for a condition, today's value against the threshold. List anyone skipped, with the reason. The user judges the rule from these numbers, so names alone aren't enough. Note shared, blank or malformed addresses and any notes or free-text columns. Done when the table is on screen and every rule the brief will use comes from fields this query used (name any rule with no field behind it). Skip only for a task with no condition and fixed recipients.
-    4. **Ask, one card per unclear area.** Go through the five areas below in order. An area is settled only when it passes its "clear when" test or the user answered its card; otherwise call `ask_user` for it. When an answer changes what the preview showed, run the preview again before the next card. Done when all five areas are settled.
-    5. **Create**, once all five areas are settled. Save `settings/ai/tasks/<name>.ai_task.aml` from the brief template and add an `AiSchedule` entry to `schedules.aml` (entries are comma-separated), then validate both. The copilot's own "Accept creating new file?" step is the user's last check. Done when both files are saved and validate.
-    6. **Report.** Write the report below, then ask the follow-up card. Done when both are on screen.
+    4. **Ask, one card per unclear area.** Once the preview is in your message, call `ask_user` for the first unclear area below, then once for each next one, in order. An area is settled only when it passes its "clear when" test or the user answered its card. When an answer changes what the preview showed, run the preview again before the next card. Done when all five areas are settled.
+    5. **Create**, once all five areas are settled. First check them against the user's own words: a vague word in the request ("noteworthy", "anything you think leadership should know") leaves the Condition open, and no named file type leaves the Attachment open, so go back to step 4 for any area still open, even when your own choice seems obvious. Then save `settings/ai/tasks/<name>.ai_task.aml` from the brief template and add an `AiSchedule` entry to `schedules.aml` (entries are comma-separated), then validate both. The copilot's own "Accept creating new file?" step is the user's last check. Done when both files are saved and validate.
+    6. **Report.** In one reply, write the report below and call `ask_user` with the follow-ups: the report text first, then the call. A reply with only the report ends your turn before the card appears. Done when both are on screen.
 
     ## Unclear areas and their cards
 
@@ -33,24 +33,21 @@ Skill create_ai_task {
 
     ## Report
 
-    After saving, write this, filled with what the user confirmed or said. Keep each cell to a few words: the key fact, no explanation.
+    After saving, write this, filled with what the user confirmed or said. Keep each line to the key facts, no explanation.
 
     ```
-    ## ✅ Task created: commit and publish to activate it
+    ## ✅ Task created `<name>` (please commit and publish to use)
 
-    | 📋 Task | `<name>` |
-    |---|---|
-    | 👥 To | <recipients, or the address column> |
-    | 🔔 Sends when | <rule in a few words> · today: <yes or no, with the deciding number> |
-    | 🗓️ Schedule | <Mon 08:00 Asia/Saigon> (`<0 1 * * 1>` UTC) · first run <Mon 12 Oct> |
-    | 📎 Attachment | <PNG chart, XLSX table, PDF, or none> |
-    | ✉️ Message | <what it says, in a few words> |
-    | ⚙️ Also | runs as <user> · subject starts <prefix or "no prefix"> |
+    - 👥 **To** <recipients, or the address column>
+    - 🗓️ **When** <Mondays 8:00 AM Asia/Saigon> · first run <Oct 12, 2026>
+    - 🔔 **Condition** <rule in a few words> · today: <yes or no, with the deciding number>
+    - ✉️ **Output** <what it says, in a few words> · <PNG chart | XLSX table | PDF | no attachment>
+    - ⚙️ **Settings** runs as <user> · subject starts <prefix, or "no prefix"> · cron `<0 1 * * 1>` UTC
     ```
 
-    The `##` line is the status header: keep it first, worded as above. Call the task "scheduled" only once it is published.
+    The `##` line is the status header: start the reply with it, worded as above, with the task name in backticks. Write the 🔔 Condition line only for a task that sends on a condition; a task that sends every run leaves it out. End the text with the list: no lead-in line before the header and no closing line after the list, such as "both files validate". Call the task "scheduled" only once it is published.
 
-    Then call `ask_user` once with 2–3 follow-ups as options, and "Nothing else for now" as the last option. Each follow-up names something specific to this task that you saw: a threshold the preview shows near its line ("Lower the threshold to 8%: India is at −9.98%"), a freshness guard when the data lands late, a test with Run now after publishing (it sends for real), a second destination only if the user mentioned one, a daylight-saving shift.
+    In the same reply, right after the report, call `ask_user` once with the follow-ups as options: "Commit and publish now" first, then 1–2 that each name something specific to this task that you saw, then "Nothing else for now" last. Task-specific follow-ups: a threshold the preview shows near its line ("Lower the threshold to 8%: India is at −9.98%"), a freshness guard when the data lands late, a test with Run now after publishing (it sends for real), a second destination only if the user mentioned one, a daylight-saving shift. When the user picks "Commit and publish now", do it if you have a tool for it, committing only the task file and `schedules.aml`. Otherwise say where to click: Commit changes (with only those two files), then Publish, both at the top right.
 
     ## Time and timezone
 

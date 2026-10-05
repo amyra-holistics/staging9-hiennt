@@ -1,0 +1,389 @@
+Dashboard r05_haid_html_a3 {
+  title: 'Finance Performance Report — Print Ready'
+  description: @md
+A print-ready finance report with report-period filtering, department and category detail, and metric definitions.
+;;
+
+  block f_report_period: FilterBlock {
+    label: 'Selected Report Period'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_cogs: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_department_table: VizBlock {
+    label: 'Financial Performance by Department'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'net_sales'
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'net_sales'
+            direction: 'desc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_category_table: VizBlock {
+    label: 'Financial Performance by Category'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_net_sales_1'
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_net_sales_1'
+            direction: 'desc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_report_period'
+      to: ['v_net_sales', 'v_cogs', 'v_gross_profit', 'v_department_table', 'v_category_table']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  :root {
+    --page-width: 210mm;
+    --page-height: 297mm;
+    --page-margin: 15mm;
+    --ink: #14213d;
+    --muted: #5f6b7a;
+    --accent: #0f766e;
+    --accent-soft: #e6f4f1;
+    --paper: #ffffff;
+    --line: #cbd5e1;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #e5e7eb; }
+  body { color: var(--ink); font-family: Arial, Helvetica, sans-serif; }
+  .report-page {
+    width: var(--page-width);
+    min-height: var(--page-height);
+    margin: 10mm auto;
+    padding: var(--page-margin);
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: 0 2mm 8mm rgba(15, 23, 42, .16);
+    display: flex;
+    flex-direction: column;
+  }
+  .report-header, .report-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8mm;
+    color: var(--muted);
+    font-size: 8.5pt;
+    letter-spacing: .04em;
+  }
+  .report-header { border-bottom: 1px solid var(--line); padding-bottom: 4mm; }
+  .report-footer { border-top: 1px solid var(--line); padding-top: 3mm; margin-top: auto; }
+  .report-brand { color: var(--ink); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .report-period { color: var(--accent); font-weight: 700; text-align: right; }
+  .page-number { white-space: nowrap; }
+  .cover { justify-content: space-between; }
+  .cover-main { padding-top: 24mm; }
+  .eyebrow { color: var(--accent); font-size: 9pt; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  h1 { margin: 5mm 0 4mm; color: var(--ink); font-size: 33pt; line-height: 1.04; letter-spacing: -.035em; }
+  h2 { margin: 0; color: var(--ink); font-size: 19pt; letter-spacing: -.02em; }
+  h3 { margin: 0 0 2mm; color: var(--ink); font-size: 11pt; }
+  p { margin: 0; color: var(--muted); font-size: 10pt; line-height: 1.55; }
+  .export-note { margin: 7mm 0; padding: 3.5mm 4mm; border-left: 3px solid var(--accent); background: var(--accent-soft); color: var(--ink); font-size: 9pt; }
+  .filter-panel { margin: 7mm 0 8mm; padding: 4mm; border: 1px solid var(--line); border-radius: 2mm; background: #f8fafc; }
+  .filter-panel h3 { margin-bottom: 2mm; }
+  .toc { margin-top: 12mm; padding-top: 6mm; border-top: 2px solid var(--ink); }
+  .toc ol { margin: 4mm 0 0; padding-left: 6mm; }
+  .toc li { margin: 2.5mm 0; color: var(--muted); font-size: 10.5pt; }
+  .toc a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+  .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin: 8mm 0; }
+  .kpi-card { min-height: 35mm; padding: 4mm; border: 1px solid var(--line); border-top: 3px solid var(--accent); background: #fff; }
+  .section-page { gap: 6mm; }
+  .section-intro { padding: 4mm 0; }
+  .table-frame { border: 1px solid var(--line); border-radius: 1.5mm; overflow: hidden; background: #fff; }
+  .definition-list { margin: 8mm 0 0; border-top: 1px solid var(--line); }
+  .definition { padding: 5mm 0; border-bottom: 1px solid var(--line); }
+  .definition dt { color: var(--ink); font-size: 11pt; font-weight: 700; }
+  .definition dd { margin: 1.5mm 0 0; color: var(--muted); font-size: 10pt; line-height: 1.5; }
+  h-block { display: block; width: 100%; }
+
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    html, body { background: #fff; }
+    .report-page {
+      width: 210mm;
+      min-height: 297mm;
+      height: 297mm;
+      margin: 0;
+      box-shadow: none;
+      break-after: page;
+      page-break-after: always;
+    }
+    .report-page:last-child { break-after: auto; page-break-after: auto; }
+    .table-frame, .kpi-card, .definition { break-inside: avoid; page-break-inside: avoid; }
+    a { color: inherit; text-decoration: none; }
+  }
+</style>
+
+<section class="report-page cover" id="cover">
+  <header class="report-header">
+    <span class="report-brand">Finance Performance Report</span>
+    <span class="report-period">Selected report period: use the control below</span>
+  </header>
+  <main class="cover-main">
+    <div class="eyebrow">A4 print-ready financial reporting</div>
+    <h1>Finance<br>Performance Report</h1>
+    <p>Period-filtered Net Sales, COGS, and Gross Profit for financial review and PDF distribution.</p>
+    <div class="export-note"><strong>PDF tip:</strong> use the dashboard <strong>Export</strong> button to create the PDF. The report is formatted for A4 portrait pages and clean page breaks.</div>
+    <div class="filter-panel">
+      <h3>Selected report period</h3>
+      <p>Select the reporting window below. It filters every KPI and both financial tables in this report.</p>
+      <h-block name="f_report_period"></h-block>
+    </div>
+    <nav class="toc" aria-label="Table of contents">
+      <div class="eyebrow">Contents</div>
+      <ol>
+        <li><a href="#summary">1. Financial summary</a></li>
+        <li><a href="#department">2. Department performance</a></li>
+        <li><a href="#category">3. Category performance</a></li>
+        <li><a href="#definitions">4. Metric definitions</a></li>
+      </ol>
+    </nav>
+  </main>
+  <footer class="report-footer">
+    <span>Finance Performance Report</span>
+    <span>Selected report period controlled on page 1</span>
+    <span class="page-number">Page 1 of 5</span>
+  </footer>
+</section>
+
+<section class="report-page section-page" id="summary">
+  <header class="report-header">
+    <span class="report-brand">Finance Performance Report</span>
+    <span class="report-period">Selected report period: dashboard control</span>
+  </header>
+  <main>
+    <div class="eyebrow">Section 1</div>
+    <h2>Financial summary</h2>
+    <p class="section-intro">Headline financial outcomes for the selected report period. Currency formatting is inherited from @Dataset:thelook.</p>
+    <div class="kpi-grid">
+      <div class="kpi-card"><h3>Net Sales</h3><h-block name="v_net_sales"></h-block></div>
+      <div class="kpi-card"><h3>COGS</h3><h-block name="v_cogs"></h-block></div>
+      <div class="kpi-card"><h3>Gross Profit</h3><h-block name="v_gross_profit"></h-block></div>
+    </div>
+  </main>
+  <footer class="report-footer">
+    <span>Finance Performance Report</span>
+    <span>Selected report period controlled on page 1</span>
+    <span class="page-number">Page 2 of 5</span>
+  </footer>
+</section>
+
+<section class="report-page section-page" id="department">
+  <header class="report-header">
+    <span class="report-brand">Finance Performance Report</span>
+    <span class="report-period">Selected report period: dashboard control</span>
+  </header>
+  <main>
+    <div class="eyebrow">Section 2</div>
+    <h2>Department performance</h2>
+    <p class="section-intro">Departments ranked by Net Sales, with matching COGS and Gross Profit for the selected report period.</p>
+    <div class="table-frame"><h-block name="v_department_table"></h-block></div>
+  </main>
+  <footer class="report-footer">
+    <span>Finance Performance Report</span>
+    <span>Selected report period controlled on page 1</span>
+    <span class="page-number">Page 3 of 5</span>
+  </footer>
+</section>
+
+<section class="report-page section-page" id="category">
+  <header class="report-header">
+    <span class="report-brand">Finance Performance Report</span>
+    <span class="report-period">Selected report period: dashboard control</span>
+  </header>
+  <main>
+    <div class="eyebrow">Section 3</div>
+    <h2>Category performance</h2>
+    <p class="section-intro">Categories ranked by Net Sales, with matching COGS and Gross Profit for the selected report period.</p>
+    <div class="table-frame"><h-block name="v_category_table"></h-block></div>
+  </main>
+  <footer class="report-footer">
+    <span>Finance Performance Report</span>
+    <span>Selected report period controlled on page 1</span>
+    <span class="page-number">Page 4 of 5</span>
+  </footer>
+</section>
+
+<section class="report-page section-page" id="definitions">
+  <header class="report-header">
+    <span class="report-brand">Finance Performance Report</span>
+    <span class="report-period">Selected report period: dashboard control</span>
+  </header>
+  <main>
+    <div class="eyebrow">Section 4</div>
+    <h2>Metric definitions</h2>
+    <p class="section-intro">Definitions used consistently in the KPI summary and detailed financial tables.</p>
+    <dl class="definition-list">
+      <div class="definition">
+        <dt>Net Sales</dt>
+        <dd>Sale price of order items excluding Cancelled and Returned items.</dd>
+      </div>
+      <div class="definition">
+        <dt>COGS</dt>
+        <dd>Product cost of order items counted in Net Sales; Cancelled and Returned items are excluded.</dd>
+      </div>
+      <div class="definition">
+        <dt>Gross Profit</dt>
+        <dd>Net Sales minus COGS.</dd>
+      </div>
+      <div class="definition">
+        <dt>Report period</dt>
+        <dd>The user-selected date range applied using Order Items Created at. It filters all five data blocks.</dd>
+      </div>
+    </dl>
+  </main>
+  <footer class="report-footer">
+    <span>Finance Performance Report</span>
+    <span>Selected report period controlled on page 1</span>
+    <span class="page-number">Metric definitions</span>
+  </footer>
+</section>
+;;
+  }
+}

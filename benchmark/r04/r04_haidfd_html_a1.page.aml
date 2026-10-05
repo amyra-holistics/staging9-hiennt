@@ -1,0 +1,494 @@
+Dashboard r04_haidfd_html_a1 {
+  title: 'Monthly Performance Review'
+  description: @md
+    A five-slide monthly retail performance deck. Use the date range and department controls to refresh every KPI, trend, category view, and takeaway for the selected period.
+  ;;
+  theme: H.themes.classic
+
+  block slide_title: TextBlock {
+    content: @md
+      # Monthly Performance Review
+      A focused retail readout for the selected reporting period.
+    ;;
+  }
+
+  block slide_kpis: TextBlock {
+    content: @md
+      ## Headline KPIs
+      The period's sales, profit, margin, and order volume at a glance.
+    ;;
+  }
+
+  block slide_trend: TextBlock {
+    content: @md
+      ## Monthly trend
+      Follow net sales and gross profit through time.
+    ;;
+  }
+
+  block slide_category: TextBlock {
+    content: @md
+      ## Category breakdown
+      Compare the categories that contribute most to sales and gross profit.
+    ;;
+  }
+
+  block slide_takeaways: TextBlock {
+    content: @md
+      ## Key takeaways
+      A selected-period summary and ranked category detail.
+    ;;
+  }
+
+  block date_range: FilterBlock {
+    label: 'Date Range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block department_filter: FilterBlock {
+    label: 'Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+
+  block gross_sales_kpi: VizBlock {
+    label: 'Gross Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block net_sales_kpi: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_profit_kpi: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_margin_kpi: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block orders_kpi: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block monthly_sales_profit_trend: VizBlock {
+    label: 'Monthly Sales and Profit Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        label: 'Sales and Profit'
+        series { mark_type: 'line' field: VizFieldFull { ref: r(thelook.net_sales) label: 'Net Sales' format { type: 'number' pattern: 'inherited' } } }
+        series { mark_type: 'line' field: VizFieldFull { ref: r(thelook.gross_profit) label: 'Gross Profit' format { type: 'number' pattern: 'inherited' } } }
+      }
+      settings { legend_label: 'top' show_data_points: false sort: LineFamilySort { type: 'xaxis' direction: 'asc' } }
+    }
+  }
+
+  block net_sales_by_category: VizBlock {
+    label: 'Net Sales by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block gross_profit_by_category: VizBlock {
+    label: 'Gross Profit by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block category_performance_detail: VizBlock {
+    label: 'Category performance'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          uname: 'net_sales'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 25
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'net_sales'
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  block selected_period_key_takeaways: VizBlock {
+    label: 'Selected-period key takeaways'
+    viz: MarkdownViz {
+      dataset: thelook
+      values: [
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      content: @md
+        <section class="period-performance-summary">
+          <h2 class="period-performance-summary__title">Performance at a glance</h2>
+          <p class="period-performance-summary__context">All values reflect the viewer-selected reporting period.</p>
+          <div class="period-performance-summary__metrics">
+            <div class="period-performance-summary__metric">
+              <span class="period-performance-summary__label">Net sales</span>
+              <span class="period-performance-summary__value">{{ rows[0].values.`Net Sales` }}</span>
+            </div>
+            <div class="period-performance-summary__metric">
+              <span class="period-performance-summary__label">Gross profit</span>
+              <span class="period-performance-summary__value">{{ rows[0].values.`Gross Profit` }}</span>
+            </div>
+            <div class="period-performance-summary__metric">
+              <span class="period-performance-summary__label">Gross margin</span>
+              <span class="period-performance-summary__value">{{ rows[0].values.`Gross Margin` }}</span>
+            </div>
+          </div>
+          <p class="period-performance-summary__takeaway">The business generated <strong>{{ rows[0].values.`Net Sales` }}</strong> in net sales and retained <strong>{{ rows[0].values.`Gross Profit` }}</strong> in gross profit, for a <strong>{{ rows[0].values.`Gross Margin` }}</strong> gross margin.</p>
+        </section>
+      ;;
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_range'
+      to: ['gross_sales_kpi', 'net_sales_kpi', 'gross_profit_kpi', 'gross_margin_kpi', 'orders_kpi', 'monthly_sales_profit_trend', 'net_sales_by_category', 'gross_profit_by_category', 'category_performance_detail', 'selected_period_key_takeaways']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'department_filter'
+      to: ['gross_sales_kpi', 'net_sales_kpi', 'gross_profit_kpi', 'gross_margin_kpi', 'orders_kpi', 'monthly_sales_profit_trend', 'net_sales_by_category', 'gross_profit_by_category', 'category_performance_detail', 'selected_period_key_takeaways']
+      field: r(thelook_products.department)
+    },
+    FilterInteraction {
+      from: 'date_range'
+      to: ['department_filter']
+      disabled: true
+    },
+    FilterInteraction {
+      from: 'department_filter'
+      to: ['date_range']
+      disabled: true
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .r04-deck, .r04-deck * { box-sizing: border-box; }
+        .r04-deck {
+          --ink: #102A43;
+          --canvas: #F7F5F0;
+          --vermilion: #D95D39;
+          --mist: #DCE6E8;
+          --charcoal: #263238;
+          color: var(--ink);
+          background: var(--canvas);
+          font-family: Georgia, 'Times New Roman', serif;
+          height: 100vh;
+          overflow-y: auto;
+          scroll-snap-type: y mandatory;
+          scroll-behavior: smooth;
+        }
+        .r04-slide {
+          width: 100%;
+          min-height: 620px;
+          height: min(100vh, 56.25vw);
+          max-height: 900px;
+          padding: clamp(28px, 4vw, 70px);
+          position: relative;
+          overflow: hidden;
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+          page-break-after: always;
+          break-after: page;
+        }
+        .r04-slide:last-child { page-break-after: auto; break-after: auto; }
+        .r04-slide::after {
+          content: '';
+          position: absolute;
+          right: 0;
+          bottom: 0;
+          width: 23%;
+          height: 7px;
+          background: var(--vermilion);
+        }
+        .r04-deck h1, .r04-deck h2, .r04-deck p { margin: 0; }
+        .r04-deck h1 { font-size: clamp(3rem, 6.7vw, 7.2rem); line-height: .88; letter-spacing: -.06em; }
+        .r04-deck h2 { font-size: clamp(2.1rem, 4vw, 4.4rem); line-height: .95; letter-spacing: -.045em; }
+        .r04-overline { font: 600 .72rem/1.2 Arial, sans-serif; letter-spacing: .16em; color: var(--vermilion); }
+        .r04-subtitle { max-width: 35rem; margin-top: 1.3rem !important; font-size: clamp(1rem, 1.5vw, 1.35rem); line-height: 1.45; color: #486581; }
+        .r04-slide-head { display: flex; justify-content: space-between; align-items: end; padding-bottom: 1rem; border-bottom: 2px solid var(--ink); }
+        .r04-page { font: 600 .72rem/1 Arial, sans-serif; letter-spacing: .12em; color: #627D98; }
+        .r04-title { background: var(--ink); color: var(--canvas); display: grid; grid-template-columns: 1.3fr .7fr; gap: 4vw; align-items: center; }
+        .r04-title::after { width: 36%; height: 18px; }
+        .r04-title .r04-subtitle { color: var(--mist); }
+        .r04-title .r04-overline { color: #F6AE2D; }
+        .r04-control-panel { align-self: stretch; background: var(--canvas); color: var(--ink); padding: clamp(22px, 3vw, 42px); display: flex; flex-direction: column; justify-content: center; border-left: 8px solid var(--vermilion); }
+        .r04-control-panel p { margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.4; }
+        .r04-control-panel h-block + h-block { margin-top: 1rem; }
+        .r04-kpis { background: var(--canvas); }
+        .r04-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); margin-top: clamp(34px, 6vh, 70px); border-top: 1px solid #9FB3C8; border-bottom: 1px solid #9FB3C8; }
+        .r04-kpi-grid h-block { min-width: 0; min-height: 180px; padding: 1.4rem; border-left: 1px solid #9FB3C8; }
+        .r04-kpi-grid h-block:first-child { border-left: 0; }
+        .r04-trend { background: var(--mist); }
+        .r04-chart-wrap { height: calc(100% - 165px); min-height: 380px; margin-top: 2rem; background: #FFFFFF; border: 1px solid #BCCCDC; padding: 1rem; }
+        .r04-chart-wrap h-block { display: block; height: 100%; }
+        .r04-category { background: var(--charcoal); color: var(--canvas); }
+        .r04-category .r04-slide-head { border-color: var(--mist); }
+        .r04-category .r04-page { color: #BCCCDC; }
+        .r04-category-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; height: calc(100% - 150px); margin-top: 1.7rem; }
+        .r04-category-card { min-height: 390px; background: var(--canvas); padding: 1rem; color: var(--ink); border-top: 8px solid var(--vermilion); }
+        .r04-category-card h-block { display: block; height: 100%; }
+        .r04-takeaways { background: #FFFFFF; }
+        .r04-takeaway-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 2rem; height: calc(100% - 160px); margin-top: 1.8rem; }
+        .r04-takeaway-panel { min-height: 390px; padding: 1.4rem; background: var(--mist); border-top: 8px solid var(--vermilion); }
+        .r04-detail-panel { min-height: 390px; padding: 1rem; border: 1px solid #BCCCDC; }
+        .r04-takeaway-panel h-block, .r04-detail-panel h-block { display: block; height: 100%; }
+        .period-performance-summary { color: #102A43; font-family: Arial, sans-serif; }
+        .period-performance-summary__title { margin: 0; font-size: 1.4rem; }
+        .period-performance-summary__context, .period-performance-summary__takeaway { color: #486581; line-height: 1.5; }
+        .period-performance-summary__metrics { display: grid; grid-template-columns: 1fr; gap: .8rem; margin: 1.5rem 0; }
+        .period-performance-summary__metric { padding: .8rem 0; border-bottom: 1px solid #9FB3C8; }
+        .period-performance-summary__label { display: block; font-size: .75rem; color: #627D98; }
+        .period-performance-summary__value { display: block; margin-top: .25rem; font-size: 1.75rem; font-weight: 700; }
+        @media (max-width: 900px) {
+          .r04-slide { height: auto; min-height: 100vh; }
+          .r04-title, .r04-takeaway-grid { grid-template-columns: 1fr; }
+          .r04-kpi-grid { grid-template-columns: repeat(2, 1fr); }
+          .r04-kpi-grid h-block:nth-child(odd) { border-left: 0; }
+          .r04-category-grid { grid-template-columns: 1fr; height: auto; }
+        }
+        @media print {
+          .r04-deck { height: auto; overflow: visible; }
+          .r04-slide { width: 100vw; height: 56.25vw; min-height: 0; max-height: none; margin: 0; page-break-after: always; break-after: page; }
+          .r04-slide:last-child { page-break-after: auto; break-after: auto; }
+        }
+      </style>
+      <main class="r04-deck">
+        <section class="r04-slide r04-title">
+          <div>
+            <div class="r04-overline">Retail performance / monthly deck</div>
+            <h-block name="slide_title" />
+            <p class="r04-subtitle">A restrained review of commercial momentum, designed to move from the whole business to the category-level signal.</p>
+          </div>
+          <aside class="r04-control-panel">
+            <p><strong>Set the reporting frame.</strong><br>Every slide refreshes with these shared controls.</p>
+            <h-block name="date_range" />
+            <h-block name="department_filter" />
+          </aside>
+        </section>
+        <section class="r04-slide r04-kpis">
+          <div class="r04-slide-head"><div><div class="r04-overline">01 / Performance snapshot</div><h-block name="slide_kpis" /></div><div class="r04-page">MONTHLY REVIEW</div></div>
+          <div class="r04-kpi-grid">
+            <h-block name="gross_sales_kpi" />
+            <h-block name="net_sales_kpi" />
+            <h-block name="gross_profit_kpi" />
+            <h-block name="gross_margin_kpi" />
+            <h-block name="orders_kpi" />
+          </div>
+        </section>
+        <section class="r04-slide r04-trend">
+          <div class="r04-slide-head"><div><div class="r04-overline">02 / Direction of travel</div><h-block name="slide_trend" /></div><div class="r04-page">MONTHLY REVIEW</div></div>
+          <div class="r04-chart-wrap"><h-block name="monthly_sales_profit_trend" /></div>
+        </section>
+        <section class="r04-slide r04-category">
+          <div class="r04-slide-head"><div><div class="r04-overline">03 / Mix and contribution</div><h-block name="slide_category" /></div><div class="r04-page">MONTHLY REVIEW</div></div>
+          <div class="r04-category-grid">
+            <div class="r04-category-card"><h-block name="net_sales_by_category" /></div>
+            <div class="r04-category-card"><h-block name="gross_profit_by_category" /></div>
+          </div>
+        </section>
+        <section class="r04-slide r04-takeaways">
+          <div class="r04-slide-head"><div><div class="r04-overline">04 / Readout</div><h-block name="slide_takeaways" /></div><div class="r04-page">MONTHLY REVIEW</div></div>
+          <div class="r04-takeaway-grid">
+            <div class="r04-takeaway-panel"><h-block name="selected_period_key_takeaways" /></div>
+            <div class="r04-detail-panel"><h-block name="category_performance_detail" /></div>
+          </div>
+        </section>
+      </main>
+    ;;
+  }
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 60
+  }
+}

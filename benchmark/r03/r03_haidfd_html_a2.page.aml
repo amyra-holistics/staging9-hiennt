@@ -1,0 +1,640 @@
+PageTheme r03_haidfd_html_a2_theme {
+  background {
+    bg_color: "#F5EFE6"
+  }
+
+  canvas {
+    background {
+      bg_color: "#F5EFE6"
+    }
+    border {
+      border_width: 0
+    }
+    shadow: "none"
+  }
+
+  block {
+    text {
+      font_family: "Manrope"
+      font_color: "#1B1F3B"
+    }
+    background {
+      bg_color: "transparent"
+    }
+    border {
+      border_width: 0
+    }
+    padding: 0
+    shadow: "none"
+  }
+
+  viz {
+    metric_kpi {
+      alignment: "left"
+      trend {
+        positive {
+          text {
+            font_color: "#1F9E8F"
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "#DDF3F0"
+          }
+        }
+        negative {
+          text {
+            font_color: "#D64545"
+            font_weight: "bold"
+          }
+          background {
+            bg_color: "#FBE3E1"
+          }
+        }
+      }
+    }
+  }
+
+  custom_css: @css
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap');
+
+    .r03-business-review,
+    .r03-business-review * {
+      box-sizing: border-box;
+    }
+
+    .r03-business-review {
+      --ink: #1B1F3B;
+      --coral: #FF6B5A;
+      --sand: #F5EFE6;
+      --teal: #1F9E8F;
+      --alert: #D64545;
+      --slate: #5B6477;
+      color: var(--ink);
+      font-family: 'Manrope', Arial, sans-serif;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .r03-business-review h1,
+    .r03-business-review h2,
+    .r03-business-review p {
+      margin: 0;
+    }
+
+    .r03-header {
+      background: var(--ink);
+      border-radius: 20px;
+      min-height: 172px;
+      overflow: hidden;
+    }
+
+    .r03-header .dac-text-block {
+      height: 100%;
+    }
+
+    .r03-header-copy {
+      align-items: center;
+      color: white;
+      display: grid;
+      gap: 22px;
+      grid-template-columns: auto minmax(0, 1fr);
+      min-height: 172px;
+      padding: 30px 36px;
+    }
+
+    .r03-logo {
+      height: 46px;
+      width: 148px;
+    }
+
+    .r03-header-copy p {
+      color: #D8DCE8;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.45;
+      margin-top: 8px;
+      max-width: 620px;
+    }
+
+    .r03-header-copy h1 {
+      font-size: clamp(28px, 4vw, 46px);
+      font-weight: 800;
+      letter-spacing: -0.05em;
+      line-height: 1.02;
+    }
+
+    .r03-control-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 0.8fr);
+      margin: 18px 0 24px;
+    }
+
+    .r03-control,
+    .r03-kpi-card,
+    .r03-chart-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(27, 31, 59, 0.10);
+      border-radius: 16px;
+    }
+
+    .r03-control {
+      min-height: 96px;
+      padding: 10px 14px;
+    }
+
+    .r03-control .dac-ic-block {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+    }
+
+    .r03-control .dac-ic-block-label {
+      color: var(--slate);
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .r03-kpi-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .r03-kpi-card {
+      min-height: 184px;
+      overflow: hidden;
+      padding: 20px;
+      position: relative;
+    }
+
+    .r03-kpi-title .dac-text-block {
+      margin-bottom: 6px;
+    }
+
+    .r03-kpi-caption {
+      align-items: center;
+      color: var(--slate);
+      display: flex;
+      font-size: 13px;
+      font-weight: 800;
+      gap: 9px;
+      letter-spacing: -0.01em;
+    }
+
+    .r03-kpi-icon {
+      align-items: center;
+      background: var(--sand);
+      border-radius: 10px;
+      color: var(--coral);
+      display: inline-flex;
+      height: 32px;
+      justify-content: center;
+      width: 32px;
+    }
+
+    .r03-kpi-icon svg {
+      height: 18px;
+      width: 18px;
+    }
+
+    .r03-kpi-value .dac-viz-block,
+    .r03-kpi-value .dac-viz-block > div {
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .r03-kpi-value .dac-viz-block-label-container {
+      display: none;
+    }
+
+    .r03-section-heading {
+      margin: 36px 0 14px;
+    }
+
+    .r03-section-heading .dac-text-block {
+      border-bottom: 1px solid rgba(27, 31, 59, 0.15);
+      padding-bottom: 12px;
+    }
+
+    .r03-section-heading h2 {
+      color: var(--ink);
+      font-size: 21px;
+      font-weight: 800;
+      letter-spacing: -0.035em;
+      line-height: 1.2;
+    }
+
+    .r03-section-heading p {
+      color: var(--slate);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-top: 5px;
+    }
+
+    .r03-chart-card {
+      min-height: 390px;
+      overflow: hidden;
+      padding: 16px 18px 10px;
+    }
+
+    .r03-chart-card .dac-viz-block,
+    .r03-chart-card .dac-viz-block > div {
+      height: 100%;
+    }
+
+    .r03-chart-card .dac-viz-block-label {
+      color: var(--ink);
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .r03-drivers-grid {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 900px) {
+      .r03-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .r03-control-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .r03-business-review { padding: 12px; }
+      .r03-header-copy { grid-template-columns: 1fr; padding: 26px 22px; }
+      .r03-kpi-grid, .r03-drivers-grid { grid-template-columns: 1fr; }
+      .r03-kpi-card { min-height: 160px; }
+    }
+  ;;
+}
+
+Dashboard r03_haidfd_html_a2 {
+  title: 'TheLook business review'
+  description: @md
+A commercial performance review for monitoring sales, orders, margin, and the product mix behind them.
+  ;;
+  theme: r03_haidfd_html_a2_theme
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block review_header: TextBlock {
+    content: @md
+<div class="r03-header-copy">
+  <img class="r03-logo" alt="TheLook" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 90'%3E%3Ccircle cx='37' cy='45' r='28' fill='%23FF6B5A'/%3E%3Cpath d='M24 45h26M37 32v26' stroke='white' stroke-width='7' stroke-linecap='round'/%3E%3Ctext x='77' y='60' font-family='Arial,sans-serif' font-size='48' font-weight='800' fill='white'%3Ethelook%3C/text%3E%3C/svg%3E" />
+  <div>
+    <h1>Commercial performance</h1>
+    <p>Review sales momentum, order demand, margin quality, and the product mix shaping this period.</p>
+  </div>
+</div>
+    ;;
+  }
+
+  block f_date: FilterBlock {
+    label: 'Order date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block p_compare: PopBlock {
+    label: 'Compare to'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block net_sales_title: TextBlock {
+    content: @md
+<div class="r03-kpi-caption"><span class="r03-kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/><path d="m7 15 4-4 3 2 5-6"/></svg></span>Net Sales</div>
+    ;;
+  }
+
+  block orders_title: TextBlock {
+    content: @md
+<div class="r03-kpi-caption"><span class="r03-kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2 12h10l2-8H6"/><circle cx="9" cy="20" r="1"/><circle cx="17" cy="20" r="1"/></svg></span>Orders</div>
+    ;;
+  }
+
+  block aov_title: TextBlock {
+    content: @md
+<div class="r03-kpi-caption"><span class="r03-kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 10h8M8 14h4"/></svg></span>Average order value</div>
+    ;;
+  }
+
+  block margin_title: TextBlock {
+    content: @md
+<div class="r03-kpi-caption"><span class="r03-kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V5M4 19h16"/><path d="M7 15l3-3 3 2 4-7"/></svg></span>Gross Margin</div>
+    ;;
+  }
+
+  block net_sales_kpi: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block total_orders_kpi: VizBlock {
+    label: 'Total Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Total Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block aov_kpi: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block gross_margin_kpi: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+
+  block trend_heading: TextBlock {
+    content: @md
+<h2>Sales momentum</h2>
+<p>Track the relationship between monthly net sales and demand, then use the controls above to focus the review.</p>
+    ;;
+  }
+
+  block monthly_net_sales_and_total_orders: VizBlock {
+    label: 'Monthly Net Sales and Total Orders'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        label: 'Created Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      y_axis {
+        label: 'Total Orders'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.total_orders)
+            label: 'Total Orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block drivers_heading: TextBlock {
+    content: @md
+<h2>Product mix</h2>
+<p>Identify which categories and brands are contributing the most net sales in the selected period.</p>
+    ;;
+  }
+
+  block category_net_sales_ranking: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block top_ten_brand_net_sales_ranking: VizBlock {
+    label: 'Top 10 Product Brands by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.brand)
+        label: 'Product Brand'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 10
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: [
+        'net_sales_kpi',
+        'total_orders_kpi',
+        'aov_kpi',
+        'gross_margin_kpi',
+        'monthly_net_sales_and_total_orders',
+        'category_net_sales_ranking',
+        'top_ten_brand_net_sales_ranking'
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: [
+        'net_sales_kpi',
+        'total_orders_kpi',
+        'aov_kpi',
+        'gross_margin_kpi',
+        'monthly_net_sales_and_total_orders',
+        'category_net_sales_ranking',
+        'top_ten_brand_net_sales_ranking'
+      ]
+      field: r(thelook_products.category)
+    },
+    PopInteraction {
+      from: 'p_compare'
+      to: [
+        'net_sales_kpi',
+        'total_orders_kpi',
+        'aov_kpi',
+        'gross_margin_kpi',
+        'monthly_net_sales_and_total_orders'
+      ]
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+<div class="r03-business-review">
+  <header class="r03-header"><h-block name="review_header" /></header>
+
+  <section class="r03-control-grid" aria-label="Business review controls">
+    <div class="r03-control"><h-block name="f_date" /></div>
+    <div class="r03-control"><h-block name="f_category" /></div>
+    <div class="r03-control"><h-block name="p_compare" /></div>
+  </section>
+
+  <section class="r03-kpi-grid" aria-label="Key performance indicators">
+    <article class="r03-kpi-card">
+      <div class="r03-kpi-title"><h-block name="net_sales_title" /></div>
+      <div class="r03-kpi-value"><h-block name="net_sales_kpi" /></div>
+    </article>
+    <article class="r03-kpi-card">
+      <div class="r03-kpi-title"><h-block name="orders_title" /></div>
+      <div class="r03-kpi-value"><h-block name="total_orders_kpi" /></div>
+    </article>
+    <article class="r03-kpi-card">
+      <div class="r03-kpi-title"><h-block name="aov_title" /></div>
+      <div class="r03-kpi-value"><h-block name="aov_kpi" /></div>
+    </article>
+    <article class="r03-kpi-card">
+      <div class="r03-kpi-title"><h-block name="margin_title" /></div>
+      <div class="r03-kpi-value"><h-block name="gross_margin_kpi" /></div>
+    </article>
+  </section>
+
+  <section class="r03-section-heading"><h-block name="trend_heading" /></section>
+  <section class="r03-chart-card"><h-block name="monthly_net_sales_and_total_orders" /></section>
+
+  <section class="r03-section-heading"><h-block name="drivers_heading" /></section>
+  <section class="r03-drivers-grid">
+    <article class="r03-chart-card"><h-block name="category_net_sales_ranking" /></article>
+    <article class="r03-chart-card"><h-block name="top_ten_brand_net_sales_ranking" /></article>
+  </section>
+</div>
+    ;;
+  }
+}

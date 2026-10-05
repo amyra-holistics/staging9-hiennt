@@ -1,0 +1,259 @@
+Dashboard r01_haid_html_a1 {
+  title: 'Sales Performance Dashboard'
+  description: @md Monitor sales performance with a shared order-item date range. Net Sales excludes Cancelled and Returned order items. ;;
+  theme: H.themes.classic
+
+  block title: TextBlock {
+    content: @md
+# Sales Performance Dashboard
+Use the date range to review net sales, order volume, order value, and gross margin over time.
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Order Item Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Monthly Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block top_categories: VizBlock {
+    label: 'Top Categories by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+
+      calculation category_rank_by_net_sales {
+        label: 'Category Rank by Net Sales'
+        formula: @aql rank(order: net_sales | desc(), partition: []);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+
+      filter {
+        field: 'category_rank_by_net_sales'
+        operator: 'less_than'
+        value: 11
+      }
+
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block source_note: TextBlock {
+    content: @md
+**Data source:** TheLook eCommerce (`thelook`) on `demodb`.
+
+**Refresh:** This dashboard uses the standard dashboard query cache; refresh timing follows the platform cache configuration.
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: ['kpi_net_sales', 'kpi_orders', 'kpi_aov', 'kpi_gross_margin', 'monthly_net_sales', 'top_categories']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .sales-dashboard {
+    display: grid;
+    gap: 20px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(240px, 360px);
+    gap: 16px;
+  }
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .analytics {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 20px;
+  }
+  .footer {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 12px;
+  }
+  @media (max-width: 960px) {
+    .kpis, .analytics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .analytics > :first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    .kpis, .analytics { grid-template-columns: 1fr; }
+    .analytics > :first-child { grid-column: auto; }
+  }
+</style>
+<div class="sales-dashboard">
+  <header>
+    <h-block name="title" />
+  </header>
+  <section class="controls">
+    <h-block name="date_filter" />
+  </section>
+  <section class="kpis">
+    <h-block name="kpi_net_sales" />
+    <h-block name="kpi_orders" />
+    <h-block name="kpi_aov" />
+    <h-block name="kpi_gross_margin" />
+  </section>
+  <section class="analytics">
+    <h-block name="monthly_net_sales" />
+    <h-block name="top_categories" />
+  </section>
+  <footer class="footer">
+    <h-block name="source_note" />
+  </footer>
+</div>
+    ;;
+  }
+}

@@ -1,0 +1,401 @@
+Dashboard r05_haidfd_canvas_a2 {
+  title: 'TheLook Financial Statement'
+  description: @md
+    A printable financial-statement report with an unfiltered date control, executive summary, department and category statements, and governed metric definitions.
+  ;;
+  theme: H.themes.classic
+
+  // Report framing — paper, ink, and copper ledger treatment is intentionally carried by static TextBlocks.
+  block cover: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#f5f0e6; border:2px solid #21313a; padding:30px 38px; color:#21313a; font-family:Georgia, serif;">
+        <div style="font-family:Arial, sans-serif; font-size:11px; letter-spacing:1.6px; color:#9b5b3e;">THELOOK / MANAGEMENT ACCOUNTS</div>
+        <div style="border-top:5px solid #9b5b3e; margin:20px 0 24px;"></div>
+        <h1 style="margin:0; font-size:42px; line-height:1.05; font-weight:normal;">Financial<br>statement</h1>
+        <p style="margin:22px 0 0; max-width:560px; font-size:17px; line-height:1.5;">A fixed-format report of net sales, cost of goods sold, and gross profitability.</p>
+        <div style="position:absolute; bottom:26px; left:38px; right:38px; border-top:1px solid #9b5b3e; padding-top:12px; font-family:Arial, sans-serif; font-size:11px; letter-spacing:1px;">REPORT A2 · VIEWER-SELECTED PERIOD</div>
+      </div>
+    ;;
+  }
+
+  block contents: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#fbf8f1; border:1px solid #9b5b3e; padding:22px 30px; color:#21313a; font-family:Arial, sans-serif;">
+        <div style="font-size:11px; letter-spacing:1.5px; color:#9b5b3e;">REPORT GUIDE</div>
+        <h2 style="font-family:Georgia, serif; font-size:24px; font-weight:normal; margin:8px 0 16px;">Contents</h2>
+        <div style="display:grid; grid-template-columns:1fr auto; gap:9px 20px; font-size:14px; border-top:1px solid #d1c1aa; padding-top:13px;">
+          <span>Executive summary</span><span>01</span>
+          <span>Profitability over time</span><span>02</span>
+          <span>Department financial statement</span><span>03</span>
+          <span>Category financial statement</span><span>04</span>
+          <span>Metric definitions</span><span>05</span>
+        </div>
+      </div>
+    ;;
+  }
+
+  block summary_header: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#21313a; color:#f5f0e6; padding:16px 24px; font-family:Arial, sans-serif; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-family:Georgia, serif; font-size:23px;">01 / Executive summary</span>
+        <span style="font-size:10px; letter-spacing:1.4px; color:#d5b08a;">PROFIT &amp; LOSS LEDGER</span>
+      </div>
+    ;;
+  }
+
+  block date_filter: FilterBlock {
+    label: 'Order item created date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block net_sales_kpi: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block cogs_kpi: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_profit_kpi: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_margin_kpi: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block profitability_over_time: VizBlock {
+    label: 'Gross profit and margin over time'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Gross Profit'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block summary_footer: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; border-top:1px solid #9b5b3e; color:#5b6465; padding:10px 4px; font-family:Arial, sans-serif; font-size:11px; display:flex; justify-content:space-between;"><span>THELOOK FINANCIAL STATEMENT</span><span>01</span></div>
+    ;;
+  }
+
+  block department_header: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#21313a; color:#f5f0e6; padding:16px 24px; font-family:Arial, sans-serif; display:flex; justify-content:space-between; align-items:center;"><span style="font-family:Georgia, serif; font-size:23px;">02 / Department statement</span><span style="font-size:10px; letter-spacing:1.4px; color:#d5b08a;">COMPARATIVE LEDGER</span></div>
+    ;;
+  }
+
+  block department_financial_statement: VizBlock {
+    label: 'Department financial statement'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format {
+            type: 'text'
+          }
+          uname: 'department'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'department'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+
+  block gross_profit_by_department: VizBlock {
+    label: 'Gross profit by department'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.department)
+        label: 'Department'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block department_footer: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; border-top:1px solid #9b5b3e; color:#5b6465; padding:10px 4px; font-family:Arial, sans-serif; font-size:11px; display:flex; justify-content:space-between;"><span>THELOOK FINANCIAL STATEMENT</span><span>02</span></div>
+    ;;
+  }
+
+  block definitions_header: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#21313a; color:#f5f0e6; padding:16px 24px; font-family:Arial, sans-serif; display:flex; justify-content:space-between; align-items:center;"><span style="font-family:Georgia, serif; font-size:23px;">04–05 / Category statement &amp; definitions</span><span style="font-size:10px; letter-spacing:1.4px; color:#d5b08a;">REFERENCE LEAVES</span></div>
+    ;;
+  }
+
+  block metric_definitions: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; background:#fbf8f1; border:1px solid #d1c1aa; padding:18px 22px; color:#21313a; font-family:Arial, sans-serif;"><div style="font-size:11px; letter-spacing:1.3px; color:#9b5b3e;">GOVERNED METRIC DEFINITIONS</div><h3 style="font-family:Georgia, serif; font-weight:normal; margin:8px 0 10px; font-size:20px;">How to read this statement</h3><div style="font-size:12px; line-height:1.42; display:grid; grid-template-columns:1fr 1fr; gap:8px 18px;"><div><strong>Net Sales</strong><br>Sale price of order items excluding Cancelled and Returned items.</div><div><strong>COGS</strong><br>Product cost of the order items included in Net Sales.</div><div><strong>Gross Profit</strong><br>Net Sales less COGS.</div><div><strong>Gross Margin</strong><br>Gross Profit as a share of Net Sales; safely blank where Net Sales is zero.</div></div><p style="margin:12px 0 0; padding-top:9px; border-top:1px solid #d1c1aa; font-size:11px; line-height:1.4; color:#5b6465;">All statement blocks use the viewer-selected Order item created date. Category values are ranked by Gross Profit, highest first.</p></div>
+    ;;
+  }
+
+  block category_financial_statement: VizBlock {
+    label: 'Category financial statement'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 3
+            direction: 'desc'
+          }
+        ]
+      }
+    }
+  }
+
+  block definitions_footer: TextBlock {
+    content: @md
+      <div style="height:100%; box-sizing:border-box; border-top:1px solid #9b5b3e; color:#5b6465; padding:10px 4px; font-family:Arial, sans-serif; font-size:11px; display:flex; justify-content:space-between;"><span>THELOOK FINANCIAL STATEMENT</span><span>04–05</span></div>
+    ;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_filter'
+      to: ['net_sales_kpi', 'cogs_kpi', 'gross_profit_kpi', 'gross_margin_kpi', 'profitability_over_time', 'department_financial_statement', 'gross_profit_by_department', 'category_financial_statement']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: CanvasLayout {
+    label: 'Financial statement'
+    width: 1180
+    height: 3340
+    grid_size: 10
+    auto_expand_vertically: false
+
+    // Cover zone
+    block cover { position: pos(20, 20, 1140, 360) layer: 1 }
+    block contents { position: pos(20, 400, 1140, 240) layer: 1 }
+
+    // Summary zone
+    block summary_header { position: pos(20, 700, 1140, 70) layer: 1 }
+    block date_filter { position: pos(20, 790, 280, 100) layer: 1 }
+    block net_sales_kpi { position: pos(320, 790, 200, 120) layer: 1 }
+    block cogs_kpi { position: pos(540, 790, 200, 120) layer: 1 }
+    block gross_profit_kpi { position: pos(760, 790, 200, 120) layer: 1 }
+    block gross_margin_kpi { position: pos(980, 790, 180, 120) layer: 1 }
+    block profitability_over_time { position: pos(20, 940, 1140, 500) layer: 1 }
+    block summary_footer { position: pos(20, 1470, 1140, 50) layer: 1 }
+
+    // Department zone
+    block department_header { position: pos(20, 1600, 1140, 70) layer: 1 }
+    block department_financial_statement { position: pos(20, 1700, 1140, 320) layer: 1 }
+    block gross_profit_by_department { position: pos(20, 2050, 1140, 500) layer: 1 }
+    block department_footer { position: pos(20, 2580, 1140, 50) layer: 1 }
+
+    // Category and definition reference zone
+    block definitions_header { position: pos(20, 2710, 1140, 70) layer: 1 }
+    block metric_definitions { position: pos(20, 2810, 550, 250) layer: 1 }
+    block category_financial_statement { position: pos(610, 2810, 550, 250) layer: 1 }
+    block definitions_footer { position: pos(20, 3090, 1140, 50) layer: 1 }
+
+    mobile { mode: 'auto' }
+  }
+}

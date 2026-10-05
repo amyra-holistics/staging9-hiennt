@@ -1,0 +1,844 @@
+Dashboard r04_haid_canvas_a1 {
+  title: 'Monthly Performance Review'
+  description: @md
+    Five-slide completed-month performance review for TheLook eCommerce. Sales and profit use the order-item creation month.
+  ;;
+  theme: H.themes.classic
+
+  block s1_title: TextBlock {
+    content: @md
+      # Monthly Performance Review
+
+      ## August 2026 | TheLook eCommerce
+
+      **Completed-month view**
+    ;;
+  }
+
+  block s1_period: TextBlock {
+    content: @md
+      ## Reporting period
+
+      **1–31 August 2026**
+
+      Latest fully completed month in the validated data.
+    ;;
+  }
+
+  block s1_scope: TextBlock {
+    content: @md
+      **Scope and definitions**  
+      Sales and profit use the order-item creation month. Net Sales excludes Cancelled and Returned items. Return Rate is Returned order items divided by all order items.
+    ;;
+  }
+
+  block s2_heading: TextBlock {
+    content: @md
+      # Headline KPIs
+
+      **August sales rose on materially higher fulfilled-order volume while margin held steady.** All comparisons are against July 2026.
+    ;;
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.net_sales)
+    label: 'Net Sales — August 2026 · July $32,291 · MoM +$8,707 (+27.0%)'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at matches @(2026-08-01 to 2026-08-31)",
+  ]
+  settings {
+    display_mode: 'single'
+  }
+}
+  }
+
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_profit)
+    label: 'Gross Profit — July $16,862; month-over-month +$4,510 (+26.7%)'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at is @(2026-08)",
+  ]
+  settings {
+    display_mode: 'single'
+  }
+}
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_margin)
+    label: 'Gross Margin'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at matches @(2026-08)",
+  ]
+  settings {
+    display_mode: 'compare_by_percent'
+    alignment: 'center'
+  }
+}
+  }
+
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.fulfilled_orders)
+    label: 'Fulfilled Orders'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value: RelativePopValue {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  filter {
+    field: r(thelook_order_items.created_at)
+    operator: 'matches'
+    value: '2026-08'
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+    row_limit: 1
+  }
+}
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.aov)
+    label: 'Average Order Value — August 2026 (July $86.80; MoM +$0.43 / +0.5%)'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  filter {
+    field: r(thelook_order_items.created_at)
+    operator: 'matches'
+    value: '2026-08'
+  }
+  settings {
+    display_mode: 'compare_by_percent'
+    alignment: 'center'
+  }
+}
+  }
+
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.return_rate)
+    label: 'Return Rate'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  compare_value: VizPopSettings {
+    field: r(thelook_order_items.created_at)
+    show_growth_rate: true
+    value {
+      duration: 1
+      granularity: 'month'
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at is @(2026-08)",
+  ]
+  settings {
+    display_mode: 'compare_by_percent'
+    alignment: 'center'
+  }
+}
+  }
+
+  block s2_note: TextBlock {
+    content: @md
+      *Return Rate uses all order items as its denominator; Net Sales and the sales-related metrics exclude Cancelled and Returned items.*
+    ;;
+  }
+
+  block s3_heading: TextBlock {
+    content: @md
+      # Monthly Trend
+
+      **August is the strongest month in the validated 13-month run, driven by order volume rather than basket expansion.**
+    ;;
+  }
+
+  block trend_sales_profit: VizBlock {
+    label: 'Net Sales and Gross Profit — Aug 2025 to Aug 2026'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Item Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+    uname: 'order_item_month'
+  }
+  y_axis {
+    label: 'Sales and Profit'
+    series {
+      mark_type: 'column'
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at matches @(2025-08 to 2026-08)",
+  ]
+  settings {
+    x_axis_label: 'Month'
+    legend_label: 'top'
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block trend_orders_aov: VizBlock {
+    label: 'Fulfilled Orders and AOV — Aug 2025 to Aug 2026'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Item Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    label: 'Fulfilled Orders'
+    series {
+      mark_type: 'column'
+      field: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  y_axis {
+    label: 'AOV'
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'AOV'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      alignment: 'right'
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at matches @(2025-08 - 2026-08)",
+  ]
+  settings {
+    legend_label: 'bottom'
+    show_data_points: true
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block s4_heading: TextBlock {
+    content: @md
+      # Category Breakdown
+
+      **Sales are dispersed across categories; Suits & Sport Coats combines top-tier sales with the strongest profit contribution among the leaders.**
+    ;;
+  }
+
+  block category_sales_ranking: VizBlock {
+    label: 'Top 10 Categories by Net Sales'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_products.category)
+    label: 'Product Category'
+  }
+  y_axis {
+    series {
+      mark_type: 'bar'
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  conditions: [
+    "thelook_order_items.created_at is @(2026-08)",
+  ]
+  settings {
+    row_limit: 10
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block category_economics_table: VizBlock {
+    label: 'Top 5 Category Economics'
+    viz: DataTable {
+  dataset: thelook
+  filter {
+    field: r(thelook_order_items.created_at)
+    operator: 'matches'
+    value: '2026-08'
+  }
+  fields: [
+    VizFieldFull {
+      label: 'Product Category'
+      ref: r(thelook_products.category)
+      format {
+        type: 'text'
+      }
+    },
+    VizFieldFull {
+      label: 'Net Sales'
+      ref: r(thelook.net_sales)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'net_sales'
+    },
+    VizFieldFull {
+      label: 'Gross Profit'
+      ref: r(thelook.gross_profit)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'Gross Margin'
+      ref: r(thelook.gross_margin)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'Return Rate'
+      ref: r(thelook.return_rate)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+  ]
+  settings {
+    pagination_size: 5
+    row_limit: 5
+    show_row_number: false
+    wrap_header_text: false
+    wrap_cell_text: false
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'net_sales'
+        direction: 'desc'
+      }
+    ]
+    single_cell_display: 'normal'
+  }
+}
+  }
+
+  block s4_note: TextBlock {
+    content: @md
+      *Do not sum category-level Fulfilled Orders or AOV: a single order can include more than one category. Blank Return Rates remain blank rather than being treated as zero.*
+    ;;
+  }
+
+  block s5_heading: TextBlock {
+    content: @md
+      # Key Takeaways
+
+      **What happened, what drove it, and what deserves follow-up.**
+    ;;
+  }
+
+  block takeaways_monthly: VizBlock {
+    label: 'July to August Performance Narrative'
+    viz: MarkdownViz {
+  dataset: thelook
+  rows: [
+    VizFieldFull {
+      ref: r(thelook_order_items.created_at)
+      label: 'Month'
+      transformation: 'datetrunc month'
+      format {
+        type: 'date'
+        pattern: 'LLL yyyy'
+      }
+      uname: 'datetrunc_month_created_at_1'
+    }
+  ]
+  values: [
+    VizFieldFull {
+      ref: r(thelook.net_sales)
+      label: 'Net Sales'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_profit)
+      label: 'Gross Profit'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_margin)
+      label: 'Gross Margin'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.fulfilled_orders)
+      label: 'Fulfilled Orders'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.aov)
+      label: 'Average Order Value'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.return_rate)
+      label: 'Return Rate'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    }
+  ]
+  conditions: [
+    "thelook_order_items.created_at matches @(2026-07 - 2026-08)"
+  ]
+  content: @md
+    <style>
+      .performance-narrative {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      .performance-card {
+        border: 1px solid #E5E7EB;
+        border-radius: 10px;
+        padding: 1.25rem;
+        background: #FFFFFF;
+      }
+      .performance-card h3 {
+        margin: 0 0 0.65rem;
+        color: #111827;
+        font-size: 1rem;
+      }
+      .performance-card p {
+        margin: 0;
+        color: #4B5563;
+        font-size: 0.9rem;
+        line-height: 1.55;
+      }
+      .performance-card strong { color: #111827; }
+      .caveat-card {
+        grid-column: 1 / -1;
+        border-left: 4px solid #94A3B8;
+        background: #F8FAFC;
+      }
+      .caveat-card h3 { color: #334155; }
+      @media (max-width: 760px) {
+        .performance-narrative { grid-template-columns: 1fr; }
+      }
+    </style>
+
+    <div class="performance-narrative">
+      <section class="performance-card">
+        <h3>Volume-led growth</h3>
+        <p>
+          Net Sales moved from <strong>{{ rows[0].values.`Net Sales` }}</strong> in
+          {{ rows[0].`Month` }} to <strong>{{ rows[1].values.`Net Sales` }}</strong>
+          in {{ rows[1].`Month` }}. Fulfilled Orders moved from
+          <strong>{{ rows[0].values.`Fulfilled Orders` }}</strong> to
+          <strong>{{ rows[1].values.`Fulfilled Orders` }}</strong>, while Average
+          Order Value was <strong>{{ rows[0].values.`Average Order Value` }}</strong>
+          and <strong>{{ rows[1].values.`Average Order Value` }}</strong>.
+        </p>
+      </section>
+
+      <section class="performance-card">
+        <h3>Profit scaled with sales</h3>
+        <p>
+          Gross Profit was <strong>{{ rows[0].values.`Gross Profit` }}</strong> in
+          {{ rows[0].`Month` }} and <strong>{{ rows[1].values.`Gross Profit` }}</strong>
+          in {{ rows[1].`Month` }}. Gross Margin was
+          <strong>{{ rows[0].values.`Gross Margin` }}</strong> and
+          <strong>{{ rows[1].values.`Gross Margin` }}</strong>, respectively,
+          providing context on margin stability as sales changed.
+        </p>
+      </section>
+
+      <section class="performance-card">
+        <h3>Returns watch</h3>
+        <p>
+          Return Rate was <strong>{{ rows[0].values.`Return Rate` }}</strong> in
+          {{ rows[0].`Month` }} and <strong>{{ rows[1].values.`Return Rate` }}</strong>
+          in {{ rows[1].`Month` }}. Read this alongside the fulfilled-order volume
+          shown above.
+        </p>
+      </section>
+
+      <section class="performance-card caveat-card">
+        <h3>Metric caveat</h3>
+        <p>
+          Figures use order-item creation month. Net Sales excludes Cancelled and
+          Returned items. Return Rate is Returned items divided by all order items.
+        </p>
+      </section>
+    </div>
+  ;;
+  settings {
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'datetrunc_month_created_at_1'
+        direction: 'asc'
+      }
+    ]
+    row_limit: 2
+  }
+}
+  }
+
+  block takeaways_category: VizBlock {
+    label: 'August Category Focus and Watch Item'
+    viz: MarkdownViz {
+  dataset: thelook
+  rows: [
+    VizFieldFull {
+      ref: r(thelook_products.category)
+      label: 'Product Category'
+      format {
+        type: 'text'
+      }
+    },
+  ]
+  values: [
+    VizFieldFull {
+      ref: r(thelook.net_sales)
+      label: 'Net Sales'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'net_sales_sort'
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_profit)
+      label: 'Gross Profit'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.gross_margin)
+      label: 'Gross Margin'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      ref: r(thelook.return_rate)
+      label: 'Return Rate'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+  ]
+  conditions: [
+    "thelook_order_items.created_at is @(2026-08)",
+  ]
+  content: @md
+    <style>
+      .august-takeaways {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 12px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      .august-card {
+        background: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 10px;
+        padding: 16px;
+      }
+      .august-card--focus { border-top: 4px solid #2563EB; }
+      .august-card--watch { border-top: 4px solid #D97706; }
+      .eyebrow {
+        color: #6B7280;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .category-name {
+        color: #111827;
+        font-size: 19px;
+        font-weight: 700;
+        line-height: 1.3;
+        margin: 6px 0 14px;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .metric-label {
+        color: #6B7280;
+        font-size: 12px;
+        margin-bottom: 3px;
+      }
+      .metric-value {
+        color: #1F2937;
+        font-size: 15px;
+        font-weight: 650;
+      }
+      .note {
+        color: #6B7280;
+        font-size: 12px;
+        line-height: 1.45;
+        margin: 14px 0 0;
+      }
+    </style>
+
+    <div class="august-takeaways">
+      <article class="august-card august-card--focus">
+        <div class="eyebrow">Category focus · #3 by Net Sales</div>
+        <div class="category-name">{{ rows[2].`Product Category` }}</div>
+        <div class="metrics">
+          <div>
+            <div class="metric-label">Net Sales</div>
+            <div class="metric-value">{{ rows[2].values.`Net Sales` }}</div>
+          </div>
+          <div>
+            <div class="metric-label">Gross Profit</div>
+            <div class="metric-value">{{ rows[2].values.`Gross Profit` }}</div>
+          </div>
+          <div>
+            <div class="metric-label">Gross Margin</div>
+            <div class="metric-value">{{ rows[2].values.`Gross Margin` }}</div>
+          </div>
+        </div>
+        <p class="note">Highest Gross Profit in the validated top-three sales categories. This is a review candidate, not a causal conclusion.</p>
+      </article>
+
+      <article class="august-card august-card--watch">
+        <div class="eyebrow">Watch item · #10 by Net Sales</div>
+        <div class="category-name">{{ rows[9].`Product Category` }}</div>
+        <div class="metrics">
+          <div>
+            <div class="metric-label">Net Sales</div>
+            <div class="metric-value">{{ rows[9].values.`Net Sales` }}</div>
+          </div>
+          <div>
+            <div class="metric-label">Return Rate</div>
+            <div class="metric-value">{{ rows[9].values.`Return Rate` }}</div>
+          </div>
+        </div>
+        <p class="note">This is a review candidate for follow-up, not a causal conclusion.</p>
+      </article>
+    </div>
+  ;;
+  settings {
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'net_sales_sort'
+        direction: 'desc'
+      },
+    ]
+  }
+}
+  }
+
+  interactions: []
+
+  view: TabLayout {
+    tab title: CanvasLayout {
+      label: '1. Title'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block s1_title { position: pos(60, 100, 760, 300) layer: 1 }
+      block s1_period { position: pos(900, 120, 320, 220) layer: 1 }
+      block s1_scope { position: pos(60, 580, 1100, 90) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab kpis: CanvasLayout {
+      label: '2. Headline KPIs'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block s2_heading { position: pos(40, 20, 1200, 110) layer: 1 }
+      block kpi_net_sales { position: pos(40, 150, 380, 190) layer: 1 }
+      block kpi_gross_profit { position: pos(450, 150, 380, 190) layer: 1 }
+      block kpi_gross_margin { position: pos(860, 150, 380, 190) layer: 1 }
+      block kpi_fulfilled_orders { position: pos(40, 370, 380, 190) layer: 1 }
+      block kpi_aov { position: pos(450, 370, 380, 190) layer: 1 }
+      block kpi_return_rate { position: pos(860, 370, 380, 190) layer: 1 }
+      block s2_note { position: pos(40, 600, 1200, 70) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab trend: CanvasLayout {
+      label: '3. Monthly Trend'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block s3_heading { position: pos(40, 20, 1200, 110) layer: 1 }
+      block trend_sales_profit { position: pos(40, 150, 760, 500) layer: 1 }
+      block trend_orders_aov { position: pos(830, 150, 410, 500) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab category: CanvasLayout {
+      label: '4. Category Breakdown'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block s4_heading { position: pos(40, 20, 1200, 110) layer: 1 }
+      block category_sales_ranking { position: pos(40, 150, 730, 460) layer: 1 }
+      block category_economics_table { position: pos(800, 150, 440, 460) layer: 1 }
+      block s4_note { position: pos(40, 630, 1200, 60) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+
+    tab takeaways: CanvasLayout {
+      label: '5. Key Takeaways'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block s5_heading { position: pos(40, 20, 1200, 100) layer: 1 }
+      block takeaways_monthly { position: pos(40, 140, 1200, 300) layer: 1 }
+      block takeaways_category { position: pos(40, 460, 1200, 210) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

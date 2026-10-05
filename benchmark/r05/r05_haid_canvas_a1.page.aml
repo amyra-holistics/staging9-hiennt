@@ -1,0 +1,493 @@
+Dashboard r05_haid_canvas_a1 {
+  title: 'Finance Report'
+  description: @md
+Printable finance report for Net Sales, COGS, Gross Profit, and Gross Margin. Use the Reporting Period control to select the period for all financial views.
+;;
+
+  block f_reporting_period: FilterBlock {
+    label: 'Reporting Period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block d_grain: DateDrillBlock {
+    label: 'Trend Grain'
+    default: 'month'
+  }
+
+  block p_compare: PopBlock {
+    label: 'Prior-period comparison'
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.net_sales)
+    label: 'Net Sales'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+}
+  }
+
+  block v_cogs: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.cogs)
+    label: 'COGS'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+}
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_profit)
+    label: 'Gross Profit'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+}
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_margin)
+    label: 'Gross Margin'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  settings {
+    display_mode: 'single'
+    alignment: 'center'
+  }
+}
+  }
+
+  block v_finance_trend: VizBlock {
+    label: 'Finance Trend'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Item Created Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    label: 'Amount'
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  settings {
+    x_axis_label: 'Month'
+    legend_label: 'top'
+    show_data_points: true
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block v_department_finance: VizBlock {
+    label: 'Finance by Department'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format {
+            type: 'text'
+          }
+          uname: 'thelook_products_department_1'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        row_limit: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_products_department_1'
+            direction: 'asc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  block v_reporting_period_display: VizBlock {
+    label: 'Selected Reporting Period'
+    viz: MarkdownViz {
+      dataset: thelook
+      calculation reporting_period_start {
+        label: 'Reporting Period Start'
+        formula: @aql thelook_order_items | min(thelook_order_items.created_at);;
+        calc_type: 'measure'
+        data_type: 'datetime'
+      }
+      calculation reporting_period_end {
+        label: 'Reporting Period End'
+        formula: @aql thelook_order_items | max(thelook_order_items.created_at);;
+        calc_type: 'measure'
+        data_type: 'datetime'
+      }
+      calculation matching_order_item_count {
+        label: 'Matching Order Item Count'
+        formula: @aql thelook_order_items | count(thelook_order_items.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+        hidden: true
+      }
+      values: [
+        VizFieldFull {
+          ref: 'reporting_period_start'
+          label: 'Reporting Period Start'
+          format {
+            type: 'datetime'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: 'reporting_period_end'
+          label: 'Reporting Period End'
+          format {
+            type: 'datetime'
+            pattern: 'dd LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: 'matching_order_item_count'
+          label: 'Matching Order Item Count'
+          hidden: true
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      content: @md
+        <span style="font-size: 0.85rem; color: #4B5563; white-space: nowrap;"><strong>Reporting period:</strong> {{ rows[0].values.`Reporting Period Start` }} to {{ rows[0].values.`Reporting Period End` }}</span>
+      ;;
+    }
+  }
+
+  block v_category_finance: VizBlock {
+    label: 'Department and Category Financial Statement'
+    viz: DataTable {
+  dataset: thelook
+  fields: [
+    VizFieldFull {
+      label: 'Department'
+      ref: r(thelook_products.department)
+      format {
+        type: 'text'
+      }
+      uname: 'product_department'
+    },
+    VizFieldFull {
+      label: 'Category'
+      ref: r(thelook_products.category)
+      format {
+        type: 'text'
+      }
+      uname: 'product_category'
+    },
+    VizFieldFull {
+      label: 'Net Sales'
+      ref: r(thelook.net_sales)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'COGS'
+      ref: r(thelook.cogs)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'Gross Profit'
+      ref: r(thelook.gross_profit)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'Gross Margin'
+      ref: r(thelook.gross_margin)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    }
+  ]
+  settings {
+    pagination_size: 100
+    row_limit: 100
+    show_row_number: true
+    wrap_header_text: true
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'product_department'
+        direction: 'asc'
+      },
+      KeyBasedSortSetting {
+        key: 'product_category'
+        direction: 'asc'
+      }
+    ]
+    single_cell_display: 'normal'
+  }
+}
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_reporting_period'
+      to: ['v_net_sales', 'v_cogs', 'v_gross_profit', 'v_gross_margin', 'v_finance_trend', 'v_department_finance', 'v_category_finance', 'v_reporting_period_display']
+      field: r(thelook_order_items.created_at)
+    },
+    DateDrillInteraction {
+      from: 'd_grain'
+      to: ['v_finance_trend']
+      field: r(thelook_order_items.created_at)
+    },
+    PopInteraction {
+      from: 'p_compare'
+      to: ['v_net_sales', 'v_cogs', 'v_gross_profit', 'v_gross_margin', 'v_finance_trend']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root { color: #172033; font-family: Arial, Helvetica, sans-serif; }
+        * { box-sizing: border-box; }
+        .page {
+          width: 210mm;
+          min-height: 297mm;
+          margin: 0 auto 12mm;
+          padding: 15mm 15mm 20mm;
+          position: relative;
+          background: #ffffff;
+          box-shadow: 0 1mm 4mm rgba(23, 32, 51, .12);
+          page-break-after: always;
+          break-after: page;
+        }
+        .page:last-of-type { page-break-after: auto; break-after: auto; }
+        .report-header {
+          border-bottom: 1px solid #d8deea;
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          padding-bottom: 5mm;
+          margin-bottom: 6mm;
+        }
+        .report-header h1 { font-size: 18pt; margin: 0; }
+        .report-header p { color: #526176; font-size: 9pt; margin: 0; text-align: right; }
+        .report-footer {
+          position: absolute;
+          bottom: 8mm;
+          left: 15mm;
+          right: 15mm;
+          border-top: 1px solid #d8deea;
+          color: #526176;
+          display: flex;
+          justify-content: space-between;
+          font-size: 8pt;
+          padding-top: 3mm;
+        }
+        .toc { background: #f5f7fb; border-left: 3px solid #365d9d; padding: 4mm 5mm; margin: 0 0 6mm; }
+        .toc strong { display: block; margin-bottom: 2mm; }
+        .toc a { color: #294d85; display: inline-block; font-size: 9pt; margin-right: 5mm; text-decoration: none; }
+        .section-title { border-bottom: 2px solid #365d9d; font-size: 13pt; margin: 6mm 0 3mm; padding-bottom: 2mm; }
+        .section-note, .definition-note { color: #526176; font-size: 9pt; line-height: 1.45; margin: 0 0 4mm; }
+        .controls { display: grid; gap: 4mm; grid-template-columns: 2fr 1fr 1.3fr; margin-bottom: 5mm; }
+        .kpis { display: grid; gap: 4mm; grid-template-columns: repeat(4, 1fr); margin-bottom: 6mm; }
+        .two-column { display: grid; gap: 6mm; grid-template-columns: 1.25fr .75fr; }
+        .definition-table { border-collapse: collapse; font-size: 9pt; width: 100%; }
+        .definition-table th, .definition-table td { border: 1px solid #d8deea; padding: 3mm; text-align: left; vertical-align: top; }
+        .definition-table th { background: #eef3fb; }
+        .definition-table code { font-family: Consolas, monospace; font-size: 8pt; }
+        @media print {
+          .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+          .page:last-of-type { page-break-after: auto; break-after: auto; }
+        }
+      </style>
+
+      <section class="page" id="overview">
+        <header class="report-header">
+          <div><h1>Finance Report</h1></div>
+          <h-block name="v_reporting_period_display" />
+        </header>
+
+        <nav class="toc" aria-label="Table of contents">
+          <strong>Contents</strong>
+          <a href="#overview">1. Overview</a>
+          <a href="#category-detail">2. Department &amp; Category Detail</a>
+          <a href="#metric-definitions">3. Metric Definitions</a>
+        </nav>
+
+        <div class="controls">
+          <h-block name="f_reporting_period" />
+          <h-block name="d_grain" />
+          <h-block name="p_compare" />
+        </div>
+
+        <h2 class="section-title">Selected-period profitability</h2>
+        <p class="section-note">The controls above determine the reporting period, trend grain, and optional prior-period comparison.</p>
+        <div class="kpis">
+          <h-block name="v_net_sales" />
+          <h-block name="v_cogs" />
+          <h-block name="v_gross_profit" />
+          <h-block name="v_gross_margin" />
+        </div>
+
+        <h2 class="section-title">Finance movement and department contribution</h2>
+        <div class="two-column">
+          <div><h-block name="v_finance_trend" /></div>
+          <div><h-block name="v_department_finance" /></div>
+        </div>
+
+        <footer class="report-footer"><span>Finance Report · Confidential</span><span>Page 1 · <h-block name="v_reporting_period_display" /></span></footer>
+      </section>
+
+      <section class="page" id="category-detail">
+        <header class="report-header">
+          <div><h1>Finance Report</h1></div>
+          <h-block name="v_reporting_period_display" />
+        </header>
+
+        <h2 class="section-title">Department and category financial statement</h2>
+        <p class="section-note">Review Net Sales, COGS, Gross Profit, and Gross Margin at the department/category level. The table responds to the Reporting Period control.</p>
+        <h-block name="v_category_finance" />
+
+        <aside class="definition-note"><strong>Reading note.</strong> Net Sales and COGS exclude Cancelled and Returned order items. Gross Profit is Net Sales less COGS; Gross Margin is Gross Profit divided by Net Sales.</aside>
+        <footer class="report-footer"><span>Finance Report · Confidential</span><span>Page 2 · <h-block name="v_reporting_period_display" /></span></footer>
+      </section>
+
+      <section class="page" id="metric-definitions">
+        <header class="report-header">
+          <div><h1>Finance Report</h1></div>
+          <h-block name="v_reporting_period_display" />
+        </header>
+
+        <h2 class="section-title">Governed metric definitions</h2>
+        <p class="definition-note">All report views use the governed metrics from the TheLook eCommerce dataset at the order-item sales grain.</p>
+        <table class="definition-table">
+          <thead><tr><th>Metric</th><th>Definition</th><th>Scope and format</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Net Sales</strong></td><td><code>sum(thelook_order_items.sale_price)</code>, excluding Cancelled and Returned items.</td><td>Currency; sales recognized at order-item created date for this report.</td></tr>
+            <tr><td><strong>COGS</strong></td><td><code>sum(thelook_products.cost)</code> through the order-item to product relationship, excluding Cancelled and Returned items.</td><td>Currency; aligned to Net Sales status scope.</td></tr>
+            <tr><td><strong>Gross Profit</strong></td><td><code>net_sales - cogs</code></td><td>Currency; derived from the two governed metrics above.</td></tr>
+            <tr><td><strong>Gross Margin</strong></td><td><code>safe_divide(gross_profit, net_sales)</code></td><td>Percentage; supporting profitability rate.</td></tr>
+          </tbody>
+        </table>
+        <p class="definition-note">Do not substitute Gross Sales for Net Sales: Gross Sales includes all statuses. The Reporting Period filter applies <code>thelook_order_items.created_at</code>; it has no hard-coded default.</p>
+        <footer class="report-footer"><span>Finance Report · Confidential</span><span>Page 3 · <h-block name="v_reporting_period_display" /></span></footer>
+      </section>
+    ;;
+  }
+}

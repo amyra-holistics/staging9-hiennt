@@ -1,0 +1,670 @@
+Dashboard r04_haidfd_canvas_a3 {
+  title: 'The Look | Sales Performance'
+  description: @md A focused fashion-retail performance view: read the headline, follow monthly movement, compare category trade-offs, and close with an evidence-based takeaway.;;
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  // Cover
+  block cover_title: TextBlock {
+    content: @md # The Look
+## Sales performance edit
+A restrained view of commercial health across time, customer mix, and product department.
+
+Use the filters on each tab to set the lens for that page.;;
+  }
+  block cover_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block cover_gender: FilterBlock {
+    label: 'Customer gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+  }
+  block cover_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+  block cover_note: TextBlock {
+    content: @md ### Five tabs, one decision flow
+**Headline** establishes commercial scale. **Monthly trend** shows movement. **Category breakdown** reveals the trade-offs. **Key takeaways** turns the visible evidence into one practical focus area.;;
+  }
+
+  // Headline KPI slide
+  block headline_title: TextBlock {
+    content: @md # Headline performance
+A compact read of revenue quality, order volume, and returns for the selected customer and department lens.;;
+  }
+  block headline_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block headline_gender: FilterBlock {
+    label: 'Customer gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+  }
+  block headline_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block kpi_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block kpi_average_order_value: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  block kpi_return_rate: VizBlock {
+    label: 'Return Rate'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.return_rate)
+        label: 'Return Rate'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  // Monthly trend slide
+  block trend_title: TextBlock {
+    content: @md # Monthly movement
+Read sales and profit together, then use orders and return rate to distinguish healthy demand from weaker quality.;;
+  }
+  block trend_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block trend_gender: FilterBlock {
+    label: 'Customer gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+  }
+  block trend_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+  block monthly_net_sales_gross_profit_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'bottom'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block monthly_fulfilled_orders_trend: VizBlock {
+    label: 'Monthly Fulfilled Orders'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        label: 'Order Item Month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            label: 'Fulfilled Orders'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block monthly_return_rate_trend: VizBlock {
+    label: 'Monthly Return Rate'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Order Item Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Return Rate'
+            ref: r(thelook.return_rate)
+            format {
+              type: 'number'
+              pattern: '#,###0.0%'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  // Category breakdown slide
+  block category_title: TextBlock {
+    content: @md # Category trade-offs
+Rank the assortment by sales, then compare margin, profit, fulfilment, and return signals before prioritising a category.;;
+  }
+  block category_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block category_gender: FilterBlock {
+    label: 'Customer gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+  }
+  block category_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+  block net_sales_by_category: VizBlock {
+    label: 'Net Sales by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block gross_margin_by_category: VizBlock {
+    label: 'Gross Margin by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block category_performance_detail: VizBlock {
+    label: 'Category Performance Detail'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Product Category'
+          ref: r(thelook_products.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'net_sales'
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Fulfilled Orders'
+          ref: r(thelook.fulfilled_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'net_sales'
+            direction: 'desc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  block category_priority_signals: VizBlock {
+    label: 'Category Priority Signals'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          format {
+            type: 'text'
+          }
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'net_sales'
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'gross_profit'
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'gross_margin'
+        },
+        VizFieldFull {
+          ref: r(thelook.return_rate)
+          label: 'Return Rate'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'return_rate'
+        }
+      ]
+      settings {
+        pagination_size: 10
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'net_sales'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  // Key takeaways slide
+  block takeaways_title: TextBlock {
+    content: @md # Key takeaways
+A decision-ready readout grounded only in the selected dashboard evidence.;;
+  }
+  block takeaways_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+  block takeaways_gender: FilterBlock {
+    label: 'Customer gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+  }
+  block takeaways_department: FilterBlock {
+    label: 'Product department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+  }
+  block ai_key_takeaways: AiBlock {
+    label: 'Commercial readout'
+    prompt: @md From @VizBlock:r04_haidfd_canvas_a3.kpi_net_sales, @VizBlock:r04_haidfd_canvas_a3.kpi_gross_profit, @VizBlock:r04_haidfd_canvas_a3.kpi_gross_margin, @VizBlock:r04_haidfd_canvas_a3.kpi_fulfilled_orders, @VizBlock:r04_haidfd_canvas_a3.kpi_average_order_value, @VizBlock:r04_haidfd_canvas_a3.kpi_return_rate, @VizBlock:r04_haidfd_canvas_a3.monthly_net_sales_gross_profit_trend, @VizBlock:r04_haidfd_canvas_a3.monthly_fulfilled_orders_trend, @VizBlock:r04_haidfd_canvas_a3.monthly_return_rate_trend, @VizBlock:r04_haidfd_canvas_a3.net_sales_by_category, @VizBlock:r04_haidfd_canvas_a3.gross_margin_by_category, and @VizBlock:r04_haidfd_canvas_a3.category_priority_signals, summarize headline KPI performance, important monthly movements, and category trade-offs. Recommend one focus area only when the shown data supports it. Do not invent values, causes, targets, comparisons, or results not present in the source visualizations.;;
+  }
+  block takeaways_note: TextBlock {
+    content: @md **Reading note**
+The narrative refreshes from its named KPI, trend, and category sources. It is intentionally constrained to visible evidence rather than assumed causes.;;
+  }
+
+  explicit_interactions: [
+    FilterInteraction { from: 'headline_date' to: ['kpi_net_sales', 'kpi_gross_profit', 'kpi_gross_margin', 'kpi_fulfilled_orders', 'kpi_average_order_value', 'kpi_return_rate'] field: r(thelook_order_items.created_at) },
+    FilterInteraction { from: 'headline_gender' to: ['kpi_net_sales', 'kpi_gross_profit', 'kpi_gross_margin', 'kpi_fulfilled_orders', 'kpi_average_order_value', 'kpi_return_rate'] field: r(thelook_users.gender) },
+    FilterInteraction { from: 'headline_department' to: ['kpi_net_sales', 'kpi_gross_profit', 'kpi_gross_margin', 'kpi_fulfilled_orders', 'kpi_average_order_value', 'kpi_return_rate'] field: r(thelook_products.department) },
+
+    FilterInteraction { from: 'trend_date' to: ['monthly_net_sales_gross_profit_trend', 'monthly_fulfilled_orders_trend', 'monthly_return_rate_trend'] field: r(thelook_order_items.created_at) },
+    FilterInteraction { from: 'trend_gender' to: ['monthly_net_sales_gross_profit_trend', 'monthly_fulfilled_orders_trend', 'monthly_return_rate_trend'] field: r(thelook_users.gender) },
+    FilterInteraction { from: 'trend_department' to: ['monthly_net_sales_gross_profit_trend', 'monthly_fulfilled_orders_trend', 'monthly_return_rate_trend'] field: r(thelook_products.department) },
+
+    FilterInteraction { from: 'category_date' to: ['net_sales_by_category', 'gross_margin_by_category', 'category_performance_detail', 'category_priority_signals'] field: r(thelook_order_items.created_at) },
+    FilterInteraction { from: 'category_gender' to: ['net_sales_by_category', 'gross_margin_by_category', 'category_performance_detail', 'category_priority_signals'] field: r(thelook_users.gender) },
+    FilterInteraction { from: 'category_department' to: ['net_sales_by_category', 'gross_margin_by_category', 'category_performance_detail', 'category_priority_signals'] field: r(thelook_products.department) }
+  ]
+
+  view: TabLayout {
+    tab cover: CanvasLayout {
+      label: 'Cover'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block cover_title { position: pos(40, 80, 800, 220) layer: 1 }
+      block cover_date { position: pos(40, 360, 360, 100) layer: 1 }
+      block cover_gender { position: pos(440, 360, 360, 100) layer: 1 }
+      block cover_department { position: pos(840, 360, 360, 100) layer: 1 }
+      block cover_note { position: pos(40, 520, 1160, 120) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab headline: CanvasLayout {
+      label: 'Headline KPIs'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block headline_title { position: pos(40, 20, 1160, 100) layer: 1 }
+      block headline_date { position: pos(40, 140, 360, 80) layer: 1 }
+      block headline_gender { position: pos(440, 140, 360, 80) layer: 1 }
+      block headline_department { position: pos(840, 140, 360, 80) layer: 1 }
+      block kpi_net_sales { position: pos(40, 280, 360, 140) layer: 1 }
+      block kpi_gross_profit { position: pos(440, 280, 360, 140) layer: 1 }
+      block kpi_gross_margin { position: pos(840, 280, 360, 140) layer: 1 }
+      block kpi_fulfilled_orders { position: pos(40, 480, 360, 140) layer: 1 }
+      block kpi_average_order_value { position: pos(440, 480, 360, 140) layer: 1 }
+      block kpi_return_rate { position: pos(840, 480, 360, 140) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab monthly_trend: CanvasLayout {
+      label: 'Monthly Trend'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block trend_title { position: pos(40, 20, 1160, 80) layer: 1 }
+      block trend_date { position: pos(40, 120, 360, 80) layer: 1 }
+      block trend_gender { position: pos(440, 120, 360, 80) layer: 1 }
+      block trend_department { position: pos(840, 120, 360, 80) layer: 1 }
+      block monthly_net_sales_gross_profit_trend { position: pos(40, 240, 1160, 260) layer: 1 }
+      block monthly_fulfilled_orders_trend { position: pos(40, 540, 560, 160) layer: 1 }
+      block monthly_return_rate_trend { position: pos(640, 540, 560, 160) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab category_breakdown: CanvasLayout {
+      label: 'Category Breakdown'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block category_title { position: pos(40, 20, 1160, 80) layer: 1 }
+      block category_date { position: pos(40, 120, 360, 80) layer: 1 }
+      block category_gender { position: pos(440, 120, 360, 80) layer: 1 }
+      block category_department { position: pos(840, 120, 360, 80) layer: 1 }
+      block net_sales_by_category { position: pos(40, 240, 560, 200) layer: 1 }
+      block gross_margin_by_category { position: pos(640, 240, 560, 200) layer: 1 }
+      block category_performance_detail { position: pos(40, 480, 760, 220) layer: 1 }
+      block category_priority_signals { position: pos(840, 480, 360, 220) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab key_takeaways: CanvasLayout {
+      label: 'Key Takeaways'
+      width: 1280
+      height: 720
+      grid_size: 20
+      block takeaways_title { position: pos(40, 20, 1160, 80) layer: 1 }
+      block takeaways_date { position: pos(40, 120, 360, 80) layer: 1 }
+      block takeaways_gender { position: pos(440, 120, 360, 80) layer: 1 }
+      block takeaways_department { position: pos(840, 120, 360, 80) layer: 1 }
+      block ai_key_takeaways { position: pos(40, 240, 760, 420) layer: 1 }
+      block takeaways_note { position: pos(840, 240, 360, 180) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

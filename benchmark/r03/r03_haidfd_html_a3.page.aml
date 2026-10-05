@@ -1,0 +1,350 @@
+Dashboard r03_haidfd_html_a3 {
+  title: 'TheLook Business Review'
+  description: @md
+    Commercial performance review for TheLook, with a shared sales-date filter and month-over-month KPI comparisons.
+  ;;
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block f_sales_date: FilterBlock {
+    label: 'Sales date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block p_month_over_month: PopBlock {
+    label: 'Compare with'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block monthly_net_sales_trend: VizBlock {
+    label: 'Monthly Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block net_sales_by_product_category: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format { type: 'text' }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_sales_date'
+      to: [
+        'kpi_net_sales',
+        'kpi_orders',
+        'kpi_aov',
+        'kpi_gross_margin',
+        'monthly_net_sales_trend',
+        'net_sales_by_product_category'
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    PopInteraction {
+      from: 'p_month_over_month'
+      to: ['kpi_net_sales', 'kpi_orders', 'kpi_aov', 'kpi_gross_margin']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+        .tl-review, .tl-review * { box-sizing: border-box; }
+        .tl-review {
+          --ink: #1B1F3B;
+          --coral: #FF6B5A;
+          --sand: #F5EFE6;
+          --teal: #1F9E8F;
+          --alert: #D64545;
+          --slate: #5B6477;
+          --paper: #FFFFFF;
+          --line: rgba(27, 31, 59, .14);
+          font-family: 'Manrope', Arial, sans-serif;
+          color: var(--ink);
+          background: var(--sand);
+          min-height: 100%;
+          padding: clamp(16px, 3vw, 40px);
+        }
+        .tl-review h1, .tl-review h2, .tl-review p { margin: 0; }
+        .tl-shell { max-width: 1440px; margin: 0 auto; }
+        .tl-hero {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: end;
+          gap: 28px;
+          padding: clamp(24px, 4vw, 52px);
+          background: var(--ink);
+          color: var(--paper);
+          border-radius: 24px 24px 8px 8px;
+          position: relative;
+          overflow: hidden;
+        }
+        .tl-hero::after {
+          content: '';
+          position: absolute;
+          width: 280px;
+          height: 280px;
+          right: -100px;
+          bottom: -155px;
+          border: 44px solid var(--coral);
+          border-radius: 50%;
+          opacity: .96;
+        }
+        .tl-brand { display: inline-flex; align-items: center; gap: 11px; margin-bottom: 28px; }
+        .tl-brand-mark { width: 34px; height: 34px; flex: 0 0 34px; }
+        .tl-wordmark { font-size: 19px; font-weight: 800; letter-spacing: -.05em; }
+        .tl-kicker { color: #BFC5D7; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+        .tl-hero h1 { max-width: 760px; margin-top: 10px; font-size: clamp(31px, 5vw, 56px); line-height: 1.04; letter-spacing: -.06em; }
+        .tl-hero p { max-width: 600px; margin-top: 16px; color: #D9DCE7; font-size: 15px; line-height: 1.65; }
+        .tl-hero-note { position: relative; z-index: 1; max-width: 245px; padding: 14px 16px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.22); border-radius: 12px; color: #F6F7FA; font-size: 12px; font-weight: 600; line-height: 1.5; }
+        .tl-controls { display: grid; grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr); gap: 14px; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-top: 0; }
+        .tl-control { min-width: 0; padding: 3px 8px; border-radius: 10px; background: #FAFAFC; }
+        .tl-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 22px; }
+        .tl-kpi-card { min-width: 0; min-height: 190px; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 22px rgba(27, 31, 59, .06); }
+        .tl-kpi-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; margin-bottom: 6px; }
+        .tl-kpi-icon { display: grid; width: 40px; height: 40px; place-items: center; border-radius: 10px; font-size: 20px; font-weight: 800; }
+        .tl-kpi-icon.sales { background: #FFE3DF; color: var(--coral); }
+        .tl-kpi-icon.orders { background: #DEF3F0; color: var(--teal); }
+        .tl-kpi-icon.aov { background: #E8EAF2; color: var(--ink); }
+        .tl-kpi-icon.margin { background: #FFF0D1; color: #A46100; }
+        .tl-kpi-caption { color: var(--slate); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+        .tl-kpi-card .dac-viz-block, .tl-kpi-card h-block { min-height: 0; }
+        .tl-kpi-card .h-kpi-metric-kpi { color: var(--ink) !important; font-family: 'Manrope', Arial, sans-serif !important; font-size: 29px !important; font-weight: 800 !important; letter-spacing: -.055em; }
+        .tl-kpi-card .h-kpi-metric-label { color: var(--slate) !important; font-family: 'Manrope', Arial, sans-serif !important; font-size: 12px !important; font-weight: 700 !important; }
+        .tl-kpi-card .h-kpi-metric-diff, .tl-kpi-card .h-kpi-metric-diff * { font-family: 'Manrope', Arial, sans-serif !important; font-weight: 800 !important; }
+        .tl-kpi-card .friendly-diff:not(.negative) { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px solid rgba(31,158,143,.25); border-radius: 999px; background: #E3F6F3; color: #14766B !important; }
+        .tl-kpi-card .friendly-diff.negative { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px solid rgba(214,69,69,.26); border-radius: 999px; background: #FCE7E7; color: var(--alert) !important; }
+        .tl-kpi-card .friendly-diff:not(.negative)::before { content: '↑'; }
+        .tl-kpi-card .friendly-diff.negative::before { content: '↓'; }
+        .tl-section { margin-top: 34px; }
+        .tl-section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+        .tl-section h2 { font-size: 22px; letter-spacing: -.04em; }
+        .tl-section p { color: var(--slate); font-size: 13px; line-height: 1.5; }
+        .tl-chart-card { min-width: 0; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 22px rgba(27, 31, 59, .05); }
+        .tl-chart-card .dac-viz-block-label { color: var(--ink) !important; font-family: 'Manrope', Arial, sans-serif !important; font-weight: 800 !important; letter-spacing: -.02em; }
+        .tl-chart-card h-block { display: block; min-height: 340px; }
+        .tl-footer { display: flex; justify-content: space-between; gap: 16px; padding: 24px 4px 6px; color: var(--slate); font-size: 12px; line-height: 1.5; }
+        .tl-footer strong { color: var(--ink); }
+        @media (max-width: 1080px) { .tl-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (max-width: 720px) {
+          .tl-review { padding: 10px; }
+          .tl-hero { grid-template-columns: 1fr; padding: 26px; border-radius: 16px 16px 6px 6px; }
+          .tl-hero-note { display: none; }
+          .tl-controls { grid-template-columns: 1fr; padding: 12px; }
+          .tl-kpi-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 14px; }
+          .tl-kpi-card { min-height: 160px; }
+          .tl-section { margin-top: 26px; }
+          .tl-section-head { display: block; }
+          .tl-section-head p { margin-top: 6px; }
+          .tl-chart-card { padding: 12px; }
+          .tl-chart-card h-block { min-height: 285px; }
+          .tl-footer { display: block; }
+          .tl-footer p + p { margin-top: 6px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .tl-review *, .tl-review *::before, .tl-review *::after { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+      </style>
+
+      <main class="tl-review">
+        <div class="tl-shell">
+          <header class="tl-hero">
+            <div>
+              <div class="tl-brand" aria-label="TheLook">
+                <svg class="tl-brand-mark" viewBox="0 0 34 34" role="img" aria-label="TheLook logo">
+                  <rect width="34" height="34" rx="9" fill="#FF6B5A"/>
+                  <path d="M6.5 17c2.7-4.8 6.2-7.2 10.5-7.2S24.8 12.2 27.5 17c-2.7 4.8-6.2 7.2-10.5 7.2S9.2 21.8 6.5 17Z" fill="#F5EFE6"/>
+                  <circle cx="17" cy="17" r="3.6" fill="#1B1F3B"/>
+                </svg>
+                <span class="tl-wordmark">theLook</span>
+              </div>
+              <div class="tl-kicker">Commercial performance</div>
+              <h1>Business review, built for the next decision.</h1>
+              <p>Track sales quality, order volume, and category momentum in one focused view. Choose a sales-date range, then compare each key metric with the previous month.</p>
+            </div>
+            <div class="tl-hero-note">Net Sales excludes cancelled and returned order items. Gross Margin is calculated from Net Sales less COGS.</div>
+          </header>
+
+          <section class="tl-controls" aria-label="Review controls">
+            <div class="tl-control"><h-block name="f_sales_date" /></div>
+            <div class="tl-control"><h-block name="p_month_over_month" /></div>
+          </section>
+
+          <section class="tl-kpi-grid" aria-label="Key performance indicators">
+            <article class="tl-kpi-card">
+              <div class="tl-kpi-top"><span class="tl-kpi-caption">Revenue quality</span><span class="tl-kpi-icon sales" aria-hidden="true">$</span></div>
+              <h-block name="kpi_net_sales" />
+            </article>
+            <article class="tl-kpi-card">
+              <div class="tl-kpi-top"><span class="tl-kpi-caption">Demand</span><span class="tl-kpi-icon orders" aria-hidden="true">◫</span></div>
+              <h-block name="kpi_orders" />
+            </article>
+            <article class="tl-kpi-card">
+              <div class="tl-kpi-top"><span class="tl-kpi-caption">Basket size</span><span class="tl-kpi-icon aov" aria-hidden="true">↗</span></div>
+              <h-block name="kpi_aov" />
+            </article>
+            <article class="tl-kpi-card">
+              <div class="tl-kpi-top"><span class="tl-kpi-caption">Profitability</span><span class="tl-kpi-icon margin" aria-hidden="true">%</span></div>
+              <h-block name="kpi_gross_margin" />
+            </article>
+          </section>
+
+          <section class="tl-section" aria-labelledby="trend-heading">
+            <div class="tl-section-head">
+              <div><h2 id="trend-heading">How sales are moving</h2><p>Monthly Net Sales, ordered chronologically for a clear view of commercial momentum.</p></div>
+            </div>
+            <div class="tl-chart-card"><h-block name="monthly_net_sales_trend" /></div>
+          </section>
+
+          <section class="tl-section" aria-labelledby="category-heading">
+            <div class="tl-section-head">
+              <div><h2 id="category-heading">Where sales are landing</h2><p>Product categories ranked by Net Sales for the selected sales-date range.</p></div>
+            </div>
+            <div class="tl-chart-card"><h-block name="net_sales_by_product_category" /></div>
+          </section>
+
+          <footer class="tl-footer">
+            <p><strong>How to read this review:</strong> the date control applies to every KPI and chart; the comparison control adds the previous-month growth badge to all four KPI cards.</p>
+            <p>theLook · Business Review</p>
+          </footer>
+        </div>
+      </main>
+    ;;
+  }
+}

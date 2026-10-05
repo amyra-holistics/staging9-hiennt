@@ -1,0 +1,322 @@
+Dashboard r04_haidfd_canvas_a2 {
+  title: 'Monthly Performance Review'
+  description: @md
+    A five-slide monthly performance review for TheLook eCommerce. Use the date range to set the reporting window, compare headline KPIs with a prior period, drill the sales trend, and focus the category view.
+  ;;
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 60
+  }
+
+  block title_hero: TextBlock {
+    content: @md
+      # Monthly Performance Review
+
+      A focused readout of sales performance, customer demand, margin, and category mix.
+
+      **How to use this deck:** start with the KPI comparison, inspect the trend at a useful time grain, then isolate category performance before reviewing the AI-generated takeaway.
+    ;;
+  }
+
+  block title_scope: TextBlock {
+    content: @md
+      ## What is included
+
+      Net Sales excludes cancelled and returned order items. The reporting controls use **Order Items Created At** so the figures, trend, and category charts stay aligned to the selected period.
+    ;;
+  }
+
+  block date_range: FilterBlock {
+    label: 'Reporting period'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block period_comparison: PopBlock {
+    label: 'Compare with'
+    default {
+      type: 'relative'
+      duration: 1
+      granularity: 'month'
+      show_growth_rate: true
+    }
+  }
+
+  block net_sales_kpi: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block total_orders_kpi: VizBlock {
+    label: 'Total Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.total_orders)
+        label: 'Total Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block customers_kpi: VizBlock {
+    label: 'Customers'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.customers)
+        label: 'Customers'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block gross_margin_kpi: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block trend_date_drill: DateDrillBlock {
+    label: 'Trend grain'
+    default: 'month'
+  }
+
+  block monthly_net_sales: VizBlock {
+    label: 'Net Sales Trend'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Sales Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block category_filter: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block category_net_sales: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format { type: 'text' }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block category_mix: VizBlock {
+    label: 'Net Sales Category Mix'
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        show_percentage: true
+        sort: PieFamilySort {
+          type: 'pie'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block ai_summary: AiBlock {
+    label: 'Performance Takeaway'
+    prompt: 'Summarize this dashboard performance concisely, call out the key movers, and recommend one action.'
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'date_range'
+      to: [
+        'net_sales_kpi',
+        'total_orders_kpi',
+        'customers_kpi',
+        'gross_margin_kpi',
+        'monthly_net_sales',
+        'category_net_sales',
+        'category_mix',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    PopInteraction {
+      from: 'period_comparison'
+      to: [
+        'net_sales_kpi',
+        'total_orders_kpi',
+        'customers_kpi',
+        'gross_margin_kpi',
+      ]
+      field: r(thelook_order_items.created_at)
+    },
+    DateDrillInteraction {
+      from: 'trend_date_drill'
+      to: ['monthly_net_sales']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'category_filter'
+      to: ['category_net_sales', 'category_mix']
+      field: r(thelook_products.category)
+    },
+  ]
+
+  view: TabLayout {
+    tab title: CanvasLayout {
+      label: 'Title'
+      width: 1200
+      height: 675
+      grid_size: 15
+      block title_hero { position: pos(90, 150, 1020, 270) }
+      block title_scope { position: pos(90, 465, 1020, 120) }
+      mobile { mode: 'auto' }
+    }
+
+    tab headline_kpis: CanvasLayout {
+      label: 'Headline KPIs'
+      width: 1200
+      height: 675
+      grid_size: 15
+      block date_range { position: pos(60, 45, 330, 105) }
+      block period_comparison { position: pos(420, 45, 330, 105) }
+      block net_sales_kpi { position: pos(60, 225, 240, 180) }
+      block total_orders_kpi { position: pos(330, 225, 240, 180) }
+      block customers_kpi { position: pos(600, 225, 240, 180) }
+      block gross_margin_kpi { position: pos(870, 225, 240, 180) }
+      mobile { mode: 'auto' }
+    }
+
+    tab trend: CanvasLayout {
+      label: 'Trend'
+      width: 1200
+      height: 675
+      grid_size: 15
+      block trend_date_drill { position: pos(60, 45, 300, 105) }
+      block monthly_net_sales { position: pos(60, 180, 1080, 435) }
+      mobile { mode: 'auto' }
+    }
+
+    tab category_breakdown: CanvasLayout {
+      label: 'Category Breakdown'
+      width: 1200
+      height: 675
+      grid_size: 15
+      block category_filter { position: pos(60, 45, 330, 105) }
+      block category_net_sales { position: pos(60, 180, 690, 435) }
+      block category_mix { position: pos(780, 180, 360, 435) }
+      mobile { mode: 'auto' }
+    }
+
+    tab key_takeaways: CanvasLayout {
+      label: 'Key Takeaways'
+      width: 1200
+      height: 675
+      grid_size: 15
+      block ai_summary { position: pos(180, 105, 840, 465) }
+      mobile { mode: 'auto' }
+    }
+  }
+}

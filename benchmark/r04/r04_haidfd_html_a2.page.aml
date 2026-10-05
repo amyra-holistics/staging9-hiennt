@@ -1,0 +1,327 @@
+Dashboard r04_haidfd_html_a2 {
+  title: 'TheLook Performance Edit'
+  description: @md
+    A five-slide fashion-retail performance deck for monitoring net sales, profitability, fulfilled orders, monthly momentum, and category performance.
+  ;;
+
+  block f_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_net_sales_trend: VizBlock {
+    label: 'Monthly Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_category_performance: VizBlock {
+    label: 'Net Sales by Category'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: ['v_net_sales', 'v_gross_profit', 'v_fulfilled_orders', 'v_net_sales_trend', 'v_category_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: ['v_net_sales', 'v_gross_profit', 'v_fulfilled_orders', 'v_net_sales_trend', 'v_category_performance']
+      field: r(thelook_products.category)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root {
+          --ink: #1d2730;
+          --paper: #f3f0e8;
+          --bone: #fffdf8;
+          --denim: #183d5d;
+          --berry: #8f2948;
+          --brass: #a67b32;
+          --line: #c8c0b2;
+        }
+        html { scroll-behavior: smooth; }
+        .deck {
+          background: var(--paper);
+          color: var(--ink);
+          font-family: Georgia, 'Times New Roman', serif;
+          padding: 24px;
+        }
+        .deck-nav {
+          position: sticky;
+          top: 12px;
+          z-index: 3;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          width: fit-content;
+          max-width: 100%;
+          margin: 0 auto 20px;
+          padding: 8px;
+          background: rgba(255, 253, 248, 0.96);
+          border: 1px solid var(--line);
+          box-shadow: 4px 4px 0 var(--brass);
+        }
+        .deck-nav a {
+          color: var(--denim);
+          font-family: Arial, sans-serif;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.04em;
+          padding: 8px 10px;
+          text-decoration: none;
+        }
+        .deck-nav a:hover { background: #e7ded0; }
+        .deck-nav a:focus-visible, .slide:focus-visible {
+          outline: 3px solid var(--berry);
+          outline-offset: 3px;
+        }
+        .slide {
+          box-sizing: border-box;
+          aspect-ratio: 16 / 9;
+          min-height: 640px;
+          max-width: 1440px;
+          margin: 0 auto 28px;
+          padding: clamp(24px, 4vw, 64px);
+          overflow: auto;
+          scroll-margin-top: 88px;
+          background: var(--bone);
+          border: 1px solid var(--line);
+          box-shadow: 10px 10px 0 var(--denim);
+        }
+        .kicker, .folio {
+          color: var(--berry);
+          font-family: Arial, sans-serif;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+        .title-slide {
+          display: grid;
+          grid-template-columns: 1.45fr 0.55fr;
+          grid-template-rows: 1fr auto;
+          gap: 28px;
+          background: var(--denim);
+          color: var(--bone);
+        }
+        .title-slide .kicker { color: #f2c879; }
+        .title-slide h1 {
+          align-self: center;
+          max-width: 9ch;
+          margin: 0;
+          font-size: clamp(3.5rem, 8vw, 8rem);
+          font-weight: 400;
+          line-height: 0.86;
+          letter-spacing: -0.06em;
+        }
+        .title-slide p { max-width: 30ch; font-size: clamp(1.05rem, 1.8vw, 1.45rem); line-height: 1.4; }
+        .filters { align-self: end; display: grid; gap: 14px; }
+        .title-slide .folio { color: #f2c879; text-align: right; }
+        .slide-head { display: flex; justify-content: space-between; gap: 20px; align-items: baseline; border-bottom: 2px solid var(--ink); margin-bottom: 24px; }
+        .slide h2 { margin: 0 0 12px; font-size: clamp(2rem, 4vw, 4.5rem); font-weight: 400; line-height: 0.95; letter-spacing: -0.045em; }
+        .slide-intro { max-width: 55ch; margin: 0 0 24px; font-size: 1.1rem; line-height: 1.45; }
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+        .kpi-grid h-block { min-height: 260px; border-top: 6px solid var(--brass); background: #f6f1e6; }
+        .hero-chart h-block, .category-chart h-block { display: block; min-height: 390px; }
+        .trend-slide { background: #e7ded0; }
+        .category-slide { background: #f6f1e6; }
+        .takeaways { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 80px); align-items: center; height: calc(100% - 82px); }
+        .takeaways ol { margin: 0; padding-left: 1.3em; font-size: clamp(1.3rem, 2.5vw, 2.7rem); line-height: 1.25; }
+        .takeaways li { margin-bottom: 0.65em; }
+        .note { border-left: 7px solid var(--berry); padding: 8px 0 8px 20px; font-family: Arial, sans-serif; line-height: 1.5; }
+        @media (max-width: 760px) {
+          .deck { padding: 12px; }
+          .slide { aspect-ratio: auto; min-height: auto; padding: 28px 20px; box-shadow: 5px 5px 0 var(--denim); }
+          .title-slide, .takeaways { display: block; }
+          .title-slide h1 { margin: 52px 0; }
+          .filters { margin-top: 30px; }
+          .kpi-grid { grid-template-columns: 1fr; }
+          .kpi-grid h-block, .hero-chart h-block, .category-chart h-block { min-height: 300px; }
+          .folio { margin-top: 26px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          html { scroll-behavior: auto; }
+        }
+      </style>
+      <main class="deck" aria-label="TheLook performance report">
+        <nav class="deck-nav" aria-label="Performance deck slides">
+          <a href="#title">Cover</a>
+          <a href="#headline-kpis">Headline KPIs</a>
+          <a href="#net-sales-trend">Net-sales trend</a>
+          <a href="#category-breakdown">Category breakdown</a>
+          <a href="#key-takeaways">Key takeaways</a>
+        </nav>
+
+        <section class="slide title-slide" id="title" tabindex="-1" aria-labelledby="title-heading">
+          <div>
+            <div class="kicker">TheLook / Performance Edit</div>
+            <h1 id="title-heading">The shape of the season.</h1>
+            <p>Use the date and category selectors to tailor this five-part readout of commercial performance.</p>
+          </div>
+          <div class="filters" aria-label="Report filters">
+            <h-block name="f_date" />
+            <h-block name="f_category" />
+          </div>
+          <div class="folio">01 / 05</div>
+        </section>
+
+        <section class="slide" id="headline-kpis" tabindex="-1" aria-labelledby="kpi-heading">
+          <div class="slide-head"><div><div class="kicker">Commercial pulse</div><h2 id="kpi-heading">Headline KPIs</h2></div><div class="folio">02 / 05</div></div>
+          <p class="slide-intro">A compact read of realized sales, gross profit, and orders counted in net sales.</p>
+          <div class="kpi-grid">
+            <h-block name="v_net_sales" />
+            <h-block name="v_gross_profit" />
+            <h-block name="v_fulfilled_orders" />
+          </div>
+        </section>
+
+        <section class="slide trend-slide" id="net-sales-trend" tabindex="-1" aria-labelledby="trend-heading">
+          <div class="slide-head"><div><div class="kicker">Momentum</div><h2 id="trend-heading">Net-sales trend</h2></div><div class="folio">03 / 05</div></div>
+          <p class="slide-intro">Monthly net sales show the rhythm of demand after cancelled and returned items are excluded.</p>
+          <div class="hero-chart"><h-block name="v_net_sales_trend" /></div>
+        </section>
+
+        <section class="slide category-slide" id="category-breakdown" tabindex="-1" aria-labelledby="category-heading">
+          <div class="slide-head"><div><div class="kicker">Merchandise mix</div><h2 id="category-heading">Category breakdown</h2></div><div class="folio">04 / 05</div></div>
+          <p class="slide-intro">Compare net sales across categories, ranked from the strongest commercial contribution downward.</p>
+          <div class="category-chart"><h-block name="v_category_performance" /></div>
+        </section>
+
+        <section class="slide" id="key-takeaways" tabindex="-1" aria-labelledby="takeaway-heading">
+          <div class="slide-head"><div><div class="kicker">Read this next</div><h2 id="takeaway-heading">Key takeaways</h2></div><div class="folio">05 / 05</div></div>
+          <div class="takeaways">
+            <ol>
+              <li>Begin with the commercial pulse, then narrow the date range or category.</li>
+              <li>Use the monthly line to distinguish sustained momentum from a single-period lift.</li>
+              <li>Use the ranked category view to focus merchandise decisions where sales concentrate.</li>
+            </ol>
+            <div class="note"><strong>Metric note.</strong> Net sales exclude cancelled and returned order items. Gross profit is net sales less product cost. Fulfilled orders count distinct orders with at least one order item included in net sales.</div>
+          </div>
+        </section>
+      </main>
+    ;;
+  }
+}

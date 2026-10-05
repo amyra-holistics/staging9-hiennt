@@ -1,0 +1,342 @@
+Dashboard r05_haid_html_a2 {
+  title: 'Finance Report | Printable A4'
+  description: @md
+    Printable A4 finance report for the reporting period selected with the Date Range control.
+  ;;
+
+  block f_date_range: FilterBlock {
+    label: 'Date Range'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_cogs: VizBlock {
+    label: 'COGS'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.cogs)
+        label: 'COGS'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_gross_profit: VizBlock {
+    label: 'Gross Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_profit)
+        label: 'Gross Profit'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block v_department_finance: VizBlock {
+    label: 'Finance by Department'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Department'
+          ref: r(thelook_products.department)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'COGS'
+          ref: r(thelook.cogs)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'gross_profit'
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        show_sum_row: true
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'gross_profit'
+            direction: 'desc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+
+  block v_category_finance: VizBlock {
+    label: 'Finance by Category'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_products.category)
+          label: 'Product Category'
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.cogs)
+          label: 'COGS'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_profit)
+          label: 'Gross Profit'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date_range'
+      to: ['v_net_sales', 'v_cogs', 'v_gross_profit', 'v_department_finance', 'v_category_finance']
+      field: r(thelook_order_items.created_at)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        :root {
+          --ink: #132238;
+          --navy: #19385f;
+          --blue: #3676a8;
+          --paper: #f8fafc;
+          --rule: #cbd5e1;
+          --muted: #64748b;
+          --page-w: 210mm;
+          --page-h: 297mm;
+          --margin-x: 16mm;
+          --margin-top: 15mm;
+          --margin-bottom: 18mm;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+          margin: 0;
+          color: var(--ink);
+          font-family: Arial, Helvetica, sans-serif;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+        .page {
+          width: var(--page-w);
+          height: var(--page-h);
+          margin: 0 auto 8mm;
+          padding: var(--margin-top) var(--margin-x) var(--margin-bottom);
+          overflow: hidden;
+          position: relative;
+          background: var(--paper);
+          box-shadow: 0 4px 20px rgba(15, 23, 42, .16);
+          page-break-after: always;
+          break-after: page;
+        }
+        .page:last-child { page-break-after: auto; break-after: auto; }
+        .page-header {
+          align-items: center;
+          border-bottom: 1px solid var(--rule);
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 7mm;
+          padding-bottom: 4mm;
+        }
+        .brand { color: var(--navy); font-size: 8pt; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }
+        .period-note { color: var(--muted); font-size: 7.5pt; text-align: right; }
+        .page-footer {
+          align-items: center;
+          border-top: 1px solid var(--rule);
+          bottom: 7mm;
+          color: var(--muted);
+          display: flex;
+          font-size: 7.5pt;
+          justify-content: space-between;
+          left: var(--margin-x);
+          padding-top: 3mm;
+          position: absolute;
+          right: var(--margin-x);
+        }
+        .eyebrow { color: var(--blue); font-size: 8pt; font-weight: 700; letter-spacing: .16em; margin: 0 0 3mm; text-transform: uppercase; }
+        h1 { color: var(--navy); font-size: 32pt; letter-spacing: -.04em; line-height: 1.03; margin: 0 0 5mm; }
+        h2 { color: var(--navy); font-size: 19pt; letter-spacing: -.02em; margin: 0 0 3mm; }
+        h3 { color: var(--navy); font-size: 10pt; margin: 0 0 2mm; }
+        p { color: #334155; font-size: 10pt; line-height: 1.55; margin: 0 0 4mm; }
+        .cover-lede { font-size: 12pt; max-width: 125mm; }
+        .control-card { background: #eaf1f8; border-left: 4px solid var(--blue); margin: 9mm 0; padding: 4mm 5mm; }
+        .toc { border-top: 1px solid var(--rule); margin-top: 10mm; padding-top: 4mm; }
+        .toc a { border-bottom: 1px solid var(--rule); color: var(--navy); display: flex; font-size: 10pt; justify-content: space-between; padding: 3.5mm 0; text-decoration: none; }
+        .toc a:hover { color: var(--blue); }
+        .section-intro { margin-bottom: 5mm; }
+        .kpi-strip { display: grid; gap: 4mm; grid-template-columns: repeat(3, 1fr); margin: 5mm 0 7mm; }
+        .kpi-card { background: #ffffff; border: 1px solid var(--rule); min-height: 34mm; padding: 4mm; }
+        .table-wrap { background: #ffffff; border: 1px solid var(--rule); padding: 3mm; }
+        .table-wrap h-block { display: block; height: 158mm; }
+        .definition-grid { display: grid; gap: 5mm; margin-top: 8mm; }
+        .definition { background: #ffffff; border-left: 4px solid var(--blue); padding: 5mm 6mm; }
+        .definition p { margin-bottom: 0; }
+        .source-note { background: #eaf1f8; border: 1px solid #c8d9e8; margin-top: 8mm; padding: 4mm 5mm; }
+        @page { size: A4; margin: 0; }
+        @media print {
+          body { background: #ffffff; }
+          .page { box-shadow: none; margin: 0; }
+        }
+      </style>
+
+      <section class="page" id="cover">
+        <header class="page-header">
+          <div class="brand">TheLook | Finance</div>
+          <div class="period-note">Reporting period is selected with the Date Range control</div>
+        </header>
+        <div class="eyebrow">Printable A4 management report</div>
+        <h1>Finance<br>Report</h1>
+        <p class="cover-lede">A print-ready view of sales, cost of goods sold, and gross profit, organized for financial review.</p>
+        <div class="control-card">
+          <h3>Reporting period</h3>
+          <p>Select the period before printing. The Date Range control filters every KPI and both finance tables in this report.</p>
+          <h-block name="f_date_range" />
+        </div>
+        <nav class="toc" aria-label="Table of contents">
+          <div class="eyebrow">Contents</div>
+          <a href="#department"><span>Department finance</span><span>02</span></a>
+          <a href="#category"><span>Category finance</span><span>03</span></a>
+          <a href="#definitions"><span>Metric definitions</span><span>04</span></a>
+        </nav>
+        <footer class="page-footer"><span>TheLook Finance Report</span><span>Reporting period selected with Date Range control · Page 01 / 04</span></footer>
+      </section>
+
+      <section class="page" id="department">
+        <header class="page-header">
+          <div class="brand">TheLook | Finance Report</div>
+          <div class="period-note">Reporting period is selected with the Date Range control</div>
+        </header>
+        <div class="eyebrow">02 · Financial performance</div>
+        <h2>Department finance</h2>
+        <p class="section-intro">Use the KPI strip for the selected reporting period, then compare the full sales, cost, and gross-profit contribution of each department.</p>
+        <div class="kpi-strip">
+          <div class="kpi-card"><h3>Net Sales</h3><h-block name="v_net_sales" /></div>
+          <div class="kpi-card"><h3>COGS</h3><h-block name="v_cogs" /></div>
+          <div class="kpi-card"><h3>Gross Profit</h3><h-block name="v_gross_profit" /></div>
+        </div>
+        <div class="table-wrap"><h3>Department detail</h3><h-block name="v_department_finance" /></div>
+        <footer class="page-footer"><span>TheLook Finance Report</span><span>Reporting period selected with Date Range control · Page 02 / 04</span></footer>
+      </section>
+
+      <section class="page" id="category">
+        <header class="page-header">
+          <div class="brand">TheLook | Finance Report</div>
+          <div class="period-note">Reporting period is selected with the Date Range control</div>
+        </header>
+        <div class="eyebrow">03 · Financial performance</div>
+        <h2>Category finance</h2>
+        <p class="section-intro">Review the category-level composition of the same selected reporting period. Categories are listed alphabetically for print-friendly reconciliation.</p>
+        <div class="table-wrap"><h3>Category detail</h3><h-block name="v_category_finance" /></div>
+        <footer class="page-footer"><span>TheLook Finance Report</span><span>Reporting period selected with Date Range control · Page 03 / 04</span></footer>
+      </section>
+
+      <section class="page" id="definitions">
+        <header class="page-header">
+          <div class="brand">TheLook | Finance Report</div>
+          <div class="period-note">Reporting period is selected with the Date Range control</div>
+        </header>
+        <div class="eyebrow">04 · Documentation</div>
+        <h2>Metric definitions</h2>
+        <p>These report definitions follow the dataset documentation and apply to all finance views in this report.</p>
+        <div class="definition-grid">
+          <article class="definition"><h3>Net Sales</h3><p>Net Sales excludes Cancelled/Returned.</p></article>
+          <article class="definition"><h3>COGS</h3><p>COGS counts product cost on included items.</p></article>
+          <article class="definition"><h3>Gross Profit</h3><p>Gross Profit = Net Sales − COGS.</p></article>
+        </div>
+        <div class="source-note"><h3>Period control</h3><p>The Date Range control uses Order Items Created at and is mapped to all three KPIs plus the department and category finance tables.</p></div>
+        <footer class="page-footer"><span>TheLook Finance Report</span><span>Reporting period selected with Date Range control · Page 04 / 04</span></footer>
+      </section>
+    ;;
+  }
+
+  theme {
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+    }
+  }
+}

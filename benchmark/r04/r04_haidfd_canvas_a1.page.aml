@@ -1,0 +1,387 @@
+Dashboard r04_haidfd_canvas_a1 {
+  title: 'TheLook eCommerce — September 2026 Performance Review'
+  description: @md
+    A five-slide executive performance review for the month ended 30 September 2026.
+    Covers net sales, profitability, order health, twelve-month momentum, category mix,
+    and the decisions to carry into the next month.
+  ;;
+  theme: PageTheme {
+    background {
+      bg_color: "#17212B"
+    }
+    canvas {
+      background {
+        bg_color: "#F7F5F0"
+      }
+      border {
+        border_style: "none"
+      }
+      shadow: "none"
+    }
+    block {
+      text {
+        font_size: 16
+        font_color: "#17212B"
+        font_family: "Inter, system-ui, sans-serif"
+        font_weight: "normal"
+      }
+      label {
+        font_size: 14
+        font_color: "#17212B"
+        font_family: "Inter, system-ui, sans-serif"
+        font_weight: "bold"
+      }
+      background {
+        bg_color: "#F7F5F0"
+      }
+      border {
+        border_style: "none"
+      }
+      shadow: "none"
+    }
+  }
+  block s1_cover: TextBlock {
+    content: @md
+      # TheLook eCommerce
+      ## September 2026 Performance Review
+
+      **Month ended 30 September 2026**  
+      Net sales, profitability, order health, and category mix.
+
+      ---
+
+      ### A record sales month, led by volume while service quality improved.
+
+      <span style="color:#2563EB">01</span> &nbsp; Performance review  
+      <span style="color:#5C8D6D">Cobalt marks primary data. Sage marks favorable operational change.</span>  
+      <span style="color:#E76F51">Coral is reserved for risks and watch-outs.</span>
+    ;;
+  }
+
+  block s2_title: TextBlock {
+    content: @md
+      # Headline KPIs
+      September closed with strong sales and profit generation. Sales and profit lead; AOV and return rate provide operational context.
+    ;;
+  }
+  block s2_kpis: VizBlock {
+    label: 'September 2026 operating result'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format { type: 'number' pattern: 'inherited' }
+          uname: 'custom_net_sales_1'
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Fulfilled Orders'
+          ref: r(thelook.fulfilled_orders)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Average Order Value'
+          ref: r(thelook.aov)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      ]
+      conditions: [
+        "thelook_order_items.created_at is @(2026-09)",
+      ]
+      settings {
+        show_row_number: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_net_sales_1'
+            direction: 'desc'
+          }
+        ]
+        single_cell_display: 'normal'
+      }
+    }
+  }
+  block s2_readout: TextBlock {
+    content: @md
+      ### Readout
+      **Net Sales:** $60,501 &nbsp; | &nbsp; **Gross Profit:** $31,176 &nbsp; | &nbsp; **Gross Margin:** 51.5%  
+      **Fulfilled Orders:** 714 &nbsp; | &nbsp; **Average Order Value:** $84.73 &nbsp; | &nbsp; **Return Rate:** 8.5%
+    ;;
+  }
+
+  block s3_title: TextBlock {
+    content: @md
+      # Monthly Trend
+      ## Momentum accelerated into September
+      September is the twelve-month high for both Net Sales and Gross Profit.
+    ;;
+  }
+  block s3_trend: VizBlock {
+    label: 'Monthly Net Sales and Gross Profit'
+    viz: LineChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format { type: 'date' pattern: 'LLL yyyy' }
+      }
+      y_axis {
+        label: 'Sales and Profit'
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.gross_profit)
+            label: 'Gross Profit'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.fulfilled_orders)
+            label: 'Fulfilled Orders'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.return_rate)
+            label: 'Return Rate'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      ]
+      conditions: [
+        "thelook_order_items.created_at matches @(2025-10-01 until 2026-10-01)",
+      ]
+      settings {
+        legend_label: 'bottom'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block s3_readout: TextBlock {
+    content: @md
+      **September momentum:** Net Sales rose from $40,998 to $60,501 month over month (+47.6%). Gross Profit rose from $21,372 to $31,176 (+45.9%).
+    ;;
+  }
+
+  block s4_title: TextBlock {
+    content: @md
+      # Category Breakdown
+      ## Jeans led September sales
+      Rank categories by Net Sales; use the tooltip to inspect Gross Margin and Items Sold.
+    ;;
+  }
+  block s4_category: VizBlock {
+    label: 'September Net Sales by Product Category'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+        format { type: 'text' }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        },
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.items_sold)
+            label: 'Items Sold'
+            format { type: 'number' pattern: 'inherited' }
+          }
+        }
+      ]
+      filter {
+        field: r(thelook_order_items.created_at)
+        operator: 'matches'
+        value: 'last month'
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block s4_readout: TextBlock {
+    content: @md
+      **Top categories:** Jeans $8,209 (46.0% margin; 70 items); Outerwear & Coats $6,745 (55.9%; 57 items); Shorts $4,811 (49.3%; 88 items).  
+      <span style="color:#E76F51">Watch-out:</span> Jeans was the largest sales category, but its margin trailed Outerwear & Coats by 9.9 percentage points.
+    ;;
+  }
+
+  block s5_title: TextBlock {
+    content: @md
+      # Key Takeaways
+      Decisions and watch-outs from the August-to-September comparison.
+    ;;
+  }
+  block s5_takeaways: TextBlock {
+    content: @md
+      ### 1. Scale drove the result
+      Fulfilled Orders grew **51.9%** (470 to 714), exceeding the **47.6%** increase in Net Sales.
+
+      ### 2. Service quality improved
+      <span style="color:#5C8D6D">Return Rate declined 1.8 percentage points</span>, from 10.3% to 8.5%.
+
+      ### 3. Protect unit economics
+      <span style="color:#E76F51">Gross Margin declined 0.6 percentage points</span> and AOV declined 2.9%, from $87.23 to $84.73. Investigate category and promotion mix before carrying the sales playbook forward.
+    ;;
+  }
+  block s5_comparison: VizBlock {
+    label: 'August and September comparison'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'Month'
+          ref: r(thelook_order_items.created_at)
+          transformation: 'datetrunc month'
+          format { type: 'date' pattern: 'LLL yyyy' }
+          uname: 'order_item_month'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Gross Profit'
+          ref: r(thelook.gross_profit)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Fulfilled Orders'
+          ref: r(thelook.fulfilled_orders)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Average Order Value'
+          ref: r(thelook.aov)
+          format { type: 'number' pattern: 'inherited' }
+        },
+        VizFieldFull {
+          label: 'Return Rate'
+          ref: r(thelook.return_rate)
+          format { type: 'number' pattern: 'inherited' }
+        }
+      ]
+      conditions: [
+        "thelook_order_items.created_at is @(last 2 months)",
+      ]
+      settings {
+        pagination_size: 2
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'order_item_month'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+
+  view: TabLayout {
+    tab slide_01: CanvasLayout {
+      label: '01 Cover'
+      width: 1920
+      height: 1080
+      grid_size: 20
+      block s1_cover { position: pos(180, 180, 1560, 650) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab slide_02: CanvasLayout {
+      label: '02 Headline KPIs'
+      width: 1920
+      height: 1080
+      grid_size: 20
+      block s2_title { position: pos(120, 80, 1680, 180) layer: 1 }
+      block s2_kpis { position: pos(120, 310, 1680, 300) layer: 1 }
+      block s2_readout { position: pos(120, 700, 1680, 160) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab slide_03: CanvasLayout {
+      label: '03 Monthly Trend'
+      width: 1920
+      height: 1080
+      grid_size: 20
+      block s3_title { position: pos(120, 60, 1680, 160) layer: 1 }
+      block s3_trend { position: pos(120, 250, 1680, 600) layer: 1 }
+      block s3_readout { position: pos(120, 900, 1680, 100) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab slide_04: CanvasLayout {
+      label: '04 Category Breakdown'
+      width: 1920
+      height: 1080
+      grid_size: 20
+      block s4_title { position: pos(120, 60, 1680, 160) layer: 1 }
+      block s4_category { position: pos(120, 250, 1120, 680) layer: 1 }
+      block s4_readout { position: pos(1300, 310, 500, 420) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+    tab slide_05: CanvasLayout {
+      label: '05 Key Takeaways'
+      width: 1920
+      height: 1080
+      grid_size: 20
+      block s5_title { position: pos(120, 60, 1680, 120) layer: 1 }
+      block s5_takeaways { position: pos(120, 220, 1680, 370) layer: 1 }
+      block s5_comparison { position: pos(120, 650, 1680, 300) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

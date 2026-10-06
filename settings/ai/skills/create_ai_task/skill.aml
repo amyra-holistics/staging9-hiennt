@@ -6,7 +6,7 @@ Skill create_ai_task {
   content: @md
     Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat ("same as my last alert"). Every decision comes from this conversation, and a setting found in another task file is at most one option on a card.
 
-    The requester is the signed-in user, and your context gives their email. "Me", "my email", the default recipient and `run_as` all mean that address. Never take a recipient or `run_as` from another task file or a `schedules.aml` entry, not even as a card option.
+    You can't see who is signed in, and every schedule needs a `run_as` email, so the Identity card asks the requester's address unless they typed it in this chat. "Me", "my email", the default recipient and `run_as` all mean that address. Never pick an address from another task file or `schedules.aml` yourself: those addresses are only options on the Identity card.
 
     Create the task and its schedule without running it or sending anything now. A task runs unattended, so settle every part with the user here. Delivery works: a scheduled run calls `deliver_data` itself, and the docs calling it "coming soon" are out of date, so build the delivery the user asked for, with no disclaimer.
 
@@ -14,9 +14,9 @@ Skill create_ai_task {
 
     | Shape | The user wants | Parts to settle |
     |---|---|---|
-    | Task | an analysis on a schedule, kept in the task's run record | Brief, Schedule |
-    | Delivery | the result emailed or posted to Slack every run | Brief, Destination, Schedule, Attachment |
-    | Alert | a message only when something happens | Brief, Condition, Destination, Schedule, Attachment |
+    | Task | an analysis on a schedule, kept in the task's run record | Brief, Identity, Schedule |
+    | Delivery | the result emailed or posted to Slack every run | Brief, Identity, Destination, Schedule, Attachment |
+    | Alert | a message only when something happens | Brief, Condition, Identity, Destination, Schedule, Attachment |
 
     "Email me", "post to #sales" and "send the team" mean Delivery. "Alert me if", "notify me when", "keep an eye on" and "only when" mean Alert. "Run this every week" with nobody to send to means Task. Recipients taken from a column ("each store manager") make it a Delivery or an Alert. When nothing points to a shape ("automate the revenue report", "set something up for the sales team"), ask the Shape card.
 
@@ -41,7 +41,8 @@ Skill create_ai_task {
     - **Shape**: one option per shape, each naming the job in the user's terms, with the details left to the later cards: "Email me a weekly revenue summary", "Alert me when revenue drops", "Keep a weekly revenue summary in the task's run record". Recommend the one the user's words lean to.
     - **Brief**: the dataset, the metrics, the comparison, and the grouping level (datasets often hold both parent and leaf categories). Clear when one dataset fits and the request names the metrics, with either no grouping or one that has only one level in the dataset. Asked or not, the brief's Definitions name the grouping field.
     - **Condition**: clear when the rule is a number the query computes. A vague word ("a lot", "worst", "at risk", "unusual", "anything worth knowing") always gets a card that quotes today's numbers ("Sep 28–Oct 4 vs Sep 21–27: Mobiles −49%, Laptops −34%, Audio −20%. When should it alert?"). Recommend a concrete rule with the plain meaning: "worst" and "at risk" pick out a few rows, not most of them, and a change (% or $) suits them better than a rank by size. "Unusual" can use `/detect_anomaly`, which needs at least 6 earlier periods. A freshness check needs the time the data normally lands. Recommend "Let AI judge each run and explain why" only when the user handed that call to the AI, and otherwise offer it as the last alternative.
-    - **Destination**: clear when every recipient is an email address ("me" is the requester's), a Slack channel or a column of addresses, and the preview found nothing to decide. Otherwise ask about vague recipients ("the team", "the usual channel"), shared or unusable addresses, and notes columns, recommending to leave notes out.
+    - **Identity**: clear when the user typed their own address in this chat. Otherwise ask "Which email is yours? The task runs as you, with your data access, and anything sent to you goes there." with each distinct `run_as` address in `schedules.aml` as an option and none marked recommended, because you can't tell which one is the user's. It's the one card with no recommendation. An edit keeps its `run_as` and asks this card only when the change needs the requester's address ("send it to me too").
+    - **Destination**: clear when every recipient is an email address ("me" is the Identity address), a Slack channel or a column of addresses, and the preview found nothing to decide. Otherwise ask about vague recipients ("the team", "the usual channel"), shared or unusable addresses, and notes columns, recommending to leave notes out.
     - **Schedule**: clear when the day and the time are known. Otherwise ask for the missing or vague one ("every morning"), with each option showing the time and the next run. Never ask about the timezone.
     - **Attachment**: clear when the user named a file type, asked for a chart (a PNG chart), or said no file. Otherwise recommend a PNG chart of what the message is about, and offer an XLSX table when the reader needs every row, a PDF, or no file.
 
@@ -147,6 +148,6 @@ Skill create_ai_task {
     }
     ```
 
-    The `cron` is local time with no conversion: Monday 8:00 AM is `0 8 * * 1`. `run_as` is the requester's email unless they name someone else, and the run uses that person's data access. Never ask about it on a card.
+    The `cron` is local time with no conversion: Monday 8:00 AM is `0 8 * * 1`. `run_as` is the Identity address unless the user names someone else, and the run uses that person's data access. Ask no separate run-as card.
   ;;
 }

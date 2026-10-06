@@ -1,0 +1,28 @@
+AiTask qa5_t11_leadership_digest {
+  label: 'QA5 T11 Weekly Leadership Sales Digest'
+  description: 'Reviews last week’s sales against the preceding full week and emails a concise leadership digest only when material changes are found.'
+
+  brief: @md
+    Using @Dataset:ecommerce_official, run fresh queries in the workspace timezone. Define **last week** as the most recently completed Monday–Sunday calendar week immediately before the task run date, and **prior week** as the complete Monday–Sunday calendar week immediately before last week. Exclude the current partial week.
+
+    Evaluate the dataset-defined `revenue` metric, distinct `orders.id` count, and average revenue per distinct order for both weeks. Also evaluate revenue by `countries.name`, `categories.name`, and `merchants.name`; and evaluate the distinct-order share with `orders.status` values `cancelled` and `refunded` for both weeks. Use unrounded values for all comparisons and present revenue as currency.
+
+    Treat an item as noteworthy only when at least one of these conditions holds:
+    - Overall revenue, distinct order count, or average revenue per order changes by at least 15% week over week, when the corresponding prior-week value is non-zero.
+    - A country, category, or merchant both changes revenue by at least 20% week over week and contributes at least 10% of the absolute total-revenue change between the two weeks. If prior-week segment revenue is zero, do not calculate a percentage change or flag that segment under this rule.
+    - The cancelled-order or refunded-order share changes by at least 5 percentage points.
+
+    If one or more items are noteworthy, use the available AI delivery capability to send exactly one concise email to **nhi.ty@holistics.io**. The subject must begin exactly with **[QA5 T11]** and identify the last-week reporting period. In the body, identify the reporting period and summarize only the flagged items, prioritizing the largest business impact and limiting the digest to five insights. For each insight, show the relevant current and prior values plus the absolute and/or percentage change needed to substantiate it. Do not infer causes or include unflagged routine metrics.
+
+    If no item meets these materiality conditions, do not send an email or any other delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - Fresh queries against @Dataset:ecommerce_official compare the two most recently completed consecutive Monday–Sunday calendar weeks in the workspace timezone, excluding the current partial week.
+    - The task evaluates dataset-defined revenue, distinct orders.id, and average revenue per distinct order overall; revenue by countries.name, categories.name, and merchants.name; and the distinct-order shares for orders.status values cancelled and refunded.
+    - Overall metrics are flagged only for an absolute week-over-week change of at least 15% with a non-zero prior-week value. Country, category, and merchant revenue is flagged only when its absolute percentage change is at least 20%, its prior-week value is non-zero, and it contributes at least 10% of the absolute overall revenue change. Cancelled or refunded order-share changes are flagged only at an absolute shift of at least 5 percentage points.
+    - When one or more items are flagged, exactly one email is delivered through the available AI delivery capability to nhi.ty@holistics.io. Its subject begins exactly with [QA5 T11], identifies the reporting period, and its concise body contains only up to five fact-based flagged insights with the supporting current and prior values and changes.
+    - When no item is flagged, no email or other delivery is sent.
+    - All results use fresh query data and contain no unsupported causal claims.
+  ;;
+}

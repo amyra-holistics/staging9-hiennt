@@ -39,15 +39,14 @@ Skill create_ai_task {
     After saving, write this, filled with what the user confirmed or said. Keep each cell to the key facts, no explanation.
 
     ````
-    ## <label>
+    ## <label> (Publish to activate)
 
-    Task created. Commit and publish to activate it.
+    Your task is created. <Every Monday at 8:00 AM, I'll compare each product category's revenue with the week before and email nhi.ty@holistics.io the chart when any category falls 20% or more.>
 
     | | |
     |---|---|
-    | 🏷️ Status | [Draft](#pos) (Commit and publish to activate this task) |
     | 🗓️ Schedule | <Mondays 8:00 AM (Asia/Ho_Chi_Minh)> |
-    | 👥 Send to | <recipients, the address column, or the channel> |
+    | 📨 Delivery | <channel · who gets it: Email · nhi.ty@holistics.io \| Slack · #sales-alerts \| Email · each store manager (manager_email)> |
     | 📝 Brief | <one compact sentence: what it reports and when it sends: Alert when a category's revenue falls 20% or more week over week> |
     | 📎 Attachment | <what is attached · its format: Viz · PNG \| Table · XLSX \| Viz · PDF \| None> |
 
@@ -55,7 +54,7 @@ Skill create_ai_task {
 
     ## Acceptance criteria
 
-    1. <each confirmed criterion, word for word>
+    - [ ] <each confirmed criterion, word for word>
 
     ```artifact
     <stored_artifact.id from the task file's save result: FileEdit:…>
@@ -65,11 +64,13 @@ Skill create_ai_task {
     <stored_artifact.id from the schedules.aml save result>
     ```
 
+    ### Follow-up
+
     [Commit and publish now](#opt)
     [<a follow-up specific to this task>](#opt)
     ````
 
-    The first `##` line is the task's `label` alone, in plain words: no icon, no backticks, no "Task created". The line under it is always "Task created. Commit and publish to activate it." The table starts with an empty header row (`| | |` then `|---|---|`) so that no row renders bold. Status is the green pill `[Draft](#pos)` and "(Commit and publish to activate this task)" until the task is published. Join each icon and its label with a non-breaking space, as above, so the label never wraps. Schedule gives the day and the local time, then the timezone in brackets: "Mondays 8:00 AM (Asia/Ho_Chi_Minh)", or "(Workspace timezone)" when you can't name it. Brief is one compact sentence joining what each message reports and when it sends. Attachment names what is attached and its format: "Viz · PNG", "Table · XLSX", or "None". Under the table, one line gives the first run's date and the user it runs as, both in bold, with their role in brackets only when a tool result or the chat context states it. The second `##` line, "Acceptance criteria", lists the confirmed criteria, word for word. Then the two saved files appear as artifact cards: for each, a fenced block with the language `artifact` holding only the `stored_artifact.id` that its `suggest_file_creation` or `suggest_file_edits` result returned, the task file first. The chat draws each block as a card titled with that save's summary, showing the path, that opens the file. Leave a blank line after each heading, the line under the name, the table, the first-run line, the criteria and each card. End the text with the follow-up buttons: no lead-in line before the name, and nothing else between these parts and the buttons, such as "both files validate" or a chart. The answer holds no chart. Call the task "scheduled" only once it is published.
+    The first `##` line is the task's `label` in plain words, then "(Publish to activate)" until the task is published: no icon, no backticks, no "Task created". The line under it starts "Your task is created." and adds one sentence, in your own voice, of what the task will do from its first run on: when it runs, what it checks or reports, the condition for sending (an alert sends only when it's met), who gets it and how, and the attachment. Name the recipients as the user did: "email you" only when the user said "me", otherwise the address, column or channel. For a task that sends every run, drop the condition: "Every Monday at 8:00 AM, I'll email the sales team last week's revenue by region, with every row as an XLSX." The table starts with an empty header row (`| | |` then `|---|---|`) so that no row renders bold. Join each icon and its label with a non-breaking space, as above, so the label never wraps. Schedule gives the day and the local time, then the timezone in brackets: "Mondays 8:00 AM (Asia/Ho_Chi_Minh)", or "(Workspace timezone)" when you can't name it. Delivery names the channel, then who gets it. Brief is one compact sentence joining what each message reports and when it sends. Attachment names what is attached and its format: "Viz · PNG", "Table · XLSX", or "None". Under the table, one line gives the first run's date and the user it runs as, both in bold, with their role in brackets only when a tool result or the chat context states it. The second `##` line, "Acceptance criteria", lists the confirmed criteria word for word as a checklist, one `- [ ]` item each. Then the two saved files appear as artifact cards: for each, a fenced block with the language `artifact` holding only the `stored_artifact.id` that its `suggest_file_creation` or `suggest_file_edits` result returned, the task file first. The chat draws each block as a card titled with that save's summary, showing the path, that opens the file. Then the `###` line "Follow-up", with the buttons under it. Leave a blank line after each heading, the line under the name, the table, the first-run line, the criteria and each card. End the text with the follow-up buttons: no lead-in line before the name, and nothing else between these parts and the buttons, such as "both files validate" or a chart. The answer holds no chart. Call the task "scheduled" only once it is published.
 
     The follow-ups are inline buttons, not an `ask_user` card: each is a Markdown link to `#opt` on its own line, and clicking one sends its text as the user's next message, so word each as a request the user would type. "Commit and publish now" comes first, then 1–2 that each name something specific to this task that you saw: a threshold the preview shows near its line ("Lower the threshold to 8%: India is at −9.98%"), a freshness guard when the data lands late, a test with Run now after publishing (it sends for real), a second destination only if the user mentioned one. When the user sends "Commit and publish now", do it if you have a tool for it, committing only the task file and `schedules.aml`. Otherwise say where to click: Commit changes (with only those two files), then Publish, both at the top right.
 

@@ -4,9 +4,11 @@ Skill create_ai_task {
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
+    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat ("like my last alert", "same as before"): every decision for this task comes from this conversation.
+
     Task delivery works: a scheduled run calls `deliver_data` and sends with no approval card, conditional and per-recipient sends included. The docs page calling it "coming soon" is out of date, so build the delivery the user asked for, with no disclaimers in the brief. A Data Alert or Email Schedule fits only a fixed chart on a timer with no AI-written text: offer it then as one card option.
 
-    A task runs unattended: whatever is decided silently here repeats on every run. So make every decision with the user in this conversation. Read earlier chats (`fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call`, `search_organization_conversations`) only when the request points to one ("like my last alert", "same as before"); otherwise every decision comes from this conversation. A setting from an earlier chat or another task file may belong to someone else's task, so it never settles an area: still run the preview and ask every card, offering that setting as one option.
+    A task runs unattended: whatever is decided silently here repeats on every run. So make every decision with the user in this conversation. A setting from an earlier chat or another task file may belong to someone else's task, so it never settles an area: still run the preview and ask every card, offering that setting as one option.
 
     Every number in the preview, the cards, the report and the brief comes from a query result: compute totals, ranks, % changes and who qualifies in the AQL query, and copy the figures from the result.
 

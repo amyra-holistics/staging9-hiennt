@@ -179,15 +179,11 @@ Dashboard demo_slides {
       }
     ;;
   }
+
   block k_cover_rev: VizBlock {
     label: 'Revenue'
     viz: MetricKpi {
       dataset: ecommerce_official
-      theme {
-        metric_kpi {
-          alignment: 'center'
-        }
-      }
       value: VizFieldFull {
         label: 'Revenue'
         ref: r(ecommerce_official.revenue)
@@ -216,15 +212,17 @@ Dashboard demo_slides {
       }
       theme {
         metric_kpi {
-          alignment: 'center'
           label {
             font_size: 16
+          }
+          value {
+            font_size: 44
           }
         }
       }
       value: VizFieldFull {
-        label: 'Distinct Orders'
         ref: 'distinct_order_count'
+        label: 'Distinct Orders'
         format {
           type: 'number'
           pattern: '#,###0'
@@ -233,6 +231,112 @@ Dashboard demo_slides {
     }
     settings {
       hide_label: true
+    }
+  }
+  block k_cover_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'average_order_value'
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+
+
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_cover_bar: VizBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+        border_radius: 0
+      }
+      shadow: 'none'
+      padding: 4
+      label {
+        font_family: 'Inter'
+        font_size: 15
+        font_color: '#05264C'
+        font_weight: 'bold'
+      }
+      text {
+        font_family: 'Inter'
+        font_size: 13
+        font_color: '#374151'
+      }
+    }
+    label: 'Revenue by customer country'
+    viz: ColumnChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        label: 'Customer Country'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2C6A95'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
     }
   }
   block v_ld9y: VizBlock {
@@ -1003,47 +1107,10 @@ Dashboard demo_slides {
       }
     }
   }
-  block f_order_date: FilterBlock {
-    theme: BlockTheme {
-      background {
-        bg_color: 'rgba(255, 255, 255, 0.12)'
-      }
-      border {
-        border_width: 1
-        border_style: 'solid'
-        border_color: 'rgba(255, 255, 255, 0.35)'
-        border_radius: 12
-      }
-      shadow: 'none'
-      padding: 10
-      label {
-        font_family: 'Inter'
-        font_size: 13
-        font_color: '#FFFFFF'
-        font_weight: 'semibold'
-      }
-      text {
-        font_family: 'Inter'
-        font_size: 13
-        font_color: '#FFFFFF'
-      }
-    }
-    label: 'Order date range'
-    type: 'field'
-    source: FieldFilterSource {
-      dataset: ecommerce_official
-      field: r(orders.created_at)
-    }
-    default {
-      operator: 'matches'
-      value: '$H_NIL$'
-    }
-  }
   block t_cover: TextBlock {
     content: @md
-      <div class="tr-eyebrow">Ecommerce performance review</div>
-      <h1 class="tr-headline">Revenue is up 3x in a year.<br><span class="tr-accent">Here is what is driving it.</span></h1>
-      <p class="tr-lede">A walk through revenue, orders, markets, products and customers. Choose a date range below to set the scope for the charts.</p>
+      <h1 class="tr-headline is-mid">Ecommerce performance review</h1>
+      <p class="tr-lede">Aug 2023 to Oct 2026 · All markets</p>
     ;;
   }
   block t_agenda: TextBlock {
@@ -1058,9 +1125,9 @@ Dashboard demo_slides {
       <div class="tr-eyebrow">01 · At a glance</div>
       <h2 class="tr-headline is-mid">$11.6M in revenue from 33,010 orders</h2>
       <p class="tr-lede">The average order is worth about $351. 759 merchants list 8,731 products for 10,264 registered users.</p>
-      <ul class="tr-points"><li>Revenue, orders and users are all lifetime totals.</li><li>Use the date filter on slide 1 to see them for a narrower period.</li></ul>
+      <ul class="tr-points"><li>Revenue, orders and users are all lifetime totals.</li><li>The latest month, Oct 2026, is partial.</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>The catalog is broad, and the business is already at scale.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_trend: TextBlock {
@@ -1070,7 +1137,7 @@ Dashboard demo_slides {
       <p class="tr-lede">Monthly revenue grew from $345K in Sep 2025 to $1.06M in Sep 2026.</p>
       <ul class="tr-points"><li>Growth has been steady since mid-2024, when monthly revenue was about $90K.</li><li>The one sharp dip was Apr 2025, down 38% from March. Revenue passed its March level again by August.</li><li>Oct 2026 is a partial month, so its short bar is not a decline.</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Growth is sustained, not a one-off spike.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_mix: TextBlock {
@@ -1080,7 +1147,7 @@ Dashboard demo_slides {
       <p class="tr-lede">Of 33,010 orders, 23,174 (70%) were delivered, 8,153 (25%) cancelled and 1,683 (5%) refunded.</p>
       <ul class="tr-points"><li>Cancelled orders account for $2.85M, or 25% of reported revenue.</li><li>Refunds add another $0.59M (5%).</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Every 10% fewer cancellations is worth about $285K.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_kpis: TextBlock {
@@ -1088,7 +1155,7 @@ Dashboard demo_slides {
       <div class="tr-split"><div><div class="tr-eyebrow">02 · Monthly KPIs</div>
       <h2 class="tr-headline is-mid">Growth comes from volume, not bigger baskets</h2>
       <p class="tr-lede">Average order value has stayed close to $350 while monthly orders grew from 975 in Sep 2025 to over 1,900 by May 2026.</p></div><div><ul class="tr-points"><li>Revenue and orders move in step, month after month.</li><li>Order count is the lever to watch.</li></ul>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div></div></div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div></div></div>
     ;;
   }
   block t_div1: TextBlock {
@@ -1109,7 +1176,7 @@ Dashboard demo_slides {
       <p class="tr-lede">The United States is the largest market at $1.34M, only 12% of revenue.</p>
       <ul class="tr-points"><li>Nine of the ten countries each contribute between $1.1M and $1.3M.</li><li>Singapore is the outlier at $0.63M, about half of its peers.</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Revenue is well diversified across regions.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_country: TextBlock {
@@ -1119,7 +1186,7 @@ Dashboard demo_slides {
       <p class="tr-lede">Lifting Singapore to the peer average of about $1.2M would add roughly $0.6M.</p>
       <ul class="tr-points"><li>The United States, Vietnam, Australia and Germany lead.</li><li>The top market is only 18% ahead of the ninth.</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Look at Singapore before investing in a new market.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_cat: TextBlock {
@@ -1129,15 +1196,15 @@ Dashboard demo_slides {
       <p class="tr-lede">Body, Living Room and Televisions together earn $3.0M, or 26% of revenue.</p>
       <ul class="tr-points"><li>Body leads at $1.13M. Bedroom trails at $0.14M.</li><li>Televisions ($0.91M), T-shirts ($0.89M), Mobiles ($0.87M) and Snacks ($0.84M) follow closely.</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Strength spans electronics, fashion and food, not one vertical.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div>
     ;;
   }
   block t_prod: TextBlock {
     content: @md
       <div class="tr-split"><div><div class="tr-eyebrow">03 · Products</div>
       <h2 class="tr-headline is-mid">A broad catalog with a long tail</h2>
-      <p class="tr-lede">8,731 products from 759 merchants are listed. The table ranks the top 20; the bubble chart shows how price, units sold and revenue relate.</p></div><div><ul class="tr-points"><li>Look for high-price items that still sell in volume.</li><li>Use the date filter on slide 1 to see how the leaders change over time.</li></ul>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div></div></div>
+      <p class="tr-lede">8,731 products from 759 merchants are listed. The table ranks the top 20; the bubble chart shows how price, units sold and revenue relate.</p></div><div><ul class="tr-points"><li>Look for high-price items that still sell in volume.</li><li>The ranking reflects all orders in the period.</li></ul>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div></div></div>
     ;;
   }
   block t_div2: TextBlock {
@@ -1157,15 +1224,15 @@ Dashboard demo_slides {
       <h2 class="tr-headline is-mid">The customer base doubles every year</h2>
       <p class="tr-lede">Registered users grew from 478 in 2023 to 1,249 in 2024, 2,769 in 2025 and 5,767 so far in 2026.</p></div><div><ul class="tr-points"><li>2026 is a partial year and already 2.1 times all of 2025.</li><li>Women generate 68% of revenue ($7.8M versus $3.8M).</li></ul>
       <div class="tr-callout"><span class="tr-callout-label">So what</span>Acquisition is accelerating, and the audience skews female.</div>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div></div></div>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div></div></div>
     ;;
   }
   block t_topc: TextBlock {
     content: @md
       <div class="tr-split"><div><div class="tr-eyebrow">04 · Top customers</div>
       <h2 class="tr-headline is-mid">Know your best customers by name</h2>
-      <p class="tr-lede">The table lists the top 20 customers with their country, orders and revenue.</p></div><div><ul class="tr-points"><li>Use it to find accounts for personal outreach or loyalty offers.</li><li>Use the date filter on slide 1 to see how the leaders change over time.</li></ul>
-      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) with no filters applied.</div></div></div>
+      <p class="tr-lede">The table lists the top 20 customers with their country, orders and revenue.</p></div><div><ul class="tr-points"><li>Use it to find accounts for personal outreach or loyalty offers.</li><li>The ranking reflects all orders in the period.</li></ul>
+      <div class="tr-note">Commentary reflects all data (Aug 2023 to Oct 2026) (Aug 2023 to Oct 2026).</div></div></div>
     ;;
   }
   block t_wrap_head: TextBlock {
@@ -1408,8 +1475,8 @@ Dashboard demo_slides {
     .hdeck .tr-slide > .tr-frame { flex: 1; min-height: 240px; }
     /* Light sheet that carries charts on dark slides. The charts' own text is dark, so they need a light surface. */
     .hdeck .tr-sheet {
-      background: linear-gradient(160deg, #E4EFF8 0%, #D3E5F2 100%);
-      border: 1px solid rgba(255, 255, 255, 0.55);
+      background: linear-gradient(160deg, #C9DBEA 0%, #B4CCE0 100%);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       border-radius: 20px;
       padding: 22px;
       display: flex;
@@ -1479,6 +1546,28 @@ Dashboard demo_slides {
       display: flex;
     }
     .hdeck .tr-filter > * { flex: 1; min-width: 0; }
+
+    /* ---- Cover: title and logo on top, chart left, three KPI cards right */
+    .hdeck .tr-cover-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 22px; flex-shrink: 0; }
+    .hdeck .tr-cover-head .tr-headline { margin-bottom: 8px; }
+    .hdeck .tr-cover-head .tr-eyebrow { margin-bottom: 12px; }
+    .hdeck .tr-cover-side { display: flex; flex-direction: column; align-items: flex-end; gap: 14px; flex-shrink: 0; }
+    .hdeck .tr-logo-badge { display: inline-flex; align-items: center; padding: 10px 16px; border-radius: 10px; background: var(--t-dark-bg); }
+    .hdeck .tr-cover-side img { height: 24px; display: block; }
+    /* Cover sits higher: less top padding, a compact header, and a gap above the footer line. */
+    .hdeck .tr-slide.is-cover { padding-top: calc(var(--t-pad) * 0.55); }
+    .hdeck .tr-cover-head { margin-bottom: 12px; }
+    .hdeck .tr-cover-head .tr-headline { margin: 0 0 4px; font-size: clamp(24px, 2.8cqw, 36px); }
+    .hdeck .tr-cover-head .tr-lede { font-size: 15px; }
+    .hdeck .tr-cover-grid { margin-bottom: 18px; }
+    .hdeck .tr-cover-grid > .tr-frame { overflow: hidden; }
+
+    /* The grid is sized by the space left above the footer, so its children cannot push into the nav. */
+    .hdeck .tr-cover-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 20px; }
+    .hdeck .tr-cover-grid > .tr-frame { min-height: 0; padding: 14px; }
+    .hdeck .tr-cover-kpis { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px; min-height: 0; }
+    .hdeck .tr-cover-kpis .tr-kpicard { min-height: 0; padding: 10px 18px; overflow: hidden; }
+    .hdeck .tr-cover-kpis .h-kpi-metric { font-size: clamp(26px, 3cqw, 38px) !important; }
 
     /* ---- At a glance: KPI cards */
     .hdeck .tr-kpigrid {
@@ -1653,12 +1742,17 @@ Dashboard demo_slides {
 
   </style>
 
-  <section class="tr-slide is-dark" id="tr-1">
-    <div class="tr-body">
-      <div class="tr-copy"><h-block name="t_cover" /><div class="tr-filters"><div class="tr-filter"><h-block name="f_order_date" /></div></div></div>
-      <div class="tr-lozenges">
-        <div class="tr-lozenge is-tall"><div class="tr-lozenge-label">Revenue</div><div class="tr-kpi-value"><h-block name="k_cover_rev" /></div></div>
-        <div class="tr-lozenge is-short"><div class="tr-lozenge-label">Orders</div><div class="tr-kpi-value"><h-block name="k_cover_ord" /></div></div>
+  <section class="tr-slide is-cover" id="tr-1">
+    <div class="tr-cover-head">
+      <div class="tr-copy"><h-block name="t_cover" /></div>
+      <div class="tr-cover-side"><span class="tr-logo-badge"><img src="https://cdn.holistics.io/logos/holistics-logo-white.svg" alt="Holistics" /></span></div>
+    </div>
+    <div class="tr-cover-grid">
+      <div class="tr-frame"><h-block name="v_cover_bar" /></div>
+      <div class="tr-cover-kpis">
+        <div class="tr-kpicard"><div class="tr-kpi-value"><h-block name="k_cover_rev" /></div></div>
+        <div class="tr-kpicard"><div class="tr-kpi-value"><h-block name="k_cover_ord" /></div></div>
+        <div class="tr-kpicard"><div class="tr-kpi-value"><h-block name="k_cover_aov" /></div></div>
       </div>
     </div>
     <nav class="tr-nav" aria-label="Slide navigation">
@@ -1818,19 +1912,5 @@ Dashboard demo_slides {
   settings {
     autorun_on_open: true
   }
-  explicit_interactions: [
-    FilterInteraction {
-      from: 'f_order_date'
-      to: [
-        'v_ld9y',
-        'v_acsc',
-        'k_cover_rev',
-        'k_cover_ord',
-        'v_quxa',
-        'v_fofr',
-        'v_products_categories'
-      ]
-      field: r(orders.created_at)
-    }
-  ]
+  explicit_interactions: []
 }

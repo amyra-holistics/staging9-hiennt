@@ -1257,7 +1257,7 @@ Dashboard all_viz {
       field: r(categories.name)
     }
     default {
-      operator: 'matches'
+      operator: 'is'
       value: '$H_NIL$'
     }
     settings {

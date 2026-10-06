@@ -1399,7 +1399,7 @@ height: 100%
     tab business: CanvasLayout {
       label: 'Business'
       width: 1220
-      height: 1860
+      height: 1855
       auto_expand_vertically: true
       block t_business_header_bg {
         position: pos(0, 0, 1220, 200)
@@ -1443,19 +1443,19 @@ height: 100%
         layer: 2
       }
       block v_business_kpi_table {
-        position: pos(20, 370, 1180, 300)
+        position: pos(15, 935, 1180, 300)
       }
       block v_sales_country {
-        position: pos(20, 675, 785, 560)
+        position: pos(20, 370, 785, 560)
       }
       block v_business_map {
-        position: pos(15, 1240, 1185, 615)
+        position: pos(15, 1235, 1185, 615)
       }
       block t_ihk0 {
         position: pos(515, 220, 40, 40)
       }
       block v_ueqh {
-        position: pos(830, 775, 340, 265)
+        position: pos(830, 470, 340, 265)
       }
       mobile {
         mode: 'auto'

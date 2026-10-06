@@ -1,0 +1,957 @@
+Dashboard sales_performance {
+  title: 'Sales Performance'
+  description: ''
+  owner: 'phuong.nl@holistics.io'
+  theme: H.themes.vanilla
+  block f_country_copy: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(countries.name)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+  block f_created_at_copy: FilterBlock {
+    label: 'Date of order'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: 'Last 30 days'
+    }
+  }
+  block v_oroj: VizBlock {
+    label: 'User profiles'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          ref: r(users.id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'users_id'
+        },
+        VizFieldFull {
+          ref: r(users.full_name)
+          format {
+            type: 'text'
+          }
+          uname: 'users_full_name'
+        },
+        VizFieldFull {
+          ref: r(users.gender)
+          format {
+            type: 'text'
+          }
+          uname: 'users_gender'
+        },
+        VizFieldFull {
+          ref: r(users.birth_date)
+          format {
+            type: 'date'
+          }
+          uname: 'users_birth_date'
+        },
+        VizFieldFull {
+          ref: r(users.sign_up_at)
+          format {
+            type: 'datetime'
+          }
+          uname: 'users_sign_up_at'
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'users_id'
+            width: 90
+          },
+          ColumnStyle {
+            key: 'users_full_name'
+            width: 166
+          },
+          ColumnStyle {
+            key: 'users_gender'
+            width: 121
+          },
+          ColumnStyle {
+            key: 'users_birth_date'
+            width: 137
+          },
+          ColumnStyle {
+            key: 'users_sign_up_at'
+            width: 175
+          }
+        ]
+      }
+    }
+  }
+  block v_5x1w: VizBlock {
+    label: 'Orders by date and status'
+    viz: PivotTable {
+      dataset: ecommerce_official
+      rows: [
+        VizFieldFull {
+          ref: r(orders.created_at)
+          transformation: 'datetrunc year'
+          format {
+            type: 'date'
+            pattern: 'yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(orders.created_at)
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: r(orders.status)
+          format {
+            type: 'text'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'Total orders'
+          ref: r(orders.id)
+          aggregation: 'count'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_total: true
+        show_column_total: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_buf1: VizBlock {
+    label: 'Total orders by Status'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(orders.status)
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          label: 'Total orders'
+          ref: r(orders.id)
+          aggregation: 'count'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        row_limit: 5000
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+      }
+    }
+  }
+  block v_0dy0: VizBlock {
+    label: 'Orders by country'
+    viz: ColumnChart {
+      dataset: ecommerce_official
+      calculation orders_id_prev_1mo {
+        label: 'Orders Id (prev. 1mo)'
+        formula: @aql count(orders, orders.id) | relative_period(orders.created_at, interval(-1 month), strict: true);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(orders.id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          field: VizFieldFull {
+            ref: 'orders_id_prev_1mo'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_b62q: VizBlock {
+    label: 'User count by country'
+    viz: LineChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(users.id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_yp2k: VizBlock {
+    label: 'Total users'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        ref: r(users.id)
+        aggregation: 'count'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_i897: VizBlock {
+    label: 'Total orders this month'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        label: 'Total orders'
+        ref: r(orders.id)
+        aggregation: 'count'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(orders.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block t_x46v: TextBlock {
+    content: @md # Orders Overview;;
+  }
+  block v_hj49: VizBlock {
+    label: 'Daily sales trend'
+    viz: LineChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        transformation: 'datetrunc day'
+        format {
+          type: 'date'
+          pattern: 'LLL dd, yyyy'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Order count'
+            ref: r(orders.id)
+            aggregation: 'count distinct'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+          settings {
+            line_interpolation: 'smooth'
+          }
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Trend line of Order count'
+            ref: r(orders.id)
+            aggregation: 'count distinct'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+            analytic: RegressionLine {
+              type: 'linear'
+            }
+          }
+          settings {
+            line_style: 'dashed'
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_ft0b: VizBlock {
+    label: 'User profiles'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          ref: r(users.id)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'users_id'
+        },
+        VizFieldFull {
+          ref: r(users.full_name)
+          format {
+            type: 'text'
+          }
+          uname: 'users_full_name'
+        },
+        VizFieldFull {
+          ref: r(users.gender)
+          format {
+            type: 'text'
+          }
+          uname: 'users_gender'
+        },
+        VizFieldFull {
+          ref: r(users.birth_date)
+          format {
+            type: 'date'
+          }
+          uname: 'users_birth_date'
+        },
+        VizFieldFull {
+          ref: r(users.sign_up_at)
+          format {
+            type: 'datetime'
+          }
+          uname: 'users_sign_up_at'
+        }
+      ]
+      settings {
+        show_row_number: true
+        row_limit: 5000
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+        column_styles: [
+          ColumnStyle {
+            key: 'users_id'
+            width: 90
+          },
+          ColumnStyle {
+            key: 'users_full_name'
+            width: 166
+          },
+          ColumnStyle {
+            key: 'users_gender'
+            width: 121
+          },
+          ColumnStyle {
+            key: 'users_birth_date'
+            width: 137
+          },
+          ColumnStyle {
+            key: 'users_sign_up_at'
+            width: 175
+          }
+        ]
+      }
+    }
+  }
+  block v_ri1j: VizBlock {
+    label: 'Users overtime'
+    viz: LineChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(users.sign_up_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(users.id)
+            aggregation: 'count'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_gogk: VizBlock {
+    label: 'Total users'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        ref: r(users.id)
+        aggregation: 'count'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_5cxj: VizBlock {
+    label: 'Users by country'
+    viz: BarChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+        }
+        series {
+          field: VizFieldFull {
+            ref: r(users.id)
+            aggregation: 'count distinct'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 5000
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        x_axis_show_null_datetime: false
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_rqda: VizBlock {
+    label: 'Avg Daily Order Count'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation avg_daily_order_count {
+        label: 'Avg Daily Order Count'
+        formula: @aql unique(orders.created_at | day())
+  | select(daily_order_count: orders | count_distinct(orders.id))
+  | avg(daily_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        label: 'Avg Daily Order Count'
+        ref: 'avg_daily_order_count'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(orders.created_at)
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'month'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_xsw2: VizBlock {
+    label: 'Total Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation h_pop__revenue {
+        label: 'Prior Month Revenue'
+        formula: @aql revenue | relative_period(orders.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      filter {
+        field: r(orders.created_at)
+        operator: 'matches'
+        value: 'Last 30 days'
+      }
+      value: VizFieldFull {
+        label: 'Total Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      compare_value: VizFieldFull {
+        ref: 'h_pop__revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  view: TabLayout {
+    label: 'View 1'
+    tab view_1: CanvasLayout {
+      label: 'Orders'
+      width: 960
+      height: 1000
+      grid_size: 20
+      auto_expand_vertically: true
+      block f_country_copy {
+        position: pos(380, 20, 260, 80)
+      }
+      block f_created_at_copy {
+        position: pos(680, 20, 260, 80)
+      }
+      block v_buf1 {
+        position: pos(20, 600, 420, 380)
+      }
+      block v_0dy0 {
+        position: pos(460, 600, 480, 380)
+      }
+      block v_i897 {
+        position: pos(380, 100, 260, 120)
+      }
+      block t_x46v {
+        position: pos(20, 20, 320, 60)
+      }
+      block v_hj49 {
+        position: pos(20, 240, 920, 340)
+        layer: 1
+      }
+      block v_rqda {
+        position: pos(680, 100, 260, 120)
+        layer: 1
+      }
+      block v_xsw2 {
+        position: pos(20, 100, 320, 120)
+        layer: 1
+      }
+      mobile {
+        mode: 'auto'
+      }
+      default_zoom: 0.55
+    }
+    tab tab_5p91: CanvasLayout {
+      label: 'Users'
+      width: 1300
+      grid_size: 20
+      auto_expand_vertically: true
+      mobile {
+        mode: 'auto'
+      }
+      block v_ft0b {
+        position: pos(480, 340, 780, 540)
+        layer: 2
+      }
+      block v_ri1j {
+        position: pos(480, 20, 780, 300)
+        layer: 3
+      }
+      block v_gogk {
+        position: pos(20, 20, 400, 140)
+        layer: 4
+      }
+      block v_5cxj {
+        position: pos(40, 340, 400, 540)
+        layer: 2
+      }
+      height: 1660
+    }
+  }
+  settings {
+    timezone: 'Etc/UTC'
+    cache_duration: 1440
+    autorun_on_open: true
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_country_copy'
+      to: [
+        'f_created_at_copy'
+      ]
+      field: r(countries.name)
+    },
+    FilterInteraction {
+      from: 'f_created_at_copy'
+      to: [
+        'f_country_copy'
+      ]
+      field: r(orders.created_at)
+    },
+    FilterInteraction {
+      from: 'f_country_copy'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj',
+        'v_rqda',
+        'v_xsw2'
+      ]
+      field: r(countries.name)
+    },
+    FilterInteraction {
+      from: 'f_created_at_copy'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_rqda',
+        'v_xsw2'
+      ]
+      field: r(orders.created_at)
+    },
+    FilterInteraction {
+      from: 'v_oroj'
+      to: [
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_5x1w'
+      to: [
+        'v_oroj',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_buf1'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_0dy0'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_b62q'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_yp2k'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_i897',
+        'v_hj49',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_i897'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_hj49',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_hj49'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_rqda',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_ft0b'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_b62q',
+        'v_yp2k',
+        'v_ri1j',
+        'v_gogk',
+        'v_5cxj'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_ri1j'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_b62q',
+        'v_yp2k',
+        'v_ft0b',
+        'v_gogk',
+        'v_5cxj'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_gogk'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_b62q',
+        'v_yp2k',
+        'v_ft0b',
+        'v_ri1j',
+        'v_5cxj'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_5cxj'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_b62q',
+        'v_yp2k',
+        'v_ft0b',
+        'v_ri1j',
+        'v_gogk'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_rqda'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_xsw2'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_xsw2'
+      to: [
+        'v_oroj',
+        'v_5x1w',
+        'v_buf1',
+        'v_0dy0',
+        'v_b62q',
+        'v_yp2k',
+        'v_i897',
+        'v_hj49',
+        'v_rqda'
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 Dashboard all_viz {
   theme: DynamicPageTheme {
-    light: purple
-    dark: forest
+    light: brand_theme_light
+    dark: brand_theme_dark
   }
-  title: 'All viz test'
+  title: 'Demo dashboard'
   description: ''
   owner: 'hien.nt@holistics.io'
   // block v_tydi: VizBlock {
@@ -104,10 +104,11 @@ Dashboard all_viz {
   //     hide_controls: true
   //   }
   // }
+  block t_f8rx: block_ha_heading('All Metrics To Date')
   block t_block_ha_page_header_bg: block_ha_page_header_bg()
   block t_block_ha_page_header: block_ha_page_header(
-    'Sales and Orders',
-    'Monitor overall sales performance, order trends, and fulfillment outcomes to understand revenue drivers and operational efficiency.'
+    'Sales',
+    'Monitor revenue, order volume, fulfillment mix, and customer markets.'
   )
   block t_2pu8: TextBlock {
     theme: BlockTheme {
@@ -124,326 +125,113 @@ Dashboard all_viz {
     content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
   }
   block v_fofr: VizBlock {
-    label: 'Total Sales by Ship mode'
+    label: 'Revenue by Order Month'
     viz: CombinationChart {
-      dataset: superstore
-      calculation sum_of_superstore_sales {
-        label: 'Total Sales'
-        formula: @aql sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_profit {
-        label: 'Total Profit'
-        formula: @aql sum(superstore_csv.profit);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_discount {
-        label: 'Total Discount'
-        formula: @aql sum(superstore_csv.discount);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_sales_prev_1y {
-        label: 'Sum Of Superstore Sales (prev. 1y)'
-        formula: @aql sum_of_superstore_sales | relative_period(superstore_csv.order_date, interval(-1 year), strict: true);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: r(superstore_csv.order_date)
-        operator: 'matches'
-        value: '2016-01-01 - 2017-12-31'
-      }
+      dataset: ecommerce_official
       x_axis: VizFieldFull {
-        ref: r(superstore_csv.order_date)
-        transformation: 'datetrunc quarter'
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
         format {
           type: 'date'
-          pattern: 'yyyy Qq'
+          pattern: 'LLL yyyy'
         }
       }
       y_axis {
-        settings {
-          show_data_label_by: 'value'
-        }
-        series {
-          mark_type: 'column'
-          field: VizFieldFull {
-            ref: 'sum_of_superstore_sales'
-            format {
-              type: 'number'
-              pattern: '#,###0.00"A"'
-            }
-          }
-        }
-      }
-      y_axis {
-        settings {
-          alignment: 'right'
-        }
         series {
           mark_type: 'line'
           field: VizFieldFull {
-            label: 'Prev. 1 year'
-            ref: 'sum_of_superstore_sales_prev_1y'
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
             format {
               type: 'number'
-              pattern: '#,###0.00"A"'
+              pattern: 'inherited'
             }
           }
         }
       }
       settings {
-        row_limit: 10000
-        x_axis_show_null_datetime: false
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
         }
       }
     }
   }
   block v_quxa: VizBlock {
-    label: 'Sales by Segment'
+    label: 'Revenue by Order Status'
     viz: PieChart {
-      dataset: superstore
-      calculation sum_of_superstore_sales {
-        label: 'Total Sales'
-        formula: @aql sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_profit {
-        label: 'Total Profit'
-        formula: @aql sum(superstore_csv.profit);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_discount {
-        label: 'Total Discount'
-        formula: @aql sum(superstore_csv.discount);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation sum_of_superstore_sales_prev_1y {
-        label: 'Sum Of Superstore Sales (prev. 1y)'
-        formula: @aql sum_of_superstore_sales | relative_period(superstore_csv.order_date, interval(-1 year), strict: true);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      filter {
-        field: r(superstore_csv.order_date)
-        operator: 'matches'
-        value: '2016-01-01 - 2017-12-31'
-      }
+      dataset: ecommerce_official
       legend: VizFieldFull {
-        ref: r(superstore_csv.segment)
+        ref: r(orders.status)
+        label: 'Order Status'
         format {
           type: 'text'
         }
       }
       series {
         field: VizFieldFull {
-          label: ' '
-          ref: 'sum_of_superstore_sales'
-          format {
-            type: 'number'
-            pattern: '#,###0.00"A"'
-          }
-        }
-
-      }
-      settings {
-        display_as_donut: true
-        row_limit: 10000
-        data_label_position: 'none'
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
-      }
-    }
-  }
-  block v_ny30: VizBlock {
-    label: 'User Signed Up'
-    viz: MarkdownViz {
-      dataset: ecommerce_dataset
-      calculation users_users_signed_up_prev_1y {
-        label: 'Users Users Signed Up (prev. 1y)'
-        formula: @aql ecommerce_ga_users.users_signed_up_count | relative_period(ecommerce_users.sign_up_date, interval(-1 year), strict: true);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation users_users_signed_up_prev_1y_01 {
-        label: 'Users Users Signed Up (prev. 1y) 01'
-        formula: @aql ecommerce_users.users_signed_up_count | exact_period(ecommerce_users.sign_up_at, @(2026-03-01 - 2026-03-08));;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      values: [
-        VizFieldFull {
-          label: 'PoP Comparison of Users Signed Up'
-          ref: 'users_users_signed_up_prev_1y_01'
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
           format {
             type: 'number'
             pattern: 'inherited'
           }
         }
-      ]
-      content: @md <style>
-.kpi-card {
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-  background: #3760D6;
-  border-radius: 8px;
-  padding: 8px;
-  padding-top: 16px;
-  color: white;
-  width: 100%;
-  height: 300px;
-}
-
-.kpi-title { font-size: 14px; font-weight: 400; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.9; }
-
-.kpi-value {
-  font-size: 56px;
-  font-weight: 700;
-  margin-top: 20px;
-}
-
-.kpi-change-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 40px;
-}
-
-.kpi-pill-blue {
-  background: white;
-  padding: 4px 12px;
-  border-radius: 999px;
-  color: #1A1A2E;
-  font-size: 12px;
-  font-weight: 500;
-  align-items: center;
-  gap: 6px;
-}
-
-.kpi-vs {
-  opacity: 0.6;
-  font-size: 14px;
-}
-
-</style>
-
-<div class="kpi-card">
-
-<!-- <div class="kpi-title">
-Users Signed Up
-</div> -->
-
-<div class="kpi-value">
-{{ rows[0].values.`Users Signed Up`.formatted }}
-</div>
-
-<div class="kpi-change-row">
-
-<div class="kpi-pill-blue">
-  <span style="vertical-align: middle;"> ▼  {{ rows[0].values.`PoP Comparison of Users Signed Up`.formatted }}</span>
-</div>
-
-
-</div>
-
-
-</div>                     ;;
+      }
       settings {
-        show_row_total: true
-        show_column_total: true
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'asc'
       }
     }
   }
-  // block v_k7dv: VizBlock {
-  //   label: 'Month Sign Up Date and Users Signed Up'
-  //   viz: CustomChart {
-  //     dataset: ecommerce_dataset
-  //     custom_chart_id: 33033
-  //     field x: VizFieldFull {
-  //       ref: r(ecommerce_ga_users.sign_up_date)
-  //       transformation: 'datetrunc month'
-  //       format {
-  //         type: 'date'
-  //         pattern: 'LLL yyyy'
-  //       }
-  //     }
-  //     field y: VizFieldFull {
-  //       ref: r(ecommerce_users.users_signed_up_count)
-  //       format {
-  //         type: 'number'
-  //         pattern: 'inherited'
-  //       }
-  //     }
-  //     setting tooltip: true
-  //     setting show_axis: true
-  //     setting line_color: '#FFB84D'
-  //     setting show_ticks: false
-  //     setting smooth_line: true
-  //     setting show_data_point: false
-  //     setting background_color: 'transparent'
-  //     settings {
-  //       row_limit: 10000
-  //     }
-  //   }
-  //   settings {
-  //     hide_label: true
-  //   }
-  // }
   block v_ld9y: VizBlock {
-    theme {
-      padding {
-        top: 56
-        left: 16
-        right: 16
-        bottom: 16
-      }
-    }
-    label: 'Total Revenue'
+    label: 'Revenue'
     viz: MetricKpi {
-      dataset: superstore
-      calculation sum_of_superstore_sales {
-        label: 'Sum of Superstore Sales'
-        formula: @aql sum(superstore_csv.sales);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
+      dataset: ecommerce_official
       value: VizFieldFull {
-        label: 'Total Revenue'
-        ref: 'sum_of_superstore_sales'
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
         format {
           type: 'number'
-          pattern: 'inherited'
+          pattern: '#,###0.00"A"'
         }
       }
       settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
-        }
+        display_mode: 'single'
       }
     }
     settings {
       hide_label: true
     }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
   }
   block v_nrin: VizBlock {
-    label: 'Total Sales copy'
+    label: 'Product Count'
     viz: MetricKpi {
       dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Product listed'
         ref: r(products.name)
@@ -467,9 +255,19 @@ Users Signed Up
     }
   }
   block v_audi: VizBlock {
-    label: 'Total Sales copy copy'
+    label: 'Merchant Count'
     viz: MetricKpi {
       dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Merchant listed'
         ref: r(merchants.name)
@@ -493,52 +291,431 @@ Users Signed Up
     }
   }
   block v_acsc: VizBlock {
-    theme {
-      padding {
-        top: 56
-        left: 16
-        right: 16
-        bottom: 16
-      }
-    }
-    label: 'Total Sales copy copy copy'
+    label: 'Distinct Orders'
     viz: MetricKpi {
-      dataset: superstore
-      calculation sum_of_superstore_sales {
-        label: 'Sum of Superstore Sales'
-        formula: @aql sum(superstore_csv.sales);;
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
         calc_type: 'measure'
         data_type: 'number'
       }
-      calculation sum_of_superstore_profit {
-        label: 'Sum of Superstore Profit'
-        formula: @aql sum(superstore_csv.profit);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation count_of_superstore_order_id {
-        label: 'Count of Superstore Order id'
-        formula: @aql count(superstore_csv.order_id);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      value: VizFieldFull {
-        label: 'All-time Orders'
-        ref: 'count_of_superstore_order_id'
-        format {
-          type: 'number'
-          pattern: 'inherited'
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
         }
       }
-      settings {
-        aggregate_awareness {
-          enabled: true
-          debug_comments: true
+      value: VizFieldFull {
+        ref: 'distinct_order_count'
+        label: 'Distinct Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
         }
       }
     }
     settings {
       hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order date range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_customer_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(countries.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block v_sales_country: VizBlock {
+    label: 'Revenue by Customer Country'
+    viz: BarChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        label: 'Customer Country'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_products_categories: VizBlock {
+    label: 'Revenue by Product Category'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(categories.name)
+        label: 'Product Category'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_products_table: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(products.name)
+          label: 'Product Name'
+          format {
+            type: 'text'
+          }
+          uname: 'product_name'
+        },
+        VizFieldFull {
+          ref: r(products.price)
+          label: 'Product Price'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        },
+        VizFieldFull {
+          ref: 'total_units_sold'
+          label: 'Total Units Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_name'
+            direction: 'asc'
+          },
+        ]
+        wrap_header_text: true
+        wrap_cell_text: false
+      }
+    }
+  }
+  block v_products_bubble: VizBlock {
+    label: 'Product Price, Units, and Revenue'
+    viz: BubbleChart {
+      dataset: ecommerce_official
+
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation top_100_product_ids {
+        label: 'Top 100 Product Ids'
+        formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
+        calc_type: 'measure'
+        data_type: 'json'
+      }
+
+      x_col: VizFieldFull {
+        ref: r(products.price)
+        label: 'Product Price'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+
+      y_col: VizFieldFull {
+        ref: 'total_units_sold'
+        label: 'Total Units Sold'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+
+      z_col: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        label: 'Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+
+      label_col: VizFieldFull {
+        ref: r(products.name)
+        label: 'Product Name'
+      }
+
+      conditions: [
+        "products.id in top_100_product_ids",
+      ]
+
+      settings {
+        row_limit: 100
+      }
+    }
+  }
+  block v_users_count: VizBlock {
+    label: 'Registered Users'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation distinct_registered_user_count {
+        label: 'Distinct Registered User Count'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'distinct_registered_user_count'
+        label: 'Distinct Registered User Count'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_users_signup: VizBlock {
+    label: 'User Signups by Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation distinct_registered_users {
+        label: 'Distinct Registered Users'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(users.sign_up_date)
+        label: 'Sign Up Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'distinct_registered_users'
+            label: 'Distinct Registered Users'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Sign Up Month'
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_users_gender: VizBlock {
+    label: 'Revenue by User Gender'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(users.gender)
+        label: 'User Gender'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: PieFamilySort {
+          type: 'pie'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_users_table: VizBlock {
+    label: 'Top Customers by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(users.full_name)
+          label: 'Customer Full Name'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Customer Country'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          uname: 'revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'distinct_order_count'
+          label: 'Distinct Order Count'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
     }
   }
   block t_pour: TextBlock {
@@ -597,81 +774,971 @@ Users Signed Up
     }
     content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M5.574 4.691c-.833.692-1.052 1.862-1.491 4.203l-.75 4c-.617 3.292-.926 4.938-.026 6.022S5.88 20 9.23 20h5.54c3.35 0 5.025 0 5.924-1.084c.9-1.084.591-2.73-.026-6.022l-.75-4c-.439-2.34-.658-3.511-1.491-4.203C17.593 4 16.403 4 14.02 4H9.98c-2.382 0-3.572 0-4.406.691" opacity="0.25"/><path fill="currentColor" d="M12 9.25a2.25 2.25 0 0 1-2.122-1.5a.75.75 0 1 0-1.414.5a3.751 3.751 0 0 0 7.073 0a.75.75 0 1 0-1.414-.5A2.25 2.25 0 0 1 12 9.25"/></svg>;;
   }
+  // Reusable header and logo compositions for the restored reference tabs.
+  block t_business_header_bg: block_ha_page_header_bg()
+  block t_business_header: block_ha_page_header(
+    'Business',
+    '''This page provides you a quick understanding of the current shape and scope of the business. <br /> If you have any questions, please don't hesitate to <a href="mailto:hi@holistics.io" style="text-decoration: underline; color: white ">contact us here</a>.'''
+  )
+  block t_business_logo: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
+  }
+  block t_products_header_bg: block_ha_page_header_bg()
+  block t_products_header: block_ha_page_header('Products', 'Browse the live product catalog alongside category and product performance.')
+  block t_products_logo: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
+  }
+  block t_users_header_bg: block_ha_page_header_bg()
+  block t_users_header: block_ha_page_header('Users', 'Follow acquisition, customer activity, value, and purchase cohort retention.')
+  block t_users_logo: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
+  }
+  block v_business_aov: VizBlock {
+    label: 'Average Order Value'
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'average_order_value'
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+
+
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_business_kpi_table: VizBlock {
+    label: 'Monthly KPI Overview'
+    viz: MetricSheet {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      date_field: VizFieldFull {
+        label: 'Order Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      rows: [
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Distinct Orders'
+            ref: 'distinct_order_count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Average Order Value'
+            ref: 'average_order_value'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        max_column: 7
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_business_map: VizBlock {
+    label: 'Revenue Map by Country'
+    viz: FilledMap {
+      dataset: ecommerce_official
+      location {
+        field: VizFieldFull {
+          label: 'Country Name'
+          ref: r(countries.name)
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        location_colors {
+
+        }
+      }
+    }
+  }
+  block v_products_catalog: VizBlock {
+    label: 'Product Catalog'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Image'
+          ref: r(products.product_image)
+          format {
+            type: 'html'
+          }
+        },
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+          uname: 'products_name_1'
+        },
+        VizFieldFull {
+          label: 'Category'
+          ref: r(categories.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Product Price'
+          ref: r(products.price)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_revenue_1'
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_revenue_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'products_name_1'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+  block v_users_activity: VizBlock {
+    label: 'Monthly Customer Activity'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation active_customer_count {
+        label: 'Active Customer Count'
+        formula: @aql orders | count_distinct(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation repeat_customer_count {
+        label: 'Repeat Customer Count'
+        formula: @aql unique(orders.user_id)
+      | select(order_count: orders | count_distinct(orders.id))
+      | filter(order_count > 1)
+      | count(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Customers'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'active_customer_count'
+            label: 'Active Customer Count'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'repeat_customer_count'
+            label: 'Repeat Customer Count'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        x_axis_label: 'Order Month'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_users_retention: VizBlock {
+    label: 'Purchase Cohort Retention'
+    viz: PivotTable {
+      dataset: ecommerce_official
+
+      calculation first_purchase_month {
+        label: 'First Purchase Month'
+        formula: @aql orders | min(orders.created_at | month()) | dimensionalize(users.id);;
+        calc_type: 'dimension'
+        data_type: 'datetime'
+        model: users
+      }
+
+      calculation months_since_first_purchase {
+        label: 'Months Since First Purchase'
+        formula: @aql date_diff('month', users.first_purchase_month, (orders.created_at | month()));;
+        calc_type: 'dimension'
+        data_type: 'number'
+        model: orders
+      }
+
+      calculation purchasing_user_count {
+        label: 'Purchasing User Count'
+        formula: @aql orders | count_distinct(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation cohort_size {
+        label: 'Cohort Size'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation retention_rate {
+        label: 'Retention Rate'
+        formula: @aql purchasing_user_count * 100.0 / (cohort_size | exclude_grains(orders.months_since_first_purchase, keep_filters: true));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      rows: [
+        VizFieldFull {
+          ref: ref('users', 'first_purchase_month')
+          label: 'Cohort Month'
+          uname: 'cohort_month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+
+      columns: [
+        VizFieldFull {
+          ref: ref('orders', 'months_since_first_purchase')
+          label: 'Months Since First Purchase'
+          uname: 'months_since_first_purchase'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+
+      values: [
+        VizFieldFull {
+          ref: 'retention_rate'
+          label: 'Retention Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0\\%'
+          }
+        }
+      ]
+
+      settings {
+        show_row_total: false
+        show_column_total: false
+        show_sub_total: false
+        empty_cell_as_zero: false
+        pagination_size: 100
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'cohort_month'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'months_since_first_purchase'
+            direction: 'asc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: 'retention_rate'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FEE2E2'
+              }
+              mid {
+                value: 50
+                color: '#FEF3C7'
+              }
+              max {
+                value: 100
+                color: '#BBF7D0'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+  block v_sales_comparison: VizBlock {
+    label: 'Revenue vs Previous Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation previous_month_revenue {
+        label: 'Previous Month Revenue'
+        formula: @aql revenue | relative_period(orders.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        settings {
+          hidden: true
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Current Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Previous Month Revenue'
+            ref: 'previous_month_revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Order Month'
+        x_axis_show_null_datetime: false
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_sales_detail: VizBlock {
+    label: 'Sales Detail'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql order_items | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_units_sold {
+        label: 'Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(orders.status)
+          label: 'Order Status'
+          uname: 'order_status'
+        },
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Customer Country'
+          uname: 'customer_country'
+        },
+        VizFieldFull {
+          ref: r(categories.name)
+          label: 'Product Category'
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: 'distinct_order_count'
+          label: 'Distinct Orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'distinct_orders'
+        },
+        VizFieldFull {
+          ref: 'total_units_sold'
+          label: 'Units Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'units_sold'
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        },
+      ]
+      settings {
+        pagination_size: 50
+        show_row_number: true
+        row_limit: 50
+        wrap_header_text: true
+        wrap_cell_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'order_status'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'customer_country'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+  block f_sales_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(categories.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+  block t_business_orders_icon: TextBlock {
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="#05264c" opacity="0.4"/><ellipse cx="16" cy="17" fill="#05264c" opacity="0.4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="#05264c"/><ellipse cx="9.001" cy="17.001" fill="#05264c" rx="7" ry="4"/></svg>;;
+  }
+  block f_users_signup_date: FilterBlock {
+    label: 'Signup date range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(users.sign_up_date)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block t_ihk0: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="15" cy="6" r="3" fill="#05264c" opacity="0.4"/><ellipse cx="16" cy="17" fill="#05264c" opacity="0.4" rx="5" ry="3"/><circle cx="9.001" cy="6" r="4" fill="#05264c"/><ellipse cx="9.001" cy="17.001" fill="#05264c" rx="7" ry="4"/></svg>;;
+  }
+  block v_ueqh: VizBlock {
+    label: 'GMV by Country Name and Month today'
+    viz: MarkdownViz {
+      dataset: ecommerce_official
+      calculation today {
+        label: 'today'
+        formula: @aql @today;;
+        calc_type: 'dimension'
+        data_type: 'datetime'
+        model: countries
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Country Name'
+          ref: r(countries.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('countries', 'today')
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'GMV'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: '#,###0.00"A" [$$]'
+            group_separator: ','
+            decimal_separator: '.'
+          }
+        }
+      ]
+      content: @md <style>
+    .annotation-minimal {
+        position: relative;
+        padding-left: 20px;
+height: 100%
+    }
+
+    .annotation-minimal::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #05264c, #00627a);
+        border-radius: 2px;
+    }
+
+    .annotation-minimal .annotation-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #259b6c;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .annotation-minimal .content {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    .annotation-minimal .highlight {
+        font-weight: 600;
+        color: #05264c;
+    }
+
+    .annotation-minimal .meta {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+</style>
+
+<div class="annotation-minimal">
+    <div class="annotation-label">Key Insight</div>
+    <div class="content">
+        Our sales performance is anchored in developed Western markets, with the <span class="highlight">{{ rows[0].`Country Name` }}</span> ({{ rows[0].values.`GMV`}}), <span class="highlight">{{ rows[1].`Country Name` }}</span> ({{ rows[1].values.`GMV`}}), and <span  class="highlight">{{ rows[2].`Country Name` }}</span> ({{ rows[02].values.`GMV`}}), emerging as our top revenue contributors.
+    </div>
+    <div class="meta"><span>{{ rows[0].`today` }}</span> - Peter Parker</div>
+</div>  ;;
+      settings {
+        show_row_total: true
+        show_column_total: true
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
   view: TabLayout {
-    label: 'View 1'
-    tab view_1: CanvasLayout {
-      label: 'Overview'
+    label: 'Ecommerce performance'
+    tab business: CanvasLayout {
+      label: 'Business'
       width: 1220
+      height: 1860
       auto_expand_vertically: true
-      block v_tydi {
-        position: pos(20, 810, 1180, 400)
+      block t_business_header_bg {
+        position: pos(0, 0, 1220, 200)
+      }
+      block t_business_header {
+        position: pos(20, 80, 1180, 100)
+      }
+      block t_business_logo {
+        position: pos(20, 20, 180, 60)
         layer: 2
       }
+      block v_nrin {
+        position: pos(20, 205, 220, 160)
+      }
+      block v_users_count {
+        position: pos(260, 205, 220, 160)
+      }
+      block v_acsc {
+        position: pos(500, 205, 220, 160)
+      }
+      block v_audi {
+        position: pos(740, 205, 220, 160)
+      }
+      block v_business_aov {
+        position: pos(980, 205, 220, 160)
+      }
+      block t_zz87 {
+        position: pos(35, 220, 40, 40)
+        layer: 2
+      }
+      block t_4o8m {
+        position: pos(275, 220, 40, 40)
+        layer: 2
+      }
+      block t_7cbr {
+        position: pos(755, 220, 40, 40)
+        layer: 2
+      }
+      block t_pour {
+        position: pos(995, 220, 40, 40)
+        layer: 2
+      }
+      block v_business_kpi_table {
+        position: pos(20, 370, 1180, 300)
+      }
+      block v_sales_country {
+        position: pos(20, 675, 785, 560)
+      }
+      block v_business_map {
+        position: pos(15, 1240, 1185, 615)
+      }
+      block t_ihk0 {
+        position: pos(515, 220, 40, 40)
+      }
+      block v_ueqh {
+        position: pos(830, 775, 340, 265)
+      }
+      mobile {
+        mode: 'auto'
+      }
+      grid_size: 5
+    }
+    tab products: CanvasLayout {
+      label: 'Products'
+      width: 1220
+      height: 1800
+      grid_size: 20
+      auto_expand_vertically: true
+      block t_products_header_bg {
+        position: pos(0, 0, 1220, 200)
+      }
+      block t_products_header {
+        position: pos(20, 80, 1180, 100)
+      }
+      block t_products_logo {
+        position: pos(20, 20, 180, 60)
+        layer: 2
+      }
+      block v_nrin {
+        position: pos(20, 220, 280, 180)
+      }
+      block t_zz87 {
+        position: pos(35, 235, 40, 40)
+        layer: 2
+      }
+      block v_products_catalog {
+        position: pos(320, 220, 880, 480)
+      }
+      block v_products_categories {
+        position: pos(20, 720, 580, 480)
+      }
+      block v_products_bubble {
+        position: pos(620, 720, 580, 480)
+      }
+      block v_products_table {
+        position: pos(20, 1220, 1180, 560)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab users: CanvasLayout {
+      label: 'Users'
+      width: 1220
+      height: 1460
+      grid_size: 20
+      auto_expand_vertically: true
+      block t_users_header_bg {
+        position: pos(0, 0, 1220, 200)
+      }
+      block t_users_header {
+        position: pos(20, 80, 1180, 100)
+      }
+      block t_users_logo {
+        position: pos(20, 20, 180, 60)
+        layer: 2
+      }
+      block f_customer_country {
+        position: pos(620, 20, 280, 60)
+        layer: 2
+      }
+      block f_users_signup_date {
+        position: pos(920, 20, 280, 60)
+        layer: 2
+      }
+      block v_users_count {
+        position: pos(20, 220, 280, 180)
+      }
+      block t_4o8m {
+        position: pos(35, 235, 40, 40)
+        layer: 2
+      }
+      block v_users_signup {
+        position: pos(320, 220, 880, 360)
+      }
+      block v_users_activity {
+        position: pos(20, 600, 780, 360)
+      }
+      block t_business_orders_icon {
+        position: pos(35, 615, 40, 40)
+        layer: 2
+      }
+      block v_users_gender {
+        position: pos(820, 600, 380, 360)
+      }
+      block v_users_table {
+        position: pos(20, 980, 580, 440)
+      }
+      block v_users_retention {
+        position: pos(620, 980, 580, 440)
+      }
+      mobile {
+        mode: 'auto'
+      }
+    }
+    tab view_1: CanvasLayout {
+      label: 'Sales'
+      width: 1220
+      height: 1640
+      grid_size: 20
+      auto_expand_vertically: true
       block t_block_ha_page_header_bg {
         position: pos(0, 0, 1220, 200)
       }
       block t_block_ha_page_header {
         position: pos(20, 80, 1180, 100)
       }
+      block t_f8rx {
+        position: pos(80, 80, 1180, 100)
+      }
       block t_2pu8 {
         position: pos(20, 20, 180, 60)
         layer: 2
       }
-      block v_fofr {
-        position: pos(20, 390, 760, 400)
+      block f_order_date {
+        position: pos(620, 20, 280, 60)
+        layer: 2
       }
-      block v_quxa {
-        position: pos(800, 390, 400, 400)
+      block f_sales_category {
+        position: pos(920, 20, 280, 60)
+        layer: 2
       }
       block v_ld9y {
-        position: pos(20, 220, 280, 160)
-      }
-      block v_nrin {
-        position: pos(320, 220, 280, 160)
-        layer: 2
-      }
-      block v_audi {
-        position: pos(620, 220, 280, 160)
-        layer: 2
-      }
-      block v_acsc {
-        position: pos(920, 220, 280, 160)
-        layer: 2
+        position: pos(40, 440, 200, 160)
+        layer: 1
       }
       block t_pour {
-        position: pos(40, 230, 40, 40)
-      }
-      block t_7cbr {
-        position: pos(640, 230, 40, 40)
+        position: pos(40, 440, 40, 60)
         layer: 3
       }
-      block t_zz87 {
-        position: pos(340, 230, 40, 40)
-        layer: 3
+      block v_acsc {
+        position: pos(620, 220, 580, 180)
       }
-      block t_4o8m {
-        position: pos(940, 230, 40, 40)
-        layer: 3
+      block t_business_orders_icon {
+        position: pos(635, 235, 40, 40)
+        layer: 2
+      }
+      block v_sales_comparison {
+        position: pos(20, 420, 780, 360)
+      }
+      block v_quxa {
+        position: pos(820, 420, 380, 360)
+      }
+      block v_fofr {
+        position: pos(20, 800, 580, 360)
+      }
+      block v_products_categories {
+        position: pos(620, 800, 580, 360)
+      }
+      block v_sales_detail {
+        position: pos(20, 1180, 1180, 440)
       }
       mobile {
         mode: 'auto'
-      }
-      height: 800
-    }
-    tab tab_fb50: CanvasLayout {
-      label: 'Details'
-      width: 940
-      height: 1600
-      grid_size: 20
-      auto_expand_vertically: true
-      mobile {
-        mode: 'auto'
-      }
-      block v_ny30 {
-        position: pos(20, 60, 760, 320)
-      }
-      block v_k7dv {
-        position: pos(280, 120, 460, 200)
       }
     }
   }
@@ -680,47 +1747,110 @@ Users Signed Up
   }
   explicit_interactions: [
     FilterInteraction {
-      from: 'v_fofr'
+      from: 'f_order_date'
       to: [
-        'v_quxa',
         'v_ld9y',
-        'v_acsc'
+        'v_acsc',
+        'v_sales_comparison',
+        'v_quxa',
+        'v_fofr',
+        'v_products_categories',
+        'v_sales_detail'
       ]
+      field: r(orders.created_at)
     },
     FilterInteraction {
-      from: 'v_quxa'
+      from: 'f_sales_category'
       to: [
-        'v_fofr',
         'v_ld9y',
-        'v_acsc'
+        'v_acsc',
+        'v_sales_comparison',
+        'v_quxa',
+        'v_fofr',
+        'v_products_categories',
+        'v_sales_detail'
       ]
+      field: r(categories.name)
     },
     FilterInteraction {
-      from: 'v_ld9y'
+      from: 'f_customer_country'
       to: [
-        'v_fofr',
-        'v_quxa',
-        'v_acsc'
+        'v_users_count',
+        'v_users_signup',
+        'v_users_activity',
+        'v_users_gender',
+        'v_users_table',
+        'v_users_retention'
       ]
+      field: r(countries.name)
     },
     FilterInteraction {
-      from: 'v_acsc'
+      from: 'f_users_signup_date'
       to: [
-        'v_fofr',
-        'v_quxa',
-        'v_ld9y'
+        'v_users_count',
+        'v_users_signup'
       ]
+      field: r(users.sign_up_date)
     },
     FilterInteraction {
       from: 'v_nrin'
       to: [
-        'v_audi'
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_ueqh'
+      to: [
+        'v_nrin',
+        'v_audi',
+        'v_acsc',
+        'v_sales_country',
+        'v_users_count',
+        'v_business_aov',
+        'v_business_kpi_table',
+        'v_business_map'
       ]
     },
     FilterInteraction {
       from: 'v_audi'
       to: [
-        'v_nrin'
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_acsc'
+      to: [
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_sales_country'
+      to: [
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_users_count'
+      to: [
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_business_aov'
+      to: [
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_business_kpi_table'
+      to: [
+        'v_ueqh'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_business_map'
+      to: [
+        'v_ueqh'
       ]
     }
   ]

@@ -3,12 +3,12 @@ ColorPalette brand_color_palette {
 
   categorical {
     colors: [
-      "#05264C",
-      "#2d608a",
-      "#23a672",
-      "#a0e3f2",
-      "#5298b8",
-      "#55c5c9"
+      "#2C6A95",
+      "#4E8DB4",
+      "#6BB5D0",
+      "#42BD86",
+      "#96D8E8",
+      "#67D3D4"
     ]
   }
 }

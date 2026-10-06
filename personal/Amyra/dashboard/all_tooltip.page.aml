@@ -1,5 +1,5 @@
 Dashboard all_viz_test_copy {
-  theme: H.themes.classic
+  theme: DynamicPageTheme { light: H.themes.classic, dark: H.themes.midnight }
   title: 'All viz test'
   description: ''
   owner: 'hien.nt@holistics.io'

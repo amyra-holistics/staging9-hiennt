@@ -18,5 +18,5 @@ Dashboard blank_dashboard {
       mode: 'auto'
     }
   }
-  theme: H.themes.classic
+  theme: DynamicPageTheme { light: H.themes.classic, dark: H.themes.midnight }
 }

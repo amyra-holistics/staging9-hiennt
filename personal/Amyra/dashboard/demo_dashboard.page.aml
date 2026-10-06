@@ -6,110 +6,9 @@ Dashboard all_viz {
   title: 'Demo dashboard'
   description: ''
   owner: 'hien.nt@holistics.io'
-  // block v_tydi: VizBlock {
-  //   label: 'KPI Overview'
-  //   viz: MetricSheet {
-  //     dataset: ecommerce_official
-  //     filter {
-  //       field: r(dim_dates.date_key)
-  //       operator: 'matches'
-  //       value: '12 months ago to last month end'
-  //     }
-  //     date_field: VizFieldFull {
-  //       ref: r(dim_dates.date_key)
-  //       transformation: 'datetrunc month'
-  //       format {
-  //         type: 'date'
-  //       }
-  //     }
-  //     rows: [
-  //       MetricHeading {
-  //         label: '🎯Orders'
-  //         settings {
-  //           background_color: '#05264C'
-  //           text_color: '#FFFFFF'
-  //         }
-  //       },
-  //       MetricSeries {
-  //         field: VizFieldFull {
-  //           ref: r(ecommerce_orders.total_orders_count)
-  //           format {
-  //             type: 'number'
-  //             pattern: 'inherited'
-  //           }
-  //         }
-  //       },
-  //       MetricSeries {
-  //         field: VizFieldFull {
-  //           ref: r(ecommerce_orders.cancelled_orders_count)
-  //           format {
-  //             type: 'number'
-  //             pattern: 'inherited'
-  //           }
-  //         }
-  //         settings {
-  //           mark_type: 'line'
-  //         }
-  //       },
-  //       MetricHeading {
-  //         label: '💰 Revenue'
-  //         settings {
-  //           background_color: '#05264C'
-  //           text_color: '#FFFFFF'
-  //         }
-  //       },
-  //       MetricSeries {
-  //         field: VizFieldFull {
-  //           ref: r(order_master.nmv)
-  //           format {
-  //             type: 'number'
-  //             pattern: '[$$]#,###0.00'
-  //           }
-  //         }
-  //       },
-  //       MetricSeries {
-  //         field: VizFieldFull {
-  //           ref: r(order_master.gmv)
-  //           format {
-  //             type: 'number'
-  //             pattern: '[$$]#,###0.00'
-  //           }
-  //         }
-  //         settings {
-  //           mark_type: 'line'
-  //         }
-  //       },
-  //       MetricSeries {
-  //         field: VizFieldFull {
-  //           ref: r(order_master.aov)
-  //           format {
-  //             type: 'number'
-  //             pattern: 'inherited'
-  //           }
-  //         }
-  //         settings {
-  //           mark_type: 'line'
-  //         }
-  //       }
-  //     ]
-  //     settings {
-  //       aggregate_awareness {
-  //         enabled: true
-  //         debug_comments: true
-  //       }
-  //     }
-  //   }
-  //   settings {
-  //     hide_label: true
-  //     hide_controls: true
-  //   }
-  // }
   block t_f8rx: block_ha_heading('All Metrics To Date')
   block t_block_ha_page_header_bg: block_ha_page_header_bg()
-  block t_block_ha_page_header: block_ha_page_header(
-    'Sales',
-    'Monitor revenue, order volume, fulfillment mix, and customer markets.'
-  )
+  block t_block_ha_page_header: block_ha_page_header('Sales', 'Monitor revenue, order volume, fulfillment mix, and customer markets.')
   block t_2pu8: TextBlock {
     theme: BlockTheme {
       background {
@@ -351,7 +250,7 @@ Dashboard all_viz {
       field: r(countries.name)
     }
     default {
-      operator: 'matches'
+      operator: 'is'
       value: '$H_NIL$'
     }
     settings {
@@ -489,21 +388,18 @@ Dashboard all_viz {
     label: 'Product Price, Units, and Revenue'
     viz: BubbleChart {
       dataset: ecommerce_official
-
       calculation total_units_sold {
         label: 'Total Units Sold'
         formula: @aql order_items | sum(order_items.quantity);;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       calculation top_100_product_ids {
         label: 'Top 100 Product Ids'
         formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
         calc_type: 'measure'
         data_type: 'json'
       }
-
       x_col: VizFieldFull {
         ref: r(products.price)
         label: 'Product Price'
@@ -512,7 +408,6 @@ Dashboard all_viz {
           pattern: '[$$]#,###0.00'
         }
       }
-
       y_col: VizFieldFull {
         ref: 'total_units_sold'
         label: 'Total Units Sold'
@@ -521,7 +416,6 @@ Dashboard all_viz {
           pattern: '#,###0'
         }
       }
-
       z_col: VizFieldFull {
         ref: r(ecommerce_official.revenue)
         label: 'Revenue'
@@ -530,16 +424,13 @@ Dashboard all_viz {
           pattern: '[$$]#,###0.00'
         }
       }
-
       label_col: VizFieldFull {
         ref: r(products.name)
         label: 'Product Name'
       }
-
       conditions: [
         "products.id in top_100_product_ids",
       ]
-
       settings {
         row_limit: 100
       }
@@ -774,12 +665,8 @@ Dashboard all_viz {
     }
     content: @md <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="currentColor" d="M5.574 4.691c-.833.692-1.052 1.862-1.491 4.203l-.75 4c-.617 3.292-.926 4.938-.026 6.022S5.88 20 9.23 20h5.54c3.35 0 5.025 0 5.924-1.084c.9-1.084.591-2.73-.026-6.022l-.75-4c-.439-2.34-.658-3.511-1.491-4.203C17.593 4 16.403 4 14.02 4H9.98c-2.382 0-3.572 0-4.406.691" opacity="0.25"/><path fill="currentColor" d="M12 9.25a2.25 2.25 0 0 1-2.122-1.5a.75.75 0 1 0-1.414.5a3.751 3.751 0 0 0 7.073 0a.75.75 0 1 0-1.414-.5A2.25 2.25 0 0 1 12 9.25"/></svg>;;
   }
-  // Reusable header and logo compositions for the restored reference tabs.
   block t_business_header_bg: block_ha_page_header_bg()
-  block t_business_header: block_ha_page_header(
-    'Business',
-    '''This page provides you a quick understanding of the current shape and scope of the business. <br /> If you have any questions, please don't hesitate to <a href="mailto:hi@holistics.io" style="text-decoration: underline; color: white ">contact us here</a>.'''
-  )
+  block t_business_header: block_ha_page_header('Business', '''This page provides you a quick understanding of the current shape and scope of the business. <br /> If you have any questions, please don't hesitate to <a href="mailto:hi@holistics.io" style="text-decoration: underline; color: white ">contact us here</a>.''')
   block t_business_logo: TextBlock {
     theme: BlockTheme {
       background {
@@ -871,8 +758,6 @@ Dashboard all_viz {
       settings {
         display_mode: 'single'
       }
-
-
     }
     settings {
       hide_label: true
@@ -978,7 +863,6 @@ Dashboard all_viz {
       ]
       settings {
         location_colors {
-
         }
       }
     }
@@ -1112,7 +996,6 @@ Dashboard all_viz {
     label: 'Purchase Cohort Retention'
     viz: PivotTable {
       dataset: ecommerce_official
-
       calculation first_purchase_month {
         label: 'First Purchase Month'
         formula: @aql orders | min(orders.created_at | month()) | dimensionalize(users.id);;
@@ -1120,7 +1003,6 @@ Dashboard all_viz {
         data_type: 'datetime'
         model: users
       }
-
       calculation months_since_first_purchase {
         label: 'Months Since First Purchase'
         formula: @aql date_diff('month', users.first_purchase_month, (orders.created_at | month()));;
@@ -1128,28 +1010,24 @@ Dashboard all_viz {
         data_type: 'number'
         model: orders
       }
-
       calculation purchasing_user_count {
         label: 'Purchasing User Count'
         formula: @aql orders | count_distinct(orders.user_id);;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       calculation cohort_size {
         label: 'Cohort Size'
         formula: @aql users | count_distinct(users.id);;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       calculation retention_rate {
         label: 'Retention Rate'
         formula: @aql purchasing_user_count * 100.0 / (cohort_size | exclude_grains(orders.months_since_first_purchase, keep_filters: true));;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       rows: [
         VizFieldFull {
           ref: ref('users', 'first_purchase_month')
@@ -1161,7 +1039,6 @@ Dashboard all_viz {
           }
         }
       ]
-
       columns: [
         VizFieldFull {
           ref: ref('orders', 'months_since_first_purchase')
@@ -1173,7 +1050,6 @@ Dashboard all_viz {
           }
         }
       ]
-
       values: [
         VizFieldFull {
           ref: 'retention_rate'
@@ -1184,7 +1060,6 @@ Dashboard all_viz {
           }
         }
       ]
-
       settings {
         show_row_total: false
         show_column_total: false

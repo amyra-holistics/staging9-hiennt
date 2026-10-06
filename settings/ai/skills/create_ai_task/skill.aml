@@ -39,19 +39,21 @@ Skill create_ai_task {
     After saving, write this, filled with what the user confirmed or said. Keep each cell to the key facts, no explanation.
 
     ````
-    ## ✅ Task created `<label>`
+    ## <label>
 
-    | 🏷️ Status | [Draft](#pos) (Commit and publish to activate this task) |
+    Task created. Commit and publish to activate it.
+
+    | | |
     |---|---|
-    | 🗓️ Schedule | <Mondays 8:00 AM Asia/Ho_Chi_Minh> |
+    | 🏷️ Status | [Draft](#pos) (Commit and publish to activate this task) |
+    | 🗓️ Schedule | <Mondays 8:00 AM (Asia/Ho_Chi_Minh)> |
     | 👥 Send to | <recipients, the address column, or the channel> |
     | 📝 Brief | <one compact sentence: what it reports and when it sends: Alert when a category's revenue falls 20% or more week over week> |
-    | 📎 Attachment | <viz (PNG) \| table (XLSX) \| PDF \| none> |
-    | 👤 Run as | <user> (<role>) |
+    | 📎 Attachment | <what is attached · its format: Viz · PNG \| Table · XLSX \| Viz · PDF \| None> |
 
-    The first run will be on <Oct 12, 2026>.
+    The first run will be on **<October 12, 2026>** and will run as **<user>** (<role>).
 
-    ### 🎯 Acceptance criteria
+    ## Acceptance criteria
 
     1. <each confirmed criterion, word for word>
 
@@ -67,7 +69,7 @@ Skill create_ai_task {
     [<a follow-up specific to this task>](#opt)
     ````
 
-    The `##` line is the status header: the answer starts with it, with the task's `label` in backticks. The Status row is the table's header row, so write no empty header row above it; until the task is published its value is the green pill `[Draft](#pos)` and "(Commit and publish to activate this task)". Join each icon and its label with a non-breaking space, as above, so the label never wraps. Schedule gives the day, the local time and the timezone (see Time and timezone). Brief is one compact sentence joining what each message reports and when it sends. Run as shows the user, and their role in brackets only when a tool result or the chat context states it. Under the table, one line gives the first run's date. 🎯 Acceptance criteria lists the confirmed criteria, word for word. Then the two saved files appear as artifact cards: for each, a fenced block with the language `artifact` holding only the `stored_artifact.id` that its `suggest_file_creation` or `suggest_file_edits` result returned, the task file first. The chat draws each block as a card titled with that save's summary, showing the path, that opens the file. Leave a blank line after the table, the first-run line, the criteria and each card. End the text with the follow-up buttons: no lead-in line before the header, and nothing else between the table, the first-run line, the criteria, the cards and the buttons, such as "both files validate" or a chart. The answer holds no chart. Call the task "scheduled" only once it is published.
+    The first `##` line is the task's `label` alone, in plain words: no icon, no backticks, no "Task created". The line under it is always "Task created. Commit and publish to activate it." The table starts with an empty header row (`| | |` then `|---|---|`) so that no row renders bold. Status is the green pill `[Draft](#pos)` and "(Commit and publish to activate this task)" until the task is published. Join each icon and its label with a non-breaking space, as above, so the label never wraps. Schedule gives the day and the local time, then the timezone in brackets: "Mondays 8:00 AM (Asia/Ho_Chi_Minh)", or "(Workspace timezone)" when you can't name it. Brief is one compact sentence joining what each message reports and when it sends. Attachment names what is attached and its format: "Viz · PNG", "Table · XLSX", or "None". Under the table, one line gives the first run's date and the user it runs as, both in bold, with their role in brackets only when a tool result or the chat context states it. The second `##` line, "Acceptance criteria", lists the confirmed criteria, word for word. Then the two saved files appear as artifact cards: for each, a fenced block with the language `artifact` holding only the `stored_artifact.id` that its `suggest_file_creation` or `suggest_file_edits` result returned, the task file first. The chat draws each block as a card titled with that save's summary, showing the path, that opens the file. Leave a blank line after each heading, the line under the name, the table, the first-run line, the criteria and each card. End the text with the follow-up buttons: no lead-in line before the name, and nothing else between these parts and the buttons, such as "both files validate" or a chart. The answer holds no chart. Call the task "scheduled" only once it is published.
 
     The follow-ups are inline buttons, not an `ask_user` card: each is a Markdown link to `#opt` on its own line, and clicking one sends its text as the user's next message, so word each as a request the user would type. "Commit and publish now" comes first, then 1–2 that each name something specific to this task that you saw: a threshold the preview shows near its line ("Lower the threshold to 8%: India is at −9.98%"), a freshness guard when the data lands late, a test with Run now after publishing (it sends for real), a second destination only if the user mentioned one. When the user sends "Commit and publish now", do it if you have a tool for it, committing only the task file and `schedules.aml`. Otherwise say where to click: Commit changes (with only those two files), then Publish, both at the top right.
 
@@ -75,7 +77,7 @@ Skill create_ai_task {
 
     - **Storage timezone**: read it from the data source or dataset settings or the field descriptions, because the run can't ask. If it's unclear, assume UTC and say so in the brief's Definitions. Work it out yourself: few users know.
     - **Conversion**: AQL datetime fields already carry their timezone, so convert with one call, `sql_datetime('timezone', '<timezone>', <datetime field>)`. The Postgres habit of converting to UTC first shifts times by the offset the wrong way. Check one row in the preview: the converted time is later than the raw one by exactly the UTC offset (7 hours for Asia/Saigon). The brief quotes this checked expression.
-    - **Schedule timezone**: never ask about it. A time the user gives ("8:00 AM", "every morning") is local time in the timezone they named, or else in the workspace timezone: name it when the chat context or a tool result states it, and otherwise write "workspace timezone". Period words ("yesterday", "last week") follow the schedule timezone unless the user says otherwise.
+    - **Schedule timezone**: never ask about it. A time the user gives ("8:00 AM", "every morning") is local time in the timezone they named, or else in the workspace timezone: name it when the chat context or a tool result states it, and otherwise write "Workspace timezone". Period words ("yesterday", "last week") follow the schedule timezone unless the user says otherwise.
     - **Cron**: write it in the schedule's local time, with no UTC conversion: Monday 08:00 = `0 8 * * 1`. Holistics is moving crons to the workspace timezone.
     - **Periods**: define every period word with its timezone, as a complete period: "Last week" = the most recent complete Monday–Sunday week in Asia/Saigon. Check the preview's dates against it: a Monday–Sunday week starts on a Monday.
 

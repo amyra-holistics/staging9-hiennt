@@ -1,0 +1,1191 @@
+Dashboard demo_report_paged {
+  title: 'State of Ecommerce Performance 2026 (paginated)'
+  description: @md A paginated A4 version of the ecommerce report, with page numbers and one page per sheet for PDF export.;;
+  owner: 'hien.nt@holistics.io'
+  // Local theme: transparent surfaces so the custom HTML slide backgrounds show through.
+  // Colors, fonts and chart palette follow brand_theme_light.
+  theme: PageTheme {
+    color {
+      data: brand_color_palette
+    }
+    background {
+      bg_color: "transparent"
+    }
+    canvas {
+      background {
+        bg_color: "transparent"
+      }
+      border {
+        border_width: 0
+        border_radius: 12
+        border_color: "#D1D5DB"
+        border_style: "none"
+      }
+      shadow: "none"
+      opacity: 1
+    }
+    block {
+      background {
+        bg_color: "transparent"
+      }
+      border {
+        border_width: 0
+        border_radius: 12
+        border_color: "#D1D5DB"
+        border_style: "none"
+      }
+      shadow: "none"
+      padding: 0
+      opacity: 1
+      label {
+        font_family: "Inter"
+        font_size: 14
+        font_color: "#05264C"
+        font_weight: "semibold"
+        font_style: "normal"
+        letter_spacing: "0"
+      }
+      text {
+        font_family: "Inter"
+        font_size: 13
+        font_color: "#374151"
+        font_weight: "normal"
+        font_style: "normal"
+      }
+    }
+    viz {
+      table {
+        general {
+          bg_color: "#FFFFFF"
+          font_color: "#374151"
+          font_family: "Inter"
+          font_size: 13
+          border_color: "#D1D5DB"
+          grid_color: "#D1D5DB"
+          border_width: 1
+          hover_color: "#F5F8FA"
+          banding_color: "#F9FAFB"
+          cell_padding: DetailedSpacing {
+            top: 10
+            right: 16
+            bottom: 10
+            left: 16
+          }
+          borders {
+            outer: true,
+            vertical: false,
+            horizontal: true,
+            header: true,
+            row_header: false
+          }
+        }
+        header {
+          bg_color: "#FFFFFF"
+          font_color: "#05264C"
+          font_size: 13
+          font_weight: "semibold"
+        }
+        sub_header {
+          bg_color: "#F9FAFB"
+          font_color: "#374151"
+          font_size: 13
+          font_weight: "medium"
+        }
+        sub_title {
+          font_color: "#6B7280"
+          font_size: 12
+          font_weight: "medium"
+        }
+        sparkline {
+          line {
+            color: "#55c5c9"
+          }
+          column {
+            color: "#05264C"
+          }
+        }
+      }
+      metric_kpi {
+        alignment: "left"
+        label {
+          font_family: "Inter"
+          font_size: 18
+          font_color: "#374151"
+        }
+        value {
+          font_family: "Inter"
+          font_size: 44
+          font_color: "#05264C"
+        }
+        progress {
+          indicator {
+            bg_color: "#05264C"
+          }
+          track {
+            bg_color: "#D1D5DB"
+          }
+          text {
+            font_color: "#374151"
+          }
+        }
+        trend {
+          positive {
+            text {
+              font_color: "#23a672"
+              font_weight: "medium"
+            }
+            background {
+              bg_color: "#e9f8f0"
+            }
+          }
+          negative {
+            text {
+              font_color: "#c53030"
+              font_weight: "medium"
+            }
+            background {
+              bg_color: "#fcebec"
+            }
+          }
+          neutral {
+            text {
+              font_color: "#374151"
+              font_weight: "normal"
+            }
+            background {
+              bg_color: "#F5F8FA"
+            }
+          }
+        }
+      }
+    }
+    custom_css: @css
+      .rpt .dac-text-block {
+        font-family: Inter;
+        font-size: 14px;
+        color: #374151;
+        line-height: 1.6;
+      }
+      .rpt .dac-text-block h1,
+      .rpt .dac-text-block h2,
+      .rpt .dac-text-block h3,
+      .rpt .dac-text-block h4 {
+        font-family: Inter;
+        color: #05264C;
+        line-height: 1.3;
+        margin-top: 0;
+        margin-bottom: 0.5em;
+        font-weight: 700;
+      }
+    ;;
+  }
+
+  block v_ld9y: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: '#,###0.00"A"'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_acsc: VizBlock {
+    label: 'Distinct Orders'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        ref: 'distinct_order_count'
+        label: 'Distinct Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_business_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'average_order_value'
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+
+
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_nrin: VizBlock {
+    label: 'Product Count'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Product listed'
+        ref: r(products.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_audi: VizBlock {
+    label: 'Merchant Count'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Merchant listed'
+        ref: r(merchants.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_users_count: VizBlock {
+    label: 'Registered Users'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation distinct_registered_user_count {
+        label: 'Distinct Registered User Count'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'distinct_registered_user_count'
+        label: 'Distinct Registered User Count'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_fofr: VizBlock {
+    label: 'Revenue by Order Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_business_kpi_table: VizBlock {
+    label: 'Monthly KPI Overview'
+    viz: MetricSheet {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      date_field: VizFieldFull {
+        label: 'Order Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      rows: [
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Distinct Orders'
+            ref: 'distinct_order_count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Average Order Value'
+            ref: 'average_order_value'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        max_column: 7
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_quxa: VizBlock {
+    label: 'Revenue by Order Status'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(orders.status)
+        label: 'Order Status'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'asc'
+      }
+    }
+  }
+  block v_business_map: VizBlock {
+    label: 'Revenue Map by Country'
+    viz: FilledMap {
+      dataset: ecommerce_official
+      location {
+        field: VizFieldFull {
+          label: 'Country Name'
+          ref: r(countries.name)
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        location_colors {
+
+        }
+      }
+    }
+  }
+  block v_sales_country: VizBlock {
+    label: 'Revenue by Customer Country'
+    viz: BarChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(countries.name)
+        label: 'Customer Country'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_products_categories: VizBlock {
+    label: 'Revenue by Product Category'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(categories.name)
+        label: 'Product Category'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_products_table: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(products.name)
+          label: 'Product Name'
+          format {
+            type: 'text'
+          }
+          uname: 'product_name'
+        },
+        VizFieldFull {
+          ref: r(products.price)
+          label: 'Product Price'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        },
+        VizFieldFull {
+          ref: 'total_units_sold'
+          label: 'Total Units Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_name'
+            direction: 'asc'
+          },
+        ]
+        wrap_header_text: true
+        wrap_cell_text: false
+      }
+    }
+  }
+  block v_products_bubble: VizBlock {
+    label: 'Product Price, Units, and Revenue'
+    viz: BubbleChart {
+      dataset: ecommerce_official
+
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+
+      calculation top_100_product_ids {
+        label: 'Top 100 Product Ids'
+        formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
+        calc_type: 'measure'
+        data_type: 'json'
+      }
+
+      x_col: VizFieldFull {
+        ref: r(products.price)
+        label: 'Product Price'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+
+      y_col: VizFieldFull {
+        ref: 'total_units_sold'
+        label: 'Total Units Sold'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+
+      z_col: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        label: 'Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+
+      label_col: VizFieldFull {
+        ref: r(products.name)
+        label: 'Product Name'
+      }
+
+      conditions: [
+        "products.id in top_100_product_ids",
+      ]
+
+      settings {
+        row_limit: 100
+      }
+    }
+  }
+  block v_users_signup: VizBlock {
+    label: 'User Signups by Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation distinct_registered_users {
+        label: 'Distinct Registered Users'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(users.sign_up_date)
+        label: 'Sign Up Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'distinct_registered_users'
+            label: 'Distinct Registered Users'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Sign Up Month'
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_users_gender: VizBlock {
+    label: 'Revenue by User Gender'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(users.gender)
+        label: 'User Gender'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: PieFamilySort {
+          type: 'pie'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_users_table: VizBlock {
+    label: 'Top Customers by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(users.full_name)
+          label: 'Customer Full Name'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Customer Country'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          uname: 'revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'distinct_order_count'
+          label: 'Distinct Order Count'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+  block f_order_date: FilterBlock {
+    label: 'Order date range'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(orders.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_customer_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: ecommerce_official
+      field: r(countries.name)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+
+<div class="rpt">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400;1,8..60,500&display=swap');
+
+    .rpt,
+    .rpt *,
+    .rpt *::before,
+    .rpt *::after { box-sizing: border-box; }
+
+    /* ---- TOKENS: Holistics brand. Swap this block to reskin. */
+    .rpt {
+      --t-ink:      #05264C;
+      --t-body:     #374151;
+      --t-dim:      #6B7280;
+      --t-faint:    #8FA0B4;
+      --t-accent:   #2C6A95;
+      --t-teal:     #55C5C9;
+      --t-teal-dk:  #00627A;
+      --t-bg:       #FFFFFF;
+      --t-desk:     #EDF1F5;
+      --t-surface:  #F5F8FA;
+      --t-border:   #E1E7EE;
+      --t-rule:     #C9D3DE;
+      --t-dark:     linear-gradient(71deg, #05264C 0%, #0B4963 62%, #013D7D 100%);
+      --t-on-dark:     #FFFFFF;
+      --t-on-dark-dim: rgba(255, 255, 255, 0.82);
+
+      /* Running header/footer text. --t-total counts only non-cover sheets. */
+      --t-report-title:  "State of ecommerce performance 2026";
+      --t-report-period: "Aug 2023 to Oct 2026";
+      --t-source:        "Source: ecommerce_official dataset";
+      --t-confidential:  "Internal";
+      --t-total:         "11";
+
+      --t-page-w:    210mm;
+      --t-page-h:    297mm;
+      --t-page-pad:  16mm;
+      --t-radius:    6px;
+      --t-serif:     'Source Serif 4', Georgia, 'Times New Roman', serif;
+      --t-sans:      Inter, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --t-mono:      'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+
+      font-family: var(--t-sans);
+      color: var(--t-body);
+      background: var(--t-desk);
+      padding: 24px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      counter-reset: rpt-page;
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    /* ---- The sheet. Pages do not reflow: content that does not fit is clipped. */
+    .rpt .rpt-page {
+      width: min(var(--t-page-w), 100%);
+      height: var(--t-page-h);
+      flex-shrink: 0;
+      background: var(--t-bg);
+      border: 1px solid var(--t-border);
+      border-radius: 4px;
+      box-shadow: 0 6px 22px rgba(5, 38, 76, 0.10);
+      padding: var(--t-page-pad);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    /* The cover is not numbered, so it does not increment the counter. */
+    .rpt .rpt-page:not(.is-cover) { counter-increment: rpt-page; }
+
+    /* ---- Running header */
+    .rpt .rpt-head { display: flex; align-items: baseline; gap: 12px; padding-bottom: 6px; margin-bottom: 8mm; border-bottom: 1px solid var(--t-rule); flex-shrink: 0; }
+    .rpt .rpt-head-title { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-ink); }
+    .rpt .rpt-head-title::before { content: var(--t-report-title); }
+    .rpt .rpt-head-section { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--t-faint); }
+    .rpt .rpt-head-period { margin-left: auto; font-family: var(--t-mono); font-size: 10px; color: var(--t-dim); }
+    .rpt .rpt-head-period::before { content: var(--t-report-period); }
+
+    /* ---- Running footer with page number */
+    .rpt .rpt-foot { display: flex; align-items: baseline; gap: 12px; margin-top: auto; padding-top: 6px; border-top: 1px solid var(--t-rule); font-size: 9.5px; color: var(--t-faint); flex-shrink: 0; }
+    .rpt .rpt-foot-source::before { content: var(--t-source); }
+    .rpt .rpt-foot-conf { letter-spacing: 0.1em; text-transform: uppercase; }
+    .rpt .rpt-foot-conf::before { content: var(--t-confidential); }
+    .rpt .rpt-foot-page { margin-left: auto; font-family: var(--t-mono); font-size: 11px; font-weight: 500; color: var(--t-ink); }
+    .rpt .rpt-foot-page::before { content: counter(rpt-page, decimal-leading-zero) " / " var(--t-total); }
+
+    /* ---- Content zone */
+    .rpt .rpt-body { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+    /* ---- Cover (dark brand variant) */
+    .rpt .rpt-page.is-cover { background: var(--t-dark); color: var(--t-on-dark); border-color: transparent; }
+    .rpt .is-cover .rpt-foot { border-top-color: rgba(255,255,255,0.28); color: var(--t-on-dark-dim); }
+    .rpt .rpt-cover { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+    .rpt .rpt-cover-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 38mm; }
+    .rpt .rpt-cover-top img { height: 26px; display: block; }
+    .rpt .rpt-cover-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-on-dark-dim); }
+    .rpt .rpt-cover-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: var(--t-teal); margin: 0 0 14px; }
+    .rpt .rpt-cover h1 { font-family: var(--t-serif); font-weight: 600; font-size: 58px; line-height: 1.03; letter-spacing: -0.02em; color: var(--t-on-dark); margin: 0 0 18px; max-width: 12ch; }
+    .rpt .rpt-cover h1 em { font-style: italic; font-weight: 400; color: var(--t-teal); }
+    .rpt .rpt-cover-lede { font-size: 15px; line-height: 1.55; color: var(--t-on-dark-dim); max-width: 42ch; margin: 0; }
+    .rpt .rpt-contents { margin-top: auto; padding-bottom: 8mm; }
+    .rpt .rpt-contents-title { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-teal); margin: 0 0 8px; }
+    .rpt .rpt-contents ol { list-style: none; margin: 0; padding: 0; }
+    .rpt .rpt-contents li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.22); font-family: var(--t-serif); font-size: 16px; color: var(--t-on-dark); }
+    .rpt .rpt-contents li span:first-child { font-family: var(--t-sans); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--t-teal); }
+    .rpt .rpt-contents li span:last-child { font-family: var(--t-mono); font-size: 11px; color: var(--t-on-dark-dim); }
+
+    /* ---- Section kicker and story */
+    .rpt .rpt-kick { display: flex; align-items: baseline; gap: 12px; padding-bottom: 8px; margin-bottom: 6mm; border-bottom: 1px solid var(--t-border); flex-shrink: 0; }
+    .rpt .rpt-num { font-family: var(--t-serif); font-size: 17px; font-weight: 600; color: var(--t-teal-dk); }
+    .rpt .rpt-h { font-family: var(--t-sans); font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-ink); margin: 0; }
+    .rpt .rpt-story { display: grid; grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr); gap: 7mm; align-items: start; margin-bottom: 6mm; flex-shrink: 0; }
+    .rpt .rpt-stat { font-family: var(--t-serif); font-weight: 600; font-size: 64px; line-height: 0.9; letter-spacing: -0.03em; color: var(--t-accent); }
+    .rpt .rpt-stat-label { font-family: var(--t-serif); font-style: italic; font-size: 13.5px; line-height: 1.35; color: var(--t-ink); margin-top: 8px; }
+    .rpt .rpt-story h3 { font-family: var(--t-serif); font-weight: 600; font-size: 21px; line-height: 1.2; color: var(--t-ink); margin: 0 0 8px; letter-spacing: -0.01em; }
+    .rpt .rpt-story p { margin: 0 0 8px; }
+    .rpt .rpt-findings { list-style: none; padding: 0; margin: 8px 0 0; }
+    .rpt .rpt-findings li { position: relative; padding: 6px 0 6px 20px; border-top: 1px solid var(--t-border); font-size: 12px; }
+    .rpt .rpt-findings li::before { content: ''; position: absolute; left: 0; top: 13px; width: 7px; height: 7px; border-radius: 50%; background: var(--t-teal); }
+    .rpt .rpt-findings b { color: var(--t-ink); font-weight: 600; }
+
+    /* ---- Figures. Fixed heights in mm: a page cannot scroll. */
+    .rpt .rpt-figure { margin: 0 0 4mm; flex-shrink: 0; }
+    .rpt .rpt-frame { background: #FFFFFF; border: 1px solid var(--t-border); border-radius: var(--t-radius); padding: 10px; display: flex; overflow: hidden; }
+    .rpt .rpt-frame > * { flex: 1; min-width: 0; }
+    .rpt .rpt-frame .dac-viz-block { background: transparent; }
+    .rpt .is-chart .rpt-frame { height: 100mm; }
+    .rpt .is-tall .rpt-frame { height: 128mm; }
+    .rpt .is-table .rpt-frame { height: 98mm; }
+    .rpt .is-table-lg .rpt-frame { height: 150mm; }
+    .rpt .is-half .rpt-frame { height: 82mm; }
+    .rpt .rpt-cap { margin-top: 5px; font-size: 11px; font-style: italic; color: var(--t-dim); font-family: var(--t-serif); }
+    .rpt .rpt-cap b { font-style: normal; font-family: var(--t-sans); font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--t-ink); margin-right: 8px; }
+    .rpt .rpt-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6mm; }
+    .rpt .rpt-split.is-wide-left { grid-template-columns: 1.4fr 1fr; }
+
+    /* ---- Pull insight */
+    .rpt .rpt-pull { margin: 2mm 0 0; padding-left: 14px; border-left: 4px solid var(--t-teal); font-family: var(--t-serif); font-style: italic; font-size: 19px; line-height: 1.28; color: var(--t-ink); max-width: 36ch; flex-shrink: 0; }
+    .rpt .rpt-pull cite { display: block; margin-top: 8px; font-family: var(--t-sans); font-style: normal; font-size: 9px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--t-dim); }
+
+    /* ---- Summary page */
+    .rpt .rpt-h2 { font-family: var(--t-serif); font-weight: 600; font-size: 26px; line-height: 1.15; color: var(--t-ink); margin: 0 0 4mm; }
+    .rpt .rpt-scope { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5mm; padding: 8px 10px; background: var(--t-surface); border: 1px solid var(--t-border); border-radius: var(--t-radius); flex-shrink: 0; }
+    .rpt .rpt-scope-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-ink); }
+    .rpt .rpt-filter { width: 220px; min-height: 70px; padding: 6px 10px; background: #FFFFFF; border: 1px solid var(--t-border); border-radius: var(--t-radius); display: flex; }
+    .rpt .rpt-filter > * { flex: 1; min-width: 0; }
+    .rpt .rpt-scope-note { flex-basis: 100%; font-size: 10.5px; font-style: italic; color: var(--t-dim); }
+    .rpt .rpt-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; margin-bottom: 6mm; flex-shrink: 0; }
+    .rpt .rpt-kpi { background: #FFFFFF; border: 1px solid var(--t-border); border-top: 3px solid var(--t-teal); border-radius: var(--t-radius); padding: 8px 12px; height: 34mm; display: flex; overflow: hidden; }
+    .rpt .rpt-kpi > * { flex: 1; min-width: 0; }
+    .rpt .rpt-kpi-value .h-kpi-metric-kpi,
+    .rpt .rpt-kpi-value .h-kpi-metric-kpi * { font-family: var(--t-serif) !important; font-weight: 600 !important; background: transparent !important; border: none !important; }
+
+    /* ---- Implications and definitions */
+    .rpt .rpt-cards { display: grid; gap: 4mm; margin-bottom: 8mm; }
+    .rpt .rpt-card { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 12px 14px; background: var(--t-surface); border: 1px solid var(--t-border); border-left: 4px solid var(--t-teal); border-radius: var(--t-radius); }
+    .rpt .rpt-card-n { font-family: var(--t-serif); font-size: 17px; font-weight: 600; color: var(--t-teal-dk); }
+    .rpt .rpt-card h4 { font-family: var(--t-serif); font-size: 16px; font-weight: 600; color: var(--t-ink); margin: 0 0 3px; }
+    .rpt .rpt-card p { margin: 0; font-size: 12px; }
+    .rpt .rpt-def { padding: 8px 0; border-top: 1px solid var(--t-border); }
+    .rpt .rpt-def:last-of-type { border-bottom: 1px solid var(--t-border); }
+    .rpt .rpt-def h5 { font-family: var(--t-serif); font-size: 14px; font-weight: 600; color: var(--t-ink); margin: 0 0 2px; }
+    .rpt .rpt-def p { margin: 0; font-size: 11.5px; }
+    .rpt .rpt-contact { margin-top: auto; padding: 10px 14px; background: var(--t-dark); color: var(--t-on-dark); border-radius: var(--t-radius); font-size: 12px; }
+    .rpt .rpt-contact a { color: var(--t-teal); font-weight: 600; text-decoration: none; }
+
+    /* ---- Print. The padding on .rpt-page supplies the margin, so @page has none. */
+    @page { size: A4; margin: 0; }
+    @media print {
+      .rpt { background: none; padding: 0; gap: 0; display: block; }
+      .rpt .rpt-page { width: var(--t-page-w); height: var(--t-page-h); margin: 0; border: none; border-radius: 0; box-shadow: none; break-after: page; }
+      /* Without this you get a blank trailing page. */
+      .rpt .rpt-page:last-child { break-after: auto; }
+      .rpt .rpt-kpis, .rpt .rpt-figure, .rpt .rpt-card, .rpt .rpt-def { break-inside: avoid; }
+    }
+
+  </style>
+
+  <article class="rpt-page is-cover">
+    <div class="rpt-cover">
+      <div class="rpt-cover-top"><img src="https://cdn.holistics.io/logos/holistics-logo-white.svg" alt="Holistics" /><span class="rpt-cover-tag">Ecommerce report 2026</span></div>
+      <p class="rpt-cover-eyebrow">Aug 2023 to Oct 2026</p>
+      <h1>State of <em>ecommerce</em> performance</h1>
+      <p class="rpt-cover-lede">What 33,010 orders, 759 merchants and 10,264 customers tell us about growth, leakage and where to focus next.</p>
+      <div class="rpt-contents"><p class="rpt-contents-title">Contents</p><ol><li><span>01</span><span>Revenue is compounding</span><span>p. 02</span></li><li><span>02</span><span>Nearly 30% of orders never land</span><span>p. 04</span></li><li><span>03</span><span>Growth is global, not concentrated</span><span>p. 05</span></li><li><span>04</span><span>Three categories carry a quarter of revenue</span><span>p. 07</span></li><li><span>05</span><span>The customer base doubles every year</span><span>p. 09</span></li><li><span>06</span><span>What it means for next year</span><span>p. 11</span></li></ol></div>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">Summary</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<h2 class="rpt-h2">Key findings</h2>
+<div class="rpt-scope"><span class="rpt-scope-label">Set the scope</span><div class="rpt-filter"><h-block name="f_order_date" /></div><div class="rpt-filter"><h-block name="f_customer_country" /></div><span class="rpt-scope-note">Filters change the charts. The written commentary reflects all data.</span></div>
+<div class="rpt-kpis"><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_ld9y" /></div></div><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_acsc" /></div></div><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_business_aov" /></div></div><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_nrin" /></div></div><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_audi" /></div></div><div class="rpt-kpi"><div class="rpt-kpi-value"><h-block name="v_users_count" /></div></div></div>
+<ul class="rpt-findings"><li><b>Revenue tripled in a year.</b> From $345K in Sep 2025 to $1.06M in Sep 2026.</li><li><b>Growth is volume-led.</b> Average order value has held near $350.</li><li><b>Nearly 30% of orders are cancelled or refunded,</b> about $3.4M of reported revenue.</li><li><b>No market dominates.</b> The largest is 12% of revenue, and Singapore is half its peers.</li><li><b>The customer base doubles every year,</b> and women generate 68% of revenue.</li></ul>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">01 Revenue</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">01</span><h2 class="rpt-h">Revenue is compounding</h2></div><div class="rpt-story"><div><div class="rpt-stat">3&times;</div><div class="rpt-stat-label">revenue versus a year earlier</div></div><div><h3>Steady growth since mid-2024, with one sharp dip</h3><p>Monthly revenue grew from $345K in Sep 2025 to $1.06M in Sep 2026, up from about $90K a month in mid-2024. The one sharp dip came in Apr 2025, down 38% from March.</p><ul class="rpt-findings"><li>Average order value stays near $350, so growth comes from <b>more orders, not bigger baskets</b>.</li><li>Revenue passed its March 2025 level again by August.</li><li>Oct 2026 is a partial month, so its short bar is not a decline.</li></ul></div></div><figure class="rpt-figure is-tall"><div class="rpt-frame"><h-block name="v_fofr" /></div><figcaption class="rpt-cap"><b>Figure 1</b>Revenue by order month. The latest month is partial.</figcaption></figure>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">01 Revenue</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">01</span><h2 class="rpt-h">Revenue is compounding, continued</h2></div><figure class="rpt-figure is-table-lg"><div class="rpt-frame"><h-block name="v_business_kpi_table" /></div><figcaption class="rpt-cap"><b>Figure 2</b>Monthly KPI overview: orders, revenue and average order value.</figcaption></figure><blockquote class="rpt-pull">Growth is coming from more orders, not bigger baskets.<cite>Key insight</cite></blockquote>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">02 Order mix</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">02</span><h2 class="rpt-h">Nearly 30% of orders never land</h2></div><div class="rpt-story"><div><div class="rpt-stat">$3.4M</div><div class="rpt-stat-label">of reported revenue is cancelled or refunded</div></div><div><h3>Seven in ten orders are delivered</h3><p>Of 33,010 orders, 23,174 (70%) were delivered, 8,153 (25%) were cancelled and 1,683 (5%) were refunded. Reported revenue includes these orders, so the leak shows in the headline number.</p><ul class="rpt-findings"><li>Cancelled orders account for <b>$2.85M, or 25%</b> of reported revenue.</li><li>Refunds add another $0.59M (5%).</li><li>Every 10% fewer cancellations is worth about $285K.</li></ul></div></div><figure class="rpt-figure is-tall"><div class="rpt-frame"><h-block name="v_quxa" /></div><figcaption class="rpt-cap"><b>Figure 3</b>Revenue by order status. Cancelled and refunded orders are included.</figcaption></figure>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">03 Markets</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">03</span><h2 class="rpt-h">Growth is global, not concentrated</h2></div><div class="rpt-story"><div><div class="rpt-stat">12%</div><div class="rpt-stat-label">share of revenue from the largest market</div></div><div><h3>Ten markets, none dominant</h3><p>The United States is the largest market at $1.34M. Nine of the ten countries each contribute between $1.1M and $1.3M.</p><ul class="rpt-findings"><li>The United States, Vietnam, Australia and Germany lead.</li><li>The top market is only 18% ahead of the ninth.</li><li>Revenue is well diversified across regions.</li></ul></div></div><figure class="rpt-figure is-tall"><div class="rpt-frame"><h-block name="v_business_map" /></div><figcaption class="rpt-cap"><b>Figure 4</b>Revenue map by country.</figcaption></figure>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">03 Markets</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">03</span><h2 class="rpt-h">Growth is global, not concentrated, continued</h2></div><figure class="rpt-figure is-tall"><div class="rpt-frame"><h-block name="v_sales_country" /></div><figcaption class="rpt-cap"><b>Figure 5</b>Revenue by customer country.</figcaption></figure><div class="rpt-story" style="grid-template-columns:1fr"><div><h3>Singapore is the gap to close</h3><p>Singapore is the outlier at $0.63M, about half of its peers. Lifting it to the peer average of about $1.2M would add roughly $0.6M.</p></div></div><blockquote class="rpt-pull">Nine of ten markets sit between $1.1M and $1.3M. Singapore, at $0.63M, is the outlier.<cite>Key insight</cite></blockquote>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">04 Products</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">04</span><h2 class="rpt-h">Three categories carry a quarter of revenue</h2></div><div class="rpt-story"><div><div class="rpt-stat">26%</div><div class="rpt-stat-label">of revenue from Body, Living Room and Televisions</div></div><div><h3>Strength spans electronics, fashion and food</h3><p>Body, Living Room and Televisions together earn $3.0M. Body leads at $1.13M, while Bedroom trails at $0.14M. Televisions, T-shirts, Mobiles and Snacks follow closely, each between $0.84M and $0.91M.</p><ul class="rpt-findings"><li>8,731 products from 759 merchants are listed.</li><li>Look for high-price items that still sell in volume.</li></ul></div></div><figure class="rpt-figure is-tall"><div class="rpt-frame"><h-block name="v_products_categories" /></div><figcaption class="rpt-cap"><b>Figure 6</b>Revenue by product category.</figcaption></figure>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">04 Products</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">04</span><h2 class="rpt-h">Three categories carry a quarter of revenue, continued</h2></div><figure class="rpt-figure is-table"><div class="rpt-frame"><h-block name="v_products_table" /></div><figcaption class="rpt-cap"><b>Figure 7</b>Top products.</figcaption></figure><figure class="rpt-figure is-table"><div class="rpt-frame"><h-block name="v_products_bubble" /></div><figcaption class="rpt-cap"><b>Figure 8</b>Price, units sold and revenue by product.</figcaption></figure>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">05 Customers</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">05</span><h2 class="rpt-h">The customer base doubles every year</h2></div><div class="rpt-story"><div><div class="rpt-stat">2.1&times;</div><div class="rpt-stat-label">2026 signups so far versus all of 2025</div></div><div><h3>Acquisition is accelerating</h3><p>Registered users grew from 478 in 2023 to 1,249 in 2024, 2,769 in 2025 and 5,767 so far in 2026. Women generate 68% of revenue ($7.8M versus $3.8M).</p><ul class="rpt-findings"><li>2026 is a partial year and already 2.1 times all of 2025.</li><li>The audience skews female, which is worth reflecting in merchandising.</li></ul></div></div><div class="rpt-split is-wide-left"><figure class="rpt-figure is-half"><div class="rpt-frame"><h-block name="v_users_signup" /></div><figcaption class="rpt-cap"><b>Figure 9</b>User signups by month.</figcaption></figure><figure class="rpt-figure is-half"><div class="rpt-frame"><h-block name="v_users_gender" /></div><figcaption class="rpt-cap"><b>Figure 10</b>Revenue by user gender.</figcaption></figure></div>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">05 Customers</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">05</span><h2 class="rpt-h">The customer base doubles every year, continued</h2></div><figure class="rpt-figure is-table-lg"><div class="rpt-frame"><h-block name="v_users_table" /></div><figcaption class="rpt-cap"><b>Figure 11</b>Top customers by orders and revenue.</figcaption></figure><div class="rpt-story" style="grid-template-columns:1fr"><div><p>Use the table to find accounts for personal outreach or loyalty offers. Filter by country above to see the leaders in one market.</p></div></div>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+
+  <article class="rpt-page">
+    <header class="rpt-head"><span class="rpt-head-title"></span><span class="rpt-head-section">06 Next year</span><span class="rpt-head-period"></span></header>
+    <div class="rpt-body">
+<div class="rpt-kick"><span class="rpt-num">06</span><h2 class="rpt-h">What it means for next year</h2></div><div class="rpt-cards"><div class="rpt-card"><span class="rpt-card-n">01</span><div><h4>Fix the leak first</h4><p>Almost 30% of orders are cancelled or refunded. Each 10% fewer cancellations is worth about $285K, the fastest win on the table.</p></div></div><div class="rpt-card"><span class="rpt-card-n">02</span><div><h4>Close the Singapore gap</h4><p>Singapore trails its peers by about $0.6M. Understand why before investing in a new market.</p></div></div><div class="rpt-card"><span class="rpt-card-n">03</span><div><h4>Retain the new cohort</h4><p>The customer base doubles every year, so retention matters more each quarter. Order volume is the lever to watch.</p></div></div></div><h2 class="rpt-h2" style="font-size:20px">Definitions and method</h2><div class="rpt-def"><h5>How is revenue calculated?</h5><p>Revenue is the sum of quantity times product price across order items. It includes cancelled and refunded orders.</p></div><div class="rpt-def"><h5>What period does this report cover?</h5><p>August 2023 to October 2026. October 2026 is a partial month.</p></div><div class="rpt-def"><h5>Do the filters change the commentary?</h5><p>No. The written findings reflect all data. The date and country filters change the charts.</p></div><div class="rpt-def"><h5>Which charts do the filters affect?</h5><p>Date: revenue, orders, order status, revenue trend and categories. Country: users, signups, gender and top customers.</p></div><div class="rpt-contact">Questions about the data? Talk to the data team at <a href="mailto:hi@holistics.io">hi@holistics.io</a>.</div>
+    </div>
+    <footer class="rpt-foot"><span class="rpt-foot-source"></span><span class="rpt-foot-conf"></span><span class="rpt-foot-page"></span></footer>
+  </article>
+</div>
+
+    ;;
+  }
+  settings {
+    autorun_on_open: true
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: ['v_ld9y', 'v_acsc', 'v_quxa', 'v_fofr', 'v_products_categories']
+      field: r(orders.created_at)
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: ['v_users_count', 'v_users_signup', 'v_users_gender', 'v_users_table']
+      field: r(countries.name)
+    }
+  ]
+}

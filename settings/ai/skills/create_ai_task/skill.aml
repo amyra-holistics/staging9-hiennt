@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create a scheduled AI task with delivery'
-  description: "Create a scheduled AI task that emails results or posts them to Slack, including alerts that send only when a condition is met. Task delivery works today, even where the docs still say 'coming soon'. Use whenever the user wants something recurring or automatic, even without saying 'AI task': 'every Monday email me…', 'alert me in Slack if revenue drops', 'notify each manager when…', 'keep an eye on…', 'check every morning that the data landed'. Not for a one-off send now."
+  description: "Create a scheduled AI task that emails results or posts them to Slack, including alerts that send only when a condition is met. Task delivery works today, even where the docs still say 'coming soon'. Use whenever the user wants something recurring or automatic, even without saying 'AI task': 'every Monday email me…', 'alert me in Slack if revenue drops', 'notify each manager when…', 'keep an eye on…', 'check every morning that the data landed'. Not for a one-off send now. Load this skill as your first step, before writing any text or calling another tool."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md

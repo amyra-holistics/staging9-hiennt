@@ -16,7 +16,7 @@ Skill create_ai_task {
 
     Ask every question on an `ask_user` card, because a reply without a tool call ends the turn. Write only the cards and the report. Make independent reads in one step.
 
-    1. **Source.** Find the dataset by unique name: the label in snake_case with `lookup_aml_object`, then a `*.dataset.aml` search. Ask only when two datasets or metrics fit, or the grouping has levels the words don't settle, and recommend a dataset with data for the latest complete period, because a task on stale data never fires.
+    1. **Source.** Find the dataset by unique name: the label in snake_case with `lookup_aml_object`, then a `*.dataset.aml` search. Ask only when two datasets or metrics fit, or the grouping has levels the words don't settle. A dataset whose data stops before the latest complete period can't feed a recurring task: use another that fits, or ask.
     2. **Schedule.** A run needs one day and one clock time. Ask when either is missing or a range ("Monday morning", "weekly", "end of day"); each option shows the time and the next run. Never ask the timezone.
     3. **Delivery.** If the request emails, posts or alerts, load `add_ai_task_delivery` now. Otherwise ask last: "Want each <period>'s results sent to you?", with "Email me (recommended)", "No, keep them in the task" and "Post to a Slack channel". Email or Slack loads `add_ai_task_delivery`.
     4. **Save** the task file and its schedule, then run `validate_file` on each before the report. On a failure, fix and save again with the same summary.

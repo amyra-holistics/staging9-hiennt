@@ -1,0 +1,460 @@
+Dashboard r11_haidfd_html_a3 {
+  title: 'Sales Performance'
+
+  block f_date: FilterBlock {
+    label: 'Order date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_state: FilterBlock {
+    label: 'State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.state)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_traffic_source: FilterBlock {
+    label: 'Acquisition traffic source'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.traffic_source)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'AOV'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'single'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block monthly_sales_margin: VizBlock {
+    label: 'Net Sales and Gross Margin by Month'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Margin'
+            ref: r(thelook.gross_margin)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block category_donut: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: PieChart {
+      dataset: thelook
+      calculation total_net_sales {
+        label: 'Total Net Sales'
+        formula: @aql net_sales | exclude_grains(thelook_products.category);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation net_sales_share {
+        label: 'Net Sales Share'
+        formula: @aql safe_divide(net_sales * 100.0, total_net_sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        group_values_into: 10
+        sort: 'desc'
+      }
+    }
+  }
+
+  block top_products: VizBlock {
+    label: 'Top 8 Products by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.name)
+        label: 'Product Name'
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block state_performance: VizBlock {
+    label: 'State Performance'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          label: 'State'
+          ref: r(thelook_users.state)
+          format {
+            type: 'text'
+          }
+          uname: 'thelook_users_state'
+        },
+        VizFieldFull {
+          label: 'Net Sales'
+          ref: r(thelook.net_sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Fulfilled Orders'
+          ref: r(thelook.fulfilled_orders)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'AOV'
+          ref: r(thelook.aov)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          label: 'Gross Margin'
+          ref: r(thelook.gross_margin)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'thelook_users_state'
+            direction: 'asc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'monthly_sales_margin', 'category_donut', 'top_products', 'state_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_state'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'monthly_sales_margin', 'category_donut', 'top_products', 'state_performance']
+      field: r(thelook_users.state)
+    },
+    FilterInteraction {
+      from: 'f_category'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'monthly_sales_margin', 'category_donut', 'top_products', 'state_performance']
+      field: r(thelook_products.category)
+    },
+    FilterInteraction {
+      from: 'f_traffic_source'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'monthly_sales_margin', 'category_donut', 'top_products', 'state_performance']
+      field: r(thelook_users.traffic_source)
+    }
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .r11-sales-root, .r11-sales-root * { box-sizing: border-box; }
+        .r11-sales-root {
+          --ink: #172033;
+          --muted: #60708a;
+          --canvas: #f3f6fb;
+          --card: #ffffff;
+          --line: #dbe3ef;
+          --blue: #1677d2;
+          --orange: #d97730;
+          background: var(--canvas);
+          color: var(--ink);
+          font-family: Inter, Avenir, 'Segoe UI', sans-serif;
+          min-height: 100%;
+          padding: 20px;
+        }
+        .r11-sales-root .r11-title {
+          margin: 0 0 18px;
+          padding: 0 0 14px;
+          border-bottom: 3px solid var(--blue);
+          color: var(--ink);
+          font-size: clamp(22px, 2.4vw, 32px);
+          font-weight: 760;
+          letter-spacing: -0.04em;
+          line-height: 1.1;
+        }
+        .r11-sales-root .r11-shell {
+          display: grid;
+          grid-template-columns: 216px minmax(0, 1fr);
+          gap: 16px;
+          align-items: start;
+        }
+        .r11-sales-root .r11-rail {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-top: 3px solid var(--blue);
+          border-radius: 8px;
+          box-shadow: 0 4px 14px rgba(28, 48, 80, 0.06);
+          padding: 12px;
+        }
+        .r11-sales-root .r11-rail h-block + h-block { margin-top: 14px; }
+        .r11-sales-root .r11-main { display: grid; gap: 16px; min-width: 0; }
+        .r11-sales-root .r11-kpis {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+        .r11-sales-root .r11-kpis h-block,
+        .r11-sales-root .r11-panel {
+          background: var(--card);
+          border: 1px solid var(--line);
+          border-radius: 8px;
+          box-shadow: 0 4px 14px rgba(28, 48, 80, 0.06);
+          min-width: 0;
+        }
+        .r11-sales-root .r11-kpis h-block { border-top: 3px solid var(--blue); }
+        .r11-sales-root .r11-margin-kpi { border-top-color: var(--orange) !important; }
+        .r11-sales-root .r11-top-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.72fr) minmax(300px, 0.9fr);
+          gap: 16px;
+          align-items: stretch;
+        }
+        .r11-sales-root .r11-bottom-grid {
+          display: grid;
+          grid-template-columns: minmax(360px, 0.95fr) minmax(0, 1.35fr);
+          gap: 16px;
+          align-items: stretch;
+        }
+        .r11-sales-root .r11-chart { min-height: 350px; }
+        .r11-sales-root .r11-table { min-height: 390px; }
+        .r11-sales-root .r11-panel h-block { display: block; height: 100%; min-height: inherit; }
+        @media (max-width: 1180px) {
+          .r11-sales-root .r11-shell { grid-template-columns: 1fr; }
+          .r11-sales-root .r11-rail { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+          .r11-sales-root .r11-rail h-block + h-block { margin-top: 0; }
+          .r11-sales-root .r11-top-grid { grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.85fr); }
+        }
+        @media (max-width: 820px) {
+          .r11-sales-root { padding: 12px; }
+          .r11-sales-root .r11-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .r11-sales-root .r11-rail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .r11-sales-root .r11-top-grid, .r11-sales-root .r11-bottom-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 520px) {
+          .r11-sales-root .r11-kpis, .r11-sales-root .r11-rail { grid-template-columns: 1fr; }
+          .r11-sales-root .r11-chart { min-height: 310px; }
+        }
+        @media (prefers-reduced-motion: reduce) { .r11-sales-root * { scroll-behavior: auto; } }
+      </style>
+      <div class="r11-sales-root">
+        <header><h1 class="r11-title">Sales Performance</h1></header>
+        <div class="r11-shell">
+          <aside class="r11-rail">
+            <h-block name="f_date" />
+            <h-block name="f_state" />
+            <h-block name="f_category" />
+            <h-block name="f_traffic_source" />
+          </aside>
+          <main class="r11-main">
+            <section class="r11-kpis">
+              <h-block name="kpi_net_sales" />
+              <h-block name="kpi_fulfilled_orders" />
+              <h-block name="kpi_aov" />
+              <h-block class="r11-margin-kpi" name="kpi_gross_margin" />
+            </section>
+            <section class="r11-top-grid">
+              <div class="r11-panel r11-chart"><h-block name="monthly_sales_margin" /></div>
+              <div class="r11-panel r11-chart"><h-block name="category_donut" /></div>
+            </section>
+            <section class="r11-bottom-grid">
+              <div class="r11-panel r11-chart"><h-block name="top_products" /></div>
+              <div class="r11-panel r11-table"><h-block name="state_performance" /></div>
+            </section>
+          </main>
+        </div>
+      </div>
+    ;;
+  }
+}

@@ -1,0 +1,619 @@
+Dashboard r11_haidfd_canvas_a1 {
+  title: 'Sales Performance FY2026'
+  description: @md Retail-operations sales monitoring for FY2026 year-to-date, with comparable prior-year measures through 6 October 2026. ;;
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  // Left sidebar: context and operational filters.
+  block t_sidebar: TextBlock {
+    content: @md # Sales Performance FY2026
+
+Retail operations monitor
+
+**Reporting window:** 1 Jan – 6 Oct 2026
+;;
+  }
+
+  block f_order_item_date: FilterBlock {
+    label: 'Order item date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+  }
+
+  block f_customer_country: FilterBlock {
+    label: 'Customer country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_product_category: FilterBlock {
+    label: 'Product category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.category)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  // Main title and FY2026 KPI row.
+  block t_main_title: TextBlock {
+    content: @md # Sales performance
+
+FY2026 year-to-date snapshot · comparable YoY through 6 October
+;;
+  }
+
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation current_net_sales {
+        label: 'Current Net Sales'
+        formula: @aql net_sales | where(thelook_order_items.created_at matches @(2026-01-01 to 2026-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation prior_net_sales {
+        label: 'Prior Net Sales'
+        formula: @aql net_sales | where(thelook_order_items.created_at matches @(2025-01-01 to 2025-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation net_sales_yoy_absolute_change {
+        label: 'Net Sales YoY Absolute Change'
+        formula: @aql current_net_sales - prior_net_sales;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation net_sales_yoy_percent_change {
+        label: 'Net Sales YoY Percent Change'
+        formula: @aql safe_divide(net_sales_yoy_absolute_change, prior_net_sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'current_net_sales'
+        label: 'FY2026 YTD Net Sales'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      compare_value: VizFieldFull {
+        ref: 'net_sales_yoy_percent_change'
+        label: 'YoY Change'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_number'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block v_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation current_fulfilled_orders {
+        label: 'Current Fulfilled Orders'
+        formula: @aql fulfilled_orders | where(thelook_order_items.created_at matches @(2026-01-01 to 2026-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation prior_fulfilled_orders {
+        label: 'Prior Fulfilled Orders'
+        formula: @aql fulfilled_orders | where(thelook_order_items.created_at matches @(2025-01-01 to 2025-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation fulfilled_orders_yoy_absolute_change {
+        label: 'Fulfilled Orders YoY Absolute Change'
+        formula: @aql current_fulfilled_orders - prior_fulfilled_orders;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation fulfilled_orders_yoy_percent_change {
+        label: 'Fulfilled Orders YoY Percent Change'
+        formula: @aql safe_divide(fulfilled_orders_yoy_absolute_change, prior_fulfilled_orders);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'current_fulfilled_orders'
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      compare_value: VizFieldFull {
+        ref: 'fulfilled_orders_yoy_percent_change'
+        label: 'YoY Change'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_number'
+      }
+    }
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation current_aov {
+        label: 'Current Average Order Value'
+        formula: @aql aov | where(thelook_order_items.created_at matches @(2026-01-01 to 2026-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation prior_aov {
+        label: 'Prior Average Order Value'
+        formula: @aql aov | where(thelook_order_items.created_at matches @(2025-01-01 to 2025-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation aov_yoy_percent_change {
+        label: 'Average Order Value YoY Percent Change'
+        formula: @aql safe_divide(current_aov - prior_aov, prior_aov);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'current_aov'
+        label: 'FY2026 YTD Average Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      compare_value: VizFieldFull {
+        ref: 'aov_yoy_percent_change'
+        label: 'YoY Change'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_number'
+        alignment: 'center'
+      }
+    }
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      calculation current_gross_margin {
+        label: 'FY2026 YTD Gross Margin'
+        formula: @aql gross_margin | where(thelook_order_items.created_at matches @(2026-01-01 to 2026-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation prior_gross_margin {
+        label: 'FY2025 YTD Gross Margin'
+        formula: @aql gross_margin | where(thelook_order_items.created_at matches @(2025-01-01 to 2025-10-06));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation gross_margin_yoy_percentage_point_change {
+        label: 'Gross Margin YoY Percentage-Point Change'
+        formula: @aql (current_gross_margin - prior_gross_margin) * 100.0;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'current_gross_margin'
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      compare_value: VizFieldFull {
+        ref: 'gross_margin_yoy_percentage_point_change'
+        label: 'YoY Percentage-Point Change'
+        format {
+          type: 'number'
+          pattern: '#,###0.0\%'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_number'
+      }
+    }
+  }
+
+  // Trend and product mix.
+  block v_monthly_sales_margin: VizBlock {
+    label: 'Net Sales and Gross Margin by Month'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        label: 'Month'
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Net Sales'
+            ref: r(thelook.net_sales)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Gross Margin'
+            ref: r(thelook.gross_margin)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#F97316'
+            line_style: 'solid'
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      conditions: [
+        "thelook_order_items.created_at matches @(2026-01-01 to 2026-10-06)",
+      ]
+      settings {
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_sales_by_category: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'FY2026 Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+        settings {
+          color: '#2563EB'
+        }
+      }
+      filter {
+        field: r(thelook_order_items.created_at)
+        operator: 'matches'
+        value: '2026-01-01 - 2026-10-06'
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        group_values_into: 10
+        sort: 'desc'
+      }
+    }
+  }
+
+  // Product ranking and state lookup.
+  block v_top_products: VizBlock {
+    label: 'Top 8 Products by Net Sales'
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.name)
+        label: 'Product Name'
+      }
+      y_axis {
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+      }
+      conditions: [
+        "thelook_order_items.created_at matches @(2026-01-01 - 2026-10-06)",
+      ]
+      settings {
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_state_performance: VizBlock {
+    label: 'Regional Performance by Customer State'
+    viz: DataTable {
+      dataset: thelook
+      calculation current_ytd_net_sales {
+        label: 'Current YTD Net Sales'
+        formula: @aql net_sales | where(thelook_order_items.created_at matches @2026-01-01 - 2026-10-06);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation current_ytd_fulfilled_orders {
+        label: 'Current YTD Fulfilled Orders'
+        formula: @aql fulfilled_orders | where(thelook_order_items.created_at matches @2026-01-01 - 2026-10-06);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation current_ytd_aov {
+        label: 'Current YTD AOV'
+        formula: @aql aov | where(thelook_order_items.created_at matches @2026-01-01 - 2026-10-06);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation prior_ytd_net_sales {
+        label: 'Prior YTD Net Sales'
+        formula: @aql net_sales | where(thelook_order_items.created_at matches @2025-01-01 - 2025-10-06);;
+        calc_type: 'measure'
+        data_type: 'number'
+        hidden: true
+      }
+      calculation yoy_net_sales_change {
+        label: 'YoY Net Sales Change'
+        formula: @aql current_ytd_net_sales - prior_ytd_net_sales;;
+        calc_type: 'measure'
+        data_type: 'number'
+        hidden: true
+      }
+      calculation yoy_net_sales_change_percent {
+        label: 'YoY Net Sales %'
+        formula: @aql safe_divide(yoy_net_sales_change, prior_ytd_net_sales);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.state)
+          label: 'Customer State'
+          uname: 'customer_state'
+        },
+        VizFieldFull {
+          ref: 'current_ytd_net_sales'
+          label: 'Current YTD Net Sales'
+          uname: 'current_ytd_net_sales'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'current_ytd_fulfilled_orders'
+          label: 'Fulfilled Orders'
+          uname: 'current_ytd_fulfilled_orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'current_ytd_aov'
+          label: 'Current YTD AOV'
+          uname: 'current_ytd_aov'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: 'yoy_net_sales_change_percent'
+          label: 'YoY Net Sales %'
+          uname: 'yoy_net_sales_change_percent'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: false
+        wrap_header_text: true
+        wrap_cell_text: false
+        conditional_formats: [
+          ConditionalFormat {
+            ref: 'current_ytd_net_sales'
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#EFF6FF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#BFDBFE'
+              }
+            }
+          },
+          ConditionalFormat {
+            ref: 'yoy_net_sales_change_percent'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than'
+                value: 0
+              }
+              text_color: '#166534'
+              background_color: '#DCFCE7'
+            }
+          },
+          ConditionalFormat {
+            ref: 'yoy_net_sales_change_percent'
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0
+              }
+              text_color: '#B91C1C'
+              background_color: '#FEE2E2'
+            }
+          },
+        ]
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'current_ytd_net_sales'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'customer_state'
+            direction: 'asc'
+          },
+        ]
+        column_styles: [
+          ColumnStyle {
+            key: 'customer_state'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'current_ytd_net_sales'
+            width: 170
+          },
+          ColumnStyle {
+            key: 'current_ytd_fulfilled_orders'
+            width: 130
+          },
+          ColumnStyle {
+            key: 'current_ytd_aov'
+            width: 140
+          },
+          ColumnStyle {
+            key: 'yoy_net_sales_change_percent'
+            width: 130
+          },
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_item_date'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_state_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_customer_country'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_state_performance']
+      field: r(thelook_users.country)
+    },
+    FilterInteraction {
+      from: 'f_product_category'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_state_performance']
+      field: r(thelook_products.category)
+    },
+  ]
+
+  view: CanvasLayout {
+    width: 1440
+    height: 1000
+    grid_size: 20
+    auto_expand_vertically: true
+
+    // 260px sidebar: x=20–280.
+    block t_sidebar { position: pos(20, 20, 260, 140) }
+    block f_order_item_date { position: pos(20, 180, 260, 90) }
+    block f_customer_country { position: pos(20, 290, 260, 90) }
+    block f_product_category { position: pos(20, 400, 260, 90) }
+
+    // 1,120px content area: x=300–1420.
+    block t_main_title { position: pos(300, 20, 1120, 60) }
+    block v_net_sales { position: pos(300, 100, 265, 120) }
+    block v_fulfilled_orders { position: pos(585, 100, 265, 120) }
+    block v_aov { position: pos(870, 100, 265, 120) }
+    block v_gross_margin { position: pos(1155, 100, 265, 120) }
+    block v_monthly_sales_margin { position: pos(300, 240, 700, 360) }
+    block v_sales_by_category { position: pos(1020, 240, 400, 360) }
+    block v_top_products { position: pos(300, 620, 700, 360) }
+    block v_state_performance { position: pos(1020, 620, 400, 360) }
+
+    mobile {
+      mode: 'auto'
+    }
+  }
+}

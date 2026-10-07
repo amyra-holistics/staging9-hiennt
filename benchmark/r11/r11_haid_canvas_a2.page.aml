@@ -1,0 +1,375 @@
+Dashboard r11_haid_canvas_a2 {
+  title: 'Sales Performance'
+  description: 'Interactive sales performance monitoring dashboard for TheLook eCommerce.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 60
+  }
+
+  // Header and left slicer rail
+  block b_header: TextBlock {
+    content: @md
+# Sales Performance
+Monitor Net Sales, fulfillment, order value, and margin across product and customer segments.
+    ;;
+  }
+
+  block b_filters: TextBlock {
+    content: @md
+## Filters
+    ;;
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_state: FilterBlock {
+    label: 'Customer State'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.state)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_department: FilterBlock {
+    label: 'Product Department'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_products.department)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  block f_gender: FilterBlock {
+    label: 'Customer Gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+    default {
+      operator: 'is'
+      value: '$H_NIL$'
+    }
+  }
+
+  // KPI cards
+  block v_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.net_sales)
+    label: 'Net Sales'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  settings {
+    display_mode: 'single'
+  }
+}
+  }
+
+  block v_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.fulfilled_orders)
+    label: 'Fulfilled Orders'
+    format {
+      type: 'number'
+      pattern: '#,###0'
+    }
+  }
+}
+  }
+
+  block v_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.aov)
+    label: 'Average Order Value'
+    format {
+      type: 'number'
+      pattern: 'inherited'
+    }
+  }
+  settings {
+    display_mode: 'single'
+    alignment: 'center'
+  }
+}
+  }
+
+  block v_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: thelook
+  value: VizFieldFull {
+    ref: r(thelook.gross_margin)
+    label: 'Gross Margin'
+    format {
+      type: 'number'
+      pattern: '#,###0.0%'
+    }
+  }
+}
+  }
+
+  // Main analysis blocks
+  block v_monthly_sales_margin: VizBlock {
+    label: 'Net Sales & Gross Margin by Month'
+    viz: CombinationChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_order_items.created_at)
+    label: 'Order Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    label: 'Net Sales'
+    series {
+      mark_type: 'column'
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        color: '#2563EB'
+      }
+    }
+    settings {
+      alignment: 'left'
+    }
+  }
+  y_axis {
+    label: 'Gross Margin'
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      alignment: 'right'
+    }
+  }
+  settings {
+    legend_label: 'top'
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block v_category_sales: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: PieChart {
+  dataset: thelook
+  legend: VizFieldFull {
+    ref: r(thelook_products.category)
+    label: 'Product Category'
+  }
+  series {
+    field: VizFieldFull {
+      ref: r(thelook.net_sales)
+      label: 'Net Sales'
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    }
+  }
+  settings {
+    display_as_donut: true
+    legend_label: 'right'
+    show_percentage: true
+    data_label_position: 'outside'
+    sort: 'desc'
+  }
+}
+  }
+
+  block v_top_products: VizBlock {
+    label: 'Top 8 Products by Net Sales'
+    viz: BarChart {
+  dataset: thelook
+  x_axis: VizFieldFull {
+    ref: r(thelook_products.name)
+    label: 'Product Name'
+    format {
+      type: 'text'
+    }
+  }
+  y_axis {
+    series {
+      field: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+  settings {
+    row_limit: 8
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block v_state_performance: VizBlock {
+    label: 'State Performance'
+    viz: DataTable {
+  dataset: thelook
+  fields: [
+    VizFieldFull {
+      label: 'State'
+      ref: r(thelook_users.state)
+      format {
+        type: 'text'
+      }
+    },
+    VizFieldFull {
+      label: 'Net Sales'
+      ref: r(thelook.net_sales)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+      uname: 'net_sales'
+    },
+    VizFieldFull {
+      label: 'Fulfilled Orders'
+      ref: r(thelook.fulfilled_orders)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    },
+    VizFieldFull {
+      label: 'Average Order Value'
+      ref: r(thelook.aov)
+      format {
+        type: 'number'
+        pattern: 'inherited'
+      }
+    }
+  ]
+  settings {
+    pagination_size: 25
+    show_row_number: false
+    wrap_header_text: true
+    wrap_cell_text: false
+    sorts: [
+      KeyBasedSortSetting {
+        key: 'net_sales'
+        direction: 'desc'
+      }
+    ]
+  }
+}
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_category_sales', 'v_top_products', 'v_state_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_state'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_category_sales', 'v_top_products', 'v_state_performance']
+      field: r(thelook_users.state)
+    },
+    FilterInteraction {
+      from: 'f_department'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_category_sales', 'v_top_products', 'v_state_performance']
+      field: r(thelook_products.department)
+    },
+    FilterInteraction {
+      from: 'f_gender'
+      to: ['v_net_sales', 'v_fulfilled_orders', 'v_aov', 'v_gross_margin', 'v_monthly_sales_margin', 'v_category_sales', 'v_top_products', 'v_state_performance']
+      field: r(thelook_users.gender)
+    }
+  ]
+
+  view: CanvasLayout {
+    width: 1600
+    height: 1120
+    grid_size: 20
+    auto_expand_vertically: true
+
+    block b_header { position: pos(20, 20, 1560, 70) layer: 1 }
+    block b_filters { position: pos(20, 110, 240, 40) layer: 1 }
+    block f_order_date { position: pos(20, 160, 240, 110) layer: 1 }
+    block f_state { position: pos(20, 290, 240, 110) layer: 1 }
+    block f_department { position: pos(20, 420, 240, 110) layer: 1 }
+    block f_gender { position: pos(20, 550, 240, 110) layer: 1 }
+
+    block v_net_sales { position: pos(300, 110, 300, 140) layer: 1 }
+    block v_fulfilled_orders { position: pos(620, 110, 300, 140) layer: 1 }
+    block v_aov { position: pos(940, 110, 300, 140) layer: 1 }
+    block v_gross_margin { position: pos(1260, 110, 320, 140) layer: 1 }
+
+    block v_monthly_sales_margin { position: pos(300, 270, 820, 360) layer: 1 }
+    block v_category_sales { position: pos(1140, 270, 440, 360) layer: 1 }
+
+    block v_top_products { position: pos(300, 650, 620, 400) layer: 1 }
+    block v_state_performance { position: pos(940, 650, 640, 400) layer: 1 }
+
+    mobile { mode: 'auto' }
+  }
+}

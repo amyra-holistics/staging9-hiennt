@@ -1,0 +1,466 @@
+Dashboard r11_haid_html_a3 {
+  title: 'Sales Performance'
+  description: 'Sales performance overview with shared date, country, traffic source, and gender filters.'
+  theme: H.themes.classic
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+  }
+
+  // Filters
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+  }
+
+  block f_country: FilterBlock {
+    label: 'Country'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_traffic_source: FilterBlock {
+    label: 'Traffic Source'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.traffic_source)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_gender: FilterBlock {
+    label: 'Gender'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  // KPI cards
+  block kpi_net_sales: VizBlock {
+    label: 'Net Sales'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Net Sales'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_fulfilled_orders: VizBlock {
+    label: 'Fulfilled Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Fulfilled Orders'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Average Order Value'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Average Order Value'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  block kpi_gross_margin: VizBlock {
+    label: 'Gross Margin'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+  }
+
+  // Main charts
+  block v_monthly_sales_margin: VizBlock {
+    label: 'Net Sales and Gross Margin by Month'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        label: 'Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Net Sales'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#2563EB'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        x_axis_label: 'Month'
+        legend_label: 'top'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_sales_by_category: VizBlock {
+    label: 'Net Sales by Product Category'
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Product Category'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: false
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'desc'
+      }
+    }
+  }
+
+  // Lower cards
+  block v_top_products: VizBlock {
+    label: 'Top 8 Products by Net Sales'
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.name)
+        label: 'Product Name'
+      }
+      y_axis {
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Net Sales'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_country_performance: VizBlock {
+    label: 'Country Performance'
+    viz: DataTable {
+      dataset: thelook
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Country'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Net Sales'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Fulfilled Orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.gross_margin)
+          label: 'Gross Margin'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          },
+          IndexBasedSortSetting {
+            field_index: 0
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_country_performance']
+      field: r(thelook_order_items.created_at)
+    },
+    FilterInteraction {
+      from: 'f_country'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_country_performance']
+      field: r(thelook_users.country)
+    },
+    FilterInteraction {
+      from: 'f_traffic_source'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_country_performance']
+      field: r(thelook_users.traffic_source)
+    },
+    FilterInteraction {
+      from: 'f_gender'
+      to: ['kpi_net_sales', 'kpi_fulfilled_orders', 'kpi_aov', 'kpi_gross_margin', 'v_monthly_sales_margin', 'v_sales_by_category', 'v_top_products', 'v_country_performance']
+      field: r(thelook_users.gender)
+    },
+  ]
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .sales-dashboard {
+          box-sizing: border-box;
+          display: grid;
+          grid-template-columns: 220px minmax(0, 1fr);
+          min-height: 100vh;
+          background: #f7f8fa;
+          color: #1f2937;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+        .sales-dashboard * { box-sizing: border-box; }
+        .filter-rail {
+          position: sticky;
+          top: 0;
+          align-self: start;
+          min-height: 100vh;
+          padding: 20px 14px;
+          background: #ffffff;
+          border-right: 1px solid #e5e7eb;
+        }
+        .filter-rail h2 {
+          margin: 0 0 18px;
+          font-size: 16px;
+          font-weight: 700;
+        }
+        .filter-stack { display: grid; gap: 14px; }
+        .main-content { min-width: 0; padding: 0 16px 20px; }
+        .page-header {
+          display: flex;
+          align-items: center;
+          min-height: 64px;
+          margin: 0 -16px 16px;
+          padding: 0 20px;
+          background: #ffffff;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        .page-header h1 {
+          margin: 0;
+          font-size: 21px;
+          font-weight: 750;
+          letter-spacing: -0.02em;
+        }
+        .page-header p {
+          margin: 3px 0 0;
+          color: #6b7280;
+          font-size: 12px;
+        }
+        .kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .card {
+          min-width: 0;
+          overflow: hidden;
+          background: #ffffff;
+          border: 1px solid #e5e7eb;
+          border-radius: 3px;
+          box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+        }
+        .kpi-card { min-height: 132px; padding: 12px 14px; }
+        .chart-grid, .lower-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .chart-card { height: 390px; padding: 12px; }
+        .lower-card { height: 390px; padding: 12px; }
+        h-block { display: block; width: 100%; height: 100%; }
+        .filter-rail h-block { height: auto; }
+        @media (max-width: 1100px) {
+          .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 800px) {
+          .sales-dashboard { grid-template-columns: 1fr; }
+          .filter-rail { border-right: 0; border-bottom: 1px solid #e5e7eb; }
+          .filter-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .chart-grid, .lower-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 520px) {
+          .kpi-grid, .filter-stack { grid-template-columns: 1fr; }
+        }
+      </style>
+      <div class="sales-dashboard">
+        <aside class="filter-rail">
+          <h2>Filters</h2>
+          <div class="filter-stack">
+            <h-block name="f_order_date" />
+            <h-block name="f_country" />
+            <h-block name="f_traffic_source" />
+            <h-block name="f_gender" />
+          </div>
+        </aside>
+        <main class="main-content">
+          <header class="page-header">
+            <div>
+              <h1>Sales Performance</h1>
+              <p>Monitor sales volume, value, margin, product mix, and country performance.</p>
+            </div>
+          </header>
+          <section class="kpi-grid">
+            <div class="card kpi-card"><h-block name="kpi_net_sales" /></div>
+            <div class="card kpi-card"><h-block name="kpi_fulfilled_orders" /></div>
+            <div class="card kpi-card"><h-block name="kpi_aov" /></div>
+            <div class="card kpi-card"><h-block name="kpi_gross_margin" /></div>
+          </section>
+          <section class="chart-grid">
+            <div class="card chart-card"><h-block name="v_monthly_sales_margin" /></div>
+            <div class="card chart-card"><h-block name="v_sales_by_category" /></div>
+          </section>
+          <section class="lower-grid">
+            <div class="card lower-card"><h-block name="v_top_products" /></div>
+            <div class="card lower-card"><h-block name="v_country_performance" /></div>
+          </section>
+        </main>
+      </div>
+    ;;
+  }
+}

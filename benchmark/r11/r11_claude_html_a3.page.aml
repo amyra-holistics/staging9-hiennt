@@ -1,0 +1,572 @@
+Dashboard r11_claude_html_a3 {
+  title: 'Sales Performance FY2026'
+  description: '''
+Replica of the Power BI "Sales Performance FY2026" report on TheLook eCommerce.
+
+- Revenue = Net Sales (excludes Cancelled and Returned items); Orders = Fulfilled Orders.
+- Region = customer country, Channel = customer traffic source, Customer Segment = customer gender.
+- "vs LY" compares the selected fiscal year with the previous year.
+'''
+
+  // ---------- Filters ----------
+  block f_year: FilterBlock {
+    label: 'Fiscal Year'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_order_items.created_at)
+    }
+    default {
+      operator: 'matches'
+      value: '2026'
+    }
+  }
+
+  block f_region: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.country)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_channel: FilterBlock {
+    label: 'Channel'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.traffic_source)
+    }
+    settings {
+      input_type: 'multiple'
+    }
+  }
+
+  block f_segment: FilterBlock {
+    label: 'Customer Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: thelook
+      field: r(thelook_users.gender)
+    }
+    settings {
+      input_type: 'single'
+    }
+  }
+
+  // ---------- KPI cards ----------
+  block kpi_revenue: VizBlock {
+    label: 'Total Revenue'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.net_sales)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.0,"K"'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_orders: VizBlock {
+    label: 'Orders'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.fulfilled_orders)
+        label: 'Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_aov: VizBlock {
+    label: 'Avg Order Value'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.aov)
+        label: 'Avg Order Value'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_percent'
+        alignment: 'left'
+      }
+    }
+  }
+
+  block kpi_margin: VizBlock {
+    label: 'Gross Margin'
+    settings {
+      hide_label: true
+    }
+    viz: MetricKpi {
+      dataset: thelook
+      value: VizFieldFull {
+        ref: r(thelook.gross_margin)
+        label: 'Gross Margin'
+        format {
+          type: 'number'
+          pattern: '#,###0.0%'
+        }
+      }
+      compare_value: VizPopSettings {
+        field: r(thelook_order_items.created_at)
+        show_growth_rate: true
+        value: RelativePopValue {
+          duration: 1
+          granularity: 'year'
+        }
+      }
+      settings {
+        display_mode: 'compare_by_number'
+        alignment: 'left'
+      }
+    }
+  }
+
+  // ---------- Charts ----------
+  block v_monthly: VizBlock {
+    label: 'Revenue & Gross Margin % by Month'
+    settings {
+      hide_label: true
+    }
+    viz: CombinationChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_order_items.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.0,"K"'
+            }
+          }
+          settings {
+            color: '#118DFF'
+          }
+        }
+        settings {
+          alignment: 'left'
+        }
+      }
+      y_axis {
+        label: 'Gross Margin %'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(thelook.gross_margin)
+            label: 'Gross Margin %'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+          settings {
+            color: '#E66C37'
+          }
+        }
+        settings {
+          alignment: 'right'
+        }
+      }
+      settings {
+        legend_label: 'top'
+        show_data_points: true
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block v_category: VizBlock {
+    label: 'Revenue by Product Category'
+    settings {
+      hide_label: true
+    }
+    viz: PieChart {
+      dataset: thelook
+      legend: VizFieldFull {
+        ref: r(thelook_products.category)
+        label: 'Category'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.0,"K"'
+          }
+        }
+        settings {
+          point {
+            value: 'Jeans'
+            color: '#118DFF'
+          }
+          point {
+            value: 'Outerwear & Coats'
+            color: '#12239E'
+          }
+          point {
+            value: 'Suits & Sport Coats'
+            color: '#E66C37'
+          }
+          point {
+            value: 'Sweaters'
+            color: '#6B007B'
+          }
+          point {
+            value: 'Fashion Hoodies & Sweatshirts'
+            color: '#E044A7'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'inside'
+        group_values_into: 6
+        sort: 'desc'
+      }
+    }
+  }
+
+  block v_top_products: VizBlock {
+    label: 'Top 8 Products by Revenue'
+    settings {
+      hide_label: true
+    }
+    viz: BarChart {
+      dataset: thelook
+      x_axis: VizFieldFull {
+        ref: r(thelook_products.name)
+        label: 'Product'
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          field: VizFieldFull {
+            ref: r(thelook.net_sales)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.0,"K"'
+            }
+          }
+          settings {
+            color: '#118DFF'
+          }
+        }
+        settings {
+          show_data_label_by: 'value'
+        }
+      }
+      settings {
+        legend_label: 'hidden'
+        row_limit: 8
+        sort: LineFamilySort {
+          type: 'yaxis'
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_regional: VizBlock {
+    label: 'Regional Performance'
+    settings {
+      hide_label: true
+    }
+    viz: DataTable {
+      dataset: thelook
+      calculation yoy_pct {
+        label: 'YoY %'
+        formula: @aql safe_divide(
+          net_sales - (net_sales | relative_period(thelook_order_items.created_at, interval(-1 year))),
+          net_sales | relative_period(thelook_order_items.created_at, interval(-1 year))
+        ) ;;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(thelook_users.country)
+          label: 'Region'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.net_sales)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.fulfilled_orders)
+          label: 'Orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: r(thelook.aov)
+          label: 'AOV'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0'
+          }
+        },
+        VizFieldFull {
+          ref: 'yoy_pct'
+          label: 'YoY %'
+          format {
+            type: 'number'
+            pattern: '#,###0.0%'
+          }
+        }
+      ]
+      settings {
+        show_row_number: false
+        pagination_size: 25
+        sorts: [
+          IndexBasedSortSetting {
+            field_index: 1
+            direction: 'desc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: 'yoy_pct'
+            format: SingleFormat {
+              condition {
+                operator: 'greater_than_equal'
+                value: 0
+              }
+              text_color: '#107C10'
+              background_color: 'transparent'
+            }
+          },
+          ConditionalFormat {
+            ref: 'yoy_pct'
+            format: SingleFormat {
+              condition {
+                operator: 'less_than'
+                value: 0
+              }
+              text_color: '#D13438'
+              background_color: 'transparent'
+            }
+          },
+          ConditionalFormat {
+            ref: r(thelook.net_sales)
+            format: ScaleFormat {
+              min {
+                type: 'percentage'
+                value: 0
+                color: '#FFFFFF'
+              }
+              max {
+                type: 'percentage'
+                value: 100
+                color: '#9FCFFF'
+              }
+            }
+          }
+        ]
+      }
+      theme {
+        table {
+          general {
+            font_size: 13
+            font_color: '#252423'
+            banding_color: '#FAFAFA'
+            borders {
+              outer: false
+              vertical: false
+              horizontal: true
+            }
+          }
+          header {
+            bg_color: '#F3F2F1'
+            font_weight: 'bold'
+            font_color: '#252423'
+          }
+        }
+      }
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+      <style>
+        .pbi { font-family: 'Segoe UI', -apple-system, Helvetica, Arial, sans-serif; color: #252423; background: #F3F2F1; min-height: 100%; }
+        .pbi * { box-sizing: border-box; }
+        .pbi .topbar { display: flex; align-items: center; gap: 48px; height: 44px; padding: 0 20px; background: #FFFFFF; border-bottom: 1px solid #E1DFDD; }
+        .pbi .topbar h1 { margin: 0; font-size: 17px; font-weight: 700; }
+        .pbi .topbar .menu { font-size: 13px; color: #605E5C; word-spacing: 4px; }
+        .pbi .body { display: grid; grid-template-columns: 200px 1fr; min-height: calc(100vh - 44px); }
+        .pbi .side { background: #FFFFFF; border-right: 1px solid #E1DFDD; padding: 16px 12px; display: flex; flex-direction: column; gap: 8px; }
+        .pbi .side h2 { margin: 4px 4px 8px; font-size: 14px; font-weight: 700; }
+        .pbi .side .flt { min-height: 72px; display: flex; }
+        .pbi .main { padding: 16px; display: grid; gap: 16px; grid-template-columns: repeat(12, 1fr); grid-auto-rows: min-content; }
+        .pbi .card { background: #FFFFFF; border: 1px solid #E1DFDD; box-shadow: 0 1px 2px rgba(0,0,0,0.06); display: flex; flex-direction: column; padding: 12px 14px; }
+        .pbi .card .t { font-size: 15px; font-weight: 700; margin: 0; }
+        .pbi .card .s { font-size: 12px; color: #605E5C; margin: 2px 0 0; }
+        .pbi .card .viz { flex: 1; display: flex; min-height: 0; }
+        .pbi .kpi { grid-column: span 3; height: 112px; padding: 4px 6px; }
+        .pbi .monthly { grid-column: span 7; height: 360px; }
+        .pbi .category { grid-column: span 5; height: 360px; }
+        .pbi .products { grid-column: span 5; height: 400px; }
+        .pbi .regional { grid-column: span 7; height: 400px; }
+        .pbi .foot { font-size: 11px; color: #A19F9D; margin-top: 6px; }
+        @media (max-width: 1100px) {
+          .pbi .body { grid-template-columns: 1fr; }
+          .pbi .kpi { grid-column: span 6; }
+          .pbi .monthly, .pbi .category, .pbi .products, .pbi .regional { grid-column: span 12; }
+        }
+      </style>
+
+      <div class="pbi">
+        <div class="topbar">
+          <h1>Sales Performance FY2026</h1>
+          <span class="menu">File Export Share Refresh</span>
+        </div>
+
+        <div class="body">
+          <aside class="side">
+            <h2>Filters</h2>
+            <div class="flt"><h-block name="f_year" /></div>
+            <div class="flt"><h-block name="f_region" /></div>
+            <div class="flt"><h-block name="f_channel" /></div>
+            <div class="flt"><h-block name="f_segment" /></div>
+          </aside>
+
+          <main class="main">
+            <div class="card kpi"><h-block name="kpi_revenue" /></div>
+            <div class="card kpi"><h-block name="kpi_orders" /></div>
+            <div class="card kpi"><h-block name="kpi_aov" /></div>
+            <div class="card kpi"><h-block name="kpi_margin" /></div>
+
+            <section class="card monthly">
+              <p class="t">Revenue &amp; Gross Margin % by Month</p>
+              <p class="s">Revenue ($K) • Margin %</p>
+              <div class="viz"><h-block name="v_monthly" /></div>
+            </section>
+
+            <section class="card category">
+              <p class="t">Revenue by Product Category</p>
+              <div class="viz"><h-block name="v_category" /></div>
+            </section>
+
+            <section class="card products">
+              <p class="t">Top 8 Products by Revenue</p>
+              <p class="s">Revenue ($K)</p>
+              <div class="viz"><h-block name="v_top_products" /></div>
+            </section>
+
+            <section class="card regional">
+              <p class="t">Regional Performance</p>
+              <div class="viz"><h-block name="v_regional" /></div>
+              <p class="foot">Region = customer country • YoY % vs same period last year</p>
+            </section>
+          </main>
+        </div>
+      </div>
+    ;;
+  }
+
+  theme: PageTheme {
+    background {
+      bg_color: '#F3F2F1'
+    }
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+      }
+      padding: 0
+    }
+  }
+}

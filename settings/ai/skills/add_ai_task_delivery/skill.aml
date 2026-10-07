@@ -4,6 +4,8 @@ Skill add_ai_task_delivery {
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
+    Don't recall earlier chats (`fetch_conversation_messages` and the like) unless the request points to one.
+
     # Add delivery to an AI task
 
     Settle who gets the result, when it sends and what file it carries, and write it into the brief. A scheduled run calls `deliver_data` itself, so add no disclaimer. Load `create_ai_task` too: it holds the flow, files and report.

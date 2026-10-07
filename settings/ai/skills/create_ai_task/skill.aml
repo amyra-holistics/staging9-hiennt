@@ -4,18 +4,20 @@ Skill create_ai_task {
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
+    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat.
+
     # Create a scheduled AI task
 
     Author an AI task and its schedule as a draft. Don't run it or send anything: it runs unattended after publishing, so settle the essentials now.
 
-    The requester is ${H.current_user.h_email}: "me" and `run_as` mean this address. Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat.
+    The requester is ${H.current_user.h_email}: "me" and `run_as` mean this address.
 
     ## Flow
 
     Ask every question on an `ask_user` card, because a reply without a tool call ends the turn. Write only the cards and the report. Make independent reads in one step.
 
     1. **Source.** Find the dataset by unique name: the label in snake_case with `lookup_aml_object`, then a `*.dataset.aml` search. Ask only when two datasets or metrics fit, or the grouping has levels the words don't settle.
-    2. **Schedule.** Ask only when the day or time is missing or vague ("every morning"); each option shows the time and the next run. Never ask the timezone.
+    2. **Schedule.** A run needs one day and one clock time. Ask when either is missing or a range ("Monday morning", "weekly", "end of day"); each option shows the time and the next run. Never ask the timezone.
     3. **Delivery.** If the request emails, posts or alerts, load `add_ai_task_delivery` now. Otherwise ask last: "Want each <period>'s results sent to you?", with "Email me (recommended)", "No, keep them in the task" and "Post to a Slack channel". Email or Slack loads `add_ai_task_delivery`.
     4. **Save** the task file and its schedule, then validate both. On a failure, fix and save again with the same summary.
     5. **Report.**

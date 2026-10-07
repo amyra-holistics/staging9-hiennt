@@ -270,8 +270,6 @@ Dashboard demo_slides {
       settings {
         display_mode: 'single'
       }
-
-
     }
     settings {
       hide_label: true
@@ -301,7 +299,7 @@ Dashboard demo_slides {
         font_color: '#374151'
       }
     }
-    label: 'Revenue by customer country'
+    label: 'Revenue by Asian country'
     viz: ColumnChart {
       dataset: ecommerce_official
       x_axis: VizFieldFull {
@@ -329,6 +327,9 @@ Dashboard demo_slides {
           show_data_label_by: 'value'
         }
       }
+      conditions: [
+        "countries.name in ['India', 'Singapore', 'Indonesia', 'Korea', 'Vietnam']",
+      ]
       settings {
         legend_label: 'hidden'
         sort: LineFamilySort {
@@ -429,8 +430,6 @@ Dashboard demo_slides {
       settings {
         display_mode: 'single'
       }
-
-
     }
     settings {
       hide_label: true
@@ -714,7 +713,6 @@ Dashboard demo_slides {
       ]
       settings {
         location_colors {
-
         }
       }
     }
@@ -873,21 +871,18 @@ Dashboard demo_slides {
     label: 'Product Price, Units, and Revenue'
     viz: BubbleChart {
       dataset: ecommerce_official
-
       calculation total_units_sold {
         label: 'Total Units Sold'
         formula: @aql order_items | sum(order_items.quantity);;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       calculation top_100_product_ids {
         label: 'Top 100 Product Ids'
         formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
         calc_type: 'measure'
         data_type: 'json'
       }
-
       x_col: VizFieldFull {
         ref: r(products.price)
         label: 'Product Price'
@@ -896,7 +891,6 @@ Dashboard demo_slides {
           pattern: '[$$]#,###0.00'
         }
       }
-
       y_col: VizFieldFull {
         ref: 'total_units_sold'
         label: 'Total Units Sold'
@@ -905,7 +899,6 @@ Dashboard demo_slides {
           pattern: '#,###0'
         }
       }
-
       z_col: VizFieldFull {
         ref: r(ecommerce_official.revenue)
         label: 'Revenue'
@@ -914,16 +907,13 @@ Dashboard demo_slides {
           pattern: '[$$]#,###0.00'
         }
       }
-
       label_col: VizFieldFull {
         ref: r(products.name)
         label: 'Product Name'
       }
-
       conditions: [
         "products.id in top_100_product_ids",
       ]
-
       settings {
         row_limit: 100
       }
@@ -1110,7 +1100,7 @@ Dashboard demo_slides {
   block t_cover: TextBlock {
     content: @md
       <h1 class="tr-headline is-mid">Ecommerce performance review</h1>
-      <p class="tr-lede">Aug 2023 to Oct 2026 · All markets</p>
+      <p class="tr-lede">Aug 2023 to Oct 2026 · Asian markets</p>
     ;;
   }
   block t_agenda: TextBlock {
@@ -1279,7 +1269,7 @@ Dashboard demo_slides {
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     /* The wrapper is the size container: every cqw below is relative to the deck's own width, not the window. */
-    .hwrap { container-type: inline-size; width: 100%; }
+    .hwrap { container-type: inline-size; width: 100%; max-width: min(880px, 100vw); margin: 0 auto; overflow-x: hidden; }
 
     .hdeck,
     .hdeck *,
@@ -1563,7 +1553,7 @@ Dashboard demo_slides {
     .hdeck .tr-cover-grid > .tr-frame { overflow: hidden; }
 
     /* The grid is sized by the space left above the footer, so its children cannot push into the nav. */
-    .hdeck .tr-cover-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 20px; }
+    .hdeck .tr-cover-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(190px, 22cqw, 260px); grid-template-rows: minmax(0, 1fr); gap: 20px; }
     .hdeck .tr-cover-grid > .tr-frame { min-height: 0; padding: 14px; }
     .hdeck .tr-cover-kpis { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px; min-height: 0; }
     .hdeck .tr-cover-kpis .tr-kpicard { min-height: 0; padding: 10px 18px; overflow: hidden; }
@@ -1708,31 +1698,191 @@ Dashboard demo_slides {
     .hdeck .tr-dot.is-on { width: 30px; background: var(--t-accent); }
     .hdeck .is-dark .tr-dot.is-on { background: var(--t-accent-hi); }
 
-    /* ---- Narrow viewports */
-    @container (max-width: 900px) {
+    /* ---- Shrink-safe: no row keeps a minimum width, so the deck can follow the container down to phone size. */
+    .hdeck { min-width: 0; max-width: 100%; }
+    .hdeck .tr-slide,
+    .hdeck .tr-body,
+    .hdeck .tr-copy,
+    .hdeck .tr-split > *,
+    .hdeck .tr-cover-head,
+    .hdeck .tr-cover-head > *,
+    .hdeck .tr-cover-grid,
+    .hdeck .tr-cover-kpis,
+    .hdeck .tr-sheet,
+    .hdeck .tr-duo,
+    .hdeck .tr-frame,
+    .hdeck .tr-kpicard,
+    .hdeck .tr-nav { min-width: 0; }
+    .hdeck .tr-headline,
+    .hdeck .tr-lede,
+    .hdeck .tr-points li { overflow-wrap: anywhere; }
+    .hdeck .tr-nav { flex-wrap: wrap; row-gap: 12px; }
+    .hdeck .tr-dots { flex-wrap: wrap; min-width: 0; row-gap: 6px; }
+    .hdeck .tr-cover-side img { max-width: 100%; }
+
+    /* ---- Narrow viewports. Below 900px of deck width every slide stacks into one column and
+       grows to its content, so nothing is clipped. Widths are the deck's own (container), not the window's. */
+    @container (max-width: 700px) {
       .hdeck { height: auto; overflow: visible; }
-      .hdeck .tr-slide { flex: none; min-height: 780px; }
+      .hdeck .tr-slide { flex: none; min-height: 520px; height: auto; }
       .hdeck .tr-split,
       .hdeck .tr-body,
       .hdeck .tr-duo,
       .hdeck .tr-duo.is-wide-left,
       .hdeck .tr-cards,
-      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); }
-      .hdeck .tr-body { gap: 28px; }
-      .hdeck .tr-frame { min-height: 320px; padding: 14px; }
-      .hdeck .tr-lozenges { justify-content: flex-start; }
+      .hdeck .tr-cover-grid,
+      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+      .hdeck .tr-body { gap: 24px; }
+      .hdeck .tr-slide > .tr-copy { margin-bottom: 20px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame { min-height: 300px; padding: 14px; }
+      .hdeck .tr-sheet { padding: 14px; }
+      .hdeck .tr-sheet .tr-duo > .tr-frame + .tr-frame { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid var(--t-border); padding-top: 14px; margin-top: 14px; }
+      .hdeck .tr-slide.is-cover { padding-top: var(--t-pad); }
+      .hdeck .tr-cover-head { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
+      .hdeck .tr-cover-side { align-items: flex-start; }
+      .hdeck .tr-cover-grid { margin-bottom: 20px; }
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 320px; overflow: visible; }
+      .hdeck .tr-cover-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 120px; overflow: visible; }
+      .hdeck .tr-kpigrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hdeck .tr-divider-num { font-size: clamp(80px, 22cqw, 160px); }
       .hdeck .tr-nav { flex-wrap: wrap; }
       .hdeck .tr-dots { margin: 0; order: 3; width: 100%; flex-wrap: wrap; }
     }
-    @container (max-width: 600px) {
+    @container (max-width: 520px) {
       .hdeck { --t-pad: 20px; }
       .hdeck .tr-slide { min-height: 0; }
-      .hdeck .tr-lozenges { flex-wrap: wrap; gap: 14px; }
-      .hdeck .tr-lozenge.is-tall,
-      .hdeck .tr-lozenge.is-short { width: min(100%, 220px); height: auto; aspect-ratio: 1 / 1; }
-      .hdeck .tr-agenda-item { grid-template-columns: 44px 1fr; gap: 8px 12px; }
+      .hdeck .tr-headline { font-size: 30px; line-height: 1.12; margin-bottom: 14px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 25px; }
+      .hdeck .tr-lede { font-size: 15px; }
+      .hdeck .tr-points li { font-size: 14px; }
+      .hdeck .tr-callout { font-size: 14px; padding: 12px 14px; }
+      .hdeck .tr-agenda-item { grid-template-columns: 40px 1fr; gap: 6px 12px; padding: 12px 0; }
+      .hdeck .tr-agenda-name { font-size: 17px; }
       .hdeck .tr-agenda-note { grid-column: 2; }
       .hdeck .tr-kpigrid { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 100px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 260px; }
+      .hdeck .tr-card { padding: 20px 18px; }
+      .hdeck .tr-take-title { font-size: 22px; }
+      .hdeck .tr-nav { gap: 10px; }
+      .hdeck .tr-btn { padding: 9px 14px; }
+      .hdeck .tr-dot { width: 10px; }
+      .hdeck .tr-dot.is-on { width: 22px; }
+    }
+    @container (max-width: 400px) {
+      .hdeck { --t-pad: 14px; }
+      .hdeck .tr-headline { font-size: 26px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 22px; }
+      .hdeck .tr-eyebrow { letter-spacing: 0.2em; font-size: 11px; margin-bottom: 12px; }
+      .hdeck .tr-lede { font-size: 14px; }
+      .hdeck .tr-cover-kpis .h-kpi-metric { font-size: 24px !important; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 230px; padding: 10px; }
+      .hdeck .tr-sheet { padding: 10px; border-radius: 14px; }
+      .hdeck .tr-nav { justify-content: space-between; }
+      .hdeck .tr-dots { display: none; }
+      .hdeck .tr-count { font-size: 11px; }
+      .hdeck .tr-logo-badge { padding: 8px 12px; }
+      .hdeck .tr-cover-side img { height: 20px; }
+      .hdeck .tr-divider-num { font-size: 72px; }
+      .hdeck .tr-agenda-name { font-size: 16px; }
+      .hdeck .tr-stat { font-size: 56px; }
+    }
+    /* ---- Window-width fallbacks: same rules keyed to the browser window, in case the pane is wider than the visible area
+       or container queries are unavailable. */
+    @media (max-width: 900px) {
+      .hdeck { height: auto; overflow: visible; }
+      .hdeck .tr-slide { flex: none; min-height: 520px; height: auto; }
+      .hdeck .tr-split,
+      .hdeck .tr-body,
+      .hdeck .tr-duo,
+      .hdeck .tr-duo.is-wide-left,
+      .hdeck .tr-cards,
+      .hdeck .tr-cover-grid,
+      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+      .hdeck .tr-body { gap: 24px; }
+      .hdeck .tr-slide > .tr-copy { margin-bottom: 20px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame { min-height: 300px; padding: 14px; }
+      .hdeck .tr-sheet { padding: 14px; }
+      .hdeck .tr-sheet .tr-duo > .tr-frame + .tr-frame { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid var(--t-border); padding-top: 14px; margin-top: 14px; }
+      .hdeck .tr-slide.is-cover { padding-top: var(--t-pad); }
+      .hdeck .tr-cover-head { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
+      .hdeck .tr-cover-side { align-items: flex-start; }
+      .hdeck .tr-cover-grid { margin-bottom: 20px; }
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 320px; overflow: visible; }
+      .hdeck .tr-cover-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 120px; overflow: visible; }
+      .hdeck .tr-kpigrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hdeck .tr-divider-num { font-size: clamp(80px, 22cqw, 160px); }
+      .hdeck .tr-nav { flex-wrap: wrap; }
+      .hdeck .tr-dots { margin: 0; order: 3; width: 100%; flex-wrap: wrap; }
+    }
+    @media (max-width: 640px) {
+      .hdeck { --t-pad: 20px; }
+      .hdeck .tr-slide { min-height: 0; }
+      .hdeck .tr-headline { font-size: 30px; line-height: 1.12; margin-bottom: 14px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 25px; }
+      .hdeck .tr-lede { font-size: 15px; }
+      .hdeck .tr-points li { font-size: 14px; }
+      .hdeck .tr-callout { font-size: 14px; padding: 12px 14px; }
+      .hdeck .tr-agenda-item { grid-template-columns: 40px 1fr; gap: 6px 12px; padding: 12px 0; }
+      .hdeck .tr-agenda-name { font-size: 17px; }
+      .hdeck .tr-agenda-note { grid-column: 2; }
+      .hdeck .tr-kpigrid { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 100px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 260px; }
+      .hdeck .tr-card { padding: 20px 18px; }
+      .hdeck .tr-take-title { font-size: 22px; }
+      .hdeck .tr-nav { gap: 10px; }
+      .hdeck .tr-btn { padding: 9px 14px; }
+      .hdeck .tr-dot { width: 10px; }
+      .hdeck .tr-dot.is-on { width: 22px; }
+    }
+    @media (max-width: 480px) {
+      .hdeck { --t-pad: 14px; }
+      .hdeck .tr-headline { font-size: 26px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 22px; }
+      .hdeck .tr-eyebrow { letter-spacing: 0.2em; font-size: 11px; margin-bottom: 12px; }
+      .hdeck .tr-lede { font-size: 14px; }
+      .hdeck .tr-cover-kpis .h-kpi-metric { font-size: 24px !important; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 230px; padding: 10px; }
+      .hdeck .tr-sheet { padding: 10px; border-radius: 14px; }
+      .hdeck .tr-nav { justify-content: space-between; }
+      .hdeck .tr-dots { display: none; }
+      .hdeck .tr-count { font-size: 11px; }
+      .hdeck .tr-logo-badge { padding: 8px 12px; }
+      .hdeck .tr-cover-side img { height: 20px; }
+      .hdeck .tr-divider-num { font-size: 72px; }
+      .hdeck .tr-agenda-name { font-size: 16px; }
+      .hdeck .tr-stat { font-size: 56px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .hdeck .tr-slide { animation: none; }

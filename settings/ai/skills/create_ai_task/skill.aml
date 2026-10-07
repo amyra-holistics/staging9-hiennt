@@ -1,10 +1,10 @@
 Skill create_ai_task {
   label: 'Create a scheduled AI task'
-  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Change the acceptance criteria', 'Preview the first result'. When the request also emails, posts to Slack or alerts, use it together with add_ai_task_delivery. Do not use for a one-off answer or a send right now. Load this skill first, before writing any text or calling another tool."
+  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Change the acceptance criteria', 'Preview the first result'. When the request also emails, posts to Slack or alerts, use it together with add_ai_task_delivery. Do not use for a one-off answer or a send right now. Load this skill first, before writing any text or calling another tool, and settle everything from this conversation without recalling earlier chats."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
-    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat.
+    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat: earlier chats are other tasks, and copying their answers skips the user's choices.
 
     # Create a scheduled AI task
 

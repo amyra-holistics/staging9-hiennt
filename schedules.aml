@@ -25,5 +25,10 @@ const schedules = [
     cron: '0 8 * * *'
     targets: [always_fail_reviewer_task]
     run_as: 'tien.tt@holistics.io'
+  },
+  AiSchedule {
+    cron: '0 8 * * *'
+    targets: [timeout_task]
+    run_as: 'tien.tt@holistics.io'
   }
 ]

@@ -1,0 +1,18 @@
+AiTask qa_dash_weekly_sales_report {
+  label: 'QA DASH Weekly Sales Performance Report'
+  description: 'TEMP QA (nhi.ty, 2026-10-08): weekly summary and insights of the FY2026 Sales Performance dashboard with the full dashboard attached as a PDF. Run once by hand, then removed. Safe to delete.'
+
+  brief: @md
+    Every week, prepare a short summary with key insights of the **FY2026 Sales Performance** dashboard (`sales_performance_fy2026`, built on @Dataset:ecommerce_official) for **last week** compared with **the week before**. Last week is the most recently completed Monday–Sunday calendar week before the run date; the week before is the Monday–Sunday week immediately before it.
+
+    Cover revenue, distinct orders and average order value with their week-over-week changes, and the countries that moved revenue the most in each direction.
+
+    Then use the available AI delivery capability to send exactly one email to **nhi.ty@holistics.io** with the summary in the body and the **full FY2026 Sales Performance dashboard attached as a PDF**. The subject must begin exactly with **[QA DASH]** and name the reporting week.
+  ;;
+
+  acceptance_criteria: @md
+    - Exactly one email is delivered to nhi.ty@holistics.io with a subject that begins with [QA DASH] and names the reporting week.
+    - The email body states revenue, distinct orders and average order value for last week and the week before, with week-over-week changes, plus the biggest country movers, all from fresh data.
+    - The full FY2026 Sales Performance dashboard is attached as a PDF.
+  ;;
+}

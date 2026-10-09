@@ -1,0 +1,15 @@
+AiTask qa9_outside_daily_revenue {
+  label: 'QA9 Outside Daily Revenue'
+  description: 'TEMP QA 9 Oct (nhi.ty): revenue for yesterday. Saved OUTSIDE settings/ai/tasks to test the Development slash menu. Sends nothing.'
+
+  brief: @md
+    Use only @Dataset:ecommerce_official. Report the total revenue for the day before the run date, and state that date.
+
+    Answer in one short sentence. Do not send email, Slack or any other delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - The output states the date and the total revenue for it, queried fresh from @Dataset:ecommerce_official.
+    - Nothing is sent by email, Slack or any other channel.
+  ;;
+}

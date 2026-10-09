@@ -1,0 +1,401 @@
+Dashboard untitled_4_2 {
+  title: 'vy_dashboard'
+  description: '2312321adasdasd32131'
+  owner: 'vy.ht@holistics.io'
+  block v_ntre: VizBlock {
+    label: 'Date, Category, and Sales'
+    viz: DataTable {
+      dataset: vy_test
+      fields: [
+        VizFieldFull {
+          ref: r(vy_test_filter_dependency_sheet_1_csv.date)
+          format {
+            type: 'text'
+          }
+          uname: 'vy_test_filter_dependency_sheet_1_csv_date_1'
+        },
+        VizFieldFull {
+          ref: r(vy_test_filter_dependency_sheet_1_csv.category)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(vy_test_filter_dependency_sheet_1_csv.sales)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+        sorts: [
+          SortSetting {
+            key: 'vy_test_filter_dependency_sheet_1_csv_date_1'
+            direction: 'asc'
+          }
+        ]
+      }
+    }
+  }
+  block f_0hsw: FilterBlock {
+    label: 'Date'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: vy_test
+      field: r(vy_test_filter_dependency_sheet_1_csv.date)
+    }
+    default {
+      operator: 'matches'
+      value: '$H_NIL$'
+    }
+  }
+  block f_o8ba: FilterBlock {
+    label: 'Sale'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: vy_test
+      field: r(vy_test_filter_dependency_sheet_1_csv.sales)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block f_5nfr: FilterBlock {
+    label: 'Category'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: vy_test
+      field: r(vy_test_filter_dependency_sheet_1_csv.category)
+    }
+    default {
+      operator: 'is'
+      value: []
+    }
+  }
+  block v_ksvb: VizBlock {
+    label: 'Count order ID and Count User by Month Order date'
+    viz: PieChart {
+      dataset: superstore
+      calculation count_of_superstore_csv_order {
+        label: 'Count order ID'
+        formula: @aql count(superstore_csv.order_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      calculation count_user {
+        label: 'Count User'
+        formula: @aql count(superstore_csv.customer_name);;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      calculation count_order_date {
+        label: 'Count order date'
+        formula: @aql count(superstore_csv.order_date);;
+        calc_type: 'measure'
+        data_type: 'number'
+        format {
+          type: 'number'
+          pattern: 'none'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(superstore_csv.order_date)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: 'count_of_superstore_csv_order'
+          format {
+            type: 'number'
+            pattern: 'none'
+          }
+        }
+        settings {
+          color_palette: -1
+          point {
+            value: '2016-01-01'
+            color: '#62ADD4'
+          }
+          point {
+            value: '2016-02-01'
+            color: '#8DD6C3'
+          }
+          point {
+            value: '2016-03-01'
+            color: '#C3E8C2'
+          }
+          point {
+            value: '2016-04-01'
+            color: '#FDE9A3'
+          }
+          point {
+            value: '2016-05-01'
+            color: '#FFCA8F'
+          }
+          point {
+            value: '2016-06-01'
+            color: '#FD9D76'
+          }
+          point {
+            value: '2016-07-01'
+            color: '#EA7A81'
+          }
+          point {
+            value: '2016-08-01'
+            color: '#C54978'
+          }
+          point {
+            value: '2016-09-01'
+            color: '#62ADD4'
+          }
+          point {
+            value: '2016-10-01'
+            color: '#8DD6C3'
+          }
+          point {
+            value: '2016-11-01'
+            color: '#C3E8C2'
+          }
+          point {
+            value: '2016-12-01'
+            color: '#FDE9A3'
+          }
+          point {
+            value: '2017-01-01'
+            color: '#FFCA8F'
+          }
+          point {
+            value: '2017-02-01'
+            color: '#FD9D76'
+          }
+          point {
+            value: '2017-03-01'
+            color: '#EA7A81'
+          }
+          point {
+            value: '2017-04-01'
+            color: '#C54978'
+          }
+          point {
+            value: '2017-05-01'
+            color: '#62ADD4'
+          }
+          point {
+            value: '2017-06-01'
+            color: '#8DD6C3'
+          }
+          point {
+            value: '2017-07-01'
+            color: '#C3E8C2'
+          }
+          point {
+            value: '2017-08-01'
+            color: '#FDE9A3'
+          }
+          point {
+            value: '2017-09-01'
+            color: '#FFCA8F'
+          }
+          point {
+            value: '2017-10-01'
+            color: '#FD9D76'
+          }
+          point {
+            value: '2017-11-01'
+            color: '#EA7A81'
+          }
+          point {
+            value: '2017-12-01'
+            color: '#C54978'
+          }
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: 'count_user'
+          format {
+            type: 'number'
+            pattern: 'none'
+          }
+        }
+        settings {
+          color_palette: 'seq-teal'
+          point {
+            value: '2016-01-01'
+            color: '#18A59E'
+          }
+          point {
+            value: '2016-02-01'
+            color: '#46B7B1'
+          }
+          point {
+            value: '2016-03-01'
+            color: '#74C9C5'
+          }
+          point {
+            value: '2016-04-01'
+            color: '#A3DBD8'
+          }
+          point {
+            value: '2016-05-01'
+            color: '#D1EDEC'
+          }
+          point {
+            value: '2016-06-01'
+            color: '#E8F6F5'
+          }
+          point {
+            value: '2016-07-01'
+            color: '#18A59E'
+          }
+          point {
+            value: '2016-08-01'
+            color: '#46B7B1'
+          }
+          point {
+            value: '2016-09-01'
+            color: '#74C9C5'
+          }
+          point {
+            value: '2016-10-01'
+            color: '#A3DBD8'
+          }
+          point {
+            value: '2016-11-01'
+            color: '#D1EDEC'
+          }
+          point {
+            value: '2016-12-01'
+            color: '#E8F6F5'
+          }
+          point {
+            value: '2017-01-01'
+            color: '#18A59E'
+          }
+          point {
+            value: '2017-02-01'
+            color: '#46B7B1'
+          }
+          point {
+            value: '2017-03-01'
+            color: '#74C9C5'
+          }
+          point {
+            value: '2017-04-01'
+            color: '#A3DBD8'
+          }
+          point {
+            value: '2017-05-01'
+            color: '#D1EDEC'
+          }
+          point {
+            value: '2017-06-01'
+            color: '#E8F6F5'
+          }
+          point {
+            value: '2017-07-01'
+            color: '#18A59E'
+          }
+          point {
+            value: '2017-08-01'
+            color: '#46B7B1'
+          }
+          point {
+            value: '2017-09-01'
+            color: '#74C9C5'
+          }
+          point {
+            value: '2017-10-01'
+            color: '#A3DBD8'
+          }
+          point {
+            value: '2017-11-01'
+            color: '#D1EDEC'
+          }
+          point {
+            value: '2017-12-01'
+            color: '#E8F6F5'
+          }
+        }
+      }
+    }
+  }
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 1300
+    height: 800
+    grid_size: 20
+    auto_expand_vertically: true
+    block v_ntre {
+      position: pos(20, 100, 620, 420)
+      layer: 1
+    }
+    block f_0hsw {
+      position: pos(20, 0, 300, 80)
+      layer: 2
+    }
+    block f_o8ba {
+      position: pos(340, 0, 300, 80)
+      layer: 3
+    }
+    block f_5nfr {
+      position: pos(660, 0, 300, 80)
+      layer: 4
+    }
+    block v_ksvb {
+      position: pos(660, 100, 620, 420)
+      layer: 5
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+  theme: forest
+  interactions: [
+    FilterInteraction {
+      from: 'f_0hsw'
+      to: [
+        CustomMapping {
+          block: 'f_o8ba'
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_o8ba'
+      to: [
+        CustomMapping {
+          block: 'f_0hsw'
+          disabled: true
+        }
+      ]
+    },
+    FilterInteraction {
+      from: 'f_5nfr'
+      to: [
+        CustomMapping {
+          block: [
+            'f_0hsw',
+            'f_o8ba'
+          ]
+          disabled: true
+        }
+      ]
+    }
+  ]
+}

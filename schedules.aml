@@ -1,1 +1,29 @@
-const schedules = []
+const schedules = [
+  AiSchedule {
+    cron: '0 9 * * *'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [daily_homestay_performance_summary]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'phuong.nl@holistics.io'
+    targets: [weekly_sales_orders_summary]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'phuong.nl@holistics.io'
+    targets: [weekly_daily_sales_trend_anomaly_analysis]
+  },
+  AiSchedule {
+    cron: '0 8 * * *'
+    targets: [always_fail_reviewer_task]
+    run_as: 'tien.tt@holistics.io'
+  },
+  AiSchedule {
+    cron: '0 8 * * *'
+    targets: [timeout_task]
+    run_as: 'tien.tt@holistics.io'
+  }
+]

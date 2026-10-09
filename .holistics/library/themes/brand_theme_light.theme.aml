@@ -1,0 +1,149 @@
+const brand_theme_tokens = {
+  primary: "#05264C",
+  secondary: "#55c5c9",
+  mode: "light",
+  background: "#FFFFFF",
+  canvas_bg: "#F5F8FA",
+  block_bg: "#FFFFFF",
+  text_primary: "#05264C",
+  text_muted: "#374151",
+  text_subtle: "#6B7280",
+  border: "#D1D5DB",
+  focus_ring: "#5298b8",
+  semantic_success: "#23a672",
+  semantic_warning: "#b7791f",
+  semantic_danger: "#c53030",
+  font_body: "Inter",
+  font_display: "Inter",
+  corner_style: "rounded",
+  density: "comfortable",
+  elevation: "flat"
+}
+
+PageTheme brand_theme_light {
+  title: "Brand Theme Light"
+  color { data: brand_color_palette }
+
+  background { bg_color: brand_theme_tokens("background") }
+
+  canvas {
+    background { bg_color: brand_theme_tokens("canvas_bg") }
+    border {
+      border_width: 0
+      border_radius: 12
+      border_color: brand_theme_tokens("border")
+      border_style: "none"
+    }
+    shadow: "none"
+    opacity: 1
+  }
+
+  // Raised white cards separate dashboard content from the light canvas.
+  block {
+    background { bg_color: brand_theme_tokens("block_bg") }
+    border {
+      border_width: 1
+      border_radius: 12
+      border_color: brand_theme_tokens("border")
+      border_style: "solid"
+    }
+    shadow: "none"
+    padding: 16
+    opacity: 1
+    label {
+      font_family: brand_theme_tokens("font_display")
+      font_size: 14
+      font_color: brand_theme_tokens("text_primary")
+      font_weight: "semibold"
+      font_style: "normal"
+      letter_spacing: "0"
+    }
+    text {
+      font_family: brand_theme_tokens("font_body")
+      font_size: 13
+      font_color: brand_theme_tokens("text_muted")
+      font_weight: "normal"
+      font_style: "normal"
+    }
+  }
+
+  viz {
+    table {
+      general {
+        bg_color: brand_theme_tokens("block_bg")
+        font_color: brand_theme_tokens("text_muted")
+        font_family: brand_theme_tokens("font_body")
+        font_size: 13
+        border_color: brand_theme_tokens("border")
+        grid_color: brand_theme_tokens("border")
+        border_width: 1
+        hover_color: "#F5F8FA"
+        banding_color: "#F9FAFB"
+        cell_padding: DetailedSpacing { top: 10, right: 16, bottom: 10, left: 16 }
+        borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
+      }
+      header {
+        bg_color: brand_theme_tokens("background")
+        font_color: brand_theme_tokens("text_primary")
+        font_size: 13
+        font_weight: "semibold"
+      }
+      sub_header {
+        bg_color: "#F9FAFB"
+        font_color: brand_theme_tokens("text_muted")
+        font_size: 13
+        font_weight: "medium"
+      }
+      sub_title {
+        font_color: brand_theme_tokens("text_subtle")
+        font_size: 12
+        font_weight: "medium"
+      }
+      sparkline {
+        line { color: brand_theme_tokens("secondary") }
+        column { color: brand_theme_tokens("primary") }
+      }
+    }
+
+    metric_kpi {
+      alignment: "left"
+      label {
+        font_family: brand_theme_tokens("font_body")
+        font_size: 20
+        font_color: brand_theme_tokens("text_muted")
+      }
+      value {
+        font_family: brand_theme_tokens("font_display")
+        font_size: 48
+        font_color: brand_theme_tokens("text_primary")
+      }
+      progress {
+        indicator { bg_color: brand_theme_tokens("primary") }
+        track { bg_color: brand_theme_tokens("border") }
+        text { font_color: brand_theme_tokens("text_muted") }
+      }
+      trend {
+        positive { text { font_color: brand_theme_tokens("semantic_success") font_weight: "medium" } background { bg_color: "#e9f8f0" } }
+        negative { text { font_color: brand_theme_tokens("semantic_danger") font_weight: "medium" } background { bg_color: "#fcebec" } }
+        neutral { text { font_color: brand_theme_tokens("text_muted") font_weight: "normal" } background { bg_color: "#F5F8FA" } }
+      }
+    }
+  }
+
+  custom_css: @css
+    .dac-text-block {
+      font-family: Inter;
+      font-size: 14px;
+      color: #374151;
+      line-height: 1.6;
+    }
+    .dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 {
+      font-family: Inter;
+      color: #05264C;
+      line-height: 1.3;
+      margin-top: 0;
+      margin-bottom: 0.5em;
+      font-weight: 600;
+    }
+  ;;
+}

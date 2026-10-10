@@ -37,7 +37,7 @@ Skill write_ai_task {
     }
     ```
 
-    The cron is local time. Name the task in each save's summary ("Schedule for weekly category revenue"), because it titles the file card.
+    The cron is local time. Name the task in each save's summary ("Schedule for weekly category revenue"): it titles the file card.
 
     ## Brief
 
@@ -60,13 +60,14 @@ Skill write_ai_task {
     1. Run one query returning a single table with every number the output uses (both periods, the change, the rank), sorted by priority. Build no separate tables to merge.
     2. Call `explain_result` with that query and result, asking <what the output must say>.
     3. Write the output only from that answer and the table, in the table's order.
+    4. Chart the step 1 table with `execute_viz`: bars for a ranking or comparison, a line for a trend, never a table.
     ```
 
-    Keep the brief and criteria under 5,000 characters together, because longer definitions fail to start more often.
+    Keep the brief and criteria under 5,000 characters together: longer ones fail to start more often.
 
     ## Acceptance criteria (shown as Success criteria)
 
-    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**, **top 5**). Only what a run can prove from its own results, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
+    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**). Only what a run can prove from its own results, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
 
     ## Report
 
@@ -111,8 +112,8 @@ Skill write_ai_task {
     ````
 
     - Keep the empty header row and the non-breaking space after each icon. `[Endorsed](#pos)` only if endorsed.
-    - One "▢ " paragraph per criterion, never a list (the chat adds bullets).
-    - Each artifact block holds only the `stored_artifact.id` of that file's last save, task file first.
+    - One "▢ " paragraph per criterion, never a list.
+    - Each artifact block holds only the `stored_artifact.id` of that file's last save.
     - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons for the picks most likely to be wrong: "Run at <time> instead" only when the request named no clock time ("9am" is one), "Use <label> instead" only for another dataset with current data (never one whose data has ended), "Alert at <n>% instead" for a picked threshold. Then "Preview the first result (nothing is sent)" and "Change the success criteria".
     - After a change, show only what changed, then always the changed files' artifact blocks, and no follow-ups:
 

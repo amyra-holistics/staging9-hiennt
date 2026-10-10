@@ -29,7 +29,7 @@ Skill add_ai_task_delivery {
 
     ## Brief additions
 
-    Fill At a glance (Sends to, Condition, Attachment). Keep Steps 1–3 (one table, `explain_result`, write), writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
+    Fill At a glance (Sends to, Condition, Attachment). Keep Steps 1–4 (one table, `explain_result`, write, chart), writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
     - for a condition, step 2: decide from the table, as exclusive ordered branches, each naming its destinations
     - attach: `execute_viz` from the step 1 query (per recipient: only their rows) as a named chart, never a table: bars for a ranking or comparison, sorted like the table; a line for a trend. Title it with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`

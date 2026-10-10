@@ -130,7 +130,7 @@ Skill write_ai_task {
 
     After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
     - Changed rows go in the table as `~~<old>~~ → **<new>**`, in the values the report uses ("~~None~~ → **Viz · PNG**"). Leave the table out when no row changed.
-    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
+    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`, so the saved "Covers **revenue** for **every category**" becomes `▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
 
     ````
     ## ✅ Task updated

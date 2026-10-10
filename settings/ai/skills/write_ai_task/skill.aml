@@ -80,7 +80,7 @@ Skill write_ai_task {
 
     | | |
     |---|---|
-    | 🗄️ Source | @Dataset:<unique_name> [Endorsed](#pos) · <Revenue by Category> |
+    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
     | 🗓️ Schedule | <Mondays 9:00 AM> (workspace timezone) |
     | 📨 Delivery | <None (kept in the run record)> |
     | 📝 Brief | <one sentence, key values in bold> |
@@ -111,7 +111,7 @@ Skill write_ai_task {
     [Change the success criteria](#opt)
     ````
 
-    - Keep the empty header row and the non-breaking space after each icon. `[Endorsed](#pos)` only if endorsed.
+    - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip shows its own badge.
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
     - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons for the picks most likely to be wrong: "Run at <time> instead" only when the request named no clock time ("9am" is one), "Use <label> instead" only for another dataset with current data (never one whose data has ended), "Alert at <n>% instead" for a picked threshold. Then "Preview the first result (nothing is sent)" and "Change the success criteria".

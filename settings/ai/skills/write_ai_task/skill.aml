@@ -105,7 +105,7 @@ Skill write_ai_task {
 
     ### Follow-up
 
-    [<Run at 8:00 AM instead>](#opt)
+    [<"instead" button>](#opt)
     [Preview the first result (nothing is sent)](#opt)
     [Change the success criteria](#opt)
     ````

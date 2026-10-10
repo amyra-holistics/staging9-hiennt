@@ -22,9 +22,9 @@ Skill add_ai_task_delivery {
       explore { dimensions { grp: categories.name } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
       ```
 
-      Swap in the metric, date field, dates and grouping, and keep `is @(<start> - <end>)` exactly as written.
+      Swap in the metric, date field, dates and grouping; keep `is @(<start> - <end>)` as written.
 
-      Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`, because a chart ends the turn.
+      Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`: a chart ends the turn.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
@@ -44,17 +44,17 @@ Skill add_ai_task_delivery {
     - Call `deliver_data` only from the main run: a delegated sub-task can't see earlier sends and repeats them.
 
     ## Run summary
-    Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the chart", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
+    Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the chart", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (for a condition, with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
     ```
 
     For recipients from a column, add the rule "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
 
     ## Acceptance criteria additions
 
-    Add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**; a zero previous period never qualifies) and otherwise **Nothing to send**.
+    Add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**; a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the PNG one.
 
     ## Report
 
-    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <the top values> |` after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: Mobiles −35.8%, Bathroom −34.3%". Follow-up follows `write_ai_task` (at most four buttons), with "Alert at <n>% instead" for a threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
+    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <how many qualify, each with its value> |` on its own row after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)". Follow-up follows `write_ai_task` (at most four buttons), with "Alert at <n>% instead" for a threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
   ;;
 }

@@ -26,7 +26,7 @@ Skill format_ai_task_output {
     - Periods as first and last day, both included, always as `<date> matches @(<first> - <last>)`. Never compare the date field with `>` or `<` and a date: `@2026-09-27` is midnight at the start of that day, so `> @2026-09-27` takes in the 27th.
     - Name every metric `t_…`, so it never hides a dataset metric with the same name, and use the one-argument `round()`.
 
-    In one turn, run Q1 and Q2 and start the brief's chart and export: none of them waits for another. Then call the brief's `explain_result` on Q1.
+    In one turn, run Q1 and Q2 and start the brief's chart and export: none of them waits for another. For the chart, write its AQL yourself (an `explore` with the chart's dimension, metric, `matches` period filter and sort) and pass it to `generate_viz`, with no `generate_aql`. Then call the brief's `explain_result` on Q1.
 
     **Q1. Scorecard and freshness.** One row. Repeat the `t_m1` lines for each metric.
 
@@ -106,13 +106,17 @@ Skill format_ai_task_output {
     metric t_overall = (t_base | keep_grains()) - (t_comp | keep_grains());
     explore {
       dimensions { t_group: <group field> }
-      measures { t_base: t_base, t_comp: t_comp, t_delta: t_delta, t_overall: t_overall, t_share_pct: round(safe_divide(t_delta, t_overall) * 100) }
+      measures {
+        t_base: t_base, t_comp: t_comp, t_delta: t_delta, t_overall: t_overall,
+        t_share_pct: round(safe_divide(t_delta, t_overall) * 100),
+        t_where: case(when: safe_divide(t_delta, t_overall) >= 0.4 and safe_divide(t_delta, t_overall) <= 1, then: 'name', else: 'spread')
+      }
       filters { <date> matches @(<previous first> - <this last>) }
       sorts { t_delta asc }
     }
     ```
 
-    Sort `t_delta desc` for a rise. The drivers are the top 3 rows moving the same way as `t_overall`, and the offsets are the rows moving the other way. **Spread broadly** unless the top driver's `t_share_pct` is from 40 to 100: under 40, no group dominates, and over 100, groups offset each other. When spread, leave the where part out everywhere.
+    Sort `t_delta desc` for a rise. **Read `t_where` on the first row: it decides, not you.** `name` means that row's group dominates: it goes in the headline, and the drivers (the top 3 rows moving the same way as `t_overall`) and the offsets (the rows moving the other way) go in the where block. `spread` means no group dominates (a share under 40%) or groups offset each other (over 100%): no where part anywhere, so no group in the headline, no where block and no group in the pointer.
 
     ## Write
 
@@ -129,7 +133,7 @@ Skill format_ai_task_output {
     - **Average order value** (revenue per order) $145 · down 2% · usual $139 to $152
     - **Monthly recurring revenue (MRR)** $412K · down 1% · target $438K
 
-    [more than 8 groups, and the brief's chart has every group: The attached chart has all 19 categories.]
+    [only when the scorecard has a total line in place of more than 8 group lines: The attached chart has all 19 categories.]
 
     [quiet, usual ranges checked: No metric moved outside its usual range.]
 
@@ -153,7 +157,7 @@ Skill format_ai_task_output {
 
     That crosses the 20% alert line[🔴: and is unusual: the expected range was $158K to $190K, about 4.3 times a typical day's swing][🟢: but is still within its usual range of $158K to $190K].
 
-    [Q3 ran, not spread: **Where the change sits** (by channel)
+    [Q3's first row says `name`: **Where the change sits** (by channel)
     - Paid Search: −$38.2K   ← its share is in the headline
     - Email: −$7.4K, 14% of the drop   ← up to 3 drivers
     - Social and Affiliate rose $2.9K and $1.1K, partly offsetting the drop.]   ← one sentence for all offsets
@@ -167,7 +171,7 @@ Skill format_ai_task_output {
 
     ## Rules
 
-    - **Headline first**, plain text with no bold and nothing before it, at most 25 words, about the first exception line (or the first line when there is none): metric, direction, size, baseline (previous period, usual range or target), then where, in contribution words. "Revenue fell 18% to $1.02M compared with the week before, and Paid Search accounts for about 80% of the drop." Quiet: "Revenue was $1.24M last week, up 2% from the week before and within its usual range of $1.15M to $1.32M." Give the size and the range's numbers, never just "flat" or "within its usual range". An alert's headline leaves the range to the alert line.
+    - **Headline first**, plain text with no bold and nothing before it, at most 25 words, about the first exception line (or the first line when there is none): metric, direction, size, baseline (previous period, usual range or target), then where, in contribution words, only when Q3's first row says `name`. "Revenue fell 18% to $1.02M compared with the week before, and Paid Search accounts for about 80% of the drop." Quiet: "Revenue was $1.24M last week, up 2% from the week before and within its usual range of $1.15M to $1.32M." Give the size and the range's numbers, never just "flat" or "within its usual range". An alert's headline leaves the range to the alert line.
     - **Where is never why.** Write "accounts for", "makes up" or "X% of the drop", never "due to", "because of", "caused by", "driven by" or "led by". When the change is spread broadly, leave the where part out everywhere.
     - **Baselines.** The first scorecard line names the comparison, and the lines and bullets below inherit it unless they name another. A percent change comes with the value or amount ("down 18% to $1.02M", "−$220K").
     - **Number style.** Percents as the query returns them, always with their word: "up 18%", "down 2%", and "no change" for 0%. A rate's change only in percentage points. Money of 1,000 or more in K or M with at most 3 significant digits ($1.02M, $412K, $880K), below that in whole units ($145, never $144.74), with the same decimals for the amounts in one list. Rates to 2 decimals (2.31%). The dataset's currency symbol, numerals throughout.

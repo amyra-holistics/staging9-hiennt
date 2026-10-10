@@ -130,7 +130,7 @@ Skill write_ai_task {
 
     After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
     - Changed rows go in the table, old → new, in the values the report uses ("None → Viz · PNG"). Leave the table out when no row changed.
-    - Changed criteria go under Success criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → **<new>**`, an added one `▢ **<new>**`, a removed one `▢ ~~<old>~~`.
+    - Changed criteria go under Success criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → <new>`, an added one `▢ <new>`, a removed one `▢ ~~<old>~~`. Bold only what changed in a line, never the whole line.
 
     ````
     ## ✅ Task updated
@@ -141,11 +141,11 @@ Skill write_ai_task {
 
     ### Success criteria
 
-    ▢ ~~Covers **revenue** for every category~~ → **Covers revenue and share of the weekly total for every category**
+    ▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category
 
-    ▢ **Emails nhi.ty@holistics.io the result**
+    ▢ Emails the result to **nhi.ty@holistics.io**
 
-    Still a draft: commit and publish to apply.
+    Still a draft: click `Commit changes`, then `Publish` to apply.
 
     ```artifact
     <stored_artifact.id of each changed file's last save>

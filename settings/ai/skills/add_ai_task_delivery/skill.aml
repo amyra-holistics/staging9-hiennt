@@ -1,6 +1,6 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and before writing any text, and settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
+  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'Post to Slack instead', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and before writing any text, and settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -12,15 +12,17 @@ Skill add_ai_task_delivery {
 
     ## Settle
 
-    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel. These are the only cards: ask them all in one step.
+    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. A Yes on the Send card means Email · requester. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read their task files during the dataset search), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
     - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "worst", "unusual"), don't ask: run this query for the latest complete period against the one before with `execute_aql` (`generate_aql` only if it fails), on the likely pick in the same step as the date queries, and again only if the pick changes:
 
       ```
-      metric cur = <metric> | where(<date field> is @(<start> - <end>));
-      metric prev = <metric> | where(<date field> is @(<start> - <end>));
+      metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
+      metric prev = revenue | where(orders.created_at is @(2026-09-21 - 2026-09-27));
       metric pct = safe_divide((cur - prev) * 100.0, prev);
-      explore { dimensions { grp: <group field> } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
+      explore { dimensions { grp: categories.name } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
       ```
+
+      Swap in the metric, date field, dates and grouping, and keep `is @(<start> - <end>)` exactly as written.
 
       Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`, because a chart ends the turn.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
@@ -42,7 +44,7 @@ Skill add_ai_task_delivery {
     - Call `deliver_data` only from the main run: a delegated sub-task can't see earlier sends and repeats them.
 
     ## Run summary
-    List every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason. End with one word: Delivered, Nothing to send (with the value against the threshold), Blocked, or Failed.
+    Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the chart", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
     ```
 
     For recipients from a column, add the rule "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
@@ -53,6 +55,6 @@ Skill add_ai_task_delivery {
 
     ## Report
 
-    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <the top values> |` after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: Mobiles −35.8%, Bathroom −34.3%". Follow-up holds only the "instead" buttons from `write_ai_task`, with "Alert at <n>% instead" for a stricter and a looser threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and write the full report from `write_ai_task`, opening with "Task updated".
+    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <the top values> |` after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: Mobiles −35.8%, Bathroom −34.3%". Follow-up follows `write_ai_task` (at most four buttons), with "Alert at <n>% instead" for a threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
   ;;
 }

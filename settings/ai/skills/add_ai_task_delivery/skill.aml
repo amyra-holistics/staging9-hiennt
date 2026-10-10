@@ -26,7 +26,7 @@ Skill add_ai_task_delivery {
     Fill At a glance (Sends to, Condition, Attachment). Keep `write_ai_task`'s four Steps, writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
     - for a condition, a step right after Step 1 (renumber the rest): decide from the table, as exclusive ordered branches, each naming its destinations
     - attach a Viz: the chart step's chart (per recipient: only their rows), titled with the period's dates, then `export_artifact` as PNG
-    - attach a Tab or Dashboard: `execute_dashboard` with `dashboard_uname: <name>` (and `tab_unames: [<tab>]` for a tab), then `export_artifact` as PNG. When its saved date filter isn't this run's period, add one line to the message: "The attached <title> shows <all time>, its saved filter."
+    - attach a Tab or Dashboard: `execute_dashboard` with `dashboard_uname: <name>` (and `tab_unames: [<tab>]` for a tab), then `export_artifact` as PNG on the `Dashboard:` id it returns, never on a `@Dashboard:` mention. When its saved date filter isn't this run's period, add one line to the message: "The attached <title> shows <all time>, its saved filter."
     - if the export fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`
 

@@ -118,7 +118,7 @@ Skill write_ai_task {
     [Change the acceptance criteria](#opt)
     ````
 
-    - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip has its own badge.
+    - Keep the empty header row, each icon exactly as written (Source is 🗄️, the file cabinet, never 🗂️ or 🗃️) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
     - Delivery: "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
     - Condition: the rule in plain words (which metric, which way, how much, compared with what period), with no values from today.
     - Attachment: "None", "Viz · PNG", or the file the user named ("Table · XLSX").
@@ -129,8 +129,8 @@ Skill write_ai_task {
     ## Update report
 
     After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
-    - Changed rows go in the table, old → new, in the values the report uses ("None → Viz · PNG"). Leave the table out when no row changed.
-    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → <new>`, an added one `▢ <new>`, a removed one `▢ ~~<old>~~`. Bold only what changed in a line, never the whole line.
+    - Changed rows go in the table as `~~<old>~~ → **<new>**`, in the values the report uses ("~~None~~ → **Viz · PNG**"). Leave the table out when no row changed.
+    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
 
     ````
     ## ✅ Task updated
@@ -141,7 +141,7 @@ Skill write_ai_task {
 
     ### Acceptance criteria
 
-    ▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category
+    ▢ ~~Covers revenue for every category in the Monday–Sunday week~~ → Covers revenue and **share of the weekly total** for every category in the Monday–Sunday week
 
     ▢ Emails the result to **nhi.ty@holistics.io**
 

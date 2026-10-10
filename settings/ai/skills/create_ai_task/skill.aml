@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create a scheduled AI task'
-  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Run at 8:00 AM instead', 'Change the success criteria', 'Preview the first result'. When the request also emails, posts to Slack or alerts, load add_ai_task_delivery in the same step. Do not use for a one-off answer or a send right now. Load this skill first, before writing any text, and in that same step also load write_ai_task, read_folder '.' and 'settings/ai/tasks', and read_file 'schedules.aml', and call nothing else. Settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
+  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Run at 8:00 AM instead', 'Change the success criteria', 'Preview the first result'. Do not use for a one-off answer or a send right now. Its fixed queries run as written with execute_aql; generate_aql is only a fallback after one fails. Load this skill first, before writing any text, and in that same step also load write_ai_task, read_folder '.' and 'settings/ai/tasks', and read_file 'schedules.aml', plus add_ai_task_delivery when the request emails, posts to Slack or alerts, and call nothing else. Settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, even one with the same request, because earlier chats are other tasks, and call no post_update."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -19,16 +19,16 @@ Skill create_ai_task {
     ## Keep it fast
 
     Each step costs 5–25 s. Batch independent calls, and:
-    - Run only the queries below, with `execute_aql`; use `generate_aql` only if one fails.
-    - Never write, run or paste the task's own query, and never call `search_docs`: the run writes its query from the brief.
-    - No `post_update`, no `execute_viz`, no read-backs. Your only text is the final reply; after a card is answered, go straight to the next call.
+    - Run only the queries below, as written with `execute_aql` (swap in the dataset's names); use `generate_aql` only after one fails.
+    - Never write, run or paste the task's own query, and never call `search_docs`: the run writes its query from the brief. Only Preview runs it.
+    - No `post_update`, no read-backs, and no `execute_viz` outside Preview, because a chart ends the turn. Your only text is the final reply; after a card is answered, go straight to the next call.
 
     ## Cards
 
     A question is at most 15 words in business words, never field names. The recommended option comes first, marked "(recommended)", then at most 2 more, each labelled in at most 5 words with one short line carrying the deciding fact (today's number, latest data, Endorsed). Quote numbers exactly as the query returned them, never added up or estimated.
     - **Pinned source** and **Which data** (Flow 2 and 3).
     - **Time**: the day or clock time is missing or a range ("Monday morning", "weekly", "end of day"). Options show the time; "morning" recommends 9:00 AM.
-    - **Rule**: a vague word that changes the result: a metric ("sales", "performing"), a ranking ("changed the most", "top" without a number), a threshold ("a lot", "big"). Options carry today's numbers from the Rule query.
+    - **Rule**: a vague word that changes the result: a metric ("sales", "performing"), a ranking ("changed the most", "top" without a number), a threshold ("a lot", "big", "worst", "unusual"). Options carry today's numbers from the Rule query: each metric's total, the top rows of a ranking, or for a threshold ("What counts as <the word>?") 2–3 thresholds, each with how many groups it catches today and their values, the one catching the clear outliers recommended ("20% or more · 4 today: Mobiles −35.8%, Bathroom −34.3%, …"). "Worst" means a few rows by change, not size; for "unusual" the brief can have the run use `/detect_anomaly` over 6 earlier periods.
     - **Destination** cards from `add_ai_task_delivery`.
     - **Send**, when the request never mentions sending, always after the others: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task", none recommended because only the user knows. After Yes, in one step load `add_ai_task_delivery` and ask the card "Where should they go?" with "Email · to you (recommended)" and "Slack · pick a channel next". No keeps the result in the run record.
 
@@ -36,8 +36,8 @@ Skill create_ai_task {
 
     Swap in the dataset's metric, date field, grouping and the latest complete period; keep `matches @(<start> - <end>)` and `is @(<start> - <end>)`.
     - **Latest date**, one per dataset with the fields: `explore { measures { latest: <model> | max(<model>.<date field>) } }`
-    - **Rule, metric**: one total row with each candidate metric: `explore { measures { revenue: revenue, orders: orders | count_distinct(orders.id), units: order_items | sum(order_items.quantity) } filters { orders.created_at matches @(2026-09-28 - 2026-10-04) } }`
-    - **Rule, ranking or threshold**: the latest complete period against the one before:
+    - **Rule, metric**: one total row with each candidate metric, each named unlike any model or field (`orders: orders | …` fails as a cycle): `explore { measures { revenue_total: revenue, order_count: orders | count_distinct(orders.id), unit_count: order_items | sum(order_items.quantity) } filters { orders.created_at matches @(2026-09-28 - 2026-10-04) } }`
+    - **Rule, ranking or threshold**: the latest complete period against the one before, sorted by what the card ranks (`pct ASC` for a drop, `chg DESC` for the biggest dollar change):
 
       ```
       metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
@@ -49,11 +49,11 @@ Skill create_ai_task {
 
     ## Flow
 
-    1. **First steps.** The load step reads the files (see the description). In the next step, load `write_ai_task` if it isn't loaded, and ask the Time card when needed.
-    2. **Pinned first.** A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source when it has the fields and current data: no search, no card. Always run the latest-date query on it first; data that ends before the latest complete period is not current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway".
-    3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step, and their model files. Then in one step run the latest-date query on each, `fetch_dataset` the likely pick and its Rule query. A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires. A dataset the user named is used as is. When two or more current datasets fit, ask **Which data** (each option: what it covers · latest data · Endorsed), the endorsed one recommended; when nothing fits after two folder levels, ask "Where do you look at this number today?" (a dashboard name, or "Not sure, pick for me").
-    4. **Schedule.** A run needs one day and one clock time. The cadence matches the period: a week-over-week check runs every Monday, never daily. Never ask the timezone.
-    5. **Rows.** Return every group, highest first, unless the user says top, most or biggest.
+    1. **First steps.** The load step reads the files (see the description). The next step does it all at once: load `write_ai_task` if it isn't loaded, ask the Time card when needed, and either `read_folder` every folder in the root listing, so the search runs while the user answers, or, for a pinned or named dataset, read its dataset and model files.
+    2. **Pinned first.** A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source when it has the fields and current data: no search, no card. Always run the latest-date query on it first; data that ends before the latest complete period is not current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway", and search on "Find".
+    3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of the next level in one step, and their model files. Then in one step run the latest-date query on each, `fetch_dataset` the likely pick and its Rule query (always when the task has a condition). A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires. A dataset the user named is used as is. When two or more current datasets fit, ask **Which data** (each option: what it covers · latest data · Endorsed), the endorsed one recommended; when nothing fits after two folder levels, ask "Where do you look at this number today?" (a dashboard name, or "Not sure, pick for me").
+    4. **Schedule.** A run needs a cadence (daily or one weekday) and one clock time. The cadence matches the period: a week-over-week check runs every Monday, never daily. Never ask the timezone.
+    5. **Rows.** Return every group, highest first, unless the user says top, most, biggest or worst.
     6. **Delivery.** If the request emails, posts or alerts, `add_ai_task_delivery` must be loaded too.
     7. **Write.** Save, validate and report as `write_ai_task` shows.
 
@@ -63,9 +63,12 @@ Skill create_ai_task {
 
     ## Change a task
 
-    In one step, load `write_ai_task` and read the task file and `schedules.aml`. Change only the words that change, save only the changed files, and reply with the update report. An edit runs no query: the run rebuilds its query from the brief.
-    - An "… instead" follow-up is the whole change: apply it without a card.
+    Read the task file in one step (with `write_ai_task` if it isn't loaded). Change only the words that change, save the changed files in `write_ai_task`'s order, and reply with the update report. An edit runs no query, because the run rebuilds its query from the brief; the only exceptions are the latest-date query for a new source and the Rule query for a new threshold.
+    - An "… instead" follow-up is the whole change: apply it without a card. A new time changes both the brief's Schedule line and `schedules.aml`.
     - The "Change the success criteria" button alone: ask the card "How should the success criteria change?" with 2–3 likely edits, each line quoting the criterion it changes. A typed change is the whole change: apply it, and add any new value to the Definitions and the Step that writes the output.
-    - "Preview the first result": run the brief's Steps now (the only time the task's query runs here) and show the output, then the chart the brief names, sending and saving nothing.
+
+    ## Preview the first result
+
+    Write the brief's Step 1 query (`generate_aql` is fine here), run it, and write the output as the brief's Steps say, then end with the chart the brief names (`execute_viz`). Send nothing, save nothing, and add no update report.
   ;;
 }

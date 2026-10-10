@@ -8,7 +8,7 @@ Skill write_ai_task {
 
     # Write an AI task
 
-    Save the task file, then edit `schedules.aml`, one at a time (two at once can stall). Then run `validate_file` on both in one step and write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
+    Save the task file first. In the next step, edit `schedules.aml` and run `validate_file` on the task file together, then write the report: two saves in one step can stall, and `schedules.aml` only gains the entry below, so it needs no validation unless this save created the file. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
 
     ## Files
 
@@ -67,11 +67,11 @@ Skill write_ai_task {
 
     ## Acceptance criteria (shown as Success criteria)
 
-    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**). Only what a run can prove from its own results, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
+    2–5 short lines in all, delivery lines included, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**). Only what a run can prove from its own results, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
 
     ## Report
 
-    The reply's only text, copied line for line: only the `<…>` parts change, and no line is dropped or reworded.
+    The reply's only text, copied line for line: only the `<…>` parts change, and no line is dropped or reworded, except the Condition row and the "instead" line, which follow the bullets below.
 
     ````
     ## ✅ Draft created: <label>
@@ -83,6 +83,7 @@ Skill write_ai_task {
     | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
     | 🗓️ Schedule | <Mondays 9:00 AM> (workspace timezone) |
     | 📨 Delivery | <None (kept in the run record)> |
+    | 🔔 Condition | <Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)> |
     | 📝 Brief | <one sentence, key values in bold> |
     | 📎 Attachment | <None> |
 
@@ -112,12 +113,13 @@ Skill write_ai_task {
     ````
 
     - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip shows its own badge.
+    - Delivery is "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)". The Condition row appears only for a task with a condition and lists every group that qualifies, each with its value. Attachment is "None", "Viz · PNG", or the file the user named ("Table · XLSX").
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons, only for picks that neither the request nor a card settled: "Run at <time> instead", "Use <label> instead" (another dataset with current data), "Alert at <n>% instead". Then "Preview the first result (nothing is sent)" and "Change the success criteria".
+    - Every new task ends with Follow-up, a task that sends included, at most four buttons. An "instead" button appears only for a pick you made without a card ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead"), which is rare; usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the success criteria".
     - After a change, show only the changed rows, old → new (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then always the changed files' artifact blocks, and no follow-ups:
 
-    ```
+    ````
     ## ✅ Task updated
 
     | | |
@@ -126,7 +128,11 @@ Skill write_ai_task {
     | 📝 Success criteria | + **Each category's share of the weekly total** |
 
     Still a draft: commit and publish to apply.
+
+    ```artifact
+    <stored_artifact.id of each changed file's last save>
     ```
+    ````
 
     - If saving keeps failing: "## ❌ Couldn't create the task" (or "update"), the reason in plain words, and what the user can do.
   ;;

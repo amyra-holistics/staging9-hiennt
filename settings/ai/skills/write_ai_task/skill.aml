@@ -113,7 +113,7 @@ Skill write_ai_task {
     - Keep the empty header row and the non-breaking space after each icon, so no row is bold and no label wraps.
     - One "▢ " paragraph per criterion, never a list, because the chat adds bullets.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save, task file first.
-    - Follow-up opens with one "instead" button per pick you made for the user, at most three: "Run at <time> instead" for a picked time, "Use <label> instead" only for another fresh dataset, and the delivery add-on's "Alert at <n>% instead". A task kept in the run record then adds the five buttons above. A task that sends adds nothing more, and with no picks it ends at Files.
+    - Follow-up opens with one "instead" button per pick you made for the user, at most three: "Run at <time> instead" only when you picked the time (never when the user gave it), "Use <label> instead" only for another fresh dataset, and the delivery add-on's "Alert at <n>% instead". A task kept in the run record then adds the five buttons above. A task that sends adds nothing more, and with no picks it ends at Files.
     - After a change: "Task updated. To apply the change, click `Commit changes`, then `Publish` in Development." with the next run, and "(Publish to apply)".
   ;;
 }

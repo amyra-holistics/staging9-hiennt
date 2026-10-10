@@ -14,7 +14,7 @@ Skill add_ai_task_delivery {
 
     - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. On the Where card, "Email · to you" means the requester and "Slack" leads to the channel card. In one step, ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel.
     - **Slack channel card.** "Which Slack channel? Or type another below." The options are the two channels this project's tasks already post to, most used first, read from the task files in `settings/ai/tasks` when the dataset search starts or as soon as Slack is picked. The card's free-text answer is the third option. With none known, the only option is "Not sure yet, keep it in the task".
-    - **Condition.** A rule the query computes as a number is clear. Whenever the task has a condition, run `create_ai_task`'s ranking-or-threshold Rule query on the likely pick, in the step with the date queries, and again only if the pick or the threshold changes. Its values fill the Condition row. For a vague word ("a lot", "big", "worst", "unusual"), then ask the threshold Rule card.
+    - **Condition.** A rule the query computes as a number is clear. For a vague word ("a lot", "big", "worst", "unusual"), run `create_ai_task`'s ranking-or-threshold Rule query on the likely pick, in the step with the date queries (again only if the pick changes), and ask the threshold Rule card.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
@@ -45,6 +45,6 @@ Skill add_ai_task_delivery {
 
     ## Existing tasks
 
-    Read the task, loading `write_ai_task` if needed. Run no query except the Rule query for a new threshold, save and validate only the task file, and reply with `write_ai_task`'s update report.
+    Read the task, loading `write_ai_task` if needed. Run no query except the Rule query when a new vague word needs a Rule card, save and validate only the task file, and reply with `write_ai_task`'s update report.
   ;;
 }

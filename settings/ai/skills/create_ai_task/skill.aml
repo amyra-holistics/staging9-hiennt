@@ -15,7 +15,7 @@ Skill create_ai_task {
     - Ask an `ask_user` card for each piece the request leaves vague. Decide only what is clear or has one standard answer (Monday–Sunday weeks, ties, the workspace timezone), and state it in the brief.
     - Every question is a card, never text or `#opt` buttons, because a reply without a tool call ends the turn.
     - Ask each card once its facts are ready, batching ready cards in one step.
-    - Cover only what the user asked for or picked on a card. Add no comparison, ranking, top N or threshold of your own.
+    - Cover only what the user asked for or picked on a card. Add no comparison, ranking, top N, threshold or extra metric (share, average, count) of your own.
 
     ## Speed
 
@@ -35,7 +35,7 @@ Skill create_ai_task {
       - Ranking ("changed the most", "top" without a number): the top rows.
       - Threshold ("a lot", "big", "worst", "unusual"), asked as "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values. Recommend the one that catches the clear outliers ("20% or more · 4 today: Mobiles −35.8%, Bathroom −34.3%, …"). "Worst" means a few rows by change, not size. For "unusual", the brief can have the run use `/detect_anomaly` over 6 earlier periods.
     - **Destination**: see `add_ai_task_delivery`.
-    - **Send**, only when the request never mentions sending, after every other card: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task". Recommend neither: only the user knows. After Yes, in one step load `add_ai_task_delivery` and ask "Where should they go?" with "Email · to you (recommended)" and "Slack · pick a channel next". No keeps the result in the run record.
+    - **Send**, only when the request never mentions sending, in its own step after every other card is answered, so it shows last: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task". Recommend neither: only the user knows. After Yes, in one step load `add_ai_task_delivery` and ask "Where should they go?" with "Email · to you (recommended)" and "Slack · pick a channel next". No keeps the result in the run record.
 
     ## Queries
 
@@ -93,7 +93,7 @@ Skill create_ai_task {
 
     1. **First steps.** The load step reads the files named in the description. The next step does everything at once: load `write_ai_task` if needed, ask the Time card if needed, and either `read_folder` every root folder, so the search runs while the user answers, or read a pinned or named dataset's dataset and model files.
     2. **Pinned source.** A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source if it has the fields and current data: no search, no card. Run its latest-date query first. Data that ends before the latest complete period isn't current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway".
-    3. **Source.** Open the next folder level in one step, then read every `*.dataset.aml` and its model files to find the datasets with the fields. In the next step, run the latest-date query on each, `fetch_dataset` the likely pick, and run its Rule query (always when the task has a condition).
+    3. **Source.** Open the next folder level in one step, then read every `*.dataset.aml` and its model files to find the datasets with the fields. In the next step, run the latest-date query on each, `fetch_dataset` the likely pick, and run its Rule query when a Rule card needs one.
        - A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires.
        - A dataset the user named is used as is.
        - When two or more current datasets fit, ask **Which data** (each option: what it covers · latest data · Endorsed), the endorsed one recommended.
@@ -109,7 +109,7 @@ Skill create_ai_task {
 
     ## Change a task
 
-    Read the task file in one step, loading `write_ai_task` if needed. Change only what changes, save in `write_ai_task`'s order, and reply with the update report. An edit runs no query, because the run rebuilds it from the brief. The exceptions are the latest-date query for a new source and the Rule query for a new threshold.
+    Read the task file in one step, loading `write_ai_task` if needed. Change only what changes, save in `write_ai_task`'s order, and reply with the update report. An edit runs no query, because the run rebuilds it from the brief. The exceptions are the latest-date query for a new source and the Rule query when a new vague word needs a Rule card.
     - An "… instead" button is the whole change: apply it without a card. A new time changes both the brief's Schedule line and `schedules.aml`.
     - The "Change the success criteria" button on its own: ask "How should the success criteria change?" with 2–3 likely edits, each quoting the criterion it changes. A typed change is the whole change: apply it, and add any new value to the Definitions and to the Step that writes the output.
 

@@ -1,6 +1,6 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send it to Slack too', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and that step's reads, before writing any text. Settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
+  description: "Add email, Slack or a send condition to a scheduled AI task, in a new request or for an existing task. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, even one with the same request: earlier chats are other tasks. Use when a task should email its result, post it to Slack, or send only when something happens. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send it to Slack too'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Not for a one-off send right now. Load it with create_ai_task, in the same first step and before writing any text. Settle everything from this conversation. Call no post_update."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -8,19 +8,20 @@ Skill add_ai_task_delivery {
 
     # Add delivery to an AI task
 
-    Settle who gets the result, when it sends and what file it carries, and write it into the brief. A scheduled run calls `deliver_data` itself: add no disclaimer. Load `create_ai_task` too.
+    Settle who gets the result, when it sends and what it attaches, and write it into the brief. `create_ai_task` owns the cards and queries, and `write_ai_task` owns the files and the report. A scheduled run calls `deliver_data` itself, so add no disclaimer.
 
     ## Settle
 
-    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. "Email · to you" on the Where card means Email · requester; "Slack" asks the channel card. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read the task files in `settings/ai/tasks` in the step the dataset search starts, or as soon as Slack is picked), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
-    - **Condition.** Clear when the rule is a number the query computes. Whenever the task has a condition, run the ranking-or-threshold Rule query from `create_ai_task` on the likely pick, in the same step as the date queries, and again only if the pick or the threshold changes: its values fill the Condition row. For a vague word ("a lot", "big", "worst", "unusual"), then ask the threshold Rule card as `create_ai_task` shows.
+    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. On the Where card, "Email · to you" means the requester and "Slack" leads to the channel card. In one step, ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel.
+    - **Slack channel card.** "Which Slack channel? Or type another below." The options are the two channels this project's tasks already post to, most used first, read from the task files in `settings/ai/tasks` when the dataset search starts or as soon as Slack is picked. The card's free-text answer is the third option. With none known, the only option is "Not sure yet, keep it in the task".
+    - **Condition.** A rule the query computes as a number is clear. Whenever the task has a condition, run `create_ai_task`'s ranking-or-threshold Rule query on the likely pick, in the step with the date queries, and again only if the pick or the threshold changes. Its values fill the Condition row. For a vague word ("a lot", "big", "worst", "unusual"), then ask the threshold Rule card.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
 
-    Fill At a glance (Sends to, Condition, Attachment). Keep `write_ai_task`'s four Steps (one table, `explain_result`, write, chart), writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
+    Fill At a glance (Sends to, Condition, Attachment). Keep `write_ai_task`'s four Steps, writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
     - for a condition, a step right after Step 1 (renumber the rest): decide from the table, as exclusive ordered branches, each naming its destinations
-    - attach: the chart step's chart (per recipient: only their rows), titled with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
+    - attach: the chart step's chart (per recipient: only their rows), titled with the period's dates, then `export_artifact`. If the export fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`
 
     Append word for word:
@@ -36,14 +37,14 @@ Skill add_ai_task_delivery {
     Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the chart", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (for a condition, with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
     ```
 
-    For recipients from a column, add the rule "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
+    For recipients from a column, also add "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
 
-    ## Acceptance criteria additions
+    ## Success criteria additions
 
-    Within `write_ai_task`'s 2–5 lines, add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**; a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the PNG one.
+    Within the 2–5 lines, add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**, a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the PNG one.
 
-    ## Report and existing tasks
+    ## Existing tasks
 
-    `write_ai_task` owns the report, its Delivery, Condition and Attachment rows included. To add delivery to an existing task, read the task (with `write_ai_task` if it isn't loaded), run no query except the Rule query for a new threshold, save and validate only its file, and reply with the update report.
+    Read the task, loading `write_ai_task` if needed. Run no query except the Rule query for a new threshold, save and validate only the task file, and reply with `write_ai_task`'s update report.
   ;;
 }

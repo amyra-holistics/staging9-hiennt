@@ -1,6 +1,6 @@
 Skill write_ai_task {
   label: 'Write AI task files'
-  description: "The task file, schedule entry, brief, acceptance criteria and report for a scheduled AI task. Load only when create_ai_task says to, never on its own, and settle everything from this conversation without recalling earlier chats."
+  description: "The task file, schedule entry, brief, success criteria and report for a scheduled AI task. Load only when create_ai_task says to, never on its own, and settle everything from this conversation without recalling earlier chats."
   invocation: 'manual'
   disabled: H.git.is_production
   content: @md
@@ -8,11 +8,17 @@ Skill write_ai_task {
 
     # Write an AI task
 
-    Save the task file first. In the next step, edit `schedules.aml` and run `validate_file` on the task file together, then write the report: two saves in one step can stall, and `schedules.aml` only gains the entry below, so it needs no validation unless this save created the file. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
+    ## Save order
+
+    1. Save the task file.
+    2. In the next step, edit `schedules.aml` and run `validate_file` on the task file. Two saves in one step can stall. `schedules.aml` only gains one entry, so validate it only if this save created it.
+    3. Write the report.
+
+    On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read files back.
 
     ## Files
 
-    Use these shapes; don't read other task files for their format. `<END>` is the line of two semicolons that closes an `@md` block.
+    Use these shapes, not other task files. `<END>` is the line of two semicolons that closes an `@md` block.
 
     ```
     AiTask weekly_category_revenue {
@@ -27,7 +33,7 @@ Skill write_ai_task {
     }
     ```
 
-    Save it as `settings/ai/tasks/<name>.ai_task.aml`. Add an entry to the `schedules` list in `schedules.aml`, comma-separated (create `const schedules = [ … ]` if missing):
+    Save it as `settings/ai/tasks/<name>.ai_task.aml`. Add an entry to the `schedules` list in `schedules.aml`, comma-separated (create `const schedules = [ … ]` if missing). The cron is local time.
 
     ```
     AiSchedule {
@@ -37,7 +43,7 @@ Skill write_ai_task {
     }
     ```
 
-    The cron is local time. Name the task in each save's summary ("Schedule for weekly category revenue"): it titles the file card.
+    Name the task in each save's summary ("Schedule for weekly category revenue"), because it titles the file card.
 
     ## Brief
 
@@ -63,15 +69,15 @@ Skill write_ai_task {
     4. Chart the step 1 table with `execute_viz`: bars for a ranking or comparison, sorted like the table, a line for a trend, never a table.
     ```
 
-    The brief is plain words: never paste AQL into it, because the run writes its own query from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together: longer ones fail to start more often.
+    The brief is plain words, never AQL: the run writes its query from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
 
-    ## Acceptance criteria (shown as Success criteria)
+    ## Success criteria
 
-    2–5 short lines in all, delivery lines included, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**). Only what a run can prove from its own results, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
+    2–5 short lines in all, delivery lines included, with key values in bold. They say what the output covers (metric, grouping, **Monday–Sunday week**) and only what a run can prove from its own result, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
 
     ## Report
 
-    The reply's only text, copied line for line: only the `<…>` parts change, and no line is dropped or reworded, except the Condition row and the "instead" line, which follow the bullets below.
+    The reply's only text. Copy it line for line and change only the `<…>` parts; the Condition row and the "instead" line follow the rules below.
 
     ````
     ## ✅ Draft created: <label>
@@ -112,12 +118,17 @@ Skill write_ai_task {
     [Change the success criteria](#opt)
     ````
 
-    - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip shows its own badge.
-    - Delivery is "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)". The Condition row appears only for a task with a condition and lists every group that qualifies, each with its value. Attachment is "None", "Viz · PNG", or the file the user named ("Table · XLSX").
+    - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip has its own badge.
+    - Delivery: "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
+    - Condition: only for a task with a condition, listing every group that qualifies with its value.
+    - Attachment: "None", "Viz · PNG", or the file the user named ("Table · XLSX").
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Every new task ends with Follow-up, a task that sends included, at most four buttons. An "instead" button appears only for a pick you made without a card ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead"), which is rare; usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the success criteria".
-    - After a change, show only the changed rows, old → new (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then always the changed files' artifact blocks, and no follow-ups:
+    - Follow-up ends every new task, with at most four buttons. An "instead" button ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card, which is rare. Usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the success criteria".
+
+    ## Update report
+
+    After a change, show only the changed rows, old → new (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then the changed files' artifact blocks. No follow-ups.
 
     ````
     ## ✅ Task updated
@@ -134,6 +145,6 @@ Skill write_ai_task {
     ```
     ````
 
-    - If saving keeps failing: "## ❌ Couldn't create the task" (or "update"), the reason in plain words, and what the user can do.
+    If saving keeps failing: "## ❌ Couldn't create the task" (or "update"), the reason in plain words, and what the user can do.
   ;;
 }

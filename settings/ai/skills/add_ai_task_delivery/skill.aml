@@ -1,6 +1,6 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Add email, Slack or a send condition to a scheduled AI task, in a new request or for an existing task. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, even one with the same request: earlier chats are other tasks. Use when a task should email its result, post it to Slack, or send only when something happens. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send it to Slack too'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Not for a one-off send right now. Load it with create_ai_task, in the same first step and before writing any text. Settle everything from this conversation. Call no post_update."
+  description: "Add email, Slack or a send condition to a scheduled AI task, in a new request or for an existing task. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, even one with the same request: earlier chats are other tasks. Use when a task should email its result, post it to Slack, or send only when something happens. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send it to Slack too', 'attach the Sales Performance dashboard', 'Attach a chart instead'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Not for a one-off send right now. Load it with create_ai_task, in the same first step and before writing any text. Settle everything from this conversation. Call no post_update."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -15,13 +15,19 @@ Skill add_ai_task_delivery {
     - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. On the Where card, "Email · to you" means the requester and "Slack" leads to the channel card. In one step, ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel.
     - **Slack channel card.** "Which Slack channel? Or type another below." The options are the two channels this project's tasks already post to, most used first, read from the task files in `settings/ai/tasks` when the dataset search starts or as soon as Slack is picked. The card's free-text answer is the third option. With none known, the only option is "Not sure yet, keep it in the task".
     - **Condition.** A rule the query computes as a number is clear. For a vague word ("a lot", "big", "worst", "unusual"), run `create_ai_task`'s ranking-or-threshold Rule query on the likely pick, in the step with the date queries (again only if the pick changes), and ask the threshold Rule card.
-    - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
+    - **Attachment.** A PNG of what best shows the message's subject, from the dashboards `create_ai_task` read, unless the user named a file type or said no file:
+      - **Tab**: one tab of a dashboard on the task's dataset that already shows the subject (the metric by the grouping).
+      - **Dashboard**: the subject fills the whole dashboard or several tabs, or the request names or pins it.
+      - **Viz**: otherwise, and always per recipient (a dashboard export can't be cut to one recipient's rows), the chart step's chart.
+      Note a picked dashboard's saved date filter, its date `FilterBlock`'s `default` (`$H_NIL$` is all time), because the export uses it, not the run's period. Keep the next-best type for `write_ai_task`'s "instead" button.
 
     ## Brief additions
 
     Fill At a glance (Sends to, Condition, Attachment). Keep `write_ai_task`'s four Steps, writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
     - for a condition, a step right after Step 1 (renumber the rest): decide from the table, as exclusive ordered branches, each naming its destinations
-    - attach: the chart step's chart (per recipient: only their rows), titled with the period's dates, then `export_artifact`. If the export fails, send without it and say so in the run summary
+    - attach a Viz: the chart step's chart (per recipient: only their rows), titled with the period's dates, then `export_artifact` as PNG
+    - attach a Tab or Dashboard: `execute_dashboard` with `dashboard_uname: <name>` (and `tab_unames: [<tab>]` for a tab), then `export_artifact` as PNG. When its saved date filter isn't this run's period, add one line to the message: "The attached <title> shows <all time>, its saved filter."
+    - if the export fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`
 
     Append word for word:
@@ -34,14 +40,14 @@ Skill add_ai_task_delivery {
     - Call `deliver_data` only from the main run: a delegated sub-task can't see earlier sends and repeats them.
 
     ## Run summary
-    Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the chart", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (for a condition, with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
+    Start with one title: "## ✅ Delivered", "## ⚠️ Sent without the attachment", "## ❌ Export failed", "## ❌ Delivery failed", "## ⛔ Blocked" or "## ➖ Nothing to send" (for a condition, with the value against the threshold). Then list every send from the delivery results (recipient, subject, outcome) and everyone skipped, with the reason.
     ```
 
     For recipients from a column, also add "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
 
     ## Acceptance criteria additions
 
-    Within the 2–5 lines, add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**, a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the PNG one.
+    Within the 2–5 lines, add the recipient as an address (**finance@acme.com**, never "me") and what each message carries when the export succeeds (the **PNG** chart, or the **<title>** tab or dashboard as **PNG**, noting its saved period when that isn't the run's; only that recipient's rows). For a condition, add when it sends (**falls 20% or more**, a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the attachment one.
 
     ## Existing tasks
 

@@ -77,7 +77,7 @@ Skill write_ai_task {
 
     ## Report
 
-    The reply's only text. Copy it line for line, icons included, and change only the `<…>` parts. Two lines are conditional: drop the Condition row when the task has no condition, and drop the "instead" line when no pick was made without a card.
+    The reply's only text. Copy it line for line, icons included, and change only the `<…>` parts. Two lines are conditional: drop the Condition row when the task has no condition, and drop the "instead" line when there's neither an attachment switch nor a pick made without a card.
 
     ````
     ## ✅ Draft created: <label>
@@ -121,19 +121,22 @@ Skill write_ai_task {
     - Keep the empty header row, each icon exactly as written (Source is 🗄️, the file cabinet, never 🗂️ or 🗃️) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
     - Delivery: "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
     - Condition: the rule in plain words (which metric, which way, how much, compared with what period), with no values from today.
-    - Attachment: "None", "Viz · PNG", or the file the user named ("Table · XLSX").
+    - Attachment: "None", "Viz · PNG", "Tab · <dashboard title> › <tab title> · PNG", "Dashboard · <dashboard title> · PNG", or the file the user named ("Table · XLSX").
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Follow-up ends every new task, with at most four buttons. An "instead" button ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card, which is rare. Usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the acceptance criteria".
+    - Follow-up ends every new task, with at most four buttons. A task with an attachment always gets "Attach <next-best> instead" first ("Attach a chart instead", "Attach the <tab title> tab instead", "Attach the <dashboard title> dashboard instead"), unless no dashboard uses the dataset. Any other "instead" button ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card, which is rare. "Preview the first result (nothing is sent)" and "Change the acceptance criteria" always follow.
 
     ## Update report
 
-    After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
+    After a change: the draft line right under the heading, then only what changed, then `### Files` with the changed files' artifact blocks.
     - Changed rows go in the table as `~~<old>~~ → **<new>**`, in the values the report uses ("~~None~~ → **Viz · PNG**"). Leave the table out when no row changed.
     - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`, so the saved "Covers **revenue** for **every category**" becomes `▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
+    - No follow-ups, except when the change added or switched the attachment: then end with its one "Attach <next-best> instead" button.
 
     ````
     ## ✅ Task updated
+
+    Still a draft: click `Commit changes`, then `Publish` to apply.
 
     | | |
     |---|---|
@@ -145,7 +148,7 @@ Skill write_ai_task {
 
     ▢ Emails the result to **nhi.ty@holistics.io**
 
-    Still a draft: click `Commit changes`, then `Publish` to apply.
+    ### Files
 
     ```artifact
     <stored_artifact.id of each changed file's last save>

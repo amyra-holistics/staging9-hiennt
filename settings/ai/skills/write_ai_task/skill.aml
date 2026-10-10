@@ -128,7 +128,9 @@ Skill write_ai_task {
 
     ## Update report
 
-    After a change, show only the changed rows, old → new, in the same values the report uses ("None → Viz · PNG") (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then the changed files' artifact blocks. No follow-ups.
+    After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
+    - Changed rows go in the table, old → new, in the values the report uses ("None → Viz · PNG"). Leave the table out when no row changed.
+    - Changed criteria go under Success criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → **<new>**`, an added one `▢ **<new>**`, a removed one `▢ ~~<old>~~`.
 
     ````
     ## ✅ Task updated
@@ -136,7 +138,12 @@ Skill write_ai_task {
     | | |
     |---|---|
     | 🗓️ Schedule | ~~Mondays 9:00 AM~~ → **Mondays 8:00 AM** |
-    | 📝 Success criteria | + **Each category's share of the weekly total** |
+
+    ### Success criteria
+
+    ▢ ~~Covers **revenue** for every category~~ → **Covers revenue and share of the weekly total for every category**
+
+    ▢ **Emails nhi.ty@holistics.io the result**
 
     Still a draft: commit and publish to apply.
 

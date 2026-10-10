@@ -12,30 +12,32 @@ Skill create_ai_task {
 
     The requester is ${H.current_user.h_email}: "me" and `run_as` mean this address.
 
-    ## Draft first
+    ## Ask what's vague
 
-    The task runs only after the user commits and publishes it, so the saved draft is where they confirm. Don't ask what you can decide: pick the recommended source, schedule and rules, save, and show each pick with its evidence in the report. Except a vague word that decides when it sends: ask its Rule card. Write only cards and the report, call no `post_update`, batch independent calls.
+    The task runs only after the user commits and publishes it. Ask an `ask_user` card for every piece the request leaves vague, and decide only what is clear or has one standard answer (Monday–Sunday weeks, ties, the workspace timezone), stated in the brief. Ask each card once its facts are ready, batching ready ones in one step: a reply without a tool call ends the turn. Write only cards and the report, call no `post_update`, batch independent calls.
 
     ## Cards
 
-    Ask only the cards below, in one step, because a reply without a tool call ends the turn. Each question is at most 15 words in business words, never field names. The recommended option comes first, then at most 3 options, each labelled in at most 5 words with one short line carrying the deciding fact.
+    A question is at most 15 words in business words, never field names. The recommended option comes first, marked "(recommended)", then at most 2 more, each labelled in at most 5 words with one short line carrying the deciding fact (today's number, latest data, Endorsed).
     - **Pinned source** and **Which data** (Flow 2 and 3).
-    - **Destination** and **Rule** cards from `add_ai_task_delivery`.
-    - **Send**, when the request never mentions sending, always the last card: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task". It only switches delivery on: after Yes, ask "Where should they go?" with "Email · to you" and "Slack · pick a channel next" (load `add_ai_task_delivery`); No keeps the result in the run record.
+    - **Time**: the day or clock time is missing or a range ("Monday morning", "weekly", "end of day"). Options show the time; "morning" recommends 9:00 AM.
+    - **Rule**: a vague word that changes the result: a threshold ("a lot", "big"), a ranking ("changed the most", "top" without a number), a metric ("sales"). Options carry today's numbers from the Flow 3 query step.
+    - **Destination** and threshold cards from `add_ai_task_delivery`.
+    - **Send**, when the request never mentions sending, always the last card: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task". After Yes, ask "Where should they go?" with "Email · to you" and "Slack · pick a channel next" (load `add_ai_task_delivery`); No keeps the result in the run record.
 
     ## Flow
 
-    1. **First step.** If it wasn't done with this skill's load: in one step, load `write_ai_task`, read `schedules.aml`, and `read_folder` the root and `settings/ai/tasks`.
+    1. **First step.** If it wasn't done with this skill's load: in one step, load `write_ai_task`, read `schedules.aml`, and `read_folder` the root and `settings/ai/tasks`. Ask the Time card here when needed.
     2. **Pinned first.** A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source when it has the fields and current data: no search, no card. Always run the latest-date query on it first; data that ends before the latest complete period is not current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway".
-    3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step, and their model files. Then in a single step, for every dataset with the fields, `execute_aql` with `explore { measures { latest: <model> | max(<model>.<date field>) } }` (the date field from its model file, never `generate_aql`), plus `fetch_dataset` on the likely pick. Pick the freshest, an endorsed one on a tie. A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires. A dataset the user named is used as is. Ask **Which data** only when two current datasets fit but mean different things (each option: what the data covers · how fresh), or when nothing fits after two folder levels ("Where do you look at this number today?": a dashboard name, or "Not sure, pick for me").
-    4. **Schedule.** A run needs one day and one clock time. When either is missing or a range, pick it: "morning" 9:00 AM, "end of day" 5:00 PM, "weekly" Monday 9:00 AM, "daily" 9:00 AM. The cadence matches the period: a week-over-week check runs every Monday, never daily, because a daily run repeats the same week's result. Never ask the timezone. A request with a clock time gets no other time offered.
-    5. **Rules.** Fill every other gap (metric, grouping level, week boundaries, ties) with the sensible default, stated in the brief. Return every group, highest first; cap the list only when the user says top, most or biggest.
+    3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step, and their model files. Then in a single step, for every dataset with the fields, `execute_aql` with `explore { measures { latest: <model> | max(<model>.<date field>) } }` (the date field from its model file, never `generate_aql`), plus `fetch_dataset` and any query a Rule card needs on the likely pick. A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires. A dataset the user named is used as is. When two or more current datasets fit, ask **Which data** (each option: what it covers · latest data · Endorsed), the endorsed one recommended; when nothing fits after two folder levels, ask "Where do you look at this number today?" (a dashboard name, or "Not sure, pick for me").
+    4. **Schedule.** A run needs one day and one clock time. The cadence matches the period: a week-over-week check runs every Monday, never daily, because a daily run repeats the same week's result. Never ask the timezone.
+    5. **Rows.** Return every group, highest first, unless the user says top, most or biggest.
     6. **Delivery.** If the request emails, posts or alerts, `add_ai_task_delivery` must be loaded too.
     7. **Write.** Save, validate and report as `write_ai_task` shows.
 
-    > "Set up a weekly revenue by category analysis every Monday morning." → the Send card last; saves Mondays 9:00 AM (from "morning") on the freshest dataset and offers "Run at 8:00 AM instead".
+    > "…analysis every Monday morning." → Time card first, Which data if two current datasets fit, Send card last.
 
-    > "Every Monday at 8am, email me which categories changed the most. Add a chart too." → no cards: top 5 by dollar change, Email · requester, Viz · PNG.
+    > "Every Monday at 8am, email me which categories changed the most." → one Rule card ("Top 5 by dollar change (recommended)").
 
     ## Change a task
 

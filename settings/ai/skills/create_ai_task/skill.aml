@@ -14,13 +14,13 @@ Skill create_ai_task {
 
     ## Draft first
 
-    The task runs only after the user commits and publishes it, so the saved draft is where they confirm. Don't ask what you can decide: pick the recommended source, schedule and rules, save, and show each pick with its evidence in the report. Write only the cards and the report, call no `post_update`, and batch independent calls.
+    The task runs only after the user commits and publishes it, so the saved draft is where they confirm. Don't ask what you can decide: pick the recommended source, schedule and rules, save, and show each pick with its evidence in the report. Except a vague word that decides when it sends: ask its Rule card. Write only cards and the report, call no `post_update`, batch independent calls.
 
     ## Cards
 
     Ask only the cards below, in one step, because a reply without a tool call ends the turn. Each question is at most 15 words in business words, never field names. The recommended option comes first, then at most 3 options, each labelled in at most 5 words with one short line carrying the deciding fact.
     - **Pinned source** and **Which data** (Flow 2 and 3).
-    - **Destination** cards from `add_ai_task_delivery`.
+    - **Destination** and **Rule** cards from `add_ai_task_delivery`.
     - **Send**, when the request never mentions sending, always the last card: "Send this task's results each run?" with "Yes, send them" (Send via email or Slack) and "No, keep them in the task". It only switches delivery on: after Yes, ask "Where should they go?" with "Email · to you" and "Slack · pick a channel next" (load `add_ai_task_delivery`); No keeps the result in the run record.
 
     ## Flow
@@ -39,6 +39,6 @@ Skill create_ai_task {
 
     ## Change a task
 
-    In one step, load `write_ai_task` and read the task file and `schedules.aml`. Settle only what changes and save only the changed files. A follow-up such as "Run at 8:00 AM instead", "Use <dataset> instead", "Alert at 30% instead" or "Post to Slack instead" is the whole change: apply it without a card (Slack asks its channel card when no channel is known). For "Change the success criteria", ask a card showing the current criteria, with 2–3 likely edits as options. For "Preview the first result", run the brief's Steps now and show the output, then the chart the brief names (bars of the step 1 table if none), sending and saving nothing.
+    In one step, load `write_ai_task` and read the task file and `schedules.aml`. Settle only what changes and save only the changed files. An "… instead" follow-up ("Run at 8:00 AM instead") is the whole change: apply it without a card (Slack asks its channel card when no channel is known). For "Change the success criteria", ask a card showing the current criteria, with 2–3 likely edits as options. For "Preview the first result", run the brief's Steps now and show the output, then the chart the brief names (bars of the step 1 table if none), sending and saving nothing.
   ;;
 }

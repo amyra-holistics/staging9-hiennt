@@ -86,7 +86,7 @@ Skill write_ai_task {
     | 📝 Brief | <one sentence, key values in bold> |
     | 📎 Attachment | <None> |
 
-    Runs as you (<run_as>): it sees the data you can see. First run <Mon, Oct 12>. Data through <Oct 9, 2026>.
+    Runs as you (<run_as>): it sees the data you can see. First run <Mon, Oct 12>. Latest data: <Oct 9, 2026>.
 
     ### Success criteria
 

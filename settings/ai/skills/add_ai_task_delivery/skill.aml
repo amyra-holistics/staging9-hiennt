@@ -13,7 +13,7 @@ Skill add_ai_task_delivery {
     ## Settle
 
     - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. "Email · to you" on the Where card means Email · requester; "Slack" asks the channel card. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read their task files during the dataset search), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
-    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "worst", "unusual"), don't ask: run this query for the latest complete period against the one before with `execute_aql` (`generate_aql` only if it fails), on the likely pick in the same step as the date queries, and again only if the pick changes:
+    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "big", "worst", "unusual"), run this query for the latest complete period against the one before with `execute_aql` (else `generate_aql`), on the likely pick in the same step as the date queries, and again only if the pick changes:
 
       ```
       metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
@@ -24,7 +24,7 @@ Skill add_ai_task_delivery {
 
       Swap in the metric, date field, dates and grouping; keep `is @(<start> - <end>)`.
 
-      Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`: a chart ends the turn.
+      Then ask the Rule card, "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values, the one catching the clear outliers recommended ("20% or more · 4 today: Mobiles −35.8%, Bathroom −34.3%, …"). "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). No `execute_viz`: a chart ends the turn.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
@@ -55,6 +55,6 @@ Skill add_ai_task_delivery {
 
     ## Report
 
-    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <how many qualify, each with its value> |` on its own row after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)". Follow-up follows `write_ai_task` (at most four buttons), with "Alert at <n>% instead" for a threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
+    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <how many qualify, each with its value> |` on its own row after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)". Follow-up follows `write_ai_task` (at most four buttons). To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
   ;;
 }

@@ -126,7 +126,7 @@ Skill write_ai_task {
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
     - Follow-up ends every new task.
-    - "Attach <next-best> instead" names the next-best type: "Attach a chart instead", "Attach the <tab title> tab instead" or "Attach the <dashboard title> dashboard instead". Drop it when the Attachment row says None, or when no dashboard on the task's dataset was read.
+    - "Attach <next-best> instead" offers the other kind, by name. For a Viz: "Attach the <dashboard title> dashboard instead" or "Attach the <tab title> tab instead", the best fit among the dashboards read. For a Tab or Dashboard: "Attach a chart instead". Drop it when the Delivery or Attachment row says None, or when the Attachment is a Viz and no dashboard on the task's dataset was read.
     - The other "instead" line ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") is only for a pick made without a card, which is rare: a time, source or threshold picked on a card gets none.
 
     ## Update report

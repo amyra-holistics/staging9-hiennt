@@ -19,7 +19,7 @@ Skill add_ai_task_delivery {
       - **Tab**: one tab of a dashboard on the task's dataset that already shows the subject (the metric by the grouping).
       - **Dashboard**: the subject fills the whole dashboard or several tabs, or the request names or pins it.
       - **Viz**: otherwise, and always per recipient (a dashboard export can't be cut to one recipient's rows), the chart step's chart.
-      Note a picked dashboard's saved date filter, its date `FilterBlock`'s `default` (`$H_NIL$` is all time), because the export uses it, not the run's period. Keep the next-best type for `write_ai_task`'s "instead" button.
+      Note a picked dashboard's saved date filter, its date `FilterBlock`'s `default` (`$H_NIL$` is all time), because the export uses it, not the run's period. Keep the next-best for `write_ai_task`'s "Attach" button, always the other kind: for a Viz, the best-fitting dashboard or tab read, by title; for a Tab or Dashboard, a chart.
 
     ## Brief additions
 

@@ -8,7 +8,7 @@ Skill write_ai_task {
 
     # Write an AI task
 
-    Save the files `create_ai_task` settled, run `validate_file` on each, then write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so save without listing folders again.
+    Save the files `create_ai_task` settled, run `validate_file` on each, then write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so save without listing folders again, and write the report from what you saved, without reading the files back.
 
     ## Files
 

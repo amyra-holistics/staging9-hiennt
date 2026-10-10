@@ -14,10 +14,10 @@ Skill create_ai_task {
 
     ## Flow
 
-    Ask every question on an `ask_user` card, because a reply without a tool call ends the turn. Write only the cards and the report. Keep the user waiting as little as possible: put independent calls in one step.
+    Ask every question on an `ask_user` card, because a reply without a tool call ends the turn. Write only the cards and the report, and call no `post_update`. Put independent calls in one step.
 
-    1. **First step.** In one step: load `write_ai_task`, read `schedules.aml`, `read_folder` the root and `settings/ai/tasks`, `lookup_aml_object` the label in snake_case, and ask the Schedule card if one is needed, so the user answers it while you search.
-    2. **Schedule.** A run needs one day and one clock time. Ask when either is missing or a range ("Monday morning", "weekly", "end of day"); each option shows the time and the next run. Never ask the timezone.
+    1. **First step.** In one step: load `write_ai_task`, read `schedules.aml`, `read_folder` the root and `settings/ai/tasks`, and `lookup_aml_object` the label in snake_case. If the Schedule needs a card, ask it in this step too.
+    2. **Schedule.** A run needs one day and one clock time. Ask only when either is missing or a range ("Monday morning", "weekly", "end of day"); "every Monday at 9am" needs no card. Recommend a cadence that matches the period: a week-over-week check runs every Monday, never daily, because a daily run repeats the same week's alert. Each option shows the time and the next run. Never ask the timezone.
     3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step. When two or more have the fields, `fetch_dataset` them, then in one step run `execute_aql` on each with this query instead of `generate_aql`: `explore { measures { latest: <model> | max(<model>.<date field>) } }`. Ask a Source card listing each of them, stale ones included: "<label> · data through <Oct 4, 2026>", freshest first and recommended. A dataset with no rows in the latest complete period shows "data ends <date>" and is never saved, because a task on it never fires: if it is the only one, look further or ask. Skip the card when the user named the dataset. Also ask when two metrics fit, or the grouping has levels the words don't settle.
     4. **Delivery.** If the request emails, posts or alerts, `add_ai_task_delivery` must be loaded too. Otherwise ask nothing about sending: the report offers it as follow-ups.
     5. **Write.** Save, validate and report as `write_ai_task` shows.

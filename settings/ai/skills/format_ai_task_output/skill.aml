@@ -53,7 +53,7 @@ Skill format_ai_task_output {
 
     **Freshness.** If `t_latest` is before this period's last day, rerun Q1 and Q2 on the same days of both periods, and say so in the data note.
 
-    **Q2. Usual range and run length.** One row per metric, for this period, from the 26 periods before it. Repeat the `t_m1` lines for each metric. Filter the date to this period and the 27 before it. For a group line, add the group as a filter.
+    **Q2. Usual range and run length.** One row per metric, for this period, from the 26 periods before it. Repeat the `t_m1` lines for each metric. Filter the date generously, so the window never runs short: from the same day one year before this period's first day (three years for months) to this period's last day. The window counts periods, so the extra history changes nothing. For a group line, add the group as a filter.
 
     ```
     metric t_m1 = <m1>;
@@ -84,7 +84,7 @@ Skill format_ai_task_output {
         t_m1_run: t_m1_run,
         t_m1_run_from: t_m1_run_from
       }
-      filters { <date> matches @(<first day of the period 27 before this one> - <this last>) }
+      filters { <date> matches @(<this first, one year earlier> - <this last>) }
       sorts { t_period desc }
       limit: 1
     }
@@ -191,6 +191,6 @@ Skill format_ai_task_output {
     - A bold label line sits directly above its list, with no blank line in Slack.
     - Both: escape `&`, `<` and `>` in the text, and keep `@Dashboard:<uname>` as it is, since it becomes a link.
 
-    The run summary says that every destination got the same message, word for word, with only the markup changed.
+    Whoever sends writes the run summary right away, so the review passes the first time and nothing is redone or sent twice. It names the two periods compared with their dates, each send (recipient, subject, outcome), that every destination got the same message word for word with only the markup changed, and whether the attachment went out. A run that already sent never sends again: if asked to redo, it reports the sends it made.
   ;;
 }

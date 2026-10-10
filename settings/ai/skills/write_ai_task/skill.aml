@@ -8,7 +8,7 @@ Skill write_ai_task {
 
     # Write an AI task
 
-    Save the task file, then edit `schedules.aml`, one at a time (two saves in one step can stall the approval). Then run `validate_file` on both in one step and write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
+    Save the task file, then edit `schedules.aml`, one at a time (two saves in one step can stall). Then run `validate_file` on both in one step and write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
 
     ## Files
 
@@ -111,9 +111,9 @@ Skill write_ai_task {
     ````
 
     - Keep the empty header row and the non-breaking space after each icon. `[Endorsed](#pos)` only for an endorsed dataset.
-    - One "▢ " paragraph per criterion, never a list, because the chat adds bullets.
+    - One "▢ " paragraph per criterion, never a list (the chat adds bullets).
     - Each artifact block holds only the `stored_artifact.id` of that file's last save, task file first.
-    - Follow-up has at most four buttons. First, up to two "instead" buttons for the picks most likely to be wrong: "Run at <time> instead" only when you picked the time, "Use <label> instead" only for another dataset with current data (never one whose data has ended), "Alert at <n>% instead" for a picked threshold, "Post to Slack instead" after the user chose to send. Then "Preview the first result (nothing is sent)" and "Change the success criteria".
+    - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons for the picks most likely to be wrong: "Run at <time> instead" only when you picked the time, "Use <label> instead" only for another dataset with current data (never one whose data has ended), "Alert at <n>% instead" for a picked threshold, "Post to Slack instead" after the user chose to send. Then "Preview the first result (nothing is sent)" and "Change the success criteria".
     - After a change, show only what changed, then the changed files' artifact blocks, and no follow-ups:
 
     ```

@@ -1,6 +1,6 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, before writing any text or calling another tool, and settle everything from this conversation without recalling earlier chats."
+  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and before writing any text, and settle everything from this conversation without recalling earlier chats."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -12,8 +12,8 @@ Skill add_ai_task_delivery {
 
     ## Settle
 
-    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel.
-    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "worst", "unusual"), run `execute_aql` for the latest complete period against the one before and quote it on the card. Use this query instead of `generate_aql` (fall back to it only if the query fails), and when a Source card is asked, run it on the recommended dataset in the same step:
+    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel. These are the only cards: ask them all in one step.
+    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "worst", "unusual"), don't ask: run this query for the latest complete period against the one before with `execute_aql` (`generate_aql` only if it fails), on the likely pick in the same step as the date queries, and again only if the pick changes:
 
       ```
       metric cur = <metric> | where(<date field> is @(<start> - <end>));
@@ -22,7 +22,7 @@ Skill add_ai_task_delivery {
       explore { dimensions { grp: <group field> } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
       ```
 
-      Example: "Sep 28–Oct 4 vs Sep 21–27: Mobiles −52%, Televisions −25%. When should it alert?" Recommend a concrete rule; "worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). Offer "Let AI judge each run" last, recommended only when the user handed that call to the AI. Call no `execute_viz`, because a chart ends the turn.
+      Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`, because a chart ends the turn.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
@@ -53,6 +53,6 @@ Skill add_ai_task_delivery {
 
     ## Report
 
-    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". End at Files, with no follow-ups. To add delivery to an existing task, read it, save and validate only its file, and write the full report from `write_ai_task`, opening with "Task updated".
+    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <the top values> |` after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: Mobiles −35.8%, Bathroom −34.3%". Follow-up holds only the "instead" buttons from `write_ai_task`, with "Alert at <n>% instead" for a stricter and a looser threshold you picked. To add delivery to an existing task, read it, save and validate only its file, and write the full report from `write_ai_task`, opening with "Task updated".
   ;;
 }

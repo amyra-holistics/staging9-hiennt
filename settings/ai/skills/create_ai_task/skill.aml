@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create a scheduled AI task'
-  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Change the acceptance criteria', 'Preview the first result'. When the request also emails, posts to Slack or alerts, load add_ai_task_delivery in the same step. Do not use for a one-off answer or a send right now. Load this skill first, before writing any text or calling another tool, and settle everything from this conversation without recalling earlier chats."
+  description: "Create or change a scheduled AI task: an analysis that runs on a schedule. Use when the user wants something to run regularly, even without saying 'AI task', or wants to change a task's source, schedule or acceptance criteria. Typical phrasings: 'run revenue by category every Monday', 'automate our weekly category review', 'check every morning that the data landed', 'move my task to 9 AM', 'Run at 8:00 AM instead', 'Change the acceptance criteria', 'Preview the first result'. When the request also emails, posts to Slack or alerts, load add_ai_task_delivery in the same step. Do not use for a one-off answer or a send right now. Load this skill first, before writing any text, and in that same step also load write_ai_task, read_folder '.' and 'settings/ai/tasks', and read_file 'schedules.aml'. Settle everything from this conversation without recalling earlier chats."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -12,26 +12,27 @@ Skill create_ai_task {
 
     The requester is ${H.current_user.h_email}: "me" and `run_as` mean this address.
 
+    ## Draft first
+
+    The task runs only after the user commits and publishes it, so the saved draft is where they confirm. Don't ask what you can decide: pick the recommended source, schedule and rules, save, and show each pick with its evidence in the report, with the alternatives as follow-ups. Cards are only for what can't be guessed, listed in `add_ai_task_delivery`; ask them all in one step, because a reply without a tool call ends the turn. Write only the cards and the report, call no `post_update`, and put independent calls in one step.
+
     ## Flow
 
-    Ask every question on an `ask_user` card, because a reply without a tool call ends the turn. Write only the cards and the report, and call no `post_update`. Put independent calls in one step.
-
-    1. **First step.** In one step: load `write_ai_task`, read `schedules.aml`, `read_folder` the root and `settings/ai/tasks`, and `lookup_aml_object` the label in snake_case. If the Schedule needs a card, ask it in this step too.
-    2. **Schedule.** A run needs one day and one clock time. Ask only when either is missing or a range ("Monday morning", "weekly", "end of day"); "every Monday at 9am" needs no card. Recommend a cadence that matches the period: a week-over-week check runs every Monday, never daily, because a daily run repeats the same week's alert. Each option shows the time and the next run. Never ask the timezone.
-    3. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step. When two or more have the fields, `fetch_dataset` them, then in one step run `execute_aql` on each with this query instead of `generate_aql`: `explore { measures { latest: <model> | max(<model>.<date field>) } }`. Ask a Source card listing each of them, stale ones included: "<label> · data through <Oct 4, 2026>", freshest first and recommended. A dataset with no rows in the latest complete period shows "data ends <date>" and is never saved, because a task on it never fires: if it is the only one, look further or ask. Skip the card when the user named the dataset. Also ask when two metrics fit, or the grouping has levels the words don't settle.
-    4. **Delivery.** If the request emails, posts or alerts, `add_ai_task_delivery` must be loaded too. Otherwise ask nothing about sending: the report offers it as follow-ups.
-    5. **Write.** Save, validate and report as `write_ai_task` shows.
-
-    A card covers one part: the recommended option first, marked "(recommended)", then 1–3 real alternatives, with any rule to confirm (week boundaries, top N, ties) in the option's description. Fill other gaps with a sensible default stated in the brief. In a request that sends, also ask about vague words that change the result ("changed the most").
+    1. **First step.** If it wasn't done with this skill's load: in one step, load `write_ai_task`, read `schedules.aml`, and `read_folder` the root and `settings/ai/tasks`.
+    2. **Source.** Find every dataset with the fields: the `*.dataset.aml` files in every folder, opening all subfolders of a level in one step, and their model files. Then in one step: for each dataset with the fields, `execute_aql` with `explore { measures { latest: <model> | max(<model>.<date field>) } }`, the date field taken from its model file (never `generate_aql`), and `fetch_dataset` the likely pick (endorsed, else the best name match). Pick the freshest, an endorsed one on a tie. A dataset with no rows in the latest complete period is never saved, because a task on it never fires: if all are stale, look further, then ask. A dataset the user named is used as is.
+    3. **Schedule.** A run needs one day and one clock time. When either is missing or a range, pick it: "morning" 9:00 AM, "end of day" 5:00 PM, "weekly" Monday 9:00 AM, "daily" 9:00 AM. The cadence matches the period: a week-over-week check runs every Monday, never daily, because a daily run repeats the same week's result. Never ask the timezone.
+    4. **Rules.** Fill every other gap (metric, grouping level, week boundaries, top N, ties) with the sensible default, stated in the brief.
+    5. **Delivery.** If the request emails, posts or alerts, `add_ai_task_delivery` must be loaded too. Otherwise send nothing: the report offers sending as follow-ups.
+    6. **Write.** Save, validate and report as `write_ai_task` shows.
 
     > User: "Set up a weekly revenue by category analysis every Monday morning."
-    > Cards: "Monday 8:00 AM (recommended)" in the first step, then Source (if two datasets fit) → report with follow-ups, no question about sending.
+    > No cards. Saves Mondays 9:00 AM on the freshest dataset. The report shows both picks, then "Run at 8:00 AM instead", "Use <other fresh dataset> instead" (only if one exists) and the follow-ups.
 
     > User: "Every Monday at 8am, email me which categories changed the most. Add a chart too."
-    > Loads `add_ai_task_delivery`; one card, "Top 5 by dollar change (recommended)"; saves Email · requester, Viz · PNG; the report ends at Files.
+    > Loads `add_ai_task_delivery`. No cards: top 5 by dollar change, Email · requester, Viz · PNG. The report shows the picks and ends with the "instead" follow-ups.
 
     ## Change a task
 
-    In one step, load `write_ai_task` and read the task file and `schedules.aml`. Settle only what changes and save only the changed files. For "Change the acceptance criteria", ask a card showing the current criteria, with 2–3 likely edits as options. For "Preview the first result", run the brief's Steps now and show the output and the table, sending and saving nothing.
+    In one step, load `write_ai_task` and read the task file and `schedules.aml`. Settle only what changes and save only the changed files. A follow-up such as "Run at 8:00 AM instead", "Use <dataset> instead" or "Alert at 30% instead" is the whole change: apply it without a card. For "Change the acceptance criteria", ask a card showing the current criteria, with 2–3 likely edits as options. For "Preview the first result", run the brief's Steps now and show the output and the table, sending and saving nothing.
   ;;
 }

@@ -8,7 +8,7 @@ Skill write_ai_task {
 
     # Write an AI task
 
-    Save the files `create_ai_task` settled, run `validate_file` on each, then write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so save without listing folders again, and write the report from what you saved, without reading the files back.
+    Save the files `create_ai_task` settled in one step (create the task file and edit `schedules.aml` together), then run `validate_file` on both in one step, then write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read the files back.
 
     ## Files
 
@@ -43,6 +43,7 @@ Skill write_ai_task {
 
     ```
     ## At a glance
+    - Source: @Dataset:<unique_name>
     - Sends to: none, kept in the run record
     - Condition: none, every run
     - Attachment: none
@@ -65,7 +66,7 @@ Skill write_ai_task {
 
     ## Acceptance criteria
 
-    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**, **top 5**). Only what a run can prove from its own results, never the schedule, because an unprovable line makes the review redo the job and send twice. Not "Runs every Monday at 8:00 AM" but "Keeps the result in the run record and sends nothing".
+    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**, **top 5**). Only what a run can prove from its own results, never the schedule, because an unprovable line makes the review redo the job and send twice. Not "Runs every Monday at 8:00 AM" but "Keeps the result in the run record and sends nothing". Every value a criterion names must appear in the Step that writes the output or message.
 
     ## Report
 
@@ -79,8 +80,8 @@ Skill write_ai_task {
     | | |
     |---|---|
     | 🏷️ Status | [Draft](#pos) (Publish to activate) |
-    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
-    | 🗓️ Schedule | <Mondays 8:00 AM (Workspace timezone)> |
+    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> · data through <Oct 9, 2026> (freshest of <3>) |
+    | 🗓️ Schedule | <Mondays 9:00 AM (Workspace timezone)> |
     | 📨 Delivery | <None (kept in the task's run record)> |
     | 📝 Brief | <one sentence, key values in bold> |
     | 📎 Attachment | <None> |
@@ -101,6 +102,7 @@ Skill write_ai_task {
 
     ### Follow-up
 
+    [<Run at 8:00 AM instead>](#opt)
     [Email it to me every <day>](#opt)
     [Post it to a Slack channel every <day>](#opt)
     [Preview the first result (nothing is sent)](#opt)
@@ -111,7 +113,7 @@ Skill write_ai_task {
     - Keep the empty header row and the non-breaking space after each icon, so no row is bold and no label wraps.
     - One "▢ " paragraph per criterion, never a list, because the chat adds bullets.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save, task file first.
-    - Follow-up only for a task kept in the run record; a request that sends ends at Files.
+    - Follow-up opens with one "instead" button per pick you made for the user, at most three: "Run at <time> instead" for a picked time, "Use <label> instead" only for another fresh dataset, and the delivery add-on's "Alert at <n>% instead". A task kept in the run record then adds the five buttons above. A task that sends adds nothing more, and with no picks it ends at Files.
     - After a change: "Task updated. To apply the change, click `Commit changes`, then `Publish` in Development." with the next run, and "(Publish to apply)".
   ;;
 }

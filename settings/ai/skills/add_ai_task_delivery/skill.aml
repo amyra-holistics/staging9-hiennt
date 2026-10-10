@@ -1,6 +1,6 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'Post to Slack instead', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and before writing any text, and call nothing else in that step. Settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
+  description: "Add email, Slack or a send condition to a scheduled AI task. Use when a task should email its result, post it to Slack, or send only when something happens, in a new request or for an existing task. Typical phrasings: 'every Monday email me revenue by category', 'ping #sales-alerts if revenue drops a lot', 'notify each store manager when stock runs low', 'Email it to me every Monday', 'Post it to a Slack channel every Monday', 'Only send when a category falls 10% or more', 'Alert at 30% instead', 'send it to Slack too', 'send my daily summary to my email'. Email and Slack delivery from tasks works today, even where the docs say 'coming soon'. Use it together with create_ai_task. Do not use for a one-off send right now. Load this skill first, in the same step as create_ai_task and before writing any text, and call nothing else in that step. Settle everything from this conversation. Never call fetch_conversation_messages, fetch_conversation_tool_call or search_organization_conversations unless the user points to an earlier chat, because earlier chats are other tasks, and call no post_update."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -13,25 +13,14 @@ Skill add_ai_task_delivery {
     ## Settle
 
     - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. "Email · to you" on the Where card means Email · requester; "Slack" asks the channel card. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read their task files during the dataset search), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
-    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "big", "worst", "unusual"), run this query for the latest complete period against the one before with `execute_aql` (else `generate_aql`), on the likely pick in the same step as the date queries, and again only if the pick changes:
-
-      ```
-      metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
-      metric prev = revenue | where(orders.created_at is @(2026-09-21 - 2026-09-27));
-      metric pct = safe_divide((cur - prev) * 100.0, prev);
-      explore { dimensions { grp: categories.name } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
-      ```
-
-      Swap in the metric, date field, dates and grouping; keep `is @(<start> - <end>)`.
-
-      Then ask the Rule card, "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values, the one catching the clear outliers recommended ("20% or more · 4 today: Mobiles −35.8%, Bathroom −34.3%, …"). "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). No `execute_viz`: a chart ends the turn.
+    - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "big", "worst", "unusual"), run the ranking-or-threshold Rule query from `create_ai_task` on the likely pick, in the same step as the date queries, and again only if the pick changes. Then ask the Rule card, "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values, the one catching the clear outliers recommended ("20% or more · 4 today: Mobiles −35.8%, Bathroom −34.3%, …"). "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods).
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
 
     Fill At a glance (Sends to, Condition, Attachment). Keep Steps 1–4 (one table, `explain_result`, write, chart), writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
-    - for a condition, step 2: decide from the table, as exclusive ordered branches, each naming its destinations
-    - attach: `execute_viz` from the step 1 query (per recipient: only their rows) as a named chart, never a table: bars for a ranking or comparison, sorted like the table; a line for a trend. Title it with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
+    - for a condition, a step right after Step 1 (renumber the rest): decide from the table, as exclusive ordered branches, each naming its destinations
+    - attach: the Step 4 chart (per recipient: only their rows), titled with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`
 
     Append word for word:
@@ -55,6 +44,6 @@ Skill add_ai_task_delivery {
 
     ## Report
 
-    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <how many qualify, each with its value> |` on its own row after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)". Follow-up follows `write_ai_task` (at most four buttons). To add delivery to an existing task, read it, save and validate only its file, and reply with the changes only, as `write_ai_task` shows.
+    Delivery: "Email · <address>", "Slack · #channel" or "Email · each store manager (manager_email)". Attachment: "Viz · PNG", "Table · XLSX" or "None". For a condition, add `| 🔔 Condition | <rule> · <period>: <how many qualify, each with its value> |` on its own row after Delivery, e.g. "Falls 20%+ · Sep 28–Oct 4: 4 qualify (Mobiles −35.8%, Bathroom −34.3%, Snacks −23.9%, Jeans −20.5%)". Follow-up follows `write_ai_task` (at most four buttons). To add delivery to an existing task, load `write_ai_task` and read the task in one step, run no query, save and validate only its file, and reply with the update report from `write_ai_task`.
   ;;
 }

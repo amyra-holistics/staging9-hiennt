@@ -12,7 +12,7 @@ Skill write_ai_task {
 
     ## Files
 
-    Use these shapes instead of reading other task files. `<END>` is the line of two semicolons that closes an `@md` block.
+    Use these shapes; don't read other task files for their format. `<END>` is the line of two semicolons that closes an `@md` block.
 
     ```
     AiTask weekly_category_revenue {
@@ -54,16 +54,16 @@ Skill write_ai_task {
     - <each period as complete dates: "Last week" = the most recent complete Monday–Sunday week>
     - <the grouping as the field the query groups by: "Category" = categories.name>
     - <how many rows the output lists, in what order; Step 1 returns exactly these rows, so a top 5 here is a top 5 there>
-    - <each derived metric and each rule from the cards>
+    - <each derived metric and each rule the user asked for or picked on a card>
 
     ## Steps
-    1. Run one query returning a single table with every number the output uses (both periods, the change, the rank), sorted by priority. Build no separate tables to merge.
+    1. Run one query returning a single table with every number the output uses (for a comparison: both periods and the change), sorted by priority. Build no separate tables to merge.
     2. Call `explain_result` with that query and result, asking <what the output must say>.
     3. Write the output only from that answer and the table, in the table's order.
-    4. Chart the step 1 table with `execute_viz`: bars for a ranking or comparison, a line for a trend, never a table.
+    4. Chart the step 1 table with `execute_viz`: bars for a ranking or comparison, sorted like the table, a line for a trend, never a table.
     ```
 
-    Keep the brief and criteria under 5,000 characters together: longer ones fail to start more often.
+    The brief is plain words: never paste AQL into it, because the run writes its own query from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together: longer ones fail to start more often.
 
     ## Acceptance criteria (shown as Success criteria)
 
@@ -71,7 +71,7 @@ Skill write_ai_task {
 
     ## Report
 
-    The reply's only text:
+    The reply's only text, copied line for line: only the `<…>` parts change, and no line is dropped or reworded.
 
     ````
     ## ✅ Draft created: <label>
@@ -114,8 +114,8 @@ Skill write_ai_task {
     - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip shows its own badge.
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons for the picks most likely to be wrong: "Run at <time> instead" only when the request named no clock time ("9am" is one), "Use <label> instead" only for another dataset with current data (never one whose data has ended), "Alert at <n>% instead" for a picked threshold. Then "Preview the first result (nothing is sent)" and "Change the success criteria".
-    - After a change, show only what changed, then always the changed files' artifact blocks, and no follow-ups:
+    - Every new task ends with Follow-up, a task that sends included, at most four buttons. First, up to two "instead" buttons, only for picks that neither the request nor a card settled: "Run at <time> instead", "Use <label> instead" (another dataset with current data), "Alert at <n>% instead". Then "Preview the first result (nothing is sent)" and "Change the success criteria".
+    - After a change, show only the changed rows, old → new (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then always the changed files' artifact blocks, and no follow-ups:
 
     ```
     ## ✅ Task updated
@@ -123,6 +123,7 @@ Skill write_ai_task {
     | | |
     |---|---|
     | 🗓️ Schedule | ~~Mondays 9:00 AM~~ → **Mondays 8:00 AM** |
+    | 📝 Success criteria | + **Each category's share of the weekly total** |
 
     Still a draft: commit and publish to apply.
     ```

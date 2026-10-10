@@ -39,7 +39,7 @@ Skill add_ai_task_delivery {
 
     For recipients from a column, also add "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients.", because the run's guardrail refuses addresses it can't trace to the owner.
 
-    ## Success criteria additions
+    ## Acceptance criteria additions
 
     Within the 2–5 lines, add the recipient as an address (**finance@acme.com**, never "me") and what each message carries (the **PNG** chart when the export succeeds, only that recipient's rows). For a condition, add when it sends (**falls 20% or more**, a zero previous period never qualifies) and otherwise **Nothing to send**, in a criterion apart from the PNG one.
 

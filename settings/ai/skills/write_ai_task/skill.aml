@@ -1,6 +1,6 @@
 Skill write_ai_task {
   label: 'Write AI task files'
-  description: "The task file, schedule entry, brief, success criteria and report for a scheduled AI task. Load only when create_ai_task says to, never on its own, and settle everything from this conversation without recalling earlier chats."
+  description: "The task file, schedule entry, brief, acceptance criteria and report for a scheduled AI task. Load only when create_ai_task says to, never on its own, and settle everything from this conversation without recalling earlier chats."
   invocation: 'manual'
   disabled: H.git.is_production
   content: @md
@@ -71,7 +71,7 @@ Skill write_ai_task {
 
     The brief is plain words, never AQL: the run writes its query from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
 
-    ## Success criteria
+    ## Acceptance criteria
 
     2–5 short lines in all, delivery lines included, with key values in bold. They say what the output covers (metric, grouping, **Monday–Sunday week**) and only what a run can prove from its own result, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
 
@@ -95,7 +95,7 @@ Skill write_ai_task {
 
     Runs as you (<run_as>): it sees the data you can see. First run <Mon, Oct 12>. Latest data: <Oct 9, 2026>.
 
-    ### Success criteria
+    ### Acceptance criteria
 
     Each run checks its result against these. If one isn't met, the run tries again.
 
@@ -115,7 +115,7 @@ Skill write_ai_task {
 
     [<"instead" button>](#opt)
     [Preview the first result (nothing is sent)](#opt)
-    [Change the success criteria](#opt)
+    [Change the acceptance criteria](#opt)
     ````
 
     - Keep the empty header row and the non-breaking space after each icon. No Endorsed pill: the dataset chip has its own badge.
@@ -124,13 +124,13 @@ Skill write_ai_task {
     - Attachment: "None", "Viz · PNG", or the file the user named ("Table · XLSX").
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Follow-up ends every new task, with at most four buttons. An "instead" button ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card, which is rare. Usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the success criteria".
+    - Follow-up ends every new task, with at most four buttons. An "instead" button ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card, which is rare. Usually Follow-up is just "Preview the first result (nothing is sent)" and "Change the acceptance criteria".
 
     ## Update report
 
     After a change, show only what changed, then the changed files' artifact blocks. No follow-ups.
     - Changed rows go in the table, old → new, in the values the report uses ("None → Viz · PNG"). Leave the table out when no row changed.
-    - Changed criteria go under Success criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → <new>`, an added one `▢ <new>`, a removed one `▢ ~~<old>~~`. Bold only what changed in a line, never the whole line.
+    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table: `▢ ~~<old>~~ → <new>`, an added one `▢ <new>`, a removed one `▢ ~~<old>~~`. Bold only what changed in a line, never the whole line.
 
     ````
     ## ✅ Task updated
@@ -139,7 +139,7 @@ Skill write_ai_task {
     |---|---|
     | 🗓️ Schedule | ~~Mondays 9:00 AM~~ → **Mondays 8:00 AM** |
 
-    ### Success criteria
+    ### Acceptance criteria
 
     ▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category
 

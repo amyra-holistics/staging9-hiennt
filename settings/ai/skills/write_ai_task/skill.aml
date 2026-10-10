@@ -128,7 +128,7 @@ Skill write_ai_task {
 
     ## Update report
 
-    After a change, show only the changed rows, old → new (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then the changed files' artifact blocks. No follow-ups.
+    After a change, show only the changed rows, old → new, in the same values the report uses ("None → Viz · PNG") (a criterion added: `+ **<line>**`, removed: `~~<line>~~`), then the changed files' artifact blocks. No follow-ups.
 
     ````
     ## ✅ Task updated

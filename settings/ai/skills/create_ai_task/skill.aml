@@ -39,7 +39,7 @@ Skill create_ai_task {
 
     ## Queries
 
-    Swap in the dataset's names and the latest complete period. Keep the comma after every item: without it the query fails.
+    Swap in the dataset's names and the latest complete period, which follows from today's date: run the Rule query in the same step as the date checks, not after them. Keep the comma after every item: without it the query fails.
 
     Latest date, once per dataset with the fields:
 

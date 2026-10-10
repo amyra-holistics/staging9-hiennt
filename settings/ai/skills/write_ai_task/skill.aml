@@ -1,0 +1,117 @@
+Skill write_ai_task {
+  label: 'Write AI task files'
+  description: "The task file, schedule entry, brief, acceptance criteria and report for a scheduled AI task. Load only when create_ai_task says to, never on its own, and settle everything from this conversation without recalling earlier chats."
+  invocation: 'manual'
+  disabled: H.git.is_production
+  content: @md
+    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat.
+
+    # Write an AI task
+
+    Save the files `create_ai_task` settled, run `validate_file` on each, then write the report. On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so save without listing folders again.
+
+    ## Files
+
+    Use these shapes instead of reading other task files. `<END>` is the line of two semicolons that closes an `@md` block.
+
+    ```
+    AiTask weekly_category_revenue {
+      label: 'Weekly category revenue'
+      description: 'One plain sentence, no straight apostrophe.'
+      brief: @md
+        <brief>
+      <END>
+      acceptance_criteria: @md
+        - <criterion>
+      <END>
+    }
+    ```
+
+    Save it as `settings/ai/tasks/<name>.ai_task.aml`. Add an entry to the `schedules` list in `schedules.aml`, comma-separated (create `const schedules = [ … ]` if missing):
+
+    ```
+    AiSchedule {
+      cron: '0 8 * * 1'
+      run_as: '${H.current_user.h_email}'
+      targets: [weekly_category_revenue]
+    }
+    ```
+
+    The cron is local time. Name the task in each save's summary ("Schedule for weekly category revenue"), because it titles the file card.
+
+    ## Brief
+
+    ```
+    ## At a glance
+    - Sends to: none, kept in the run record
+    - Condition: none, every run
+    - Attachment: none
+    - Schedule: <day and local time> (cron <cron>)
+
+    ## Definitions
+    - Nobody can answer questions during a run: follow these definitions and note any other choice in the result.
+    - <each period as complete dates: "Last week" = the most recent complete Monday–Sunday week>
+    - <the grouping as the field the query groups by: "Category" = categories.name>
+    - <how many rows the output lists, in what order; Step 1 returns exactly these rows, so a top 5 here is a top 5 there>
+    - <each derived metric and each rule from the cards>
+
+    ## Steps
+    1. Run one query returning a single table with every number the output uses (both periods, the change, the rank), sorted by priority. Build no separate tables to merge.
+    2. Call `explain_result` with that query and result, asking <what the output must say>.
+    3. Write the output only from that answer and the table, in the table's order.
+    ```
+
+    Keep the brief and criteria under 5,000 characters together, because longer definitions fail to start more often.
+
+    ## Acceptance criteria
+
+    2–5 short lines, key values in bold: what the output covers (metric, grouping, **Monday–Sunday week**, **top 5**). Only what a run can prove from its own results, never the schedule, because an unprovable line makes the review redo the job and send twice. Not "Runs every Monday at 8:00 AM" but "Keeps the result in the run record and sends nothing".
+
+    ## Report
+
+    The reply's only text:
+
+    ````
+    Task created as a draft. To turn it on, click `Commit changes`, then `Publish` in Development. The first run will be on **<Monday, October 12, 2026>**, running as **<run_as>**.
+
+    ## <label>
+
+    | | |
+    |---|---|
+    | 🏷️ Status | [Draft](#pos) (Publish to activate) |
+    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
+    | 🗓️ Schedule | <Mondays 8:00 AM (Workspace timezone)> |
+    | 📨 Delivery | <None (kept in the task's run record)> |
+    | 📝 Brief | <one sentence, key values in bold> |
+    | 📎 Attachment | <None> |
+
+    ### Acceptance criteria
+
+    ▢ <criterion, word for word>
+
+    ### Files
+
+    ```artifact
+    <stored_artifact.id of the task file's last save>
+    ```
+
+    ```artifact
+    <stored_artifact.id of the schedules.aml save>
+    ```
+
+    ### Follow-up
+
+    [Email it to me every <day>](#opt)
+    [Post it to a Slack channel every <day>](#opt)
+    [Preview the first result (nothing is sent)](#opt)
+    [Only send when <a rule in the user's terms>](#opt)
+    [Change the acceptance criteria](#opt)
+    ````
+
+    - Keep the empty header row and the non-breaking space after each icon, so no row is bold and no label wraps.
+    - One "▢ " paragraph per criterion, never a list, because the chat adds bullets.
+    - Each artifact block holds only the `stored_artifact.id` of that file's last save, task file first.
+    - Follow-up only for a task kept in the run record; a request that sends ends at Files.
+    - After a change: "Task updated. To apply the change, click `Commit changes`, then `Publish` in Development." with the next run, and "(Publish to apply)".
+  ;;
+}

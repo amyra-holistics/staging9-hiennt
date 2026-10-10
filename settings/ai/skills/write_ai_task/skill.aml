@@ -126,7 +126,7 @@ Skill write_ai_task {
     - One "▢ " paragraph per criterion, never a list.
     - Each artifact block holds only the `stored_artifact.id` of that file's last save.
     - Follow-up ends every new task.
-    - "Attach <next-best> instead" names the next-best type: "Attach a chart instead", "Attach the <tab title> tab instead" or "Attach the <dashboard title> dashboard instead". Drop it only when there's no attachment, or no dashboard on the task's dataset was read.
+    - "Attach <next-best> instead" names the next-best type: "Attach a chart instead", "Attach the <tab title> tab instead" or "Attach the <dashboard title> dashboard instead". Drop it when the Attachment row says None, or when no dashboard on the task's dataset was read.
     - The other "instead" line ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") is only for a pick made without a card, which is rare: a time, source or threshold picked on a card gets none.
 
     ## Update report
@@ -134,7 +134,7 @@ Skill write_ai_task {
     After a change: the draft line right under the heading, then only what changed, then `### Files` with the changed files' artifact blocks.
     - Changed rows go in the table as `~~<old>~~ → **<new>**`, in the values the report uses ("~~None~~ → **Viz · PNG**"). Leave the table out when no row changed.
     - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`, so the saved "Covers **revenue** for **every category**" becomes `▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
-    - No follow-ups, except when the change added or switched the attachment: then end with its one "Attach <next-best> instead" button.
+    - The last line, "Attach <next-best> instead", appears only when this change added or switched the attachment (adding email or Slack adds one), named as in the report. No other follow-ups.
 
     ````
     ## ✅ Task updated
@@ -156,6 +156,8 @@ Skill write_ai_task {
     ```artifact
     <stored_artifact.id of each changed file's last save>
     ```
+
+    [Attach <next-best> instead](#opt)
     ````
 
     If saving keeps failing: "## ❌ Couldn't create the task" (or "update"), the reason in plain words, and what the user can do.

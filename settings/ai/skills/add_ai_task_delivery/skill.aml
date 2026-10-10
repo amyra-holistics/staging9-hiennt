@@ -8,11 +8,11 @@ Skill add_ai_task_delivery {
 
     # Add delivery to an AI task
 
-    Settle who gets the result, when it sends and what file it carries, and write it into the brief. A scheduled run calls `deliver_data` itself, so add no disclaimer. Load `create_ai_task` too: it holds the flow, and `write_ai_task` holds the files and report.
+    Settle who gets the result, when it sends and what file it carries, and write it into the brief. A scheduled run calls `deliver_data` itself: add no disclaimer. Load `create_ai_task` too.
 
     ## Settle
 
-    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. A Yes on the Send card means Email · requester. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read their task files during the dataset search), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
+    - **Destination.** "Me" is ${H.current_user.h_email}. An address, a Slack channel or a column of addresses is clear. "Email · to you" on the Where card means Email · requester; "Slack" asks the channel card. Ask only about vague recipients ("the team"), shared or unusable addresses, or a missing Slack channel, all in one step. For Slack: "Which Slack channel? Or type another below." with the two channels this project's tasks already post to (read their task files during the dataset search), most used first; the card's own free-text answer is the third option. With none known, the only choice is "Not sure yet, keep it in the task".
     - **Condition.** Clear when the rule is a number the query computes. For a vague word ("a lot", "worst", "unusual"), don't ask: run this query for the latest complete period against the one before with `execute_aql` (`generate_aql` only if it fails), on the likely pick in the same step as the date queries, and again only if the pick changes:
 
       ```
@@ -22,16 +22,16 @@ Skill add_ai_task_delivery {
       explore { dimensions { grp: categories.name } measures { cur: cur, prev: prev, pct: pct } sorts { pct ASC } }
       ```
 
-      Swap in the metric, date field, dates and grouping; keep `is @(<start> - <end>)` as written.
+      Swap in the metric, date field, dates and grouping; keep `is @(<start> - <end>)`.
 
       Save the rule that catches the clear outliers in those numbers. "Worst" means a few rows, by change rather than size. "Unusual" can use `/detect_anomaly` (6 earlier periods). The report shows the rule with today's numbers and offers one stricter and one looser threshold. Call no `execute_viz`: a chart ends the turn.
     - **Attachment.** A PNG chart of the message's subject, unless the user named XLSX or PDF, or said no file.
 
     ## Brief additions
 
-    Fill At a glance (Sends to, Condition, Attachment). Keep Steps 1–3 (one table, `explain_result`, write), writing the message instead of the output; an existing task without them gets them, keeping what it covers, because every sent message must come from `explain_result` and one table. Then add:
+    Fill At a glance (Sends to, Condition, Attachment). Keep Steps 1–3 (one table, `explain_result`, write), writing the message instead of the output; an older task without them gets them, keeping what it covers. Then add:
     - for a condition, step 2: decide from the table, as exclusive ordered branches, each naming its destinations
-    - attach: `execute_viz` from the step 1 query (per recipient: only their rows), titled with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
+    - attach: `execute_viz` from the step 1 query (per recipient: only their rows) as a named chart, never a table: bars for a ranking or comparison, sorted like the table; a line for a trend. Title it with the period's dates, then `export_artifact`; if it fails, send without it and say so in the run summary
     - deliver: one message per recipient covering what the user asked for, with the export's job id in `export_job_ids`
 
     Append word for word:

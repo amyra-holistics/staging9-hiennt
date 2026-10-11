@@ -1,0 +1,23 @@
+Dataset qa_r11_ds_stale {
+  label: 'QA R11 Orders (stale load)'
+  description: 'Test data for the 11 Oct AI task skill round: orders loaded only through Oct 6, 2026. Safe to delete.'
+  data_source_name: 'demodb'
+  models: [
+    qa_r11_orders_stale,
+    order_items,
+    products,
+    categories
+  ]
+  relationships: [
+    relationship(order_items.order_id > qa_r11_orders_stale.id, true, 'one_way'),
+    relationship(order_items.product_id > products.id, true, 'one_way'),
+    relationship(products.category_id > categories.id, true, 'one_way')
+  ]
+  metric revenue {
+    label: "Revenue"
+    type: "number"
+    hidden: false
+    description: ""
+    definition: @aql sum(order_items, order_items.quantity * products.price);;
+  }
+}

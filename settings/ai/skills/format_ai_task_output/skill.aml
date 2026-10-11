@@ -5,7 +5,7 @@ Skill format_ai_task_output {
   content: @md
     # Format AI task messages
 
-    You write the message a scheduled AI task sends, the way a senior data analyst writes a weekly business review: the number first, what it is compared with, whether the move is normal, where it sits, and where to look. Nothing invented, nothing padded.
+    You write the message a scheduled AI task sends, the way a senior data analyst writes a weekly business review: the number first, what it is compared with, whether the move is normal, where it sits, and where to look.
 
     The brief decides **what** the result covers (metrics, grouping, periods, condition, recipients). This skill decides **how** it is checked, ordered and worded. Never drop what the brief or its acceptance criteria ask for.
 
@@ -15,8 +15,8 @@ Skill format_ai_task_output {
 
     In this order, and never trade a higher one for a lower one:
 
-    1. **Accurate.** Every number comes from a query result in this run or from the brief. A wrong number is worse than a missing clause: when a number isn't in the results, leave the clause out. Never estimate, never round a result into a different claim, never fill a gap from memory.
-    2. **Logical.** Words agree with the numbers: "fell" only for a negative change, "unusual" only for a 🔴 verdict, "within its usual range" only for a 🟢 one. Where a change sits is never why it happened.
+    1. **Accurate.** Every number comes from a query result in this run or from the brief. A wrong number is worse than a missing clause: when a number isn't in the results, leave the clause out. Never estimate or fill a gap from memory.
+    2. **Logical.** Words agree with the numbers: "fell" only for a negative change, "unusual" only for a 🔴 verdict, "within its usual range" only for a 🟢 one. 🟢 and ⚠️ are verdicts for you to read, never characters in the message. Where a change sits is never why it happened.
     3. **Complete.** Every line, group and period the brief asks for is there.
     4. **Readable.** One screen, the answer first, the same skeleton every run.
 
@@ -26,6 +26,8 @@ Skill format_ai_task_output {
     - **Digest**: no Condition. **Quiet** when step 4 finds no exception, otherwise **changed**.
 
     A run that sends nothing writes the same message as its result, without a subject.
+
+    **Delegating.** Whoever writes and sends the message must have loaded this skill. If you hand any of the run to a sub-task, start its instructions with "Load `format_ai_task_output` first and follow it", and pass word for word the task's label (the subject), the brief's dashboard, both periods and the recipients. A sub-task that delegates again passes the same.
 
     ## 3. Check before writing
 
@@ -84,7 +86,7 @@ Skill format_ai_task_output {
 
     ### Q2. Usual range and run length
 
-    One row per metric, for this period, from the 26 periods before it. Repeat the `t_m1` lines for each metric. Filter the date generously so the window never runs short: from the same day one year before this period's first day (three years for months) to this period's last day. The window counts periods, so the extra history changes nothing. For a group line, add the group as a second filter, separated by a comma: `filters { <date> matches @(…), <group field> == '<group>' }`.
+    One row per metric, for this period, from the 26 periods before it. Repeat the `t_m1` lines for each metric. Filter the date from one year before this period's first day (three years for months) to its last day, so the window never runs short. For a group line, add the group as a second filter, separated by a comma: `filters { <date> matches @(…), <group field> == '<group>' }`.
 
     ```
     metric t_m1 = <m1>;
@@ -145,14 +147,14 @@ Skill format_ai_task_output {
     }
     ```
 
-    Sort `t_delta desc` for a rise. `t_share_pct` is the group's share of the change. `t_comp_share_pct` is the group's share of the metric in the previous period, its normal size. Read it only for a sum, or a count of records that each belong to one group (an order has one channel, but its items can span several categories, so orders by category overlap). Never for a ratio such as average order value or a distinct count across overlapping groups. Showing both is what lets the reader see whether a group moved more than its size explains: a group with 80% of the drop and 45% of revenue the week before stands out, and one with 80% of both doesn't. State both numbers and let the reader compare. Never call a group "disproportionate" or compare the two yourself.
+    Sort `t_delta desc` for a rise. `t_share_pct` is the group's share of the change. `t_comp_share_pct` is the group's share of the metric in the previous period, its normal size. Use it only for a sum, or a count of records that each belong to one group (orders by channel, not orders by category, where one order spans several). Never for a ratio. Both shares together show whether a group moved more than its size explains (80% of the drop from 45% of revenue). State both and let the reader compare: never call a group "disproportionate".
 
     ## 4. Decide
 
     Read these from the results. Don't judge them.
 
     - **Verdict** per line: `t_m1_z` beyond ±3 is 🔴, within ±3 is 🟢, and null (too little history) is ⚠️, as is every line when the period is incomplete (Freshness). A ⚠️ line gets no usual range, and the data note says why.
-    - **Usual range**: `t_m1_low` to `t_m1_high`, the expected value plus or minus 3 typical swings over the last 26 periods. For an alert, `t_m1_swings` is how many typical swings the value sits from the expected one.
+    - **Usual range**: `t_m1_low` to `t_m1_high`, the expected value ± 3 typical swings over the last 26 periods. `t_m1_swings` is how far the value sits from the expected one, in typical swings.
     - **Run length**: `t_m1_run`, the periods in a row moving the same way (0 means fewer than 3), starting from `t_m1_run_from`.
     - **Exceptions**: a line that is 🔴, off its target, or has a run length of 3 or more. An alert's condition lines always are.
     - **Where**: read `t_where` on Q3's first row. `name` means that row's group dominates. It goes in the headline, and its drivers (the top 3 rows moving the same way as `t_overall`) and offsets (rows moving the other way) go in the where block. `spread` means no group dominates (under 40% of the change) or groups offset each other (over 100%). Then there is no where part anywhere: no group in the headline, no where block, no group in the pointer.
@@ -257,7 +259,7 @@ Skill format_ai_task_output {
 
     - **Where is never why.** Write "accounts for", "makes up" or "X% of the drop". Never "due to", "because of", "caused by", "driven by" or "led by" for a group. A breakdown shows where a change sits, not what caused it. When the change is spread, leave the where part out everywhere.
     - **No outside facts.** No holidays, campaigns, releases, seasonality, weather or market news unless the brief states them. No guess at a cause, ever.
-    - **"Unusual"** only with 🔴, **"significant"** never, and no adjectives in place of numbers ("sharp", "strong", "worrying").
+    - **"Unusual"**, and a swing multiple ("about 4.3 times a typical week's swing"), only with 🔴. **"Significant"** never, and no adjectives in place of numbers ("sharp", "strong", "worrying").
     - **Plain words.** Spell out a metric at its first mention. Gloss a derived metric in 2 or 3 words in brackets after its name, from its definition in the brief or the dataset ("Average order value (revenue per order)", "Churned MRR (cancellations)"), and give no gloss when it has none. When the brief's name for a metric differs from the dataset's ("Revenue" for a metric the dataset labels Gross merchandise value), gloss it with the dataset's label, so nobody confuses it with another metric. No column names, `t_…` names or unexplained abbreviations.
 
     ### Blocks
@@ -293,7 +295,8 @@ Skill format_ai_task_output {
     5. **Where**: a group appears in a contribution phrase, a where block or the pointer only when `t_where` is `name` (or, in the pointer, when exactly one group line is an exception). A group line's own name, and the fired groups in an alert, are always allowed. No causal verb follows a group name.
     6. **Highlights**: bold numbers only where the Highlights list puts them, and every group name in code style.
     7. **Footer**: its periods equal Q1's filters, "Data as of" equals `t_latest`, and the Source is the dataset's label.
-    8. **Brief**: every line, group and acceptance criterion the brief asks for is there.
+    8. **Names**: the subject is the task's label word for word, and the pointer's dashboard is exactly the brief's `@Dashboard:<uname>`.
+    9. **Brief**: every line, group and acceptance criterion the brief asks for is there.
 
     ## 7. Send
 
@@ -310,8 +313,9 @@ Skill format_ai_task_output {
     - A bold label line sits directly above its list, with no blank line in Slack.
     - Both: escape `&`, `<` and `>` in the text, including inside code. Keep `@Dashboard:<uname>` as it is, since it becomes a link, and keep the emoji as characters.
 
-    **Send once.** Only the run that wrote the message sends it. A main run that delegated the work never sends: it reports the sends its sub-task made. Whoever sends writes the run summary right away, so the review passes the first time and nothing is redone or sent twice. The summary names:
+    **Send once.** Only the run that wrote the message sends it. A main run that delegated the work never sends: it reports the sends its sub-task made. Whoever sends writes the run summary right away, so the review passes the first time and nothing is redone. It names:
     - the two periods compared, with their dates;
+    - the checks run, so the review sees them: Q1, Q2 (the 26-period window), Q3 or why it was skipped, freshness, `explain_result`, and each line's verdict;
     - each send (recipient, subject, outcome);
     - that every destination got the same message word for word, with only the markup changed;
     - whether the attachment went out.

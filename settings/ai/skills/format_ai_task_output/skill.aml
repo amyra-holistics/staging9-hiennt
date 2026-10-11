@@ -14,7 +14,7 @@ Skill format_ai_task_output {
     1. **Accurate.** Every number comes from a query result in this run or from the brief, every claim from the `explain_result` answer. You never add, subtract, divide, rank or compare numbers yourself: add a measure to the query instead. A number you don't have stays out.
     2. **Logical.** "Fell" only for a negative change. "Unusual" only for a 🔴 line. "Within its usual range" only for a 🟢 one.
     3. **Complete.** Every line, group and period the brief asks for is there.
-    4. **Do the whole run yourself.** Never call `add_task` or `delegate_task`. If you were handed this as a sub-task anyway, you are the one who writes and sends.
+    4. **One writer, one send.** Don't split the work into sub-tasks of your own (`add_task`). Whoever runs the steps writes and sends, once. A run that handed the task to a sub-task (`delegate_task`) never runs the checks or sends itself, even after a review rejects the sub-task: it reports what the sub-task did.
     5. **Your final answer is the run summary in step 8, never the message alone.** The review checks it against the brief's criteria and can't see the sends. A rejected answer makes the run start over and send twice.
 
     **Shape.** An **alert** has a Condition in the brief. If it didn't fire, send nothing (the final answer says so). A **digest** has none. It is **quiet** when nothing is an exception (step 4), otherwise **changed**.
@@ -131,15 +131,12 @@ Skill format_ai_task_output {
     }
     ```
 
-    For a chart of the change, drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add this block. Replace `<END>` with two semicolons in a row (one fails). This page can't show them.
+    For a chart of the change, drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add these three blocks. Replace each `<END>` with two semicolons in a row: one semicolon fails with "Unterminated string". This page can't show them.
 
     ```
-    calculation t_change {
-      label: '<Metric> change'
-      formula: @aql (<m1> | where(<date> matches @(<this>))) - (<m1> | where(<date> matches @(<previous>)))<END>
-      calc_type: 'measure'
-      data_type: 'number'
-    }
+    calculation t_cur { label: 'This <period>' formula: @aql <m1> | where(<date> matches @(<this first> - <this last>))<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_prev { label: 'Previous <period>' formula: @aql <m1> | where(<date> matches @(<previous first> - <previous last>))<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_change { label: '<Metric> change' formula: @aql t_cur - t_prev<END> calc_type: 'measure' data_type: 'number' }
     ```
 
     ## 4. Decide

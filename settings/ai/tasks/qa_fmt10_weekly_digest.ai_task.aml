@@ -34,7 +34,6 @@ AiTask qa_fmt10_weekly_digest {
   ;;
   acceptance_criteria: @md
     - Covers **revenue**, **orders** and **average order value** for the last complete **Monday–Sunday week** against the week before
-    - Sends one email to **nhi.ty@holistics.io** and one Slack post to **#nhity-test**, with the same message
-    - Each message carries the **PNG** chart when the export succeeds
+    - Gives each metric's **usual range** over the last 26 weeks
   ;;
 }

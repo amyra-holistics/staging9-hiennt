@@ -34,9 +34,7 @@ AiTask qa_fmt10_category_alert {
     Answer with `format_ai_task_output`'s final answer. Also list everyone skipped, with the reason.
   ;;
   acceptance_criteria: @md
-    - Compares each **category's revenue** for the last complete **Monday–Sunday week** with the week before, and sends only when one fell **more than 20%**
+    - Compares each **category's revenue** for the last complete **Monday–Sunday week** with the week before, and alerts only when one fell **more than 20%**
     - Names **every category** that fired, with its revenue, its change and whether the drop is unusual
-    - When it sends: one email to **nhi.ty@holistics.io** and one Slack post to **#nhity-test**, with the same message
-    - Each message carries the **PNG** chart when the export succeeds
   ;;
 }

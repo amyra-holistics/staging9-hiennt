@@ -21,7 +21,8 @@ AiTask qa_fmt10_category_alert {
     1. Check and write the alert with `format_ai_task_output`: its queries, `explain_result` and format replace any of your own. It covers each category's revenue for both weeks, the change and whether the condition fires.
     2. Decide from step 1's checks: if the condition fires, go on; if not, send nothing and give the run summary "## ➖ Nothing to send" with the largest category drop against the 20% line.
     3. Chart last week's revenue change by category with `execute_viz` (bars, sorted by change), titled "Revenue change by category, <last week's dates>", then `export_artifact` as PNG. If the export fails, send without it and say so in the run summary.
-    4. Deliver the alert once by email to nhi.ty@holistics.io and once to Slack #nhity-test, with the export's job id in `export_job_ids`.
+    4. Deliver the alert once by email to nhi.ty@holistics.io with the subject "QA FMT10 Category revenue alert · <last week's dates>", and once to Slack #nhity-test with the subject "QA FMT10 Category revenue alert", word for word, with the export's job id in `export_job_ids`.
+    5. Answer with `format_ai_task_output`'s final answer (its step 8), never the message alone.
 
     ## Delivery rules
     - Send each message once. If a send already succeeded in this run, report it instead of sending again, even when a later review asks to redo the task.

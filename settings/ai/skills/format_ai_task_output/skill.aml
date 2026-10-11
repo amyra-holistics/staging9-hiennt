@@ -15,6 +15,7 @@ Skill format_ai_task_output {
     2. **Logical.** "Fell" only for a negative change. "Unusual" only for a 🔴 line. "Within its usual range" only for a 🟢 one.
     3. **Complete.** Every line, group and period the brief asks for is there.
     4. **Do the whole run yourself.** Never call `add_task` or `delegate_task`. If you were handed this as a sub-task anyway, you are the one who writes and sends.
+    5. **Your final answer is the run summary in step 8, never the message alone.** The review checks it against the brief's criteria and can't see the sends. A rejected answer makes the run start over and send twice.
 
     **Shape.** An **alert** has a Condition in the brief. If it didn't fire, send nothing (the final answer says so). A **digest** has none. It is **quiet** when nothing is an exception (step 4), otherwise **changed**.
 
@@ -130,7 +131,7 @@ Skill format_ai_task_output {
     }
     ```
 
-    For a chart of the change, drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add this block. `<END>` stands for two semicolons, which this page can't show.
+    For a chart of the change, drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add this block. Replace `<END>` with two semicolons in a row (one fails). This page can't show them.
 
     ```
     calculation t_change {
@@ -166,7 +167,7 @@ Skill format_ai_task_output {
     ```
 
     - "vs <previous period>" goes only on the first line. A ⚠️ line has no range.
-    - **Tag:** only a 🔴 line gets one, `🔴 Anomaly`. A 🟢 or ⚠️ line has none.
+    - **Tag:** only a 🔴 line gets one, `🔴 Anomaly`. A 🟢 or ⚠️ line ends after its range: never write 🟢, ⚪, ⚠️ or "within range" on a line.
     - One metric's alert has no scorecard line.
 
     **Conclusion**, as the one `> ` quote:
@@ -226,7 +227,7 @@ Skill format_ai_task_output {
     | `> quote` | `<blockquote>` | `>` before the line |
     | `- ` list | `<ul><li>` | `• ` before each line |
 
-    - **Subject:** in email, the task's label, then " · " and this period, written as in the footer: "Weekly sales digest · Sep 28 – Oct 4". Each run gets its own email thread, so Gmail never hides the footer. In Slack, it's the label alone.
+    - **Subject:** use the subjects the brief's deliver step gives, word for word. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Sep 28 – Oct 4"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
     - In Slack, a bold label sits directly above its list, and the footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
     - Escape `&`, `<` and `>` in the text. Keep `@Dashboard:<uname>` and the emoji as written. Put the export's job id in `export_job_ids`.
     - **A run that already sent never sends again**, even when a review asks it to redo the task. It reports the sends it made.

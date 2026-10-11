@@ -31,7 +31,7 @@ Skill format_ai_task_output {
 
     ## 3. Check before writing
 
-    Run the three queries below with `execute_aql` on the brief's dataset. They replace the brief's own query, `generate_aql`, `/detect_anomaly` and `/analyze_contribution`, with the same formulas, so never load or call those for this. The brief's dashboard is only for the pointer: fetch its title, never review its tiles.
+    Run the three queries below with `execute_aql` on the brief's dataset. They replace the brief's own query, `generate_aql`, `/detect_anomaly` and `/analyze_contribution`, with the same formulas, so never load or call those for this. The brief's dashboard is only for the pointer: don't fetch or review it.
 
     **Every number in the message comes from these results or the brief.** You never add, subtract, divide, count, rank or compare numbers yourself. If you need a number the queries don't return, add a measure to the query and run it again.
 
@@ -42,6 +42,7 @@ Skill format_ai_task_output {
     - `<m1>`, `<m2>`, …: the scorecard lines in the brief's order, each as an AQL expression: a dataset metric, or the brief's definition such as `count_distinct(orders.id)` or `safe_divide(revenue, count_distinct(orders.id))`.
     - **Periods come from the brief, and a reported period has always ended.** "Last week" or "last month" is the latest one whose last day is before today: on Sunday Oct 11, last week is Sep 28 – Oct 4, never Oct 5 – 11. Freshness (below) is only for a period that has ended but isn't fully loaded.
     - Periods as first and last day, both included, always as `<date> matches @(<first> - <last>)`. Never compare the date field with `>` or `<` and a date: `@2026-09-27` is midnight at the start of that day, so `> @2026-09-27` takes in the 27th.
+    - Keep the templates' line breaks: each block on its own line (`sorts { … } limit: 1` on one line is a syntax error).
     - Name every metric `t_…`, so it never hides a dataset metric with the same name (an inline `aov` silently uses the dataset's `aov`). Use the one-argument `round()`: `round(x, 0)` fails on some databases.
 
     ### Order of calls
@@ -49,7 +50,6 @@ Skill format_ai_task_output {
     In one turn, start all of these, since none waits for another:
     - Q1 and Q2;
     - `fetch_dataset` on the brief's dataset, for its label (the footer's Source) and, if a query fails, its field names;
-    - `fetch_dashboard` on the brief's dashboard, for its title only (the pointer);
     - the brief's chart and export. For the chart, write its AQL yourself (an `explore` with the chart's dimension, metric, `matches` period filter and sort) and pass it to `generate_viz`, with no `generate_aql`.
 
     Then run Q3, only for the exception lines (step 4). Last, make the brief's `explain_result` call once, on all the checks: pass Q1 as `aql`, every result artifact (Q1, Q2, Q3) in `result`, and this question: "For each line, state the current and previous value, the change and percent (Q1), the usual range and whether it is within it (Q2), and the where rows (Q3). Use only numbers in these results: no totals, ranks or comparisons of your own." The message is that answer, formatted: a claim it doesn't make stays out, and a number it computed that no query returns stays out.
@@ -199,7 +199,7 @@ Skill format_ai_task_output {
     ---
 
     [📎 _Attached: Revenue by category, Oct 5 – 11 (PNG)_]
-    [🔗 _Look at **Paid Search** on the Sales Performance dashboard ([Link](@Dashboard:<uname>))_]
+    [🔗 _Look at **Paid Search** on the @Dashboard:<uname> dashboard_]
     🕒 _Data as of Oct 11, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
     ```
 
@@ -276,8 +276,8 @@ Skill format_ai_task_output {
     - **Data note.** At most one, only when a check found something about the data: an incomplete period, too little history, or the two checks disagreeing. One sentence, in its own paragraph under the headline.
     - **Footer section.** After the body, a `---` divider (blank line before and after), then up to three lines, each fully in italic, in this order:
       - 📎 `_Attached: <chart title> (PNG)_`, only when the export succeeded. With more than 8 groups collapsed to a total line, add the group count: `(all 19 categories, PNG)`.
-      - 🔗 the pointer: `_<Dashboard title> dashboard ([Link](@Dashboard:<uname>))_`, the title from `fetch_dashboard`. With a group to look at (Q3's `name` group, or the one exception group line): `_Look at **Paid Search** on the <title> dashboard ([Link](@Dashboard:<uname>))_`. With no dashboard, leave the line out. No cause, advice or promise of a later check.
-      - 🕒 the data line: `Data as of <t_latest, with the year>` · `Period: <this period>` · `Compared with: <previous period> (previous <week | month | day>)` · `Usual range: last 26 <weeks | months | days>` (left out when no line has a range) · `Source: <dataset label from fetch_dataset>`. No timezone: the query's days follow the dataset's settings, so a label could be wrong. A period is a range with an en dash, naming the month once within a month ("Sep 21 – 27", "Sep 28 – Oct 4"), a day as "Oct 9", a month as "September 2026". Nothing in the footer section may contain an underscore except inside the `@Dashboard:<uname>` link target.
+      - 🔗 the pointer: `_@Dashboard:<uname> dashboard_`. Delivery turns the mention into the dashboard's title as a link. Never put it inside another link: that breaks in both destinations. With a group to look at (Q3's `name` group, or the one exception group line): `_Look at **Paid Search** on the @Dashboard:<uname> dashboard_`. With no dashboard, leave the line out. No cause, advice or promise of a later check.
+      - 🕒 the data line: `Data as of <t_latest, with the year>` · `Period: <this period>` · `Compared with: <previous period> (previous <week | month | day>)` · `Usual range: last 26 <weeks | months | days>` (left out when no line has a range) · `Source: <dataset label from fetch_dataset>`. No timezone: the query's days follow the dataset's settings, so a label could be wrong. A period is a range with an en dash, naming the month once within a month ("Sep 21 – 27", "Sep 28 – Oct 4"), a day as "Oct 9", a month as "September 2026". Nothing in the footer section may contain an underscore except the `@Dashboard:<uname>` mention.
     - **Same skeleton every run**, with fresh sentences.
     - **Length** about 110 words quiet, 180 changed, 120 alert, not counting the subject, the footer section and links. Rows the brief requires stay even past the budget.
 
@@ -293,7 +293,7 @@ Skill format_ai_task_output {
     6. **Where**: a group appears in a contribution phrase, a where block or the pointer only when `t_where` is `name` (or, in the pointer, when exactly one group line is an exception). A group line's own name and the fired groups in an alert are always allowed. No causal verb follows a group name.
     7. **Format**: bold only where Highlights puts it, code style only on tags, one quote, the divider, the footer section in italic.
     8. **Footer section**: its periods equal Q1's filters, "Data as of" equals `t_latest`, the Source is the dataset's label, the 📎 line only if the export succeeded.
-    9. **Names**: the subject is the task's label word for word. When the brief names a dashboard, the 🔗 line has its title and exactly that `@Dashboard:<uname>`.
+    9. **Names**: the subject is the task's label word for word. When the brief names a dashboard, the 🔗 line has exactly that `@Dashboard:<uname>`.
     10. **Brief**: every line, group and acceptance criterion the brief asks for is there.
 
     ## 7. Send
@@ -305,16 +305,15 @@ Skill format_ai_task_output {
     | paragraph | `<p>` | text, then a blank line |
     | `**bold**` | `<strong>` | `*bold*` |
     | `_italic_` | `<em>` | `_italic_` |
-    | `` `tag` `` | `<code style="background:#f2f3f5;border-radius:4px;padding:1px 6px;font-size:90%">` | `` `tag` `` |
-    | `> quote` | `<blockquote style="margin:12px 0;padding:6px 12px;border-left:3px solid #c9ced6;color:#333">` | `>` before the line |
-    | `---` | `<hr style="border:none;border-top:1px solid #dcdfe4;margin:16px 0">` | a line of 24 `─` |
-    | `[Link](@Dashboard:<uname>)` | `<a href="@Dashboard:<uname>">Link</a>` | `<@Dashboard:<uname>\|Link>` |
+    | `` `tag` `` | `<code>` | `` `tag` `` |
+    | `> quote` | `<blockquote>` | `>` before the line |
+    | `---` | `<p>` holding a line of 24 `─` | a line of 24 `─` |
     | `- ` list | `<ul><li>` | `• ` before each line |
 
-    - A bold label line sits directly above its list, with no blank line in Slack. In Slack, the three footer lines have no blank line between them; in email, each is its own `<p style="margin:2px 0">`.
+    - A bold label line sits directly above its list, with no blank line in Slack. In Slack, the three footer lines have no blank line between them; in email, each is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
     - Both: escape `&`, `<` and `>` in the text (not in the markup above). Keep `@Dashboard:<uname>` exactly as written, since delivery turns it into the dashboard's address, and keep the emoji as characters.
 
-    **Send once.** Only the run that wrote the message sends it. A main run that delegated the work never sends: it reports the sends its sub-task made. Whoever sends writes the run summary right away, so the review passes the first time and nothing is redone. It names:
+    **Send once.** Only the run that wrote the message sends it. A main run that delegated the work never sends: it reports the sends its sub-task made. Whoever sends writes the run summary right away, as its final answer (the text it returns or submits), so the review passes the first time and nothing is redone. The review sees only that answer, never the sends. It names:
     - the two periods compared, with their dates;
     - the checks run, so the review sees them: Q1, Q2 (the 26-period window), Q3 or why it was skipped, freshness, `explain_result`, and each line's tag;
     - each send (recipient, subject, outcome);
@@ -343,7 +342,7 @@ Skill format_ai_task_output {
     ---
 
     📎 _Attached: Revenue by category, Sep 28 – Oct 4 (PNG)_
-    🔗 _Sales Performance dashboard ([Link](@Dashboard:sales_performance))_
+    🔗 _@Dashboard:sales_performance dashboard_
     🕒 _Data as of Oct 10, 2026 · Period: Sep 28 – Oct 4 · Compared with: Sep 21 – 27 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
     ```
 
@@ -364,7 +363,7 @@ Skill format_ai_task_output {
 
     ---
 
-    🔗 _Sales Performance dashboard ([Link](@Dashboard:sales_performance))_
+    🔗 _@Dashboard:sales_performance dashboard_
     🕒 _Data as of Oct 10, 2026 · Period: Sep 28 – Oct 4 · Compared with: Sep 21 – 27 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
     ```
 
@@ -384,7 +383,7 @@ Skill format_ai_task_output {
 
     ---
 
-    🔗 _Look at **Paid Search** on the Marketing Performance dashboard ([Link](@Dashboard:marketing_performance))_
+    🔗 _Look at **Paid Search** on the @Dashboard:marketing_performance dashboard_
     🕒 _Data as of Oct 9, 2026 · Period: Oct 9 · Compared with: Oct 8 (previous day) · Usual range: last 26 days · Source: Marketing_
     ```
 

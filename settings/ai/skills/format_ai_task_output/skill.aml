@@ -62,7 +62,7 @@ Skill format_ai_task_output {
     - **A target** adds `t_m1_gap_pct: round(safe_divide(t_m1_cur - <target>, <target>) * 100)`.
     - **A ratio metric** (average order value, conversion rate) adds `t_m1_num_pct` and `t_m1_den_pct`, the percent change of its numerator and denominator.
     - **Groups:** up to 8 get a line each. With more, use a total line plus the groups that are exceptions. An alert lists only the groups that fired, in the query's order, up to 8; with more, the headline says how many fired.
-    - **More than 100 groups** (merchants, products): sort Q1 by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and add the number that fired, with the brief's condition on `c` and `p`: `t_m1_n_fired: <model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<this period>), 0), p: coalesce(<m1> | where(<previous period>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`.
+    - **More than 100 groups** (merchants, products): sort Q1 by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and add the number that fired, with the brief's condition on `c` and `p`: `t_m1_n_fired: <group model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<this period>), 0), p: coalesce(<m1> | where(<previous period>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`. `<group model>` is the model the group field belongs to, as in `merchants | group(merchants.name)`, never a metric or another model. Count by the brief's group field, never by an id. The chart then shows only the listed groups: `conditions` gets `<group field> in ["…", "…"]` next to the date, never a measure condition.
 
     **Freshness.** Compare `t_latest` with this period. On or after its last day, go on. Inside it, rerun Q1 on the same days of both periods and skip Q2: every line is ⚠️, and the data note says so ("Oct 3 and 4 aren't loaded yet, so this compares Sep 28 to Oct 2 with Sep 21 to 25, and usual ranges can't be checked yet"). Before its first day, the run is **⛔ Blocked**: skip the other queries and the chart, and send the brief's destinations one short notice in place of the message, even for an alert: "<label> couldn't run: <dataset label> has data only through <t_latest>, so <this period> can't be checked yet." Missing data is never zero and never a drop.
 
@@ -207,7 +207,7 @@ Skill format_ai_task_output {
 
     Fix what fails, then send:
     1. Every number is a column in Q1, Q2 or Q3, or is in the brief. Every claim is in the `explain_result` answer.
-    2. Every ↑, ↓, "rose" and "fell" matches the sign of its change.
+    2. Every ↑, ↓, "rose" and "fell" matches the sign of its change, and "unchanged", "no change" or "flat" appears only where the change column is exactly 0 (731 vs 730 is "↑ under 1%", or "rose slightly").
     3. `🔴 Anomaly` appears only where `t_m1_z` is beyond ±3, and there is no other tag.
     4. A group is named in a where phrase only when `t_where` is `name`. No causal verb follows a group.
     5. The footer's periods equal Q1's filters, "Data as of" equals `t_latest`, and the 🔗 line has the brief's `@Dashboard:<uname>`.
@@ -230,6 +230,7 @@ Skill format_ai_task_output {
     - **Subject:** use the subjects the brief's deliver step gives, word for word, with the dates filled in. `deliver_data` takes any text in a subject, numbers and dates included: never shorten it. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Sep 28 – Oct 4"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
     - In Slack, every scorecard line starts with `• `, with no label line above it. Only a block label (**What changed**, **Where the change sits**) sits directly above its list. The footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
     - Escape `&`, `<` and `>` in the text. Keep `@Dashboard:<uname>` and the emoji as written. Put the export's job id in `export_job_ids`.
+    - A destination that fails is not a run error: never call `submit_error` for it. Finish with the "## ⚠️ Partly delivered" final answer.
     - **A run that already sent never sends again**, even when a review asks it to redo the task. It reports the sends it made.
 
     ## 8. Final answer

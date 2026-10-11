@@ -179,7 +179,7 @@ Skill format_ai_task_output {
 
     **Footer**, after a blank line, each line fully in italic:
     - 🔗 `_@Dashboard:<uname> dashboard_`, or `_Look at **Paid Search** on the @Dashboard:<uname> dashboard_` when there is a group to look at. Delivery turns the mention into the titled link, so never wrap it in another link. Leave the line out when there's no dashboard.
-    - 🕒 `_Data as of <t_latest, with year> · Period: <this> · Compared with: <previous> (previous <week | month | day>) · Usual range: last 26 <weeks | months | days> · Source: <dataset label>_`. Leave the usual range out when no line has one. No timezone.
+    - 🕒 `_Data as of <t_latest, with year> · Period: <this> · Compared with: <previous> (previous <week | month | day>) · Usual range: last 26 <weeks | months | days> · Source: <dataset label>_`. Periods have no year ("Sep 28 – Oct 4", "Sep 21 – 27", a month as "September 2026"). Leave the usual range out when no line has one. No timezone.
     - No line about the attachment. No underscore except in the mention.
 
     **Bold**, and nothing else:
@@ -225,7 +225,7 @@ Skill format_ai_task_output {
     | `- ` list | `<ul><li>` | `• ` before each line |
 
     - **Subject:** use the subjects the brief's deliver step gives, word for word. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Sep 28 – Oct 4"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
-    - In Slack, a bold label sits directly above its list, and the footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
+    - In Slack, every scorecard line starts with `• `, with no label line above it. Only a block label (**What changed**, **Where the change sits**) sits directly above its list. The footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
     - Escape `&`, `<` and `>` in the text. Keep `@Dashboard:<uname>` and the emoji as written. Put the export's job id in `export_job_ids`.
     - **A run that already sent never sends again**, even when a review asks it to redo the task. It reports the sends it made.
 

@@ -1,6 +1,6 @@
 AiTask qa_fmt10_category_alert {
   label: 'QA FMT10 Category revenue alert'
-  description: 'Alert by email and Slack when any category's weekly revenue falls more than 20% week over week, to test the format skill.'
+  description: "Alert by email and Slack when any category's weekly revenue falls more than 20% week over week, to test the format skill."
   brief: @md
     ## At a glance
     - Source: @Dataset:ecommerce_official

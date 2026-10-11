@@ -34,7 +34,7 @@ AiTask qa_r11_merchant_drop {
     Answer with `format_ai_task_output`'s final answer. Also list everyone skipped, with the reason.
   ;;
   acceptance_criteria: @md
-    - Compares each **merchant's revenue** for the last complete **Monday–Sunday week** with the week before, stating both weeks' dates
+    - Covers **revenue by merchant** for the last complete **Monday–Sunday week** against the week before, stating both weeks' dates
     - States **how many merchants** fell **more than 50%**, and names the largest drops with their revenue and change; a zero week before never qualifies
   ;;
 }

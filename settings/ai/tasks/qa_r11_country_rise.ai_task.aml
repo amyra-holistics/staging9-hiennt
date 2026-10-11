@@ -35,7 +35,7 @@ AiTask qa_r11_country_rise {
     Answer with `format_ai_task_output`'s final answer. Also list everyone skipped, with the reason.
   ;;
   acceptance_criteria: @md
-    - Compares each **country's revenue** for the last complete **Monday–Sunday week** with the week before, stating both weeks' dates
+    - Covers **revenue by country** for the last complete **Monday–Sunday week** against the week before, stating both weeks' dates
     - Names **every country** that rose **15% or more** or was **below $15,000**, and which part each met
   ;;
 }

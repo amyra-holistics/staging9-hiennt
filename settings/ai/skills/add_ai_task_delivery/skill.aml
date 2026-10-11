@@ -47,7 +47,7 @@ Skill add_ai_task_delivery {
 
     ## Acceptance criteria additions
 
-    Add no recipient, send or attachment line: the review can't see the sends, so those lines always fail. For a condition, add one line on its verdict: "States whether any <group> **fell 20% or more**; a zero previous period never qualifies". For recipients from a column, add "Checks each <recipient's> own rows".
+    Add no recipient, send or attachment line: the review can't see the sends, so those lines always fail. For a condition, add one line on its verdict: "States whether any <group> **fell 20% or more**, and names the ones that did; a zero previous period never qualifies". For recipients from a column, add "Checks each <recipient's> own rows".
 
     ## Existing tasks
 

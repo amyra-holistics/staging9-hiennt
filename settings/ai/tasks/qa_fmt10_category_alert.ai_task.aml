@@ -34,7 +34,7 @@ AiTask qa_fmt10_category_alert {
     Answer with `format_ai_task_output`'s final answer. Also list everyone skipped, with the reason.
   ;;
   acceptance_criteria: @md
-    - Compares each **category's revenue** for the last complete **Monday–Sunday week** with the week before, stating **both weeks' dates**
+    - Covers **revenue by category** for the last complete **Monday–Sunday week** against the week before, stating **both weeks' dates**
     - States whether any category fell **more than 20%**, and names **every category** that did, with its revenue, its change and whether the drop is unusual
   ;;
 }

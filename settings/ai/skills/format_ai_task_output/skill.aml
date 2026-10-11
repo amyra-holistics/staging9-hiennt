@@ -14,7 +14,7 @@ Skill format_ai_task_output {
     1. **Accurate.** Every number comes from a query result in this run or from the brief, every claim from the `explain_result` answer. You never add, subtract, divide, rank or compare numbers yourself: add a measure to the query instead. A number you don't have stays out.
     2. **Logical.** "Fell" only for a negative change. "Unusual" only for a 🔴 line. "Within its usual range" only for a 🟢 one.
     3. **Complete.** Every line, group and period the brief asks for is there.
-    4. **One writer, one send.** Don't split the work into sub-tasks of your own (`add_task`). Whoever runs the steps writes and sends, once. A run that handed the task to a sub-task (`delegate_task`) never runs the checks or sends itself, even after a review rejects the sub-task: it reports what the sub-task did.
+    4. **One writer, one send.** Don't split the work into sub-tasks of your own (`add_task`). Whoever runs the steps writes and sends, once. A run that handed the task to a sub-task (`delegate_task`) never runs the checks or sends itself, even after a review rejects the sub-task: it reports what the sub-task did. It can't see the sub-task's sends: when the sub-task's answer is empty, it says the sends can't be confirmed from here, never that nothing was sent.
     5. **Your final answer is the run summary in step 8, never the message alone.** The review checks it against the brief's criteria and can't see the sends. A rejected answer makes the run start over and send twice.
 
     **Shape.** An **alert** has a Condition in the brief. If it didn't fire, send nothing (the final answer says so). A **digest** has none. It is **quiet** when nothing is an exception (step 4), otherwise **changed**.
@@ -24,7 +24,7 @@ Skill format_ai_task_output {
     1. `fetch_dataset` on the brief's dataset, for field names and its label (the footer's Source).
     2. Q1, Q2 and the chart's `execute_viz`, together.
     3. Q3 (only for exception lines that aren't a group) and `export_artifact` (PNG) on the chart, together.
-    4. `explain_result` once, on all the checks. Pass Q1 as `aql`, every result artifact in `result`, and this question word for word, with only its `<…>` filled: "Start with three facts: this period <first – last> vs the previous period <first – last>, with dates; the data is complete through <t_latest>; and, for an alert, the condition <the brief's condition> is met or not met, and for which lines. Then for each line, state the current and previous value, the change and percent (Q1), the usual range and whether it is within it (Q2), and the where rows (Q3). Use only numbers in these results." The review reads this answer and nothing after it, so never shorten or reword the question. With no Q3, run it in turn 3.
+    4. `explain_result` once, on all the checks. Pass Q1 as `aql` and every result artifact in `result`. The question is these sentences, word for word with only `<…>` filled, leaving out a bracketed one that doesn't apply: "Start with this period <first – last> and the previous period <first – last>, with dates, and that the data is complete through <t_latest>. [State whether the condition <the brief's condition> is met, and for which lines; when it isn't, give the largest change against the line.] [Every number counts only <the brief's filter>.] For each line, state the current and previous value, the change and percent[, the usual range over the last 26 <weeks> and whether it is within it][, and the where rows]. Use only numbers in these results, and never ask for anything." The review reads this answer and nothing after it. With no Q3, run it in turn 3.
     5. Both sends, together. Then the final answer (step 8).
 
     Never call `generate_aql`, `generate_viz`, `/detect_anomaly`, `/analyze_contribution`, or fetch the brief's dashboard. If a query errors, fix the field names from `fetch_dataset` and rerun it once. After a second error, call `generate_aql` with the same periods and formulas.
@@ -34,8 +34,9 @@ Skill format_ai_task_output {
     Fill each `<…>`:
     - `<date>` is the brief's date field, and `<grain>` is `week()`, `month()` or `day()`.
     - `<m1>`, `<m2>`… are the brief's metrics in order: a dataset metric, or the brief's formula (`count_distinct(orders.id)`, `safe_divide(revenue, count_distinct(orders.id))`).
-    - **A reported period has always ended.** "Last week" on Sunday Oct 11 is Sep 28 – Oct 4.
+    - **A reported period has always ended and never contains today.** On Sunday Oct 11, "last week" is Sep 28 – Oct 4 (Oct 5 – 11 is still running), "last month" is September, and "yesterday" is Oct 10. Data loaded for today doesn't change that.
     - A period is always `<date> matches @(<first> - <last>)`, both days included. Never use `>` or `<` with a date: `@2026-09-27` is midnight at its start.
+    - Compare text with `==` and single quotes: `orders.status == 'cancelled'`, never `=` or double quotes, even when the brief writes them.
     - Name every measure `t_…`, so it never hides a dataset metric. Use the one-argument `round()`.
     - Keep the line breaks, and separate sort keys with commas: `sorts { t_period desc, t_group asc }`. Without the comma, the second key is silently dropped.
 
@@ -57,12 +58,13 @@ Skill format_ai_task_output {
     ```
 
     - **A condition** is computed here, on the unrounded change: `t_m1_fired: case(when: safe_divide(t_m1_cur - t_m1_prev, t_m1_prev) < -0.2, then: 'yes', else: 'no')`.
-    - **A rate** (a share or a percent) changes in percentage points: `round((t_m1_cur - t_m1_prev) * 10000) / 100` replaces the percent.
+    - **A rate** (a share or a percent) is returned as a percent with 2 decimals, `round(<rate> * 10000) / 100`, for both periods. It changes in percentage points: `round((t_m1_cur - t_m1_prev) * 10000) / 100` replaces the percent. Its target gap is in points too, `round((t_m1_cur - <target>) * 10000) / 100`, never a percent of the target.
     - **A target** adds `t_m1_gap_pct: round(safe_divide(t_m1_cur - <target>, <target>) * 100)`.
     - **A ratio metric** (average order value, conversion rate) adds `t_m1_num_pct` and `t_m1_den_pct`, the percent change of its numerator and denominator.
-    - **Groups:** up to 8 get a line each. With more, use a total line plus the groups that are exceptions. An alert lists only the groups that fired, in the query's order.
+    - **Groups:** up to 8 get a line each. With more, use a total line plus the groups that are exceptions. An alert lists only the groups that fired, in the query's order, up to 8; with more, the headline says how many fired.
+    - **More than 100 groups** (merchants, products): sort Q1 by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and add the number that fired, with the brief's condition on `c` and `p`: `t_m1_n_fired: <model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<this period>), 0), p: coalesce(<m1> | where(<previous period>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`.
 
-    **Freshness.** If `t_latest` is before this period's last day, rerun Q1 on the same days of both periods and skip Q2. Every line is then ⚠️, and nothing is off target. The data note says so: "Oct 11 isn't loaded yet, so this compares Oct 5 to 10 with Sep 28 to Oct 3, and usual ranges can't be checked yet."
+    **Freshness.** Compare `t_latest` with this period. On or after its last day, go on. Inside it, rerun Q1 on the same days of both periods and skip Q2: every line is ⚠️, and the data note says so ("Oct 3 and 4 aren't loaded yet, so this compares Sep 28 to Oct 2 with Sep 21 to 25, and usual ranges can't be checked yet"). Before its first day, the run is **⛔ Blocked**: skip the other queries and the chart, and send the brief's destinations one short notice in place of the message, even for an alert: "<label> couldn't run: <dataset label> has data only through <t_latest>, so <this period> can't be checked yet." Missing data is never zero and never a drop.
 
     **Q2. Usual range.** This period against the 26 before it. Filter from one year before this period's first day (three years for months) to its last day.
 
@@ -87,7 +89,7 @@ Skill format_ai_task_output {
     }
     ```
 
-    **Grouped Q2**, for group lines and alerts: one query for all groups. Add `t_group: <group field>` as a second dimension, use `sorts { t_period desc, t_group asc }` and `limit: 100`, and read only the rows of this period. Each group gets its own window.
+    **Grouped Q2**, for group lines and alerts: one query for all groups. Add `t_group: <group field>` as a second dimension, use `sorts { t_period desc, t_group asc }` and `limit: 100`, and read only the rows of this period. Each group gets its own window. With more than 100 groups, also filter it to the groups the message lists: `<group field> in ["…", "…"]`.
 
     **Cross-check.** `t_m1` must equal Q1's `t_m1_cur`. If it doesn't, fix Q1's days and rerun it. If they still differ, use Q1, leave that line's range out, and say so in the data note.
 
@@ -143,7 +145,7 @@ Skill format_ai_task_output {
 
     Read these from the results. Don't judge them.
     - **Verdict:** `t_m1_z` beyond ±3 is 🔴 Anomaly. Within ±3 is 🟢. Null (too little history) or an incomplete period is ⚠️, and the line gets no usual range.
-    - **Usual range:** `t_m1_low` to `t_m1_high`. `t_m1_swings` is how far off it is, in typical swings.
+    - **Usual range:** `t_m1_low` to `t_m1_high`. When `t_m1_low` is below 0 for a metric that can't be negative (revenue, a count), write "usual up to <high>". `t_m1_swings` is how far off it is, in typical swings.
     - **Exception:** a 🔴 line, a line off its target, or an alert's condition line.
     - **Where:** `t_where` on Q3's first row. `name` means that group goes in the headline, and the next 2 drivers plus the offsets go in the where block. `spread` means no group is named anywhere.
 
@@ -163,7 +165,7 @@ Skill format_ai_task_output {
     - **<Metric or group>**[ (<gloss>)] <value> · **<arrow change>**[ vs <previous period>][ · usual <low> to <high>][ · target <t>][ `🔴 Anomaly`]
     ```
 
-    - "vs <previous period>" goes only on the first line. A ⚠️ line has no range.
+    - "vs <previous period>" goes only on the first line. A ⚠️ line has no range and no explanation: it ends after its change.
     - **Tag:** only a 🔴 line gets one, `🔴 Anomaly`. A 🟢 or ⚠️ line ends after its range: never write 🟢, ⚪, ⚠️ or "within range" on a line.
     - One metric's alert has no scorecard line.
 
@@ -190,7 +192,7 @@ Skill format_ai_task_output {
     - the block labels.
 
     **Numbers**:
-    - ↑ and ↓ replace "up" and "down" in lines and brackets: "↑ 4%", "↓ 0.33 percentage points". Use "↑ under 1%" when `t_m1_pct` is 0 but the change isn't. "No change" only when the change is 0. "New this week" when the previous value is 0 or null. Sentences keep their verbs.
+    - ↑ and ↓ replace "up" and "down" in lines and brackets: "↑ 4%", "↓ 0.33 percentage points". Use "↑ under 1%" when `t_m1_pct` is 0 but the change isn't. "No change", "flat" or "unchanged" only when the change is 0, in every sentence, not only on lines. "New this week" when the previous value is 0 or null. Sentences keep their verbs.
     - Money of 1,000 or more is K or M with at most 3 significant digits ($1.02M, $412K, $8.99K); below that, whole units. Counts are whole numbers with separators (7,050). Rates have 2 decimals.
     - Use a real minus sign (−$26K) and numerals. Rounding only shortens a number: $254,550 is "$255K", and a 0.4% rise is never "flat".
 
@@ -210,6 +212,7 @@ Skill format_ai_task_output {
     4. A group is named in a where phrase only when `t_where` is `name`. No causal verb follows a group.
     5. The footer's periods equal Q1's filters, "Data as of" equals `t_latest`, and the 🔗 line has the brief's `@Dashboard:<uname>`.
     6. Every line, group and acceptance criterion the brief asks for is there.
+    7. The Slack body has no `**`: bold there is one asterisk on each side.
 
     ## 7. Send
 
@@ -224,7 +227,7 @@ Skill format_ai_task_output {
     | `> quote` | `<blockquote>` | `>` before the line |
     | `- ` list | `<ul><li>` | `• ` before each line |
 
-    - **Subject:** use the subjects the brief's deliver step gives, word for word. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Sep 28 – Oct 4"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
+    - **Subject:** use the subjects the brief's deliver step gives, word for word, with the dates filled in. `deliver_data` takes any text in a subject, numbers and dates included: never shorten it. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Sep 28 – Oct 4"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
     - In Slack, every scorecard line starts with `• `, with no label line above it. Only a block label (**What changed**, **Where the change sits**) sits directly above its list. The footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
     - Escape `&`, `<` and `>` in the text. Keep `@Dashboard:<uname>` and the emoji as written. Put the export's job id in `export_job_ids`.
     - **A run that already sent never sends again**, even when a review asks it to redo the task. It reports the sends it made.
@@ -246,7 +249,7 @@ Skill format_ai_task_output {
     <the Markdown message>
     ```
 
-    The title is "## ✅ Delivered", "## ⚠️ Sent without the attachment", "## ❌ Delivery failed", "## ⛔ Blocked", or "## ➖ Nothing to send". For Nothing to send, give the value against the threshold in place of Chart, Sent and the message.
+    The title is "## ✅ Delivered", "## ⚠️ Sent without the attachment", "## ⚠️ Partly delivered" (a destination failed: name it and its error on the Sent line), "## ❌ Delivery failed", "## ⛔ Blocked", or "## ➖ Nothing to send". The Sent line lists every destination the brief names, each with its outcome from `deliver_data`, failures included. For Nothing to send, give the largest change against the threshold, with its group, in place of Chart, Sent and the message; never list every group. For Blocked, give the latest date loaded and the notice as sent.
 
     ## 9. Examples
 

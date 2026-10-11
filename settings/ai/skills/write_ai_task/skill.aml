@@ -59,21 +59,21 @@ Skill write_ai_task {
     - Nobody can answer questions during a run: follow these definitions and note any other choice in the result.
     - <each period as complete dates: "Last week" = the most recent complete Monday–Sunday week>
     - <the grouping as the field the query groups by: "Category" = categories.name>
-    - <how many rows the output lists, in what order; Step 1 returns exactly these rows, so a top 5 here is a top 5 there>
+    - <how many rows the output lists, in what order: a top 5 here is a top 5 in the output>
     - <each derived metric and each rule the user asked for or picked on a card>
 
     ## Steps
-    1. Run one query returning a single table with every number the output uses (for a comparison: both periods and the change), sorted by priority. Build no separate tables to merge.
-    2. Call `explain_result` with that query and result, asking <what the output must say>.
-    3. Write the output only from that answer and the table, in the table's order.
-    4. Chart the step 1 table with `execute_viz`: bars for a ranking or comparison, sorted like the table, a line for a trend, never a table.
+    0. Before anything else, load `format_ai_task_output`. Don't split the work into sub-tasks of your own.
+    1. Check and write the output with `format_ai_task_output`: its queries, `explain_result` and format replace any of your own. It covers <what the output must say>, in the Definitions' order.
+    2. Chart <the metric by the grouping> with `execute_viz`: bars for a ranking or comparison, sorted like the output, a line for a trend, never a table.
+    3. Answer with `format_ai_task_output`'s final answer (its step 8), never the output alone.
     ```
 
-    The brief is plain words, never AQL: the run writes its query from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
+    The brief is plain words, never AQL: `format_ai_task_output` writes the run's queries from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
 
     ## Acceptance criteria
 
-    2–5 short lines in all, delivery lines included, with key values in bold. They say what the output covers (metric, grouping, **Monday–Sunday week**) and only what a run can prove from its own result, never the schedule: an unprovable line makes the review redo the job and send twice. Every value a criterion names must appear in the Step that writes the output or message.
+    2–5 short lines, with key values in bold. They say only what the run's `explain_result` answer can prove: the metric and grouping, both periods with their dates (**Monday–Sunday week**), that the data is complete, and the condition's verdict. Never a recipient, a send, an attachment, a chart or the schedule: the review reads that answer, written before the sends, so such a line always fails and the run redoes the job. Recipients and attachments go only in the deliver step. For a condition on groups, write "States whether any <group> <condition>, and names the ones that did", never "Compares each <group>": the review then asks for every group's numbers. Every value a criterion names must appear in the Step that writes the output or message. For a grouping with more than 8 groups, the criterion reads "Checks **every <group>** against its usual range" instead of "Covers … for every <group>", because the message lists only the total and the exception groups.
 
     ## Report
 
@@ -149,7 +149,7 @@ Skill write_ai_task {
 
     ▢ ~~Covers revenue for every category in the Monday–Sunday week~~ → Covers revenue and **share of the weekly total** for every category in the Monday–Sunday week
 
-    ▢ Emails the result to **nhi.ty@holistics.io**
+    ▢ States **both weeks' dates** and that the data is complete
 
     ### Files
 

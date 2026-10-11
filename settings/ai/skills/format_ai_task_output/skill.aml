@@ -33,13 +33,14 @@ Skill format_ai_task_output {
 
     Run the three queries below with `execute_aql` on the brief's dataset. They replace the brief's own query, `generate_aql`, `/detect_anomaly` and `/analyze_contribution`, with the same formulas, so never load or call those for this. The brief's dashboard is only for the pointer: don't fetch or review it.
 
-    **Every number in the message comes from these results or the brief**: values, differences, percents, gaps, shares, counts, ranges and run lengths. You never add, subtract, divide, count, rank or compare numbers yourself. If you need a number the queries don't return, add a measure to the query and run it again.
+    **Every number in the message comes from these results or the brief.** You never add, subtract, divide, count, rank or compare numbers yourself. If you need a number the queries don't return, add a measure to the query and run it again.
 
     ### Filling the templates
 
     Fill each `<…>` from the brief and the dataset:
     - `<date>`: the brief's date field. `<grain>`: its period as `week()`, `month()` or `day()`.
     - `<m1>`, `<m2>`, …: the scorecard lines in the brief's order, each as an AQL expression: a dataset metric, or the brief's definition such as `count_distinct(orders.id)` or `safe_divide(revenue, count_distinct(orders.id))`.
+    - **Periods come from the brief, and a reported period has always ended.** "Last week" or "last month" is the latest one whose last day is before today: on Sunday Oct 11, last week is Sep 28 – Oct 4, never Oct 5 – 11. Freshness (below) is only for a period that has ended but isn't fully loaded.
     - Periods as first and last day, both included, always as `<date> matches @(<first> - <last>)`. Never compare the date field with `>` or `<` and a date: `@2026-09-27` is midnight at the start of that day, so `> @2026-09-27` takes in the 27th.
     - Name every metric `t_…`, so it never hides a dataset metric with the same name (an inline `aov` silently uses the dataset's `aov`). Use the one-argument `round()`: `round(x, 0)` fails on some databases.
 
@@ -218,7 +219,7 @@ Skill format_ai_task_output {
 
     The alert line is the brief's Condition in words. With several groups, the headline already names them, so the alert line gives the verdicts without repeating the ranges on their lines: "Each crossed the 20% alert line. For `Mobiles`, that is unusual, about **5.2 times** a typical week's swing, while the others are within their usual ranges."
 
-    In the where block, the first driver's share of the drop is already in the headline, so its line gives the amount and its normal size. The next drivers (up to 2 more) add their share of the drop. One sentence covers all the offsets.
+    In the where block, the first driver's share is already in the headline, the next 2 drivers add theirs, and one sentence covers the offsets.
 
     ### Headline
 
@@ -235,7 +236,7 @@ Skill format_ai_task_output {
 
     ### Highlights
 
-    Highlights tell the reader where to look, so they appear only where something needs attention, and nowhere else.
+    Highlights mark only what needs attention.
 
     **Bold numbers, only these:**
     - Headline, changed digest or alert: the current value and the size of the change, plus the top group's share when there is a where part.
@@ -295,7 +296,7 @@ Skill format_ai_task_output {
     5. **Where**: a group appears in a contribution phrase, a where block or the pointer only when `t_where` is `name` (or, in the pointer, when exactly one group line is an exception). A group line's own name, and the fired groups in an alert, are always allowed. No causal verb follows a group name.
     6. **Highlights**: bold numbers only where the Highlights list puts them, and every group name in code style.
     7. **Footer**: its periods equal Q1's filters, "Data as of" equals `t_latest`, and the Source is the dataset's label.
-    8. **Names**: the subject is the task's label word for word, and the pointer's dashboard is exactly the brief's `@Dashboard:<uname>`.
+    8. **Names**: the subject is the task's label word for word. When the brief names a dashboard, the 🔗 pointer is there with exactly that `@Dashboard:<uname>`.
     9. **Brief**: every line, group and acceptance criterion the brief asks for is there.
 
     ## 7. Send
@@ -324,7 +325,7 @@ Skill format_ai_task_output {
 
     ## 8. Worked examples
 
-    Illustrative numbers, consistent within each example. Each has its subject line first.
+    Illustrative numbers.
 
     **Quiet digest.** Q2 put every line within ±3, and no run reached 3.
 
@@ -366,7 +367,7 @@ Skill format_ai_task_output {
     🕒 _Data as of Oct 11, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
     ```
 
-    Average order value is 🟢 with no run, so it gets no bullet and no bold. The −$220K, −$26K and 1,360 are `t_overall`, `t_delta` and `t_m2_change`, never computed.
+    Average order value isn't an exception, so no bullet and no bold. −$220K, −$26K and 1,360 are `t_overall`, `t_delta` and `t_m2_change`.
 
     **Alert.** Condition: daily revenue falls more than 20%. It fired, Q2 says 🔴, and Q3 says `name`.
 

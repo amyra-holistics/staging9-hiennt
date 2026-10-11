@@ -208,7 +208,7 @@ Skill format_ai_task_output {
     Fix what fails, then send:
     1. Every number is a column in Q1, Q2 or Q3, or is in the brief. Every claim is in the `explain_result` answer.
     2. Every ↑, ↓, "rose" and "fell" matches the sign of its change, and "unchanged", "no change" or "flat" appears only where the change column is exactly 0 (731 vs 730 is "↑ under 1%", or "rose slightly").
-    3. `🔴 Anomaly` appears only where `t_m1_z` is beyond ±3, and there is no other tag.
+    3. `🔴 Anomaly` appears only where `t_m1_z` is beyond ±3, and there is no other tag. No line says "within range", "(within range)" or "range unavailable": a line without a range just ends.
     4. A group is named in a where phrase only when `t_where` is `name`. No causal verb follows a group.
     5. The footer's periods equal Q1's filters, "Data as of" equals `t_latest`, and the 🔗 line has the brief's `@Dashboard:<uname>`.
     6. Every line, group and acceptance criterion the brief asks for is there.

@@ -34,7 +34,7 @@ Skill format_ai_task_output {
     Fill each `<…>`:
     - `<date>` is the brief's date field, and `<grain>` is `week()`, `month()` or `day()`.
     - `<m1>`, `<m2>`… are the brief's metrics in order: a dataset metric, or the brief's formula (`count_distinct(orders.id)`, `safe_divide(revenue, count_distinct(orders.id))`).
-    - **Periods come from the warehouse, never from your own date arithmetic.** `<this>` and `<previous>` are relative literals: "last week" is `@(last week)` and `@(2 weeks ago)`, "last month" is `@(last month)` and `@(2 months ago)`, "yesterday" is `@(yesterday)` and `@(2 days ago)`. `<window>` is `@(53 weeks ago - last week)`, `@(37 months ago - last month)` or `@(366 days ago - yesterday)`, and `<both>` is `@(2 weeks ago - last week)`, `@(2 months ago - last month)` or `@(2 days ago - yesterday)`. They follow the workspace's week start and clock, have always ended, and never contain today.
+    - **Periods come from the warehouse, never from your own date arithmetic.** `<this>` and `<previous>` are relative literals: "last week" is `@(last week)` and `@(2 weeks ago)`, "last month" is `@(last month)` and `@(2 months ago)`, "yesterday" is `@(yesterday)` and `@(2 days ago)`. `<window>` is `@(53 weeks ago - last week)`, `@(37 months ago - last month)` or `@(366 days ago - yesterday)`, and `<both>` is `@(2 weeks ago - last week)`, `@(2 months ago - last month)` or `@(2 days ago - yesterday)`. They follow the workspace's week start and clock, have always ended, and never contain today. Keep them in every query, even when the returned days look like the wrong weekday: never rewrite one as explicit dates. The days Q1 returns are the period.
     - **Every date you write** (message, subject, footer, chart title, the `explain_result` question) comes from Q1's `t_this_first`, `t_this_last`, `t_prev_first` and `t_prev_last`, never from today's date. Every date in this skill is only an example.
     - A period filter is always `<date> matches <this>` (or `<previous>`). Never use `>` or `<` with a date: `@2024-03-10` is midnight at its start.
     - Compare text with `==` and single quotes: `orders.status == 'cancelled'`, never `=` or double quotes, even when the brief writes them.
@@ -239,6 +239,8 @@ Skill format_ai_task_output {
     | `` `🔴 Anomaly` `` | `[🔴 Anomaly]` as plain text | `` `🔴 Anomaly` `` |
     | `> quote` | `<blockquote>` | `>` before the line |
     | `- ` list | `<ul><li>` | `• ` before each line |
+
+    An alert headline in Slack: `Merchant revenue rose *200%* or more for *64 merchants* in _Oct 5 – 11_ versus _Sep 28 – Oct 4_.`
 
     - **Subject:** use the subjects the brief's deliver step gives, word for word, with the dates filled in. `deliver_data` takes any text in a subject, numbers and dates included: never shorten it. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Mar 4 – 10"), so each run gets its own Gmail thread and nothing is hidden; in Slack, the label alone.
     - In Slack, every scorecard line starts with `• `, with no label line above it. Only a block label (**What changed**, **Where the change sits**) sits directly above its list. The footer lines have no blank line between them. In email, each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.

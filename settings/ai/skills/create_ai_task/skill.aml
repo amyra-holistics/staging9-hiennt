@@ -39,7 +39,7 @@ Skill create_ai_task {
 
     ## Queries
 
-    Swap in the dataset's names and the latest complete period, which follows from today's date: run the Rule query in the same step as the date checks, not after them. Keep the comma after every item: without it the query fails.
+    Swap in the dataset's names. Periods are relative literals that the warehouse resolves, never dates you work out: `@(last week)` and `@(2 weeks ago)`, `@(last month)` and `@(2 months ago)`, `@(yesterday)` and `@(2 days ago)`. Run the Rule query in the same step as the date checks, not after them. Keep the comma after every item: without it the query fails.
 
     Latest date, once per dataset with the fields:
 
@@ -61,7 +61,7 @@ Skill create_ai_task {
         unit_count: order_items | sum(order_items.quantity),
       }
       filters {
-        orders.created_at matches @(2026-09-28 - 2026-10-04),
+        orders.created_at matches @(last week),
       }
     }
     ```
@@ -69,8 +69,8 @@ Skill create_ai_task {
     Rule, ranking or threshold: the latest complete period against the one before, sorted by what the card ranks (`pct ASC` for a drop, `chg DESC` for the biggest dollar change).
 
     ```
-    metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
-    metric prev = revenue | where(orders.created_at is @(2026-09-21 - 2026-09-27));
+    metric cur = revenue | where(orders.created_at matches @(last week));
+    metric prev = revenue | where(orders.created_at matches @(2 weeks ago));
     metric chg = cur - prev;
     metric pct = safe_divide(chg * 100.0, prev);
     explore {
@@ -91,8 +91,8 @@ Skill create_ai_task {
 
     ## Flow
 
-    1. **First steps.** The load step reads the files named in the description. The next step does everything at once: load `write_ai_task` if needed, ask the Time card if needed, and either `read_folder` every root folder, so the search runs while the user answers, or read a pinned or named dataset's dataset and model files.
-    2. **Pinned source.** A dataset the prompt names by its label, word for word, counts as pinned: use that one, never a look-alike with a similar label, and never ask where its data lives. A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source if it has the fields and current data: no search, no card. A pinned dashboard is also the first attachment pick. Run its latest-date query first. Data that ends before the latest complete period isn't current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway".
+    1. **First steps.** The load step reads the files named in the description. The next step does everything at once: load `write_ai_task` if needed, ask the Time card if needed, and `read_folder` every root folder, so the search runs while the user answers. Only a dataset given as `@Dataset:<name>` or a file path is read directly instead.
+    2. **Pinned source.** A dataset the prompt names by its label, word for word, counts as pinned: use that one, never a look-alike with a similar label, and never ask where its data lives. A label doesn't say where its file is: in the step after the root folders, open every folder whose name shares a word with the label (`_test_data/qa_r11` for "QA R11 …"), and read their `*.dataset.aml` files until one has that `label`. Never ask about a named dataset before every root folder is read. A pinned dataset, model or dashboard (not `schedules.aml` or a task file) is the source if it has the fields and current data: no search, no card. A pinned dashboard is also the first attachment pick. Run its latest-date query first. Data that ends before the latest complete period isn't current, so never shift the period to fit it. Otherwise ask "<Pinned> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <pinned> anyway".
     3. **Source.** Open the next folder level in one step, then read every `*.dataset.aml` and its model files to find the datasets with the fields, and in that same step up to 3 `*.page.aml` files whose names fit the dataset or subject, for the attachment (their dataset, tabs and date filter `default`), even when nothing sends yet. In the next step, run the latest-date query on each, `fetch_dataset` the likely pick, and run its Rule query when a Rule card needs one.
        - A dataset with no rows in the latest complete period is never saved or offered, because a task on it never fires.
        - A dataset the user named is used as is.

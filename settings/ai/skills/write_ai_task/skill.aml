@@ -14,7 +14,7 @@ Skill write_ai_task {
     2. In the next step, edit `schedules.aml` and run `validate_file` on the task file. Two saves in one step can stall. `schedules.aml` only gains one entry, so validate it only if this save created it.
     3. Write the report.
 
-    On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read files back.
+    On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read files back. The one exception: a save that errors or times out may already be in the file, so `read_file` it, then save only what's missing. A change already in the file is done: never save it again.
 
     ## Files
 

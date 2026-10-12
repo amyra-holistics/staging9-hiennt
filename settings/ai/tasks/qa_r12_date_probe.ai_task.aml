@@ -1,0 +1,13 @@
+AiTask qa_r12_date_probe {
+  label: 'QA R12 Date probe'
+  description: "Reports the current date the run is given, to check what a task run knows about today."
+  brief: @md
+    ## Steps
+    1. Use no tool. Quote, word for word, every current date, time and timezone your instructions give you, and say where in your instructions each one appears. If none is given, say "no current date given".
+    2. Say which Monday to Sunday dates count as the most recent complete week, and how you worked that out.
+    3. Answer with steps 1 and 2. Send nothing.
+  ;;
+  acceptance_criteria: @md
+    - Quotes the current date the run was given, or says none was given
+  ;;
+}

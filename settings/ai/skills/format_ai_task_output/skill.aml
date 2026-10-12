@@ -160,13 +160,13 @@ Skill format_ai_task_output {
 
     ## 5. Write
 
-    One Markdown message: paragraphs, `**bold**`, flat `- ` lists, one `> ` quote, `_italic_` for the footer, and `` `code` `` for the tag only. No headings, tables, nested lists or divider.
+    One Markdown message: paragraphs, `**bold**`, flat `- ` lists, one `> ` quote, `_italic_` for the footer and an alert's time phrases, and `` `code` `` for the tag only. No headings, tables, nested lists or divider.
 
     **Headline.** The first line, plain text, at most 25 words. It covers the first exception line, or the first line when there is none: the metric, direction, size and baseline. Add the where part only when `t_where` is `name`.
     - Changed: "Revenue fell **18%** to **$1.02M** compared with the week before, and **Paid Search** accounts for about **80%** of the drop."
     - Quiet: "Revenue was **$265K** last week (**↑ 4%** vs the week before), within its usual range of $221K to $299K."
     - Off target: "MRR was **$412K** in February, **6% below** the $438K target (**↓ 1%** vs January)."
-    - Several groups fired: "Revenue fell more than 20% in **Mobiles**, **T-shirts** and **Bathroom** compared with the week before." Up to 3 groups, then "and others below".
+    - An alert: the condition with its threshold, how many groups fired, and both periods in italic: "Revenue fell more than **20%** for **4 categories** in _Mar 4 – 10_ versus _Feb 26 – Mar 3_." With one metric, add its value and change: "Revenue fell more than **20%** in _Mar 4 – 10_ versus _Feb 26 – Mar 3_, to $1.02M (↓ 22%)."
 
     **Scorecard line**, one per metric or group, and nothing else on it:
 
@@ -177,11 +177,12 @@ Skill format_ai_task_output {
     - "vs <previous period>" goes only on the first line. A ⚠️ line has no range and no explanation: it ends after its change.
     - **Tag:** only a 🔴 line gets one, `🔴 Anomaly`. A 🟢 or ⚠️ line ends after its range: never write 🟢, ⚪, ⚠️ or "within range" on a line.
     - One metric's alert has no scorecard line.
+    - In an alert, only the group's name is bold: `- **Mobiles** $20.1K · ↓ 24% · usual $8.99K to $45.3K`.
 
     **Conclusion**, as the one `> ` quote:
     - A quiet digest: "No metric moved outside its usual range."
-    - An alert, one metric: "That crosses the 20% alert line[ and is unusual: the expected range was $158K to $190K, about **4.3 times** a typical day's swing][ but is still within its usual range of $158K to $190K]."
-    - An alert, several groups: "Each crossed the 20% alert line[, and all are within their usual ranges][. For **Mobiles**, that is about **5.2 times** a typical week's swing]."
+    - An alert, one metric: "That crosses the **20%** alert line[ and is unusual: the expected range was $158K to $190K, about 4.3 times a typical day's swing][ but is still within its _26-day usual range_ of $158K to $190K]."
+    - An alert, several groups: "Each crossed the **20%** alert line[, and all are within their _26-week usual ranges_][. **Mobiles** is below its _26-week usual range_]."
 
     **Blocks**, after the scorecard and only when they apply:
     - **Data note:** one sentence under the headline, only when a check found something about the data (an incomplete period, a metric with too little history, the checks disagreeing). A ⚠️ group line is never explained, here, on its line or in the conclusion.
@@ -191,9 +192,11 @@ Skill format_ai_task_output {
     **Footer**, after a blank line, each line fully in italic:
     - 🔗 `_@Dashboard:<uname> dashboard_`, or `_Look at **Paid Search** on the @Dashboard:<uname> dashboard_` when there is a group to look at. Delivery turns the mention into the titled link, so never wrap it in another link. Leave the line out when there's no dashboard.
     - 🕒 `_Data as of <t_latest, with year> · Period: <this> · Compared with: <previous> (previous <week | month | day>) · Usual range: last 26 <weeks | months | days> · Source: <dataset label>_`. Periods have no year ("Mar 4 – 10", "Feb 26 – Mar 3", a month as "February 2024"). Leave the usual range out when no line has one. No timezone.
-    - No line about the attachment. No underscore except in the mention.
+    - No line about the attachment. No other underscore, except in the mention and an alert's italic time phrases.
 
-    **Bold**, and nothing else:
+    **Bold in an alert**, and nothing else: the threshold (**20%**), how many fired (**64 merchants**), every group name, and the block labels. Values and arrow changes stay plain. Its periods and "usual range" phrases are in italic (_Oct 5 – 11_, _26-week usual range_).
+
+    **Bold in a digest**, and nothing else:
     - every line's label and arrow change;
     - the headline's value, and its change (the headline's bracketed change in a quiet digest);
     - an exception line's value, and its target when it's off target;
@@ -222,6 +225,7 @@ Skill format_ai_task_output {
     5. The footer's periods equal Q1's filters, "Data as of" equals `t_latest`, and the 🔗 line has the brief's `@Dashboard:<uname>`.
     6. Every line, group and acceptance criterion the brief asks for is there.
     7. The Slack body has no `**`: bold there is one asterisk on each side.
+    8. In an alert, bold is only the threshold, the count and group names, and the periods are in italic.
 
     ## 7. Send
 
@@ -298,14 +302,14 @@ Skill format_ai_task_output {
     **Alert, several groups**, one with no sales this week (its ⚠️ line ends after its change, and nothing else mentions it):
 
     ```
-    Revenue fell more than 20% in **Kayaks**, **Mobiles** and **T-shirts** compared with the week before, and others below.
+    Revenue fell more than **20%** for **4 categories** in _Mar 4 – 10_ versus _Feb 26 – Mar 3_.
 
-    - **Kayaks** **$0** · **↓ 100%** vs the week before
-    - **Mobiles** **$20.1K** · **↓ 24%** · usual $8.99K to $45.3K
-    - **T-shirts** **$17.8K** · **↓ 22%** · usual $14.7K to $32.1K
-    - **Bathroom** **$7.06K** · **↓ 23%** · usual $5.36K to $13.4K
+    - **Kayaks** $0 · ↓ 100% vs the week before
+    - **Mobiles** $20.1K · ↓ 24% · usual $8.99K to $45.3K
+    - **T-shirts** $17.8K · ↓ 22% · usual $14.7K to $32.1K
+    - **Bathroom** $7.06K · ↓ 23% · usual $5.36K to $13.4K
 
-    > Each crossed the 20% alert line.
+    > Each crossed the **20%** alert line.
 
     🔗 _@Dashboard:sales_performance dashboard_
     🕒 _Data as of Mar 16, 2024 · Period: Mar 4 – 10 · Compared with: Feb 26 – Mar 3 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_

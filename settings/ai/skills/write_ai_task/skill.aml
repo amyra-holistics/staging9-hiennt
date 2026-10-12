@@ -124,7 +124,8 @@ Skill write_ai_task {
     [Change the acceptance criteria](#opt)
     ````
 
-    - **Table:** keep the empty header row, each icon exactly as written (Source is 🗄️, never 🗂️ or 🗃️) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
+    - **Table:** keep the empty header row, each icon exactly as written (🗄️ Source, never 🗂️ or 🗃️; 📨 Delivery, never 📧) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
+    - **Run-as line:** keep it whole, "it sees the data you can see" included.
     - **Delivery:** "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
     - **Condition:** the rule in plain words (metric, direction, size, compared with what), no values from today. Drop the row when there's no condition.
     - **Attachment:** "None", "Viz · PNG", "Tab · <dashboard title> › <tab title> · PNG", "Dashboard · <dashboard title> · PNG", or the file the user named ("Table · XLSX").

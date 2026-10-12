@@ -1,0 +1,329 @@
+Skill format_ai_task_output {
+  label: 'Format AI task messages'
+  description: "Check and write the result of a scheduled AI task run, for email, Slack or the run record: a digest each run, or an alert when the task's condition fires. Load at the start of every AI task run, before the first query. Not for creating or editing tasks, chat answers, AI Blocks, or per-recipient notices."
+  invocation: 'auto'
+  content: @md
+    # Format AI task messages
+
+    Check and write the message a scheduled AI task sends, the way a senior analyst writes a weekly business review: the number, what it's compared with, whether the move is normal, where it sits, and where to look. The brief decides **what** the message covers (metrics, grouping, periods, condition, recipients, chart). This skill decides **how** it's checked, worded and sent. Write in the brief's language.
+
+    ## 1. Rules
+
+    1. **Accurate.** Every number comes from a query result in this run or from the brief, every claim from the `explain_result` answer. Never add, subtract, divide, rank or compare numbers yourself: add a measure to the query. A number you don't have stays out.
+    2. **Logical.** "Fell" only for a negative change. "Unusual" only for a 🔴 line. "Within its usual range" only for a 🟢 one.
+    3. **Complete.** Every line, group and period the brief asks for is there.
+    4. **One writer, one send.** Don't split the work into sub-tasks of your own (`add_task`). Whoever runs the steps writes and sends, once, and never sends again, even when a review asks to redo the task: it reports the sends it made. A run that handed the task to a sub-task (`delegate_task`) never checks or sends itself. It can't see the sub-task's sends: when the sub-task's answer is empty, it says the sends can't be confirmed from here, never that nothing was sent.
+    5. **The final answer is the run summary (step 8).** The review reads only the `explain_result` answer and your final answer, never the sends. A rejected answer restarts the run.
+
+    **Shape.** An **alert** has a Condition in the brief. If it didn't fire, send nothing. A **digest** has none: it's **quiet** when nothing is an exception (step 4), otherwise **changed**.
+
+    ## 2. Run in five turns
+
+    1. `fetch_dataset` on the brief's dataset, for field names and its label (the footer's Source).
+    2. Q1, Q2 and the chart's `execute_viz`, together.
+    3. Q3 (only for exception lines that aren't a group) and `export_artifact` (PNG) on the chart, together.
+    4. `explain_result` once, on all the checks: Q1 as `aql`, every result artifact in `result`. With no Q3, run it in turn 3. The question is these sentences, word for word with only `<…>` filled, leaving out a bracketed one that doesn't apply:
+       "Start with this period <t_this_first – t_this_last> and the previous period <t_prev_first – t_prev_last>, with dates, and that the data is complete through <t_latest>. [State whether the condition <the brief's condition> is met, and for which lines; when it isn't, give the largest change against the line.] [Every number counts only <the brief's filter>.] For each line, named as the brief names it (<Revenue, Orders, …>), state the current and previous value, the change and percent[, the usual range over the last 26 <weeks> and whether it is within it][, and the where rows]. Use only numbers in these results, and never ask for anything."
+    5. Both sends, together. Then the final answer.
+
+    Never call `generate_aql`, `generate_viz`, `/detect_anomaly`, `/analyze_contribution`, or fetch the brief's dashboard. If a query errors, fix the field names from `fetch_dataset` and rerun it once. After a second error, call `generate_aql` with the same periods and formulas.
+
+    ## 3. Queries
+
+    Fill each `<…>`:
+    - `<date>` is the brief's date field. `<grain>` is `week()`, `month()` or `day()`.
+    - `<m1>`, `<m2>`… are the brief's metrics in order: a dataset metric, or the brief's formula (`count_distinct(orders.id)`, `safe_divide(revenue, count_distinct(orders.id))`).
+    - **Periods come from the warehouse, never from your own date arithmetic.**
+
+      | Brief | `<this>` | `<previous>` | `<window>` (Q2) | `<both>` (Q3) |
+      |---|---|---|---|---|
+      | last week | `@(last week)` | `@(2 weeks ago)` | `@(53 weeks ago - last week)` | `@(2 weeks ago - last week)` |
+      | last month | `@(last month)` | `@(2 months ago)` | `@(37 months ago - last month)` | `@(2 months ago - last month)` |
+      | yesterday | `@(yesterday)` | `@(2 days ago)` | `@(366 days ago - yesterday)` | `@(2 days ago - yesterday)` |
+
+      They follow the workspace's week start and clock, have always ended, and never contain today. Keep them in every query, even when the returned days look like the wrong weekday: never rewrite one as explicit dates. The days Q1 returns are the period.
+    - **Every date you write** (message, subject, footer, chart title, the `explain_result` question) comes from Q1's `t_this_first`, `t_this_last`, `t_prev_first` and `t_prev_last`, never from today's date. Every date in this skill is only an example.
+    - A period filter is always `<date> matches <this>` (or `<previous>`), never `>` or `<` with a date: `@2024-03-10` is midnight at its start.
+    - Compare text with `==` and single quotes (`orders.status == 'cancelled'`), even when the brief writes `=` or double quotes.
+    - Name every measure `t_…`, so it never hides a dataset metric. Use the one-argument `round()`.
+    - Keep the line breaks, and separate sort keys with commas (`sorts { t_period desc, t_group asc }`): without the comma, the second key is silently dropped.
+
+    **Q1. Scorecard and freshness.** One row, or one row per group with `dimensions { t_group: <group field> }`. Repeat the `t_m1` lines per metric.
+
+    ```
+    metric t_m1_cur = <m1> | where(<date> matches <this>);
+    metric t_m1_prev = <m1> | where(<date> matches <previous>);
+    metric t_latest = max(<date> | day());
+    metric t_this_first = min(<date> | day()) | where(<date> matches <this>);
+    metric t_this_last = max(<date> | day()) | where(<date> matches <this>);
+    metric t_prev_first = min(<date> | day()) | where(<date> matches <previous>);
+    metric t_prev_last = max(<date> | day()) | where(<date> matches <previous>);
+    explore {
+      measures {
+        t_m1_cur: t_m1_cur,
+        t_m1_prev: t_m1_prev,
+        t_m1_change: t_m1_cur - t_m1_prev,
+        t_m1_pct: round(safe_divide(t_m1_cur - t_m1_prev, t_m1_prev) * 100),
+        t_latest: t_latest | keep_grains(),
+        t_this_first: t_this_first | keep_grains(),
+        t_this_last: t_this_last | keep_grains(),
+        t_prev_first: t_prev_first | keep_grains(),
+        t_prev_last: t_prev_last | keep_grains()
+      }
+    }
+    ```
+
+    Add to Q1 when the brief needs it:
+    - **Condition**, on the unrounded change: `t_m1_fired: case(when: safe_divide(t_m1_cur - t_m1_prev, t_m1_prev) < -0.2, then: 'yes', else: 'no')`.
+    - **Rate** (a share or a percent): a percent with 2 decimals, `round(<rate> * 10000) / 100`, for both periods. Its change is in percentage points, `round((t_m1_cur - t_m1_prev) * 10000) / 100`, in place of the percent, and so is its target gap, `round((t_m1_cur - <target>) * 10000) / 100`.
+    - **Target:** `t_m1_gap_pct: round(safe_divide(t_m1_cur - <target>, <target>) * 100)`.
+    - **Ratio metric** (average order value, conversion rate): `t_m1_num_pct` and `t_m1_den_pct`, the percent change of its numerator and denominator.
+    - **Groups:** up to 8 get a line each. With more, a total line plus the exception groups. An alert lists only the groups that fired, in the query's order, up to 8, and the headline says how many fired.
+    - **More than 100 groups** (merchants, products): sort by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and count the ones that fired with the brief's condition on `c` and `p`: `t_m1_n_fired: <group model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<date> matches <this>), 0), p: coalesce(<m1> | where(<date> matches <previous>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`. `<group model>` is the group field's model, as in `merchants | group(merchants.name)`. Count by the brief's group field, never by an id. The chart shows only the listed groups: `conditions` gets `<group field> in ["…", "…"]` next to the date.
+
+    **Freshness.** This period's last calendar day is `t_this_first` plus 6 days for a week, the month's last day for a month, `t_this_first` for a day.
+    - `t_latest` on or after it: go on.
+    - `t_latest` inside it: rerun Q1 on the same days of both periods, written out from `t_this_first`, `t_latest` and `t_prev_first` (`@(2024-03-04 - 2024-03-08)`), and skip Q2. Every line is ⚠️, and the data note says so ("Mar 9 and 10 aren't loaded yet, so this compares Mar 4 to 8 with Feb 26 to Mar 1, and usual ranges can't be checked yet").
+    - `t_this_first` null: the run is **⛔ Blocked**. Skip the other queries and the chart, and send the brief's destinations one short notice in place of the message, even for an alert: "<label> couldn't run: <dataset label> has data only through <t_latest>, so <last week | last month | yesterday> can't be checked yet." Missing data is never zero and never a drop.
+
+    **Q2. Usual range.** This period against the 26 before it.
+
+    ```
+    metric t_m1 = <m1>;
+    metric t_m1_prev = window_avg(t_m1, -1..-1, order: <date> | <grain> | asc());
+    metric t_m1_chg = t_m1 - t_m1_prev;
+    metric t_m1_exp = t_m1_prev + window_avg(t_m1_chg, -26..-1, order: <date> | <grain> | asc());
+    metric t_m1_sd = window_stdev(t_m1_chg, -26..-1, order: <date> | <grain> | asc());
+    explore {
+      dimensions { t_period: <date> | <grain> }
+      measures {
+        t_m1: t_m1,
+        t_m1_low: t_m1_exp - 3 * t_m1_sd,
+        t_m1_high: t_m1_exp + 3 * t_m1_sd,
+        t_m1_z: safe_divide(t_m1 - t_m1_exp, t_m1_sd),
+        t_m1_swings: round(abs(safe_divide(t_m1 - t_m1_exp, t_m1_sd)) * 10) / 10
+      }
+      filters { <date> matches <window> }
+      sorts { t_period desc }
+      limit: 1
+    }
+    ```
+
+    - **Grouped**, for group lines and alerts: one query for all groups, with `t_group: <group field>` as a second dimension, `sorts { t_period desc, t_group asc }` and `limit: 100`. Read only this period's rows. With more than 100 groups, also filter to the listed groups: `<group field> in ["…", "…"]`.
+    - **Cross-check:** `t_m1` must equal Q1's `t_m1_cur`. If not, fix Q1's days and rerun it. If they still differ, use Q1, leave that line's range out, and say so in the data note.
+
+    **Q3. Where the change sits.** Only for exception lines that aren't a group, by the brief's grouping. Use `t_delta desc` for a rise.
+
+    ```
+    metric t_base = coalesce(<m1> | where(<date> matches <this>), 0);
+    metric t_comp = coalesce(<m1> | where(<date> matches <previous>), 0);
+    metric t_delta = t_base - t_comp;
+    metric t_overall = (t_base | keep_grains()) - (t_comp | keep_grains());
+    explore {
+      dimensions { t_group: <group field> }
+      measures {
+        t_delta: t_delta,
+        t_share_pct: round(safe_divide(t_delta, t_overall) * 100),
+        t_comp_share_pct: round(safe_divide(t_comp, t_comp | keep_grains()) * 100),
+        t_where: case(when: safe_divide(t_delta, t_overall) >= 0.4 and safe_divide(t_delta, t_overall) <= 1, then: 'name', else: 'spread')
+      }
+      filters { <date> matches <both> }
+      sorts { t_delta asc }
+    }
+    ```
+
+    `t_share_pct` is the group's share of the change. `t_comp_share_pct` is its share of the metric the period before: use it only for a sum or a count where each record is in one group.
+
+    **Chart.** `execute_viz` with the brief's title, `dataset_uname` and this code. `<metric ref>` is `r(<dataset>.<metric>)`, or `'t_m'` with a `calculation t_m` like the ones below when the metric is a formula.
+
+    ```
+    BarChart {
+      dataset: <dataset>
+      x_axis: VizFieldFull { ref: r(<group field>) label: '<Group>' }
+      y_axis {
+        series {
+          field: VizFieldFull { ref: <metric ref> label: '<Metric>' format { type: 'number' pattern: 'inherited' } }
+        }
+      }
+      conditions: [
+        "<date> matches <this>",
+      ]
+      settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
+    }
+    ```
+
+    For a chart of the change: drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add these blocks. Replace each `<END>` with two semicolons in a row (one fails with "Unterminated string").
+
+    ```
+    calculation t_cur { label: 'This <period>' formula: @aql <m1> | where(<date> matches <this>)<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_prev { label: 'Previous <period>' formula: @aql <m1> | where(<date> matches <previous>)<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_change { label: '<Metric> change' formula: @aql t_cur - t_prev<END> calc_type: 'measure' data_type: 'number' }
+    ```
+
+    ## 4. Decide
+
+    Read these from the results. Don't judge them.
+    - **Verdict:** `t_m1_z` beyond ±3 is 🔴 Anomaly, within ±3 is 🟢. Null (too little history, or a group with no row this period, such as $0 sales) or an incomplete period is ⚠️, with no usual range.
+    - **Usual range:** "usual <low> to <high>" whenever `t_m1_low` is 0 or more ($40 and $900 → "usual $40 to $900"). Only a negative `t_m1_low` on a metric that can't be negative (revenue, a count) becomes "usual up to <high>" (−$120 and $900 → "usual up to $900"). `t_m1_swings` is how far off it is, in typical swings.
+    - **Exception:** a 🔴 line, a line off its target, or an alert's condition line.
+    - **Where:** `t_where` on Q3's first row. `name`: that group goes in the headline, the next 2 drivers and the offsets in the where block. `spread`: no group is named anywhere.
+
+    ## 5. Write
+
+    One Markdown message: paragraphs, `**bold**`, flat `- ` lists, one `> ` quote, `_italic_`, and `` `code` `` for the tag only. No headings, tables, nested lists or divider.
+
+    **Headline**, the first line, at most 25 words. It covers the first exception line, or the first line when there's none: the metric, direction, size and baseline. Add the where part only when `t_where` is `name`.
+    - Changed: "Revenue fell **18%** to **$1.02M** compared with the week before, and **Paid Search** accounts for about **80%** of the drop."
+    - Quiet: "Revenue was **$265K** last week (**↑ 4%** vs the week before), within its usual range of $221K to $299K."
+    - Off target: "MRR was **$412K** in February, **6% below** the $438K target (**↓ 1%** vs January)."
+    - Alert: the condition with its threshold, how many fired, both periods in italic: "Revenue fell more than **20%** for **4 categories** in _Mar 4 – 10_ versus _Feb 26 – Mar 3_." One metric adds its value and change: "…, to $1.02M (↓ 22%)."
+
+    **Scorecard line**, one per metric or group, and nothing else on it:
+
+    ```
+    digest: - **<Metric or group>**[ (<gloss>)] <value> · **<arrow change>**[ vs <previous period>][ · usual <low> to <high>][ · target <t>][ `🔴 Anomaly`]
+    alert:  - **<group>** <value> (<arrow change> · <change amount>)[ vs <previous period>][ · usual <low> to <high>][ `🔴 Anomaly`]
+    ```
+
+    - "vs <previous period>" goes only on the first line. A one-metric alert has no scorecard line.
+    - An alert's change amount is `t_m1_change` without a sign, the arrow gives the direction: `**Kozey-Rath** $1.71K (↑ 269% · $1.25K) vs the previous week`.
+    - A line with a Q2 range always shows it. A ⚠️ line has no range and no explanation: it ends after its change.
+    - **Tag:** only a 🔴 line gets `🔴 Anomaly`. Never write 🟢, ⚪, ⚠️ or "within range" on a line.
+
+    **Conclusion**, the one `> ` quote:
+    - Quiet digest: "No metric moved outside its usual range."
+    - Alert, one metric: "That crosses the **20%** alert line[ and is unusual: the expected range was $158K to $190K, about 4.3 times a typical day's swing][ but is still within its _26-day usual range_ of $158K to $190K]."
+    - Alert, several groups: "Each crossed the **20%** alert line[, and all are within their _26-week usual ranges_][. **Mobiles** is below its _26-week usual range_]."
+
+    **Blocks**, after the scorecard, only when they apply:
+    - **Data note:** one sentence under the headline, only when a check found something about the data (an incomplete period, too little history, the checks disagreeing). A ⚠️ group line is never explained, here or anywhere.
+    - **What changed** (changed digest): up to 6 bullets of under 25 words, each adding something new: a second driver or the largest offset (Q3), the top group's normal size (`t_comp_share_pct`), or which side of a ratio moved ("revenue fell 12% while orders fell 3%").
+    - **Where the change sits** (by <grouping>) (alert, `name`): the next 2 drivers with their share, then one sentence for the offsets.
+
+    **Footer**, after a blank line, each line fully in italic:
+    - 🔗 `_@Dashboard:<uname> dashboard_`, or `_Look at **Paid Search** on the @Dashboard:<uname> dashboard_` when there's a group to look at. Delivery turns the mention into the titled link: never wrap it in another link. No line when there's no dashboard.
+    - 🕒 `_Data as of <t_latest, with year> · Period: <this> · Compared with: <previous> (previous <week | month | day>) · Usual range: last 26 <weeks | months | days> · Source: <dataset label>_`. Periods have no year ("Mar 4 – 10", "Feb 26 – Mar 3", a month as "February 2024"). Leave the usual range out when no line has one. No timezone.
+    - No line about the attachment.
+
+    **Bold and italic**, and nothing else:
+    - **Digest bold:** every line's label and arrow change; the headline's value and change; an exception line's value, and its target when it's off target; the top group's share and a swing multiple; the block labels.
+    - **Alert bold:** the threshold (**20%**), how many fired (**64 merchants**), every group name, the block labels. Values and arrow changes stay plain.
+    - **Italic:** the footer, and an alert's periods and "usual range" phrases (_Oct 5 – 11_, _26-week usual range_). No other underscore except in the mention.
+
+    **Numbers:**
+    - ↑ and ↓ replace "up" and "down" in lines and brackets ("↑ 4%", "↓ 0.33 percentage points"). "↑ under 1%" when `t_m1_pct` is 0 but the change isn't. "No change", "flat" or "unchanged" only when the change is exactly 0, in any sentence. "New this week" when the previous value is 0 or null. Sentences keep their verbs.
+    - Money of 1,000 or more is K or M with at most 3 significant digits ($1.02M, $412K, $8.99K), below that whole units. Counts are whole numbers with separators (7,050). Rates have 2 decimals.
+    - A real minus sign (−$26K) and numerals. Rounding only shortens a number: $254,550 is "$255K", and a 0.4% rise is never "flat".
+
+    **Words:**
+    - Where is never why: "accounts for", "makes up", "X% of the drop", never "due to", "caused by", "driven by" or "led by".
+    - No outside facts (holidays, campaigns, seasonality) unless the brief states them. No "significant", and no adjectives in place of numbers.
+    - Spell out a metric at first mention, and gloss a derived one in 2 or 3 words ("Average order value (revenue per order)"). When the brief's name differs from the dataset's label, gloss it with the label.
+    - Length: about 110 words quiet, 180 changed, 120 alert, not counting the footer.
+
+    ## 6. Check before sending
+
+    Fix what fails, then send:
+    1. Every number is a column in Q1, Q2 or Q3, or is in the brief. Every claim is in the `explain_result` answer.
+    2. Every ↑, ↓, "rose" and "fell" matches its change's sign. "Unchanged", "no change" or "flat" only where the change is exactly 0 (731 vs 730 is "↑ under 1%").
+    3. `🔴 Anomaly` only where `t_m1_z` is beyond ±3, and no other tag. No "within range", "(within range)" or "range unavailable", and no sentence says why a range is missing. "Usual up to" only where `t_m1_low` is negative.
+    4. Every line with a Q2 row has its range, and the footer's "Usual range" appears only when a line has one.
+    5. A group is named in a where phrase only when `t_where` is `name`. No causal verb follows a group.
+    6. The footer's periods equal Q1's days, "Data as of" equals `t_latest`, and the 🔗 line has the brief's `@Dashboard:<uname>`.
+    7. Every line, group and acceptance criterion the brief asks for is there.
+    8. Bold and italic follow step 5 for this shape. The Slack body has no `**`.
+
+    ## 7. Send
+
+    Send each destination once, with the same words and only the markup changed:
+
+    | Markdown | email `body` | Slack `body` |
+    |---|---|---|
+    | paragraph | `<p>` | text, then a blank line |
+    | `**bold**` | `<strong>` | `*bold*` |
+    | `_italic_` | `<em>` | `_italic_` |
+    | `` `🔴 Anomaly` `` | `[🔴 Anomaly]` as plain text | `` `🔴 Anomaly` `` |
+    | `> quote` | `<blockquote>` | `>` before the line |
+    | `- ` list | `<ul><li>` | `• ` before each line |
+
+    An alert headline in Slack: `Merchant revenue rose *200%* or more for *64 merchants* in _Oct 5 – 11_ versus _Sep 28 – Oct 4_.`
+
+    - **Subject:** the subjects the brief's deliver step gives, word for word, with the dates filled in, never shortened. Without them: in email, the task's label, " · " and this period as in the footer ("Weekly sales digest · Mar 4 – 10"), so each run gets its own Gmail thread; in Slack, the label alone.
+    - **Slack:** every scorecard line starts with `• `, with no label line above it. Only a block label (**What changed**, **Where the change sits**) sits directly above its list. No blank line between the footer lines.
+    - **Email:** each footer line is its own `<p>`. Email drops `style` attributes and `<hr>`, so use neither.
+    - Escape `&`, `<` and `>` in the text. Keep `@Dashboard:<uname>` and the emoji as written. Put the export's job id in `export_job_ids`.
+    - A destination that fails is not a run error: never call `submit_error` for it. Finish with "## ⚠️ Partly delivered".
+
+    ## 8. Final answer
+
+    Answer with exactly this, filled in:
+
+    ```
+    ## ✅ Delivered
+    - **Periods:** <this, with dates> vs <previous, with dates> (previous <week>) · data complete through <t_latest>
+    - **Condition:** <the brief's condition>: met for <lines> | not met (<value> vs <threshold>) | none (digest)
+    - **Checks:** Q1 scorecard, freshness <complete through <t_latest> | …>, Q2 usual range over the last 26 <weeks>, Q3 <where by <grouping> | skipped: <reason>>, explain_result on all of them
+    - **Verdicts:** <each line by name: 🔴 Anomaly | 🟢 within range | ⚠️ no baseline>
+    - **Chart:** "<title>", exported as PNG (job <id>) | export failed: <error>, sent without it
+    - **Sent:** email to <address>, subject "<subject>": <outcome> · Slack <channel>, subject "<label>": <outcome>. Each destination got the message once, with the same words.
+
+    **Message as sent:**
+    <the Markdown message>
+    ```
+
+    - **Title:** "## ✅ Delivered", "## ⚠️ Sent without the attachment", "## ⚠️ Partly delivered" (name the failed destination and its error on the Sent line), "## ❌ Delivery failed", "## ⛔ Blocked", or "## ➖ Nothing to send".
+    - **Sent** lists every destination the brief names, each with its `deliver_data` outcome, failures included.
+    - **Nothing to send:** the largest change against the threshold, with its group, in place of Chart, Sent and the message. Never list every group.
+    - **Blocked:** the latest date loaded and the notice as sent.
+
+    ## 9. Examples
+
+    Illustrative numbers. Never copy them.
+
+    **Quiet digest**, every line within range:
+
+    ```
+    Revenue was **$265K** last week (**↑ 4%** vs the week before), within its usual range of $221K to $299K.
+
+    - **Revenue** $265K · **↑ 4%** vs the week before · usual $221K to $299K
+    - **Orders** 731 · **↑ under 1%** · usual 659 to 831
+    - **Average order value** (revenue per order) $362 · **↑ 4%** · usual $297 to $400
+
+    > No metric moved outside its usual range.
+
+    🔗 _@Dashboard:sales_performance dashboard_
+    🕒 _Data as of Mar 16, 2024 · Period: Mar 4 – 10 · Compared with: Feb 26 – Mar 3 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
+    ```
+
+    **Changed digest**, one Anomaly, where = `name`:
+
+    ```
+    Revenue fell **18%** to **$1.02M** compared with the week before, and **Paid Search** accounts for about **80%** of the drop.
+
+    - **Revenue** **$1.02M** · **↓ 18%** vs the week before · usual $1.16M to $1.33M `🔴 Anomaly`
+    - **Orders** 7,050 · **↓ 2%** · usual 6,800 to 7,600
+
+    **What changed**
+    - Revenue: **Paid Search** was 45% of revenue the week before. **Email** makes up another 12% (−$26K) of the $220K drop, while **Affiliate** rose $9K.
+
+    🔗 _Look at **Paid Search** on the @Dashboard:marketing_performance dashboard_
+    🕒 _Data as of Mar 17, 2024 · Period: Mar 11 – 17 · Compared with: Mar 4 – 10 (previous week) · Usual range: last 26 weeks · Source: Marketing_
+    ```
+
+    **Alert, several groups**, one with no sales this week (its ⚠️ line ends after its change, and nothing else mentions it):
+
+    ```
+    Revenue fell more than **20%** for **4 categories** in _Mar 4 – 10_ versus _Feb 26 – Mar 3_.
+
+    - **Kayaks** $0 (↓ 100% · $5.20K) vs the previous week
+    - **Mobiles** $20.1K (↓ 24% · $6.35K) · usual $8.99K to $45.3K
+    - **T-shirts** $17.8K (↓ 22% · $5.02K) · usual $14.7K to $32.1K `🔴 Anomaly`
+    - **Bathroom** $7.06K (↓ 23% · $2.11K) · usual $5.36K to $13.4K
+
+    > Each crossed the **20%** alert line. **T-shirts** is below its _26-week usual range_.
+
+    🔗 _@Dashboard:sales_performance dashboard_
+    🕒 _Data as of Mar 16, 2024 · Period: Mar 4 – 10 · Compared with: Feb 26 – Mar 3 (previous week) · Usual range: last 26 weeks · Source: Ecommerce Official_
+    ```
+  ;;
+}

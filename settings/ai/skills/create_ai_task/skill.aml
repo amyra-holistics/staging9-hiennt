@@ -61,7 +61,7 @@ Skill create_ai_task {
         unit_count: order_items | sum(order_items.quantity),
       }
       filters {
-        orders.created_at matches @(2026-09-28 - 2026-10-04),
+        orders.created_at matches @(<this first> - <this last>),
       }
     }
     ```
@@ -69,8 +69,8 @@ Skill create_ai_task {
     Rule, ranking or threshold: the latest complete period against the one before, sorted by what the card ranks (`pct ASC` for a drop, `chg DESC` for the biggest dollar change).
 
     ```
-    metric cur = revenue | where(orders.created_at is @(2026-09-28 - 2026-10-04));
-    metric prev = revenue | where(orders.created_at is @(2026-09-21 - 2026-09-27));
+    metric cur = revenue | where(orders.created_at is @(<this first> - <this last>));
+    metric prev = revenue | where(orders.created_at is @(<previous first> - <previous last>));
     metric chg = cur - prev;
     metric pct = safe_divide(chg * 100.0, prev);
     explore {

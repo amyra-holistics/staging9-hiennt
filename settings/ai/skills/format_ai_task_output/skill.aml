@@ -24,7 +24,7 @@ Skill format_ai_task_output {
     1. `fetch_dataset` on the brief's dataset, for field names and its label (the footer's Source).
     2. Q1, Q2 and the chart's `execute_viz`, together.
     3. Q3 (only for exception lines that aren't a group) and `export_artifact` (PNG) on the chart, together.
-    4. `explain_result` once, on all the checks. Pass Q1 as `aql` and every result artifact in `result`. The question is these sentences, word for word with only `<…>` filled, leaving out a bracketed one that doesn't apply: "Start with this period <first – last> and the previous period <first – last>, with dates, and that the data is complete through <t_latest>. [State whether the condition <the brief's condition> is met, and for which lines; when it isn't, give the largest change against the line.] [Every number counts only <the brief's filter>.] For each line, state the current and previous value, the change and percent[, the usual range over the last 26 <weeks> and whether it is within it][, and the where rows]. Use only numbers in these results, and never ask for anything." The review reads this answer and nothing after it. With no Q3, run it in turn 3.
+    4. `explain_result` once, on all the checks. Pass Q1 as `aql` and every result artifact in `result`. The question is these sentences, word for word with only `<…>` filled, leaving out a bracketed one that doesn't apply: "Start with this period <t_this_first – t_this_last> and the previous period <t_prev_first – t_prev_last>, with dates, and that the data is complete through <t_latest>. [State whether the condition <the brief's condition> is met, and for which lines; when it isn't, give the largest change against the line.] [Every number counts only <the brief's filter>.] For each line, state the current and previous value, the change and percent[, the usual range over the last 26 <weeks> and whether it is within it][, and the where rows]. Use only numbers in these results, and never ask for anything." The review reads this answer and nothing after it. With no Q3, run it in turn 3.
     5. Both sends, together. Then the final answer (step 8).
 
     Never call `generate_aql`, `generate_viz`, `/detect_anomaly`, `/analyze_contribution`, or fetch the brief's dashboard. If a query errors, fix the field names from `fetch_dataset` and rerun it once. After a second error, call `generate_aql` with the same periods and formulas.
@@ -34,8 +34,9 @@ Skill format_ai_task_output {
     Fill each `<…>`:
     - `<date>` is the brief's date field, and `<grain>` is `week()`, `month()` or `day()`.
     - `<m1>`, `<m2>`… are the brief's metrics in order: a dataset metric, or the brief's formula (`count_distinct(orders.id)`, `safe_divide(revenue, count_distinct(orders.id))`).
-    - **A reported period has always ended and never contains today.** On Sunday Mar 17, 2024, "last week" is Mar 4 – 10 (Mar 11 – 17 is still running), "last month" is February, and "yesterday" is Mar 16. Data loaded for today doesn't change that. Every date in this skill is only an example: work each period out from today's date.
-    - A period is always `<date> matches @(<first> - <last>)`, both days included. Never use `>` or `<` with a date: `@2024-03-10` is midnight at its start.
+    - **Periods come from the warehouse, never from your own date arithmetic.** `<this>` and `<previous>` are relative literals: "last week" is `@(last week)` and `@(2 weeks ago)`, "last month" is `@(last month)` and `@(2 months ago)`, "yesterday" is `@(yesterday)` and `@(2 days ago)`. `<window>` is `@(53 weeks ago - last week)`, `@(37 months ago - last month)` or `@(366 days ago - yesterday)`, and `<both>` is `@(2 weeks ago - last week)`, `@(2 months ago - last month)` or `@(2 days ago - yesterday)`. They follow the workspace's week start and clock, have always ended, and never contain today.
+    - **Every date you write** (message, subject, footer, chart title, the `explain_result` question) comes from Q1's `t_this_first`, `t_this_last`, `t_prev_first` and `t_prev_last`, never from today's date. Every date in this skill is only an example.
+    - A period filter is always `<date> matches <this>` (or `<previous>`). Never use `>` or `<` with a date: `@2024-03-10` is midnight at its start.
     - Compare text with `==` and single quotes: `orders.status == 'cancelled'`, never `=` or double quotes, even when the brief writes them.
     - Name every measure `t_…`, so it never hides a dataset metric. Use the one-argument `round()`.
     - Keep the line breaks, and separate sort keys with commas: `sorts { t_period desc, t_group asc }`. Without the comma, the second key is silently dropped.
@@ -43,16 +44,24 @@ Skill format_ai_task_output {
     **Q1. Scorecard and freshness.** One row, or one row per group with `dimensions { t_group: <group field> }`. Repeat the `t_m1` lines per metric.
 
     ```
-    metric t_m1_cur = <m1> | where(<date> matches @(<this first> - <this last>));
-    metric t_m1_prev = <m1> | where(<date> matches @(<previous first> - <previous last>));
+    metric t_m1_cur = <m1> | where(<date> matches <this>);
+    metric t_m1_prev = <m1> | where(<date> matches <previous>);
     metric t_latest = max(<date> | day());
+    metric t_this_first = min(<date> | day()) | where(<date> matches <this>);
+    metric t_this_last = max(<date> | day()) | where(<date> matches <this>);
+    metric t_prev_first = min(<date> | day()) | where(<date> matches <previous>);
+    metric t_prev_last = max(<date> | day()) | where(<date> matches <previous>);
     explore {
       measures {
         t_m1_cur: t_m1_cur,
         t_m1_prev: t_m1_prev,
         t_m1_change: t_m1_cur - t_m1_prev,
         t_m1_pct: round(safe_divide(t_m1_cur - t_m1_prev, t_m1_prev) * 100),
-        t_latest: t_latest | keep_grains()
+        t_latest: t_latest | keep_grains(),
+        t_this_first: t_this_first | keep_grains(),
+        t_this_last: t_this_last | keep_grains(),
+        t_prev_first: t_prev_first | keep_grains(),
+        t_prev_last: t_prev_last | keep_grains()
       }
     }
     ```
@@ -62,11 +71,11 @@ Skill format_ai_task_output {
     - **A target** adds `t_m1_gap_pct: round(safe_divide(t_m1_cur - <target>, <target>) * 100)`.
     - **A ratio metric** (average order value, conversion rate) adds `t_m1_num_pct` and `t_m1_den_pct`, the percent change of its numerator and denominator.
     - **Groups:** up to 8 get a line each. With more, use a total line plus the groups that are exceptions. An alert lists only the groups that fired, in the query's order, up to 8; with more, the headline says how many fired.
-    - **More than 100 groups** (merchants, products): sort Q1 by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and add the number that fired, with the brief's condition on `c` and `p`: `t_m1_n_fired: <group model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<this period>), 0), p: coalesce(<m1> | where(<previous period>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`. `<group model>` is the model the group field belongs to, as in `merchants | group(merchants.name)`, never a metric or another model. Count by the brief's group field, never by an id. The chart then shows only the listed groups: `conditions` gets `<group field> in ["…", "…"]` next to the date, never a measure condition.
+    - **More than 100 groups** (merchants, products): sort Q1 by `t_m1_change` (`asc` for a fall, `desc` for a rise) with `limit: 100`, and add the number that fired, with the brief's condition on `c` and `p`: `t_m1_n_fired: <group model> | group(<group field>) | select(g: <group field>, c: coalesce(<m1> | where(<date> matches <this>), 0), p: coalesce(<m1> | where(<date> matches <previous>), 0)) | filter(p > 0 and (c - p) / p < -0.5) | count(g)`. `<group model>` is the model the group field belongs to, as in `merchants | group(merchants.name)`, never a metric or another model. Count by the brief's group field, never by an id. The chart then shows only the listed groups: `conditions` gets `<group field> in ["…", "…"]` next to the date, never a measure condition.
 
-    **Freshness.** Compare `t_latest` with this period. On or after its last day, go on. Inside it, rerun Q1 on the same days of both periods and skip Q2: every line is ⚠️, and the data note says so ("Mar 9 and 10 aren't loaded yet, so this compares Mar 4 to 8 with Feb 26 to Mar 1, and usual ranges can't be checked yet"). Before its first day, the run is **⛔ Blocked**: skip the other queries and the chart, and send the brief's destinations one short notice in place of the message, even for an alert: "<label> couldn't run: <dataset label> has data only through <t_latest>, so <this period> can't be checked yet." Missing data is never zero and never a drop.
+    **Freshness.** This period's last calendar day is `t_this_first` plus 6 days for a week, the last day of its month for a month, and `t_this_first` itself for a day. When `t_latest` is on or after it, go on. Inside it, rerun Q1 on the same days of both periods, written out from `t_this_first`, `t_latest` and `t_prev_first` (`@(2024-03-04 - 2024-03-08)`), and skip Q2: every line is ⚠️, and the data note says so ("Mar 9 and 10 aren't loaded yet, so this compares Mar 4 to 8 with Feb 26 to Mar 1, and usual ranges can't be checked yet"). When `t_this_first` is null, this period has no data and the run is **⛔ Blocked**: skip the other queries and the chart, and send the brief's destinations one short notice in place of the message, even for an alert: "<label> couldn't run: <dataset label> has data only through <t_latest>, so <last week | last month | yesterday> can't be checked yet." Missing data is never zero and never a drop.
 
-    **Q2. Usual range.** This period against the 26 before it. Filter from one year before this period's first day (three years for months) to its last day.
+    **Q2. Usual range.** This period against the 26 before it, filtered to `<window>`.
 
     ```
     metric t_m1 = <m1>;
@@ -83,7 +92,7 @@ Skill format_ai_task_output {
         t_m1_z: safe_divide(t_m1 - t_m1_exp, t_m1_sd),
         t_m1_swings: round(abs(safe_divide(t_m1 - t_m1_exp, t_m1_sd)) * 10) / 10
       }
-      filters { <date> matches @(<this first, one year earlier> - <this last>) }
+      filters { <date> matches <window> }
       sorts { t_period desc }
       limit: 1
     }
@@ -96,8 +105,8 @@ Skill format_ai_task_output {
     **Q3. Where the change sits.** Only for exception lines that aren't a group, by the brief's grouping.
 
     ```
-    metric t_base = coalesce(<m1> | where(<date> matches @(<this first> - <this last>)), 0);
-    metric t_comp = coalesce(<m1> | where(<date> matches @(<previous first> - <previous last>)), 0);
+    metric t_base = coalesce(<m1> | where(<date> matches <this>), 0);
+    metric t_comp = coalesce(<m1> | where(<date> matches <previous>), 0);
     metric t_delta = t_base - t_comp;
     metric t_overall = (t_base | keep_grains()) - (t_comp | keep_grains());
     explore {
@@ -108,7 +117,7 @@ Skill format_ai_task_output {
         t_comp_share_pct: round(safe_divide(t_comp, t_comp | keep_grains()) * 100),
         t_where: case(when: safe_divide(t_delta, t_overall) >= 0.4 and safe_divide(t_delta, t_overall) <= 1, then: 'name', else: 'spread')
       }
-      filters { <date> matches @(<previous first> - <this last>) }
+      filters { <date> matches <both> }
       sorts { t_delta asc }
     }
     ```
@@ -127,7 +136,7 @@ Skill format_ai_task_output {
         }
       }
       conditions: [
-        "<date> matches @(<this first> - <this last>)",
+        "<date> matches <this>",
       ]
       settings { sort: LineFamilySort { type: 'yaxis' field_index: 0 direction: 'desc' } }
     }
@@ -136,8 +145,8 @@ Skill format_ai_task_output {
     For a chart of the change, drop `conditions`, set `direction: 'asc'` and `ref: 't_change'`, and add these three blocks. Replace each `<END>` with two semicolons in a row: one semicolon fails with "Unterminated string". This page can't show them.
 
     ```
-    calculation t_cur { label: 'This <period>' formula: @aql <m1> | where(<date> matches @(<this first> - <this last>))<END> calc_type: 'measure' data_type: 'number' }
-    calculation t_prev { label: 'Previous <period>' formula: @aql <m1> | where(<date> matches @(<previous first> - <previous last>))<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_cur { label: 'This <period>' formula: @aql <m1> | where(<date> matches <this>)<END> calc_type: 'measure' data_type: 'number' }
+    calculation t_prev { label: 'Previous <period>' formula: @aql <m1> | where(<date> matches <previous>)<END> calc_type: 'measure' data_type: 'number' }
     calculation t_change { label: '<Metric> change' formula: @aql t_cur - t_prev<END> calc_type: 'measure' data_type: 'number' }
     ```
 

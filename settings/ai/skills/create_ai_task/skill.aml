@@ -39,7 +39,7 @@ Skill create_ai_task {
 
     ## Queries
 
-    Swap in the dataset's names and the latest complete period, which follows from today's date: run the Rule query in the same step as the date checks, not after them. Keep the comma after every item: without it the query fails.
+    Swap in the dataset's names. Periods are relative literals that the warehouse resolves, never dates you work out: `@(last week)` and `@(2 weeks ago)`, `@(last month)` and `@(2 months ago)`, `@(yesterday)` and `@(2 days ago)`. Run the Rule query in the same step as the date checks, not after them. Keep the comma after every item: without it the query fails.
 
     Latest date, once per dataset with the fields:
 
@@ -61,7 +61,7 @@ Skill create_ai_task {
         unit_count: order_items | sum(order_items.quantity),
       }
       filters {
-        orders.created_at matches @(<this first> - <this last>),
+        orders.created_at matches @(last week),
       }
     }
     ```
@@ -69,8 +69,8 @@ Skill create_ai_task {
     Rule, ranking or threshold: the latest complete period against the one before, sorted by what the card ranks (`pct ASC` for a drop, `chg DESC` for the biggest dollar change).
 
     ```
-    metric cur = revenue | where(orders.created_at is @(<this first> - <this last>));
-    metric prev = revenue | where(orders.created_at is @(<previous first> - <previous last>));
+    metric cur = revenue | where(orders.created_at matches @(last week));
+    metric prev = revenue | where(orders.created_at matches @(2 weeks ago));
     metric chg = cur - prev;
     metric pct = safe_divide(chg * 100.0, prev);
     explore {

@@ -4,21 +4,21 @@ Skill write_ai_task {
   invocation: 'manual'
   disabled: H.git.is_production
   content: @md
-    Don't call `fetch_conversation`, `fetch_conversation_messages`, `fetch_conversation_tool_call` or `search_organization_conversations` unless the request points to an earlier chat.
-
     # Write an AI task
 
-    ## Save order
+    Writes the files `create_ai_task` settled, in a fixed order, then the report. Don't recall earlier chats (`fetch_conversation_messages` and the like) unless the request points to one.
+
+    ## 1. Save order
 
     1. Save the task file.
-    2. In the next step, edit `schedules.aml` and run `validate_file` on the task file. Two saves in one step can stall. `schedules.aml` only gains one entry, so validate it only if this save created it.
+    2. Next step: edit `schedules.aml` and run `validate_file` on the task file. Two saves in one step can stall. Validate `schedules.aml` only if this save created it.
     3. Write the report.
 
-    On a failure, fix and save again with the same summary. `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`, so don't list folders or read files back. The one exception: a save that errors or times out may already be in the file, so `read_file` it, then save only what's missing. A change already in the file is done: never save it again.
+    `create_ai_task` already read `schedules.aml` and `settings/ai/tasks`: don't list folders or read files back. On a failed save, fix it and save again with the same summary. A save that errored or timed out may already be in the file, so `read_file` it first and save only what's missing. Never save a change twice.
 
-    ## Files
+    ## 2. Files
 
-    Use these shapes, not other task files. `<END>` is the line of two semicolons that closes an `@md` block.
+    Use these shapes, not other task files. `<END>` is the two-semicolon line that closes an `@md` block.
 
     ```
     AiTask weekly_category_revenue {
@@ -43,9 +43,11 @@ Skill write_ai_task {
     }
     ```
 
-    Name the task in each save's summary ("Schedule for weekly category revenue"), because it titles the file card.
+    Name the task in each save's summary ("Schedule for weekly category revenue"): it titles the file card.
 
-    ## Brief
+    ## 3. Brief
+
+    Plain words, never AQL: `format_ai_task_output` writes the run's queries from it. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
 
     ```
     ## At a glance
@@ -69,15 +71,18 @@ Skill write_ai_task {
     3. Answer with `format_ai_task_output`'s final answer (its step 8), never the output alone.
     ```
 
-    The brief is plain words, never AQL: `format_ai_task_output` writes the run's queries from At a glance, Definitions and Steps. Keep the brief and criteria under 5,000 characters together, because longer ones fail to start more often.
+    ## 4. Acceptance criteria
 
-    ## Acceptance criteria
+    2–5 short lines, key values in bold. The review reads only the run's `explain_result` answer, written before any send, so a criterion may say only what that answer proves:
+    - the metric and grouping, both periods with their dates (**Monday–Sunday week**), that the data is complete, and the condition's verdict;
+    - never a recipient, send, attachment, chart or schedule: such a line always fails and the run redoes the job;
+    - a condition on groups: "States whether any <group> <condition>, and names the ones that did", never "Compares each <group>";
+    - more than 8 groups: "Checks **every <group>** against its usual range", never "Covers … for every <group>";
+    - every value a criterion names also appears in the Step that writes the output.
 
-    2–5 short lines, with key values in bold. They say only what the run's `explain_result` answer can prove: the metric and grouping, both periods with their dates (**Monday–Sunday week**), that the data is complete, and the condition's verdict. Never a recipient, a send, an attachment, a chart or the schedule: the review reads that answer, written before the sends, so such a line always fails and the run redoes the job. Recipients and attachments go only in the deliver step. For a condition on groups, write "States whether any <group> <condition>, and names the ones that did", never "Compares each <group>": the review then asks for every group's numbers. Every value a criterion names must appear in the Step that writes the output or message. For a grouping with more than 8 groups, the criterion reads "Checks **every <group>** against its usual range" instead of "Covers … for every <group>", because the message lists only the total and the exception groups.
+    ## 5. Report
 
-    ## Report
-
-    The reply's only text. Copy it line for line, icons included, and change only the `<…>` parts. Three lines are conditional: the Condition row, the "Attach" line and the other "instead" line, as the notes below say.
+    The reply's only text. Copy it line for line, icons included, changing only the `<…>` parts.
 
     ````
     ## ✅ Draft created: <label>
@@ -86,14 +91,14 @@ Skill write_ai_task {
 
     | | |
     |---|---|
-    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
-    | 🗓️ Schedule | <Mondays 9:00 AM> (workspace timezone) |
-    | 📨 Delivery | <None (kept in the run record)> |
-    | 🔔 Condition | <Any category's revenue drops 20% or more week over week> |
-    | 📝 Brief | <one sentence, key values in bold> |
-    | 📎 Attachment | <None> |
+    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
+    | 🗓️ Schedule | <Mondays 9:00 AM> (workspace timezone) |
+    | 📨 Delivery | <None (kept in the run record)> |
+    | 🔔 Condition | <Any category's revenue drops 20% or more week over week> |
+    | 📝 Brief | <one sentence, key values in bold> |
+    | 📎 Attachment | <None> |
 
-    Runs as you (<run_as>): it sees the data you can see. First run <Mon, Oct 12>. Latest data: <Oct 9, 2026>.
+    Runs as you (<run_as>): it sees the data you can see. Latest data: <Oct 9, 2026>.
 
     ### Acceptance criteria
 
@@ -119,22 +124,21 @@ Skill write_ai_task {
     [Change the acceptance criteria](#opt)
     ````
 
-    - Keep the empty header row, each icon exactly as written (Source is 🗄️, the file cabinet, never 🗂️ or 🗃️) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
-    - Delivery: "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
-    - Condition row: the rule in plain words (which metric, which way, how much, compared with what period), with no values from today. Drop it when there's no condition.
-    - Attachment: "None", "Viz · PNG", "Tab · <dashboard title> › <tab title> · PNG", "Dashboard · <dashboard title> · PNG", or the file the user named ("Table · XLSX").
-    - One "▢ " paragraph per criterion, never a list.
-    - Each artifact block holds only the `stored_artifact.id` of that file's last save.
-    - Follow-up ends every new task.
-    - "Attach <next-best> instead" offers the other kind, by name. For a Viz: "Attach the <dashboard title> dashboard instead" or "Attach the <tab title> tab instead", the best fit among the dashboards read. For a Tab or Dashboard: "Attach a chart instead". Drop it when the Delivery or Attachment row says None, or when the Attachment is a Viz and no dashboard on the task's dataset was read.
-    - The other "instead" line ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") is only for a pick made without a card, which is rare: a time, source or threshold picked on a card gets none.
+    - **Table:** keep the empty header row, each icon exactly as written (Source is 🗄️, never 🗂️ or 🗃️) and the non-breaking space after it. No Endorsed pill: the dataset chip has its own badge.
+    - **Delivery:** "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
+    - **Condition:** the rule in plain words (metric, direction, size, compared with what), no values from today. Drop the row when there's no condition.
+    - **Attachment:** "None", "Viz · PNG", "Tab · <dashboard title> › <tab title> · PNG", "Dashboard · <dashboard title> · PNG", or the file the user named ("Table · XLSX").
+    - **Criteria:** one "▢ " paragraph each, never a list.
+    - **Files:** each block holds only the `stored_artifact.id` of that file's last save.
+    - **"Attach <next-best> instead"** names the other kind. For a Viz: "Attach the <dashboard title> dashboard instead" or "Attach the <tab title> tab instead", the best fit read. For a Tab or Dashboard: "Attach a chart instead". Drop it when Delivery or Attachment is None, or when the Attachment is a Viz and no dashboard on the task's dataset was read.
+    - **The other "instead" line** ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") is only for a pick made without a card. A pick made on a card gets none.
 
-    ## Update report
+    ## 6. Update report
 
-    After a change: the draft line right under the heading, then only what changed, then `### Files` with the changed files' artifact blocks.
-    - Changed rows go in the table as `~~<old>~~ → **<new>**`, in the values the report uses ("~~None~~ → **Viz · PNG**"). Leave the table out when no row changed.
-    - Changed criteria go under Acceptance criteria as "▢ " paragraphs, never in the table. For a changed one, drop its saved bold on both sides, then bold only the words that are new: `▢ ~~<old>~~ → <new>`, so the saved "Covers **revenue** for **every category**" becomes `▢ ~~Covers revenue for every category~~ → Covers revenue and **share of the weekly total** for every category`. An added one keeps its saved bold (`▢ <new>`), a removed one is `▢ ~~<old>~~` with no bold. Never bold a whole line or a value that didn't change.
-    - The last line, "Attach <next-best> instead", appears only when this change added or switched the attachment (adding email or Slack adds one), named as in the report. No other follow-ups.
+    After a change: the draft line under the heading, then only what changed, then `### Files` with the changed files.
+    - **Rows:** `~~<old>~~ → **<new>**`, in the report's values ("~~None~~ → **Viz · PNG**"). No table when no row changed.
+    - **Criteria:** "▢ " paragraphs under Acceptance criteria, never in the table. Changed: drop its saved bold on both sides and bold only the new words. Added: keeps its bold. Removed: `▢ ~~<old>~~`, no bold. Never bold a whole line or an unchanged value.
+    - **Follow-up:** only "Attach <next-best> instead", and only when this change added or switched the attachment (adding email or Slack adds one).
 
     ````
     ## ✅ Task updated
@@ -143,7 +147,7 @@ Skill write_ai_task {
 
     | | |
     |---|---|
-    | 🗓️ Schedule | ~~Mondays 9:00 AM~~ → **Mondays 8:00 AM** |
+    | 🗓️ Schedule | ~~Mondays 9:00 AM~~ → **Mondays 8:00 AM** |
 
     ### Acceptance criteria
 

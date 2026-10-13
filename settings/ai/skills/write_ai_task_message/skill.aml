@@ -1,7 +1,7 @@
 Skill write_ai_task_message {
   label: 'Write an AI task message'
   description: "Writes the email and Slack message for a scheduled AI task run: a digest each run, or an alert when the task's condition fires. Use only when run_ai_task says to."
-  invocation: 'manual'
+  invocation: 'auto'
   content: @md
     # Write an AI task message
 

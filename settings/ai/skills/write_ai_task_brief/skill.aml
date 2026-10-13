@@ -1,7 +1,7 @@
 Skill write_ai_task_brief {
   label: 'Write an AI task brief'
   description: "Writes and saves a scheduled AI task's brief and acceptance criteria, then shows the draft report. Use only when create_ai_task or edit_ai_task says to."
-  invocation: 'manual'
+  invocation: 'auto'
   disabled: H.git.is_production
   content: @md
     # Write an AI task brief

@@ -1,0 +1,29 @@
+Model qa6_list_external {
+  type: 'query'
+  label: 'QA6 Partners (mixed domains)'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  query: @sql
+    select * from (values
+      ('Foxglove Risk', 'partner-ops@example.com', 3),
+      ('Larch Mutual', 'nhi.ty+larch@holistics.io', 2),
+      ('Maple Cover', 'nhi.ty+maple@holistics.io', 1)
+    ) as t(partner, contact_email, policies_approaching_cancellation);;
+
+  dimension partner {
+    label: 'Partner'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner }};;
+    primary_key: true
+  }
+  dimension contact_email {
+    label: 'Contact email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.contact_email }};;
+  }
+  dimension policies_approaching_cancellation {
+    label: 'Policies approaching cancellation'
+    type: 'number'
+    definition: @sql {{ #SOURCE.policies_approaching_cancellation }};;
+  }
+}

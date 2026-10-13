@@ -14,7 +14,6 @@ Dashboard data_format_tes {
           ref: r(annotated_time_series_csv.date)
           format {
             type: 'date'
-            pattern: "'W'WW yyyy"
           }
         },
         VizFieldFull {

@@ -1,0 +1,162 @@
+Dashboard data_format_tes {
+  title: 'data-format-tes'
+  description: ''
+  owner: 'hien.nt@holistics.io'
+  block title: TextBlock {
+    content: @md # Your title goes here ;;
+  }
+  block v_r2s6: VizBlock {
+    label: 'Timegrain'
+    viz: DataTable {
+      dataset: superstore
+      fields: [
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          format {
+            type: 'date'
+            pattern: "'W'WW yyyy"
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'datetrunc year'
+          format {
+            type: 'date'
+            pattern: 'yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'datetrunc quarter'
+          format {
+            type: 'date'
+            pattern: 'yyyy Qq'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'datetrunc week'
+          format {
+            type: 'date'
+            pattern: 'wwww'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'datetrunc day'
+          format {
+            type: 'date'
+            pattern: 'LLL dd, yyyy'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+  block v_w96p: VizBlock {
+    label: 'Timegrain (Time part)'
+    viz: DataTable {
+      dataset: superstore
+      fields: [
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          format {
+            type: 'date'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'date_part quarter'
+          format {
+            type: 'number'
+            pattern: 'Qq'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'date_part month'
+          format {
+            type: 'number'
+            pattern: 'MMMM'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'date_part week'
+          format {
+            type: 'number'
+            pattern: "'W'WW"
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'date_part dow'
+          format {
+            type: 'number'
+            pattern: 'dddd'
+          }
+        },
+        VizFieldFull {
+          ref: r(annotated_time_series_csv.date)
+          transformation: 'date_part day'
+          format {
+            type: 'number'
+            pattern: 'none'
+          }
+        }
+      ]
+      settings {
+        show_row_number: true
+      }
+    }
+  }
+
+  view: CanvasLayout {
+    label: 'View 1'
+    width: 800
+    height: 600
+    grid_size: 20
+    auto_expand_vertically: true
+    block title {
+      position: pos(20, 20, 760, 60)
+    }
+    block v_r2s6 {
+      position: pos(20, 80, 760, 240)
+    }
+    block v_w96p {
+      position: pos(20, 340, 760, 240)
+    }
+    mobile {
+      mode: 'auto'
+    }
+  }
+
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'v_r2s6'
+      to: [
+        'v_w96p'
+      ]
+    },
+    FilterInteraction {
+      from: 'v_w96p'
+      to: [
+        'v_r2s6'
+      ]
+    }
+  ]
+}

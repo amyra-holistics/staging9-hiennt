@@ -1,0 +1,31 @@
+AiTask qa_v2_r1_digest {
+  label: 'Weekly Category Revenue'
+  description: 'Emails last week’s revenue by product category every Monday morning.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · nhi.ty@holistics.io
+    - Condition: none, every run
+    - Attachment: Viz · PNG
+    - Schedule: Monday 9:00 AM (cron 0 9 * * 1)
+
+    ## Definitions
+    - Nobody can answer questions during a run: follow these definitions and note any other choice in the result.
+    - "Last week" is the most recent complete Monday–Sunday week.
+    - "Category" is the product category.
+    - Revenue is the total item quantity multiplied by product price.
+    - Include every category, ordered by last-week revenue from highest to lowest.
+
+    ## Steps
+    1. Get last week's complete Monday–Sunday revenue by product category using @Dataset:ecommerce_official.
+    2. Chart revenue by product category as bars, ordered from highest to lowest, and export the chart as a PNG.
+    3. Send one email to nhi.ty@holistics.io with subject "Weekly Category Revenue · <last week's dates>". Include the reporting dates and revenue for every product category, and attach the exported PNG.
+    4. Report the reporting period, category revenue results, attachment status, and email delivery status.
+  ;;
+  acceptance_criteria: @md
+    - States **revenue by product category** for the **last complete Monday–Sunday week**, including the reporting dates and confirmation that the period is complete.
+    - Lists each category in descending **revenue** order.
+    - Includes a bar-chart PNG of category revenue for the same reporting week.
+    - Sends one email to **nhi.ty@holistics.io** with the reporting period, category revenue results, and PNG attachment.
+  ;;
+}

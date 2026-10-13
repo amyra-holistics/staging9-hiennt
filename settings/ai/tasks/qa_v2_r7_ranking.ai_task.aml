@@ -1,0 +1,33 @@
+AiTask qa_v2_r7_ranking {
+  label: 'Weekly Category Revenue Changes'
+  description: 'Emails the five product categories with the largest week-over-week revenue changes every Monday morning.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · task owner
+    - Condition: none, every run
+    - Attachment: Viz · PNG
+    - Schedule: Monday 8:00 AM (cron 0 8 * * 1)
+
+    ## Definitions
+    - Nobody can answer questions during a run: follow these definitions and note any other choice in the result.
+    - "Last week" is the most recent complete Monday–Sunday week; "two weeks ago" is the Monday–Sunday week immediately before it.
+    - "Product category" is the product category.
+    - Revenue is the total item quantity multiplied by product price.
+    - "Changed the most" means the five categories with the largest absolute dollar difference between last-week revenue and two-weeks-ago revenue, regardless of whether the change is an increase or decrease.
+    - Sort the five categories by absolute dollar change descending. Break ties by product category alphabetically.
+
+    ## Steps
+    1. Get revenue for every product category for the two complete reporting weeks. Calculate each category's dollar change, percentage change, and absolute dollar change. Confirm that data is complete through the final day of last week.
+    2. Select the top five categories by absolute dollar change, using the Definitions' sorting and tie-breaking rules.
+    3. Chart the selected categories' dollar revenue changes as bars, sorted like the message, never a table. Title the chart with the two reporting-week dates and export it as a PNG.
+    4. Write an email with the two reporting-week dates and the five selected categories. For each category, state last-week revenue, prior-week revenue, dollar change, and percentage change. State whether the category increased or decreased.
+    5. Deliver the email once to the task owner with subject "Weekly Category Revenue Changes · <last week's dates>" and attach the PNG. If the export fails, deliver the email without it and say so in the run summary.
+  ;;
+  acceptance_criteria: @md
+    - Uses **revenue by product category** for the **last complete Monday–Sunday week** and the immediately preceding Monday–Sunday week, and confirms the data is complete.
+    - Lists the **five categories with the largest absolute dollar revenue changes**, ordered by absolute dollar change descending with alphabetical tie-breaking.
+    - For each listed category, gives **last-week revenue, prior-week revenue, dollar change, and percentage change**, and identifies the direction of change.
+    - Sends one email to the task owner with a **PNG bar chart** of the five selected categories' dollar revenue changes.
+  ;;
+}

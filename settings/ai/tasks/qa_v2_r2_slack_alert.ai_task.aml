@@ -1,0 +1,32 @@
+AiTask qa_v2_r2_slack_alert {
+  label: 'Weekly Category Revenue Drop Alert – Sales Alerts'
+  description: 'Checks weekly category revenue and posts to Slack when a category falls by 20 percent or more week over week.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Slack · #nhity-test
+    - Condition: Any category's revenue drops 20% or more week over week; a zero previous-week revenue never qualifies
+    - Attachment: Viz · PNG
+    - Schedule: Monday 9:00 AM (cron 0 9 * * 1)
+
+    ## Definitions
+    - Nobody can answer questions during a run: follow these definitions and note any other choice in the result.
+    - "Last week" is the most recent complete Monday–Sunday week; "two weeks ago" is the immediately preceding Monday–Sunday week.
+    - "Category" is the product category.
+    - Revenue is total item quantity multiplied by product price.
+    - A category qualifies when its last-week revenue is at least 20% lower than two weeks ago. A zero previous-week revenue never qualifies.
+    - List every qualifying category, ordered by largest percentage decline first.
+
+    ## Steps
+    1. Get revenue for last week and two weeks ago by category, and confirm both periods are complete.
+    2. If one or more categories qualify, prepare one Slack message for #nhity-test naming every qualifying category with revenue in both weeks, the percentage decline, and the reporting-week dates. Otherwise, do not send a message and record that no category qualified.
+    3. Chart revenue change for qualifying categories as bars, sorted by largest percentage decline first. Export the chart as PNG; if export fails, send the message without it and say so in the run summary.
+    4. Deliver the prepared message once to #nhity-test with subject "Weekly Category Revenue Drop Alert – Sales Alerts" and the PNG when available.
+  ;;
+  acceptance_criteria: @md
+    - Gives the **last complete Monday–Sunday week** and preceding Monday–Sunday week, and confirms the data is complete.
+    - States whether any category **fell 20% or more week over week**, excluding categories with zero prior-week revenue.
+    - Names every qualifying category with **revenue in both weeks**, direction, and **percentage change**, ordered by largest percentage decline first.
+    - Sends one Slack message to **#nhity-test** only when at least one category qualifies, with a PNG chart when export succeeds.
+  ;;
+}

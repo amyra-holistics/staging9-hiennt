@@ -1,0 +1,30 @@
+AiTask qa_v22_r1_digest {
+  label: 'Weekly Category Revenue'
+  description: 'Emails weekly revenue by product category for the most recent complete week.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · nhi.ty@holistics.io
+    - Condition: none, every run
+    - Attachment: Viz · PNG
+    - Schedule: Monday 9:00 AM (cron 0 9 * * 1)
+
+    ## Definitions
+    - "Last week" is the most recent complete Monday–Sunday week.
+    - "Category" is the product category.
+    - Revenue is the total item quantity multiplied by product price.
+
+    ## Steps
+    Load `run_ai_task` first, and do every step yourself, without sub-tasks.
+    1. Get revenue for last week, by product category, with `run_ai_task`.
+    2. Chart revenue by product category as bars, sorted by revenue.
+    3. Export the chart as PNG.
+    4. Write the message with `write_ai_task_message`. It covers revenue by product category for last week.
+    5. Deliver one email to nhi.ty@holistics.io with subject "Weekly Category Revenue · <last week's dates>" and the exported PNG attached.
+  ;;
+  acceptance_criteria: @md
+    - States the most recent complete **Monday–Sunday week** with its dates and confirms that the data is complete.
+    - Reports **revenue by product category** and the **weekly total revenue**.
+    - Sends one email to **nhi.ty@holistics.io** with a category-revenue PNG attached.
+  ;;
+}

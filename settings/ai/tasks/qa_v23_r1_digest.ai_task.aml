@@ -1,0 +1,30 @@
+AiTask qa_v23_r1_digest {
+  label: 'Weekly Sales Revenue Summary'
+  description: 'Summarizes last week’s revenue against the preceding complete week and emails the result.'
+
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · nhi.ty@holistics.io
+    - Condition: none, every run
+    - Attachment: Viz · PNG
+    - Schedule: Monday 9:00 AM (cron 0 9 * * 1)
+
+    ## Definitions
+    - “Last week” is the most recent complete Monday–Sunday week; “two weeks ago” is the Monday–Sunday week immediately before it.
+    - “Sales” means Revenue: total item quantity multiplied by product price.
+
+    ## Steps
+    Load `run_ai_task` first, and do every step yourself, without sub-tasks.
+    1. Get Revenue for last week and two weeks ago with `run_ai_task`, and confirm the data is complete for both Monday–Sunday weeks.
+    2. Chart Revenue by reporting week as bars, with both week date ranges in the title, then export it as PNG.
+    3. Write the message with `write_ai_task_message`. It covers last week’s Revenue, the prior week’s Revenue, the reporting dates, and the week-over-week change.
+    4. Deliver one email to nhi.ty@holistics.io with subject "Weekly Sales Revenue Summary · <last week’s dates>" and the exported PNG attached.
+  ;;
+
+  acceptance_criteria: @md
+    - Reports **Revenue** for the latest complete **Monday–Sunday week** and the preceding complete Monday–Sunday week, including both date ranges and confirmation that data is complete.
+    - States the week-over-week Revenue change.
+    - Sends one email to **nhi.ty@holistics.io** with the Revenue chart PNG attached.
+  ;;
+}

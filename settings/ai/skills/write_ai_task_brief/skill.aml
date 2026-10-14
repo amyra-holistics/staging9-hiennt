@@ -1,0 +1,100 @@
+Skill write_ai_task_brief {
+  label: 'Write an AI task brief'
+  description: "Writes and saves a scheduled AI task's brief and acceptance criteria, then shows the draft report. Use only when create_ai_task or edit_ai_task says to."
+  invocation: 'manual'
+  disabled: H.git.is_production
+  content: @md
+    # Write an AI task brief
+
+    The brief is the plain-language instruction every run follows, unattended, with nobody to answer questions. Write only what `create_ai_task` and `add_ai_task_delivery` settled.
+
+    ## Write the brief
+
+    Use plain words, never queries: `run_ai_task` works the queries out from the brief. Say what the message covers, never how it looks (no "every <group>", order, values per line or anomaly range): `write_ai_task_message` decides that. Keep the brief and the criteria under 5,000 characters together.
+
+    ```
+    ## At a glance
+    - Source: @Dataset:<unique_name>
+    - Sends to: none, kept in the run record
+    - Condition: none, every run
+    - Attachment: none
+    - Schedule: <day and local time> (cron <cron>)
+
+    ## Definitions
+    - <each period as complete dates: "Last week" = the most recent complete Monday–Sunday week>
+    - <the grouping as the field it groups by: "Category" = categories.name>
+    - <a top N, only when the user asked for one>
+    - <each derived metric, target and rule the user asked for or picked>
+
+    ## Steps
+    Load `run_ai_task` first, and do every step yourself, without sub-tasks.
+    1. Get <the metrics> for <this period> and the one before, by <the grouping>, with `run_ai_task`.
+    2. Chart <the metric by the grouping>: bars for a ranking or comparison, sorted like the message, or a line for a trend. Never a table.
+    3. Write the message with `write_ai_task_message`, loaded in this step. It covers <the metric by the grouping>[, the condition][, the anomaly flags].
+    ```
+
+    When the user asked for anomalies, step 1 adds: "Run `/detect_anomaly` on <metric> by <grain>, and mark the lines it flags." `add_ai_task_delivery` adds its steps around these.
+
+    ## Write the acceptance criteria
+
+    Write 2–5 short lines that the run's result is checked against, with the key values in bold:
+    - the metric and the grouping, both periods with their dates (**Monday–Sunday week**), and that the data is complete;
+    - a top N when the brief has one;
+    - never the values on each line, how many lines or "every <group>": the message decides those.
+
+    `add_ai_task_delivery` adds the criteria for the sends and the condition.
+
+    ## Save
+
+    Save the task and its schedule entry. The cron is in local time, the task runs as the signed-in user, the name is the label in snake_case, and the description is one plain sentence. Name the task in the save's summary ("Schedule for weekly category revenue"), because it titles the file card.
+
+    ## Show the draft report
+
+    After saving a new task, reply with only this, line for line and icons included, changing only the `<…>` parts:
+
+    ````
+    ## ✅ Draft created: <label>
+
+    Not running yet. Change anything below; it runs on schedule once you click `Commit changes`, then `Publish`.
+
+    | | |
+    |---|---|
+    | 🗄️ Source | @Dataset:<unique_name> · <Revenue by Category> |
+    | 🗓️ Schedule | <Mondays 9:00 AM> (workspace timezone) |
+    | 📨 Delivery | <None (kept in the run record)> |
+    | 🔔 Condition | <Any category's revenue drops 20% or more week over week> |
+    | 📝 Brief | <one sentence, key values in bold> |
+    | 📎 Attachment | <None> |
+
+    Runs as you (<run_as>): it sees the data you can see. Latest data: <Oct 9, 2026>.
+
+    ### Acceptance criteria
+
+    Each run checks its result against these. If one isn't met, the run tries again.
+
+    ▢ <criterion, word for word>
+
+    ### Files
+
+    ```artifact
+    <artifact id of the saved task>
+    ```
+
+    ### Follow-up
+
+    [Attach <next-best> instead](#opt)
+    [<other "instead" button>](#opt)
+    [Preview the first result (nothing is sent)](#opt)
+    [Change the acceptance criteria](#opt)
+    ````
+
+    - **Layout:** keep the empty header row, each icon exactly as written (🗄️, never 🗂️; 📨, never 📧) and the run-as line whole. No Endorsed pill: the dataset chip shows its own badge. Criteria are "▢ " paragraphs, never a list. One `artifact` block per saved file.
+    - **Delivery:** "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)".
+    - **Condition:** the rule in plain words, with no values from today. Drop the row when there's no condition.
+    - **Attachment:** "None", "Viz · PNG", "Tab · <dashboard> › <tab> · PNG", "Dashboard · <dashboard> · PNG", or the file the user named.
+    - **"Attach <next-best> instead":** the pick `add_ai_task_delivery` kept, by name ("Attach the <title> dashboard instead", "Attach the <tab> tab instead", "Attach a chart instead"). Drop it when Delivery or Attachment is None, or when there's no such pick.
+    - **The other "instead" button** ("Run at <time> instead", "Use <label> instead", "Alert at <n>% instead") appears only for a pick made without a card.
+
+    If saving keeps failing, reply "## ❌ Couldn't create the task", the reason in plain words, and what the user can do.
+  ;;
+}

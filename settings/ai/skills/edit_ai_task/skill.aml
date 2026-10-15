@@ -1,0 +1,68 @@
+Skill edit_ai_task {
+  label: 'Change a scheduled AI task'
+  description: "Use when the user changes the task drafted in this chat (a follow-up such as “make it 9 AM”, or an “… instead” button), or explicitly asks to update, edit or change another task by name: its schedule, source, rule, rows, acceptance criteria or attachment. Typical phrasings: “update my revenue alert to 9 AM”, “edit the Monday digest's threshold”, “Run at 8:00 AM instead”, “Use Ecommerce Official instead”, “Alert at 30% instead”, “Attach a chart instead”, “Change the acceptance criteria”, “show the top 10 instead”. Do not use for a request for a new task, schedule, report or alert, even on a subject an existing task covers (use create_ai_task), or for previewing a task's result (use run_ai_task). Load write_ai_task_brief in the same step as this skill: it saves the change."
+  invocation: 'auto'
+  disabled: H.git.is_production
+  content: @md
+    # Change a scheduled AI task
+
+    Change a task only when it's this chat's draft or the user explicitly asks to update, edit or change it by name. Any other request is a new task: use `create_ai_task`.
+
+    Change only what the user asked for, keep every other line of the task as it is, and show what changed.
+
+    ## Read the task
+
+    Read the task, and its schedule entry when the time changes. Work from this conversation and the task itself: open an earlier chat only when the user points to it.
+
+    ## Apply the change
+
+    - **An "… instead" button is the whole change.** Apply it without a card.
+      - A new time changes the brief's Schedule line and the schedule entry, in UTC as `create_ai_task` says.
+      - A new source changes the Source line and every field the brief names. It must pass `create_ai_task`'s source rules.
+      - "Attach … instead" changes the Attachment line and the attach step, never a criterion, as `add_ai_task_delivery` writes them.
+    - **"Change the acceptance criteria" on its own:** ask "How should the acceptance criteria change?" with 2–3 likely edits, each quoting the criterion it changes.
+    - **A typed change is the whole change.** Apply it everywhere the brief uses that value: the Definitions, the step that writes the message and the criterion that checks it.
+    - **A new vague word** ("a lot") gets `create_ai_task`'s Metric, Ranking or Threshold card. New recipients or a send condition follow `add_ai_task_delivery`.
+    - **Rules from another skill:** load `create_ai_task` or `add_ai_task_delivery` with `load_skill` before using its rules or cards.
+    - **An older task** whose brief still loads `format_ai_task_output`, starts with Step 0, pastes a Delivery rules block or sets the message's layout ("every <group>", values per line) gets its Steps and criteria rewritten in the current form, keeping what they cover.
+    - **A Schedule line naming another timezone** becomes UTC with any change, cron kept.
+
+    Save as `write_ai_task_brief` says, then reply with the update report below, not the draft report.
+
+    ## Show the update report
+
+    The reply's only text: the draft line under the heading, then only what changed, then the changed files.
+    - **Bold**, in this report only: the words this change added, in rows and criteria. Kept words stay plain even if saved bold (✓ "Sends one message to #sales and **one email to you@x.com**" when only the email is new).
+    - **Rows:** `~~<old>~~ → <new>`, with the draft report's icons and labels ("📨 Delivery", never 📧) and `add_ai_task_delivery`'s values ("~~None~~ → **Viz · PNG**", "~~Slack · #sales~~ → Slack · #sales; **Email · you@x.com**"). Leave the table out when no row changed.
+    - **Criteria:** "▢ " paragraphs under Acceptance criteria, never in the table.
+      - Changed: `▢ ~~<old>~~ → <new>`, the old side with no bold.
+      - Added: only when no old criterion checks the same thing (a new destination changes the sends one). Keeps the bold `write_ai_task_brief` gives it. Removed: `▢ ~~<old>~~`, with no bold.
+    - **Follow-up:** only the draft report's "Attach <next-best> instead" button, always when this change added or switched the attachment and `add_ai_task_delivery` kept a pick of the other kind.
+
+    ````
+    ## ✅ Task updated
+
+    Still a draft: click `Commit changes`, then `Publish` to apply.
+
+    | | |
+    |---|---|
+    | 🗓️ Schedule | ~~Mondays 9:00 AM UTC~~ → Mondays **8:00 AM** UTC |
+
+    ### Acceptance criteria
+
+    ▢ ~~Covers revenue by category in the Monday–Sunday week~~ → Covers revenue and **share of the weekly total** by category in the Monday–Sunday week
+
+    ▢ States **both weeks' dates** and that the data is complete
+
+    ### Files
+
+    ```artifact
+    <artifact id of each changed file's last save>
+    ```
+
+    [Attach <next-best> instead](#opt)
+    ````
+
+    If saving keeps failing, reply "## ❌ Couldn't update the task", the reason in plain words, and what the user can do.
+  ;;
+}

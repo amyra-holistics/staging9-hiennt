@@ -5,12 +5,12 @@ Skill write_ai_task_message {
   content: @md
     # Write an AI task message
 
-    Write one message (one per recipient if the brief says so) in the brief's language, from the query results and brief (every number), and the `explain_result` answer only. The brief says what to cover, this skill the layout and style, even if the brief asks otherwise.
+    Write one message—one per recipient when the brief says so—in the brief's language, using only its requirements, query results (every number) and `explain_result`. The brief sets coverage; this skill sets message format, even if they conflict.
 
     Draft in Markdown (`**bold**`, `- ` lists, `> ` quote, `_italic_`, `` `code` `` only for the anomaly tag), never headings, tables, nested lists or dividers. Convert it for each send:
     - **Email:** HTML (`<p>` per paragraph and footer line, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), never `style`.
     - **Slack:** `*bold*`, never `**`, and `• ` for `- `.
-
+ 
     ## Structure
 
     1. **Headline**, at most 25 words, on the first exception line, else the line that moved most: metric, direction, size and baseline, plus any top group the run named.
@@ -36,11 +36,10 @@ Skill write_ai_task_message {
     - **Bold, digest:** each line's label and arrow change, the headline's value and change, a named group and its share, an exception line's value and target, the block labels.
     - **Bold, alert:** the threshold, how many fired, every group name, the quote's bold numbers, the block labels. Other values and changes plain.
     - **Italic:** only the footer and an alert's periods.
-    - In lines, ↑ and ↓ replace "up" and "down". "↑ under 1%" when the rounded percent is 0 but the change isn't. "Flat" only for exactly 0. "New this <week>" when the previous value is 0 or missing.
-    - Money of 1,000 or more as K or M, at most 3 significant digits. Counts with separators (7,050), percent changes whole (↓ 48%), rates with 2 decimals and their changes in percentage points, a real minus sign (−$26K), no sign on an alert line's change amount.
-    - Where, never why: "accounts for" or "X% of the drop", never "due to", "caused by" or "driven by". "Fell" only for a negative change.
-    - No outside facts, adjectives for numbers, "significant", "unusual", "range" or "expected". Gloss a derived metric once.
-    - Length, footer aside: about 110 words (180 changed, 120 alert).
+    - **Changes:** use ↑/↓, not "up"/"down"; "↑ under 1%" when nonzero rounds to 0; "Flat" only at 0; "New this <week>" for a zero or missing prior value.
+    - **Numbers:** money ≥1,000 as K/M (up to three significant digits); counts with separators; whole percent changes; rates to two decimals and percentage-point changes; − for negative money; no sign on an alert-line change amount.
+    - **Wording:** state where, never why—"accounts for" or "X% of the drop", never causal language. Use "fell" only for a negative change; no outside facts, numeric adjectives, "significant", "unusual", "range" or "expected". Gloss a derived metric once.
+    - **Length:** footer aside, about 110 words (180 changed, 120 alert).
 
     Before sending, check every number, arrow and footer period against the query results, not a summary, then the Style rules.
 

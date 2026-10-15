@@ -8,42 +8,39 @@ Skill add_ai_task_delivery {
 
     Settle who gets the task's result, when it sends and what it attaches, then write it into the brief. A scheduled run sends on its own: add no disclaimer about sending.
 
-    ## Choose the recipients
+    ## Recipients
 
-    - An email address, a Slack channel or a column of addresses is clear, and "email me" is the signed-in user. A request that names none ("show me", "send me", "alert me", "the team") gets `create_ai_task`'s Where card: no other card asks where.
-    - After the Where card, "Send to email" is the signed-in user, unless the request names a group ("the team"): then ask "Which email addresses? Type them.", none recommended. "Send to Slack channel" asks "Which Slack channel? Type its exact name." with "Keep it in Holistics for now", none recommended. Never take a channel from another task.
-    - Ask a card for a shared or unusable address.
+    - **Resolve:** a named email, Slack channel or address column is settled; "email me" means the signed-in user. With no destination ("show me", "send me", "alert me", "the team"), use only `create_ai_task`'s Where card.
+    - **After Where:** email means the signed-in user, except a group needs "Which email addresses? Type them."; Slack needs "Which Slack channel? Type its exact name." and "Keep it in Holistics for now." Neither has a recommendation. Never reuse another task's channel; ask a card for a shared or unusable address.
 
-    ## Settle the condition
+    ## Condition
 
-    - A rule with a number ("falls 10% or more") is clear. A vague word ("a lot", "big") gets `create_ai_task`'s Threshold card (load it with `load_skill` unless loaded).
-    - Write the condition in plain words with every exclusion it needs ("a zero previous week never qualifies"). It only decides whether the run sends.
-    - "Unusual" or "anomaly" can't be a send condition yet: ask the Threshold card instead. The anomaly flags still go in the message when the user asked for them.
+    - **Rule:** a numeric rule is settled. For vague wording ("a lot", "big") or "unusual"/"anomaly", load `create_ai_task` unless loaded and use its Threshold card; anomalies remain message flags, not send conditions.
+    - **Scope:** state exclusions in plain words (for example, "a zero previous week never qualifies"); a condition decides only whether the run sends.
 
     ## Pick the attachment
 
-    Attach a PNG of what best shows the subject, unless the user named a file type or said no file. Unless recipients come from a column, always find up to 3 dashboards (`*.page.aml`, every folder level) on the task's dataset whose names fit the subject and read their tabs (`get_object_outline`), even when a chart would do. A dashboard the user pinned or named comes first.
-    - **Tab:** one tab that already shows the subject (the metric by the grouping).
-    - **Dashboard:** the subject fills the whole dashboard or several of its tabs, or the user named or pinned it.
-    - **Viz:** otherwise, and always for per-recipient messages: the task's chart.
+    Always look for matching dashboards, even when a chart would do.
+    Default to a PNG that best shows the subject, unless the user names a file type or says no file. Except for address-column recipients, find up to three matching dashboards (`*.page.aml`, every folder level) on the task dataset and read their tabs with `get_object_outline`; a named or pinned dashboard comes first.
+    - **Tab:** one tab already shows the metric by the grouping.
+    - **Dashboard:** the subject fills it or several tabs, or the user named or pinned it.
+    - **Viz:** otherwise; always use the task chart for per-recipient messages.
 
     Keep the best pick of the other kind for the draft report's button, by name: for a Viz, a dashboard or tab you read that shows the subject, even in one block of the metric by the grouping ("Attach the <title> dashboard instead", "… tab instead"); a chart for a Tab or Dashboard ("Attach a chart instead"). No button when nothing is attached.
 
-    ## Write it into the brief
+    ## Brief contract
 
-    Fill the brief's At a glance lines (Sends to, Condition, Attachment) and write its `{Condition}`, `{Attach}` and `{Deliver}` steps (an edit adds a missing one in order):
-    - **Condition:** exclusive, ordered branches from step 1's numbers, each naming its destinations. It decides who gets a message, and never writes one.
-    - **Attach:** the chart, or the dashboard or tab by name, exported as PNG. A dashboard keeps its saved date filter (none means all time). When that isn't the run's period, the message adds: "The attached <title> shows <its period>, its saved filter."
-    - **Deliver:** one message per recipient (from a column: only their own rows) covering what the user asked for, with the export attached. The subject is "<label> · <this period's dates>" by email and "<label>" in Slack, word for word.
-    - **Recipients from a column:** "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients."
+    Fill At a glance's Sends to, Condition and Attachment lines. Add missing `{Condition}`, `{Attach}` and `{Deliver}` steps in that order:
+    - **Condition:** exclusive ordered branches from step 1's numbers, each naming destinations; it never writes a message.
+    - **Attach:** export the chart, tab or named dashboard as PNG. Dashboards keep their saved date filter (none is all time); if it differs from the run period, add: "The attached <title> shows <its period>, its saved filter."
+    - **Deliver:** send one message per recipient—only their own rows for an address column—covering the request with the export attached. Use "<label> · <this period's dates>" for email and "<label>" for Slack, word for word.
+    - **Address column:** include "The task owner explicitly asked to send to the addresses in <table.column>; they are the intended recipients."
 
     In the draft report, 📨 Delivery reads "None (kept in the run record)", "Email · <address>", "Slack · #channel" or "Email · each <role> (<column>)" (several joined by "; "), and 📎 Attachment "None", "Viz · PNG", "Tab · <dashboard> › <tab> · PNG", "Dashboard · <dashboard> · PNG", or the file the user named.
 
-    Add an acceptance criterion for the sends ("Sends one message to <each destination>"), and one for a condition ("States whether any <group> **fell 20% or more**, and names the ones that did").
+    Add criteria for sends ("Sends one message to <each destination>") and conditions ("States whether any <group> **fell 20% or more**, and names the ones that did"). Changes to this chat's draft or a named task use `edit_ai_task` (load it first).
 
-    A change to this chat's draft or a named task goes through `edit_ai_task` (load it with `load_skill`).
-
-    ## Examples
+    ## Example
 
     > User: "Ping #sales-alerts if any category drops a lot week over week."
     > Delivery: Slack · #sales-alerts. A Threshold card sets the condition. Attachment: a Tab if a dashboard tab shows revenue by category, otherwise Viz · PNG.

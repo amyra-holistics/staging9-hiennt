@@ -6,16 +6,15 @@ Skill create_ai_task {
   content: @md
     # Create a scheduled AI task
 
-    Settle a new task in this chat, then save a draft with its own schedule entry: run and send nothing. Never change another task or schedule entry. Never open another task's file or an unmentioned earlier chat: `write_ai_task_brief` has the file shapes.
+    Settle a new task in this chat, then save its draft and schedule entry—never run, send, or change another task or schedule entry. Never open another task's file or an unmentioned earlier chat: `write_ai_task_brief` has the file shapes.
 
     ## Ask before deciding
 
-    - Ask an `ask_user` card for each piece the request leaves vague, even if an earlier chat or task answered it. Ask each card once, in its wording below. Decide only what's clear or has one standard answer (Monday–Sunday weeks, ties in a ranking), and state it in the brief.
-    - Every question is a card, never text or `#opt` buttons: a reply without a tool call ends the turn.
-    - Card order: Time, source and Order cards first, in one `ask_user` call as separate questions, never combined; Metric, Ranking and Threshold once a query returns their numbers; Where alone, after every other card.
-    - Cover only what the user asked or picked: add no ranking, top N, threshold or metric.
+    - Ask one `ask_user` card, in the wording below, for every unresolved choice—even if an earlier task answered it. Decide only clear or standard details (Monday–Sunday weeks; ranking ties) and state them in the brief.
+    - Use cards only, never text or `#opt` buttons. Ask Time, source and Order first, together, as separate questions; query before Metric, Ranking or Threshold; ask Where alone and last.
+    - Cover only what the user asked or picked: no added ranking, top N, threshold or metric.
 
-    Questions in business words, at most 15. At most 3 options, the recommended one first and marked "(recommended)", unless the card says none. Each option: a label of at most 5 words and the fact that decides it (today's number, latest data, Endorsed).
+    Use business words and at most 15 words per question; offer at most three choices; keep labels to five words stating their deciding fact. Put "(recommended)" first unless none is required.
 
     ## The cards
 
@@ -23,26 +22,22 @@ Skill create_ai_task {
     - **Which data:** two or more current datasets fit. Each option says what it covers. Recommend the endorsed one.
     - **Stale source:** the pinned source isn't current. "<Name> <why it can't serve>. Find another source?" with "Find another source for me" (recommended) and "Use <name> anyway".
     - **Which dashboard:** no dataset fits. "Which dashboard shows this number?" with "Not sure, pick for me" or a typed name, none recommended.
-    - **Metric, Ranking, Threshold:** a vague word that changes the result. Each option shows today's numbers: the latest complete period vs the one before, by AQL relative period (`@(last week)`).
-      - **Metric** ("sales", "how we did", "performing"): each candidate metric's total.
-      - **Ranking** ("changed the most", "top" without a number): the top rows ("Top 5 by dollar change (recommended)").
-      - **Threshold** ("a lot", "big", "worst"), asked as "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values. Recommend the one catching the clear outliers. "Worst" means a few rows by change.
+    - **Metric, Ranking, Threshold:** a vague term changes the result. Show today's numbers—the latest complete period vs the prior one using AQL relative periods (`@(last week)`). For Metric ("sales", "how we did", "performing"), show each total; for Ranking ("changed the most", "top" without a number), show top rows; for Threshold ("a lot", "big", "worst"), ask "What counts as <the word>?" with 2–3 thresholds, groups caught and values. Recommend clear outliers; "Worst" means a few rows by change.
     - **Order:** every task grouped by anything but time, unless the user named a ranking or order: never a default. "Which <groups> should the message list first?" with exactly the labels "Biggest change in amount (recommended)" and "Biggest percent change", no descriptions, whatever the metric.
     - **Where:** the request names no email address, Slack channel or column ("show me", "send me", "the team"; "email me" is clear). "Where should the result go?" with "Stay in Holistics", "Send to email" and "Send to Slack channel", none recommended. "Send me" or any request to send or alert: no Stay.
 
     ## Pick the source
 
-    - A pinned dataset, model or dashboard, or a dataset the user names by its label, is the source when it has the fields and current data.
-    - `read_folder` isn't recursive. Before calling a named dataset missing, open every root folder and subfolder (`_` and `.` ones too) and likely files. Still not found: "I can't find <name>. Which one is it?", closest names, none recommended. Never save on a look-alike the user didn't pick.
-    - Otherwise, find datasets with the needed fields and latest data.
-    - Latest data: the date field's latest date, from a query with no period filter. Data ending before the latest complete period isn't current: never offer or save it unasked, nor shift the period to fit it.
+    - Use a pinned or named dataset, model or dashboard only with needed fields and current data; otherwise find one that has both.
+    - `read_folder` isn't recursive: before declaring a named dataset missing, search every root folder, subfolder (including `_` and `.`), and likely file. If absent, ask "I can't find <name>. Which one is it?" with closest names and no recommendation—never save an unchosen look-alike.
+    - Check the date field's latest date without a period filter. If data ends before the latest complete period, don't offer or save it unasked, and don't shift the requested period.
 
     ## Shape the task
 
-    - **Schedule:** one cadence (daily, one weekday or one day of the month) and one clock time, matching the period: week over week only on Mondays, month over month only on the 1st. Times are UTC, shown with "UTC", cards too. Convert other timezones to UTC, even onto the day before (the weekday is the user's).
+    - **Schedule:** one weekday (for example, Monday), daily, or day of month, and a clock time. Match week-over-week to Monday and month-over-month to the 1st. Show UTC everywhere; convert another timezone to UTC even if it moves to the prior day (the weekday is the user's).
     - **Anomalies:** only when asked ("unusual", "outliers").
-    - **Delivery:** when the task sends or alerts, `load_skill` `add_ai_task_delivery` now unless loaded.
+    - **Delivery:** for a send or alert, load `add_ai_task_delivery` now unless already loaded.
 
-    Then follow `write_ai_task_brief`, once every Order and Where card that applies has an answer.
+    Follow `write_ai_task_brief` after every applicable Order and Where card is answered.
   ;;
 }

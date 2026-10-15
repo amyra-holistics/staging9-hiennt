@@ -6,24 +6,14 @@ Skill edit_ai_task {
   content: @md
     # Change a scheduled AI task
 
-    Change a task only when it's this chat's draft or the user explicitly asks to update, edit or change it by name. Any other request is a new task: use `create_ai_task`.
-
-    Change only what the user asked for, keep every other line of the task as it is, and show what changed.
-
-    ## Read the task
-
-    Read the task, and its schedule entry when the time changes. Work from this conversation and the task itself: open an earlier chat only when the user points to it.
+    Change a task only when it's this chat's draft or the user explicitly asks to update, edit or change it by name. Any other request is a new task: use `create_ai_task`. Read the task file, and its schedule entry only for a time change. Open an earlier chat only when the user points to it. Change only what they asked for, preserve every other line, and show the diff.
 
     ## Apply the change
 
-    - **An "… instead" button is the whole change.** Apply it without a card.
-      - A new time changes the brief's Schedule line and the schedule entry, in UTC as `create_ai_task` says.
-      - A new source changes the Source line and every field the brief names. It must pass `create_ai_task`'s source rules.
-      - "Attach … instead" changes the Attachment line and the attach step, never a criterion, as `add_ai_task_delivery` writes them.
-    - **"Change the acceptance criteria" on its own:** ask "How should the acceptance criteria change?" with 2–3 likely edits, each quoting the criterion it changes.
-    - **A typed change is the whole change.** Apply it everywhere the brief uses that value: the Definitions, the step that writes the message and the criterion that checks it.
-    - **A new vague word** ("a lot") gets `create_ai_task`'s Metric, Ranking or Threshold card. New recipients or a send condition follow `add_ai_task_delivery`.
-    - **Rules from another skill:** load `create_ai_task` or `add_ai_task_delivery` with `load_skill` before using its rules or cards.
+    - **An "… instead" button is the whole change:** apply it without a card. Time updates the Schedule line and schedule entry in UTC; source updates the Source line and every named field after `create_ai_task`'s source checks; "Attach … instead" updates the Attachment line and attach step, never a criterion, as `add_ai_task_delivery` writes them.
+    - **"Change the acceptance criteria" on its own:** ask "How should the acceptance criteria change?" with 2–3 likely edits, each quoting its criterion.
+    - **A typed change is the whole change:** update every use in Definitions, message step and checking criterion.
+    - **A new vague word** ("a lot") uses `create_ai_task`'s Metric, Ranking or Threshold card; recipients or a send condition use `add_ai_task_delivery`. Load the owner skill before its rules or cards.
     - **An older task** whose brief still loads `format_ai_task_output`, starts with Step 0, pastes a Delivery rules block or sets the message's layout ("every <group>", values per line) gets its Steps and criteria rewritten in the current form, keeping what they cover.
     - **A Schedule line naming another timezone** becomes UTC with any change, cron kept.
 

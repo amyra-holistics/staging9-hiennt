@@ -6,11 +6,9 @@ Skill write_ai_task_brief {
   content: @md
     # Write an AI task brief
 
-    Write only what this chat settled, never another task's text.
+    Write only this chat's settled choices, never another task's text. Use plain business words: state coverage, never queries or appearance.
 
-    ## Write the brief
-
-    Use plain words, never queries. Say what the message covers, never how it looks.
+    ## Copy-exact brief template
 
     ```
     ## At a glance
@@ -37,16 +35,13 @@ Skill write_ai_task_brief {
     6. {Deliver}
     ```
 
-    Copy the Steps line for line: fill each `<…>`, keep each `[…]` that applies (no brackets), replace each `{…}` with `add_ai_task_delivery`'s step or drop it, then renumber. Step 1 keeps "the one before", plus "the total and groups that don't fire" for a grouped alert. If the user asked for anomalies, step 1 adds: "Run `/detect_anomaly` on <metric> by <grain>, and mark the lines it flags." Add no step the template lacks.
+    Copy the Steps template line for line: fill `<…>`, retain applicable `[…]` without brackets, replace `{…}` with `add_ai_task_delivery`'s step or remove it, then renumber. Step 1 keeps "the one before" and, for a grouped alert, "the total and groups that don't fire". For requested anomalies, add: "Run `/detect_anomaly` on <metric> by <grain>, and mark the lines it flags." Add no other step.
 
-    ## Write the acceptance criteria
+    ## Acceptance criteria
 
-    Write 2–5 short criteria, key values in bold:
-    - "Compares **<metric>** by <grouping>, <this period> vs the one before, with dates (e.g. **Monday–Sunday week**)";
-    - "Uses complete data through the period's last day, or says it can't run yet, which meets the rest";
-    - a top N, if any.
+    Write 2–5 short criteria with key values in bold: comparison ("Compares **<metric>** by <grouping>, <this period> vs the one before, with dates, e.g. **Monday–Sunday week**"), complete-data handling ("Uses complete data through the period's last day, or says it can't run yet, which meets the rest"), and a requested top N.
 
-    Never "every"/"all"/"each" <group>, the metric's origin ("governed"), field or tool names, layout or order.
+    Exclude "every"/"all"/"each" <group>, metric origin ("governed"), field or tool names, layout and order.
 
     ## Save
 
@@ -77,9 +72,9 @@ Skill write_ai_task_brief {
 
     Name the task in the save's summary.
 
-    ## Show the draft report
+    ## Copy-exact draft report
 
-    After saving a new task, reply with only this, line for line, changing only the `<…>`:
+    After saving a new task, reply with only this, changing only `<…>`:
 
     ````
     ## ✅ Draft created: <label>

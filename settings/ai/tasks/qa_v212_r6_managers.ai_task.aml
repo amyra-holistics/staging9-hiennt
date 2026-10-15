@@ -1,0 +1,35 @@
+AiTask qa_v212_r6_managers {
+  label: 'Weekly Country Revenue Drop Alert'
+  description: 'Emails country managers only when their country revenue falls by more than 10 percent week over week.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:qa_r11_ds_managers
+    - Sends to: Email · each country manager (qa_r11_country_managers.manager_email)
+    - Condition: A country’s revenue falls more than 10% week over week; a zero previous-week revenue never qualifies
+    - Attachment: Viz · PNG
+    - Schedule: Monday 8:00 AM UTC (cron 0 8 * * 1)
+
+    ## Definitions
+    - Last week is the most recent complete Monday–Sunday week; two weeks ago is the Monday–Sunday week immediately before it.
+    - Country is countries.name.
+    - Country manager is qa_r11_country_managers.manager_email, joined to the manager’s country by country code.
+    - Revenue is the total item quantity multiplied by product price.
+    - A country qualifies when its last-week revenue is more than 10% lower than two weeks ago. A zero previous-week revenue never qualifies.
+    - The task owner explicitly asked to send to the addresses in qa_r11_country_managers.manager_email; they are the intended recipients.
+
+    ## Steps
+    Load `run_ai_task` first and do every step yourself. If a sub-task ran them, reply with only its final answer, word for word: it sets the run's status. If it returned nothing, say its sends can't be confirmed. After a retry, report only the last attempt.
+    1. Get revenue for last week and the one before, by country and country manager email, with `run_ai_task`.
+    2. Decide from Step 1 as exclusive ordered branches: for each country whose revenue fell more than 10%, prepare one email only to that country’s manager; otherwise, do not send a message to that manager and record that their country did not qualify.
+    3. Chart revenue by the qualifying recipient’s country: bars comparing last week with the week before. Never a table.
+    4. Export each recipient-specific chart as PNG.
+    5. Summarize with `explain_result`, then write the message covering that manager’s country revenue, the prior-week revenue, and percentage decline with `write_ai_task_message`, loaded in this step.
+    6. Deliver one email per qualifying country manager only, with the matching recipient-specific PNG attached. Subject: "Weekly Country Revenue Drop Alert · <last week’s dates>". Each manager receives only their own country’s data.
+  ;;
+  acceptance_criteria: @md
+    - Compares **revenue** by country, **last complete Monday–Sunday week** vs the one before, with dates.
+    - Uses complete data through the period’s last day.
+    - Sends one message to each country manager whose country **fell more than 10% week over week**; a zero previous period never qualifies.
+    - Each recipient receives only their own country’s revenue for both weeks and percentage decline.
+  ;;
+}

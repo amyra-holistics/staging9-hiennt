@@ -1,0 +1,33 @@
+AiTask qa_v212_r5_monthly {
+  label: 'Monthly Revenue by Continent Email'
+  description: 'Emails last month’s revenue by continent and the change from the prior complete month.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: email nhi.ty@holistics.io
+    - Condition: none, every run
+    - Attachment: chart exported as PNG
+    - Schedule: 1st of every month at 9:00 AM UTC (cron 0 9 1 * *)
+
+    ## Definitions
+    - Last month = the most recent complete calendar month
+    - Prior complete month = the complete calendar month before last month
+    - Continent = countries.continent_name
+    - Order = by change amount, descending
+
+    ## Steps
+    Load `run_ai_task` first and do every step yourself. If a sub-task ran them, reply with only its final answer, word for word: it sets the run's status. If it returned nothing, say its sends can't be confirmed. After a retry, report only the last attempt.
+    1. Get Revenue for last month and the one before, by Continent, with `run_ai_task`.
+    2. Chart Revenue by Continent as bars comparing last month with the prior complete month, sorted by change amount descending.
+    3. Export the chart as PNG and attach it.
+    4. Summarize with `explain_result`, then write the message covering Revenue by Continent for last month and the prior complete month with `write_ai_task_message`, loaded in this step.
+    5. Deliver one message to nhi.ty@holistics.io covering the requested comparison with the export attached. The email subject is `Monthly Revenue by Continent Email · <last month dates>`.
+  ;;
+  acceptance_criteria: @md
+    Compares **Revenue** by Continent, last month vs the one before, with dates.
+
+    Uses complete data through the period's last day.
+
+    Sends one message to nhi.ty@holistics.io.
+  ;;
+}

@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create a scheduled AI task'
-  description: "Use when the user wants an analysis to run on a schedule, such as a recurring report, digest, check or alert, even without saying “AI task”. Typical phrasings: “run revenue by category every Monday”, “email me what changed most each Monday”. Always a new task, even when one on the same subject exists. Do not use for a one-off answer, a send right now, a change to this chat's draft, or an explicit ask to update, edit or change a task (use edit_ai_task). Load write_ai_task_brief in the same step as this skill: it writes, saves and reports the draft."
+  description: "Use when the user wants an analysis to run on a schedule, such as a recurring report, digest, check or alert, even without saying “AI task”. Typical phrasings: “run revenue by category every Monday”, “email me what changed each Monday”. Always a new task, even when one on the same subject exists. Do not use for a one-off answer, a send right now, a change to this chat's draft, or an explicit ask to update, edit or change a task (use edit_ai_task). Load write_ai_task_brief in the same step as this skill: it writes, saves and reports the draft."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -27,7 +27,7 @@ Skill create_ai_task {
       - **Metric** ("sales", "how we did", "performing"): each candidate metric's total.
       - **Ranking** ("changed the most", "top" without a number): the top rows ("Top 5 by dollar change (recommended)").
       - **Threshold** ("a lot", "big", "worst"), asked as "What counts as <the word>?": 2–3 thresholds, each with how many groups it catches today and their values. Recommend the one catching the clear outliers. "Worst" means a few rows by change.
-    - **Order:** every digest grouped by anything but time, unless the user named a ranking or order: never a default. "Which <groups> should the message list first?" with "Biggest change in amount (recommended)" and "Biggest percent change", no numbers, no other option.
+    - **Order:** every digest grouped by anything but time, unless the user named a ranking or order: never a default. "Which <groups> should the message list first?" with exactly "Biggest change in amount (recommended)" and "Biggest percent change", whatever the metric, no numbers.
     - **Where:** the request names no email address, Slack channel or column ("show me", "send me", "the team"; "email me" is clear). "Where should the result go?" with "Stay in Holistics", "Send to email" and "Send to Slack channel", none recommended. "Send me" or any request to send or alert: no Stay.
 
     ## Pick the source
@@ -39,7 +39,7 @@ Skill create_ai_task {
 
     ## Shape the task
 
-    - **Schedule:** one cadence (daily, one weekday or one day of the month) and one clock time, matching the period: week over week only on Mondays, month over month only on the 1st. Times are UTC, shown with "UTC", cards too. Convert other timezones or cities to UTC, even onto the day before (the weekday is the user's).
+    - **Schedule:** one cadence (daily, one weekday or one day of the month) and one clock time, matching the period: week over week only on Mondays, month over month only on the 1st. Times are UTC, shown with "UTC", cards too. Convert other timezones to UTC, even onto the day before (the weekday is the user's).
     - **Anomalies:** only when asked ("unusual", "outliers"), as the brief's anomaly step.
     - **Delivery:** when the task sends or alerts, `load_skill` `add_ai_task_delivery` now unless loaded.
 

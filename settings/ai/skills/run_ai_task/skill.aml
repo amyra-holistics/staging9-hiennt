@@ -1,6 +1,6 @@
 Skill run_ai_task {
   label: 'Run a scheduled AI task'
-  description: "Runs a scheduled AI task's brief. Load it first in every scheduled AI task run, before planning or delegating, and when the user asks to preview a task's result in chat (“Preview the first result”, “show me what this task would send”). Not for creating or changing a task, one-off questions in chat, or AI Blocks."
+  description: "Runs a scheduled AI task's brief. Load it first in every scheduled AI task run, before planning or delegating, and when the user asks to preview a task's result in chat (“Preview the first result”). Not for creating or changing a task, one-off questions in chat, or AI Blocks."
   invocation: 'auto'
   content: @md
     # Run a scheduled AI task
@@ -16,7 +16,7 @@ Skill run_ai_task {
     - Per metric (and group when the brief groups), always get this period and the one before, even if a step names one: both values, the change and percent change, each period's first and last day (`min`/`max` of the date field per period), and the dataset's latest date (no period filter).
     - Also get what the brief needs: whether each line fired and how many groups did (unrounded, with the brief's exclusions), the gap to a target or alert line, and a ratio's numerator and denominator changes; for a grouped alert, the fired and the other groups' count and combined change, and the total's change and percent.
     - Never compute, rank or compare numbers yourself: get each one, and the lines' order, from the data. A number you don't have stays out.
-    - Write the period filter in the AQL yourself: `<date field> matches @(last week)` vs `@(2 weeks ago)` (or months, days), never worked-out dates (even if the days look off) or a period in words to another tool. Every date you write is a returned day: never work one out.
+    - Write the period filter in the AQL yourself: `<date field> matches @(last week)` vs `@(last 2 weeks begin until last week begin)` (`@(2 weeks ago)` is a rolling 7 days), or `@(last month)` vs `@(2 months ago)`, days alike; never worked-out dates or a period in words to another tool. Every date you write is a returned day.
 
     ## Decide
 

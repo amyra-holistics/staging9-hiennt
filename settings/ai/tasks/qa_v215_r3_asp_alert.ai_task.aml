@@ -1,0 +1,37 @@
+AiTask qa_v215_r3_asp_alert {
+  label: 'Weekly Category Average Selling Price Drop Alert'
+  description: 'Emails an alert when a product category average selling price falls at least 4 percent week over week.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · nhi.ty@holistics.io
+    - Condition: Send only when a product category average selling price falls 4% or more versus the previous complete week; a zero previous-week average selling price never qualifies.
+    - Attachment: Viz · PNG
+    - Schedule: Monday 7:00 AM UTC (cron 0 7 * * 1)
+
+    ## Definitions
+    - Last week = the most recent complete Monday–Sunday week.
+    - Previous week = the complete Monday–Sunday week immediately before last week.
+    - Category = categories.name.
+    - Average selling price = revenue divided by units sold.
+    - Rank qualifying categories by the dollar decrease in average selling price, largest first.
+
+    ## Steps
+    Load `run_ai_task` first and do every step yourself. If a sub-task ran them, reply with only its final answer, word for word: it sets the run's status. If it returned nothing, say its sends can't be confirmed. After a retry, report only the last attempt.
+    1. Get average selling price, revenue, and units sold for last week and the one before, by category, with `run_ai_task`.
+    2. From the step 1 numbers, send only if at least one category's average selling price fell 4% or more versus the previous week and its previous-week average selling price was not zero.
+    3. Chart average selling price by category as bars, sorted by dollar decrease in average selling price, largest first.
+    4. Export the chart as PNG.
+    5. Summarize with `explain_result`, then write the message covering category average selling price and the condition with `write_ai_task_message`, loaded in this step.
+    6. Deliver one email to nhi.ty@holistics.io covering the categories that meet the condition, with the PNG export attached. The subject is "Weekly Category Average Selling Price Drop Alert · last week's dates".
+  ;;
+  acceptance_criteria: @md
+    ▢ Compares **average selling price** by product category, last week versus the one before, with dates and complete Monday–Sunday weeks.
+
+    ▢ Uses complete data through the period's last day.
+
+    ▢ States whether any product category **fell 4% or more**, excluding categories with zero previous-week average selling price.
+
+    ▢ Sends one email to **nhi.ty@holistics.io** only when the condition is met.
+  ;;
+}

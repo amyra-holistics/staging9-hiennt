@@ -1,0 +1,29 @@
+Model qa_r11_orders_stale {
+  type: 'query'
+  label: 'QA R11 Orders (loaded through Oct 6)'
+  description: 'Test data for the 11 Oct AI task skill round: the orders table as if loading stopped after Oct 6, 2026. Safe to delete.'
+  data_source_name: 'demodb'
+  query: @sql select * from "ecommerce"."orders" where created_at < '2026-10-07';;
+
+  dimension id {
+    label: 'Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.id }};;
+    primary_key: true
+  }
+  dimension status {
+    label: 'Status'
+    type: 'text'
+    definition: @sql {{ #SOURCE.status }};;
+  }
+  dimension created_at {
+    label: 'Created At'
+    type: 'datetime'
+    definition: @sql {{ #SOURCE.created_at }};;
+  }
+  dimension user_id {
+    label: 'User Id'
+    type: 'number'
+    definition: @sql {{ #SOURCE.user_id }};;
+  }
+}

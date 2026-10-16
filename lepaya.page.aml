@@ -162,5 +162,5 @@ Dashboard lepaya_2 {
       mode: 'auto'
     }
   }
-  theme: H.themes.vanilla
+  theme: DynamicPageTheme { light: H.themes.vanilla, dark: H.themes.charcoal }
 }

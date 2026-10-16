@@ -365,7 +365,7 @@ Dashboard untitled_4_2 {
       mode: 'auto'
     }
   }
-  theme: H.themes.vanilla
+  theme: forest
   interactions: [
     FilterInteraction {
       from: 'f_0hsw'

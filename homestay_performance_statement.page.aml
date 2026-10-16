@@ -10,7 +10,6 @@ const _homestay_performance_tokens = {
   radius_pill: '999px',
   font: 'Sofia Sans, Arial, sans-serif'
 }
-
 ColorPalette homestay_performance_statement_palette {
   title: 'Performance Statement Palette'
   categorical {
@@ -26,12 +25,10 @@ ColorPalette homestay_performance_statement_palette {
     ]
   }
 }
-
 PageTheme homestay_performance_statement_theme {
   color {
     data: homestay_performance_statement_palette
   }
-
   block {
     background {
       bg_color: 'transparent'
@@ -56,7 +53,6 @@ PageTheme homestay_performance_statement_theme {
       font_weight: 'normal'
     }
   }
-
   viz {
     table {
       general {
@@ -94,12 +90,10 @@ PageTheme homestay_performance_statement_theme {
     }
   }
 }
-
 Dashboard homestay_performance_statement {
   title: 'Homestay Performance Statement'
   description: 'A three-page A4 printable portfolio, booking, market, and listing-register performance statement.'
   theme: homestay_performance_statement_theme
-
   block total_listings_kpi: VizBlock {
     label: 'Total Listings'
     viz: MetricKpi {
@@ -121,7 +115,6 @@ Dashboard homestay_performance_statement {
       hide_label: true
     }
   }
-
   block booking_count_kpi: VizBlock {
     label: 'Booking Count'
     viz: MetricKpi {
@@ -149,7 +142,6 @@ Dashboard homestay_performance_statement {
       hide_label: true
     }
   }
-
   block total_booked_nights_kpi: VizBlock {
     label: 'Total Booked Nights'
     viz: MetricKpi {
@@ -177,7 +169,6 @@ Dashboard homestay_performance_statement {
       hide_label: true
     }
   }
-
   block average_listing_price_kpi: VizBlock {
     label: 'Average Listing Price'
     viz: MetricKpi {
@@ -205,7 +196,6 @@ Dashboard homestay_performance_statement {
       hide_label: true
     }
   }
-
   block monthly_booking_count_by_check_in_month: VizBlock {
     label: 'Monthly Booking Count by Check-in Month'
     viz: CombinationChart {
@@ -246,7 +236,6 @@ Dashboard homestay_performance_statement {
       }
     }
   }
-
   block booking_count_by_reservation_status: VizBlock {
     label: 'Booking Count by Reservation Status'
     viz: PieChart {
@@ -296,7 +285,6 @@ Dashboard homestay_performance_statement {
       }
     }
   }
-
   block booking_count_by_listing_room_type: VizBlock {
     label: 'Booking Count by Listing Room Type'
     viz: CombinationChart {
@@ -405,7 +393,6 @@ Dashboard homestay_performance_statement {
       }
     }
   }
-
   block printable_listing_register: VizBlock {
     label: 'Printable Listing Register'
     viz: DataTable {
@@ -494,283 +481,291 @@ Dashboard homestay_performance_statement {
       }
     }
   }
-
   view: HTMLLayout {
-    content: @html
-      <style>
-        .homestay-statement {
-          --hs-canvas: #F3F0EE;
-          --hs-surface: #FCFBFA;
-          --hs-ink: #141413;
-          --hs-muted: #706D68;
-          --hs-rule: #E6E0DB;
-          --hs-accent: #F37338;
-          --hs-radius-sm: 20px;
-          --hs-radius-md: 40px;
-          --hs-radius-pill: 999px;
-          --hs-page-w: 210mm;
-          --hs-page-h: 297mm;
-          --hs-page-pad: 13mm;
-          color: var(--hs-ink);
-          font-family: 'Sofia Sans', Arial, sans-serif;
-          background: var(--hs-canvas);
-          padding: 12mm 0;
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        .homestay-statement *, .homestay-statement *::before, .homestay-statement *::after {
-          box-sizing: border-box;
-        }
-        .homestay-statement .hs-page {
-          width: var(--hs-page-w);
-          height: var(--hs-page-h);
-          margin: 0 auto 12mm;
-          padding: var(--hs-page-pad);
-          overflow: hidden;
-          position: relative;
-          background: var(--hs-surface);
-          border-radius: var(--hs-radius-sm);
-          box-shadow: 0 8px 28px rgba(20, 20, 19, 0.10);
-          display: flex;
-          flex-direction: column;
-          gap: 5mm;
-        }
-        .homestay-statement .hs-page::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          width: 42mm;
-          height: 4mm;
-          background: var(--hs-accent);
-          border-radius: 0 0 0 var(--hs-radius-pill);
-        }
-        .homestay-statement .hs-eyebrow {
-          color: var(--hs-accent);
-          font-size: 8pt;
-          font-weight: 700;
-          letter-spacing: .16em;
-          text-transform: uppercase;
-        }
-        .homestay-statement .hs-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 8mm;
-          padding-bottom: 4mm;
-          border-bottom: 1px solid var(--hs-rule);
-        }
-        .homestay-statement .hs-title {
-          margin: 1mm 0 0;
-          font-size: 31pt;
-          line-height: .95;
-          letter-spacing: -.045em;
-          font-weight: 700;
-        }
-        .homestay-statement .hs-meta {
-          margin: 2mm 0 0;
-          color: var(--hs-muted);
-          font-size: 9pt;
-          line-height: 1.35;
-        }
-        .homestay-statement .hs-page-no {
-          color: var(--hs-muted);
-          font-size: 8pt;
-          font-weight: 700;
-          white-space: nowrap;
-        }
-        .homestay-statement .hs-section-title {
-          margin: 0;
-          font-size: 16pt;
-          line-height: 1;
-          letter-spacing: -.02em;
-        }
-        .homestay-statement .hs-section-note {
-          margin: 1mm 0 0;
-          color: var(--hs-muted);
-          font-size: 9pt;
-          line-height: 1.35;
-        }
-        .homestay-statement .hs-kpis {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 3mm;
-        }
-        .homestay-statement .hs-card {
-          min-width: 0;
-          background: var(--hs-surface);
-          border: 1px solid var(--hs-rule);
-          border-radius: var(--hs-radius-sm);
-          padding: 4mm 3mm;
-        }
-        .homestay-statement .hs-chart-card {
-          min-width: 0;
-          background: var(--hs-surface);
-          border: 1px solid var(--hs-rule);
-          border-radius: var(--hs-radius-sm);
-          padding: 4mm;
-          overflow: hidden;
-        }
-        .homestay-statement .hs-chart-card--trend { height: 128mm; }
-        .homestay-statement .hs-chart-card--half { height: 104mm; }
-        .homestay-statement .hs-chart-card--market { height: 172mm; }
-        .homestay-statement .hs-chart-card--register { height: 235mm; padding: 3mm; }
-        .homestay-statement .hs-two-col {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-          gap: 5mm;
-        }
-        .homestay-statement .hs-live {
-          width: 100%;
-          height: 100%;
-          min-width: 0;
-        }
-        .homestay-statement .hs-footer {
-          margin-top: auto;
-          padding-top: 3mm;
-          border-top: 1px solid var(--hs-rule);
-          display: flex;
-          justify-content: space-between;
-          gap: 6mm;
-          color: var(--hs-muted);
-          font-size: 7.5pt;
-          line-height: 1.3;
-        }
-        .homestay-statement .hs-footer strong { color: var(--hs-ink); }
-        .homestay-statement .dac-viz-block-label-container {
-          margin-bottom: 2mm;
-        }
-        .homestay-statement .dac-viz-block-label {
-          color: var(--hs-ink);
-          font-family: 'Sofia Sans', Arial, sans-serif;
-          font-weight: 700;
-        }
-        @media screen and (max-width: 215mm) {
-          .homestay-statement { padding: 0; }
-          .homestay-statement .hs-page {
-            width: 100%;
-            min-height: var(--hs-page-h);
-            height: auto;
-            border-radius: 0;
-            margin: 0;
-            box-shadow: none;
-          }
-        }
-        @media print {
-          .homestay-statement {
-            padding: 0;
-            background: var(--hs-surface);
-          }
-          .homestay-statement .hs-page {
-            width: 210mm;
-            height: 297mm;
-            margin: 0;
-            border: 0;
-            border-radius: 0;
-            box-shadow: none;
-            break-after: page;
-            page-break-after: always;
-          }
-          .homestay-statement .hs-page:last-child {
-            break-after: auto;
-            page-break-after: auto;
-          }
-          .homestay-statement .hs-card,
-          .homestay-statement .hs-chart-card,
-          .homestay-statement .hs-footer {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-        }
-      </style>
+    label: 'View 1'
+    content: @html <style>
+  .homestay-statement {
+    --hs-canvas: #F3F0EE;
+    --hs-surface: #FCFBFA;
+    --hs-ink: #141413;
+    --hs-muted: #706D68;
+    --hs-rule: #E6E0DB;
+    --hs-accent: #F37338;
+    --hs-radius-sm: 20px;
+    --hs-radius-md: 40px;
+    --hs-radius-pill: 999px;
+    --hs-page-w: 210mm;
+    --hs-page-h: 297mm;
+    --hs-page-pad: 13mm;
+    color: var(--hs-ink);
+    font-family: 'Sofia Sans', Arial, sans-serif;
+    background: var(--hs-canvas);
+    padding: 12mm 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .homestay-statement *, .homestay-statement *::before, .homestay-statement *::after {
+    box-sizing: border-box;
+  }
+  .homestay-statement .hs-page {
+    width: var(--hs-page-w);
+    height: var(--hs-page-h);
+    margin: 0 auto 12mm;
+    padding: var(--hs-page-pad);
+    overflow: hidden;
+    position: relative;
+    background: var(--hs-surface);
+    border-radius: var(--hs-radius-sm);
+    box-shadow: 0 8px 28px rgba(20, 20, 19, 0.10);
+    display: flex;
+    flex-direction: column;
+    gap: 5mm;
+  }
+  .homestay-statement .hs-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 42mm;
+    height: 4mm;
+    background: var(--hs-accent);
+    border-radius: 0 0 0 var(--hs-radius-pill);
+  }
+  .homestay-statement .hs-eyebrow {
+    color: var(--hs-accent);
+    font-size: 8pt;
+    font-weight: 700;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+  }
+  .homestay-statement .hs-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8mm;
+    padding-bottom: 4mm;
+    border-bottom: 1px solid var(--hs-rule);
+  }
+  .homestay-statement .hs-title {
+    margin: 1mm 0 0;
+    font-size: 31pt;
+    line-height: .95;
+    letter-spacing: -.045em;
+    font-weight: 700;
+  }
+  .homestay-statement .hs-meta {
+    margin: 2mm 0 0;
+    color: var(--hs-muted);
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+  .homestay-statement .hs-page-no {
+    color: var(--hs-muted);
+    font-size: 8pt;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .homestay-statement .hs-section-title {
+    margin: 0;
+    font-size: 16pt;
+    line-height: 1;
+    letter-spacing: -.02em;
+  }
+  .homestay-statement .hs-section-note {
+    margin: 1mm 0 0;
+    color: var(--hs-muted);
+    font-size: 9pt;
+    line-height: 1.35;
+  }
+  .homestay-statement .hs-kpis {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 3mm;
+  }
+  .homestay-statement .hs-card {
+    min-width: 0;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-rule);
+    border-radius: var(--hs-radius-sm);
+    padding: 4mm 3mm;
+  }
+  .homestay-statement .hs-chart-card {
+    min-width: 0;
+    background: var(--hs-surface);
+    border: 1px solid var(--hs-rule);
+    border-radius: var(--hs-radius-sm);
+    padding: 4mm;
+    overflow: hidden;
+  }
+  .homestay-statement .hs-chart-card--trend { height: 128mm; }
+  .homestay-statement .hs-chart-card--half { height: 104mm; }
+  .homestay-statement .hs-chart-card--market { height: 172mm; }
+  .homestay-statement .hs-chart-card--register { height: 235mm; padding: 3mm; }
+  .homestay-statement .hs-two-col {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 5mm;
+  }
+  .homestay-statement .hs-live {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+  }
+  .homestay-statement .hs-footer {
+    margin-top: auto;
+    padding-top: 3mm;
+    border-top: 1px solid var(--hs-rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 6mm;
+    color: var(--hs-muted);
+    font-size: 7.5pt;
+    line-height: 1.3;
+  }
+  .homestay-statement .hs-footer strong { color: var(--hs-ink); }
+  .homestay-statement .dac-viz-block-label-container {
+    margin-bottom: 2mm;
+  }
+  .homestay-statement .dac-viz-block-label {
+    color: var(--hs-ink);
+    font-family: 'Sofia Sans', Arial, sans-serif;
+    font-weight: 700;
+  }
+  @media screen {
+    .homestay-statement .hs-page,
+    .homestay-statement .hs-chart-card {
+      overflow: visible;
+    }
+  }
+  @media screen and (max-width: 215mm) {
+    .homestay-statement { padding: 0; }
+    .homestay-statement .hs-page {
+      width: 100%;
+      min-height: var(--hs-page-h);
+      height: auto;
+      border-radius: 0;
+      margin: 0;
+      box-shadow: none;
+    }
+  }
+  @media print {
+    .homestay-statement {
+      padding: 0;
+      background: var(--hs-surface);
+    }
+    .homestay-statement .hs-page {
+      width: 210mm;
+      height: 297mm;
+      margin: 0;
+      border: 0;
+      border-radius: 0;
+      box-shadow: none;
+      overflow: hidden;
+      break-after: page;
+      page-break-after: always;
+    }
+    .homestay-statement .hs-page:last-child {
+      break-after: auto;
+      page-break-after: auto;
+    }
+    .homestay-statement .hs-card,
+    .homestay-statement .hs-chart-card,
+    .homestay-statement .hs-footer {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .homestay-statement .hs-chart-card {
+      overflow: hidden;
+    }
+  }
+</style>
 
-      <main class="homestay-statement" aria-label="Homestay performance statement">
-        <section class="hs-page" aria-label="Page 1: portfolio and booking trend">
-          <header class="hs-header">
-            <div>
-              <div class="hs-eyebrow">Homestay portfolio</div>
-              <h1 class="hs-title">Performance<br />Statement</h1>
-              <p class="hs-meta">Portfolio and booking overview · Dataset-wide values</p>
-            </div>
-            <div class="hs-page-no">01 / 03</div>
-          </header>
+<main class="homestay-statement" aria-label="Homestay performance statement">
+  <section class="hs-page" aria-label="Page 1: portfolio and booking trend">
+    <header class="hs-header">
+      <div>
+        <div class="hs-eyebrow">Homestay portfolio</div>
+        <h1 class="hs-title">Performance<br />Statement</h1>
+        <p class="hs-meta">Portfolio and booking overview · Dataset-wide values</p>
+      </div>
+      <div class="hs-page-no">01 / 03</div>
+    </header>
 
-          <div class="hs-kpis">
-            <div class="hs-card"><div class="hs-live"><h-block name="total_listings_kpi" /></div></div>
-            <div class="hs-card"><div class="hs-live"><h-block name="booking_count_kpi" /></div></div>
-            <div class="hs-card"><div class="hs-live"><h-block name="total_booked_nights_kpi" /></div></div>
-            <div class="hs-card"><div class="hs-live"><h-block name="average_listing_price_kpi" /></div></div>
-          </div>
+    <div class="hs-kpis">
+      <div class="hs-card"><div class="hs-live"><h-block name="total_listings_kpi" /></div></div>
+      <div class="hs-card"><div class="hs-live"><h-block name="booking_count_kpi" /></div></div>
+      <div class="hs-card"><div class="hs-live"><h-block name="total_booked_nights_kpi" /></div></div>
+      <div class="hs-card"><div class="hs-live"><h-block name="average_listing_price_kpi" /></div></div>
+    </div>
 
-          <div>
-            <div class="hs-eyebrow">Booking cadence</div>
-            <h2 class="hs-section-title">Monthly check-in demand</h2>
-            <p class="hs-section-note">Bookings scheduled to check in each month across the available period.</p>
-          </div>
-          <div class="hs-chart-card hs-chart-card--trend">
-            <div class="hs-live"><h-block name="monthly_booking_count_by_check_in_month" /></div>
-          </div>
+    <div>
+      <div class="hs-eyebrow">Booking cadence</div>
+      <h2 class="hs-section-title">Monthly check-in demand</h2>
+      <p class="hs-section-note">Bookings scheduled to check in each month across the available period.</p>
+    </div>
+    <div class="hs-chart-card hs-chart-card--trend">
+      <div class="hs-live"><h-block name="monthly_booking_count_by_check_in_month" /></div>
+    </div>
 
-          <footer class="hs-footer">
-            <span><strong>Prepared for print</strong> · A4 performance statement</span>
-            <span>Portfolio overview</span>
-          </footer>
-        </section>
+    <footer class="hs-footer">
+      <span><strong>Prepared for print</strong> · A4 performance statement</span>
+      <span>Portfolio overview</span>
+    </footer>
+  </section>
 
-        <section class="hs-page" aria-label="Page 2: booking and market mix">
-          <header class="hs-header">
-            <div>
-              <div class="hs-eyebrow">Booking and market mix</div>
-              <h2 class="hs-title">Demand<br />composition</h2>
-              <p class="hs-meta">Reservation outcomes, room-type demand, and neighbourhood commercial detail</p>
-            </div>
-            <div class="hs-page-no">02 / 03</div>
-          </header>
+  <section class="hs-page" aria-label="Page 2: booking and market mix">
+    <header class="hs-header">
+      <div>
+        <div class="hs-eyebrow">Booking and market mix</div>
+        <h2 class="hs-title">Demand<br />composition</h2>
+        <p class="hs-meta">Reservation outcomes, room-type demand, and neighbourhood commercial detail</p>
+      </div>
+      <div class="hs-page-no">02 / 03</div>
+    </header>
 
-          <div class="hs-two-col">
-            <div class="hs-chart-card hs-chart-card--half">
-              <div class="hs-live"><h-block name="booking_count_by_reservation_status" /></div>
-            </div>
-            <div class="hs-chart-card hs-chart-card--half">
-              <div class="hs-live"><h-block name="booking_count_by_listing_room_type" /></div>
-            </div>
-          </div>
+    <div class="hs-two-col">
+      <div class="hs-chart-card hs-chart-card--half">
+        <div class="hs-live"><h-block name="booking_count_by_reservation_status" /></div>
+      </div>
+      <div class="hs-chart-card hs-chart-card--half">
+        <div class="hs-live"><h-block name="booking_count_by_listing_room_type" /></div>
+      </div>
+    </div>
 
-          <div>
-            <div class="hs-eyebrow">Market coverage</div>
-            <h2 class="hs-section-title">Neighbourhood commercial detail</h2>
-            <p class="hs-section-note">Listing inventory and average advertised price by neighbourhood.</p>
-          </div>
-          <div class="hs-chart-card hs-chart-card--market">
-            <div class="hs-live"><h-block name="neighbourhood_commercial_detail" /></div>
-          </div>
+    <div>
+      <div class="hs-eyebrow">Market coverage</div>
+      <h2 class="hs-section-title">Neighbourhood commercial detail</h2>
+      <p class="hs-section-note">Listing inventory and average advertised price by neighbourhood.</p>
+    </div>
+    <div class="hs-chart-card hs-chart-card--market">
+      <div class="hs-live"><h-block name="neighbourhood_commercial_detail" /></div>
+    </div>
 
-          <footer class="hs-footer">
-            <span><strong>Source</strong> · Homestay Dataset</span>
-            <span>Booking and market mix</span>
-          </footer>
-        </section>
+    <footer class="hs-footer">
+      <span><strong>Source</strong> · Homestay Dataset</span>
+      <span>Booking and market mix</span>
+    </footer>
+  </section>
 
-        <section class="hs-page" aria-label="Page 3: printable listing register">
-          <header class="hs-header">
-            <div>
-              <div class="hs-eyebrow">Portfolio register</div>
-              <h2 class="hs-title">Listing<br />register</h2>
-              <p class="hs-meta">Alphabetical listing-level detail for review and distribution</p>
-            </div>
-            <div class="hs-page-no">03 / 03</div>
-          </header>
+  <section class="hs-page" aria-label="Page 3: printable listing register">
+    <header class="hs-header">
+      <div>
+        <div class="hs-eyebrow">Portfolio register</div>
+        <h2 class="hs-title">Listing<br />register</h2>
+        <p class="hs-meta">Alphabetical listing-level detail for review and distribution</p>
+      </div>
+      <div class="hs-page-no">03 / 03</div>
+    </header>
 
-          <div class="hs-chart-card hs-chart-card--register">
-            <div class="hs-live"><h-block name="printable_listing_register" /></div>
-          </div>
+    <div class="hs-chart-card hs-chart-card--register">
+      <div class="hs-live"><h-block name="printable_listing_register" /></div>
+    </div>
 
-          <footer class="hs-footer">
-            <span><strong>Register fields</strong> · Listing, neighbourhood, room type, capacity, bedrooms, beds, price</span>
-            <span>End of statement</span>
-          </footer>
-        </section>
-      </main>
-    ;;
+    <footer class="hs-footer">
+      <span><strong>Register fields</strong> · Listing, neighbourhood, room type, capacity, bedrooms, beds, price</span>
+      <span>End of statement</span>
+    </footer>
+  </section>
+</main>;;
   }
 }

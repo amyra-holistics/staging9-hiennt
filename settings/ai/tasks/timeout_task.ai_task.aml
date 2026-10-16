@@ -1,0 +1,12 @@
+AiTask timeout_task {
+  label: 'Timeout Task'
+  brief:
+  @md
+    /daily_homestay_performance_summary
+  ;;
+  acceptance_criteria:
+  @md
+    
+  ;;
+  timeout_minutes: 1
+}

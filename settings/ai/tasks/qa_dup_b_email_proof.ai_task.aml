@@ -1,0 +1,14 @@
+AiTask qa_dup_b_email_proof {
+  label: 'QA DUP B Weekly revenue email'
+  description: 'TEMP QA (nhi.ty, 2026-10-12): repro of the double send. Emails last week revenue once. Safe to delete.'
+  brief: @md
+    Don't load any skill for this task.
+    1. Using @Dataset:ecommerce_official, query total revenue for the last complete Monday to Sunday week.
+    2. Email it once to nhi.ty@holistics.io with the subject "[DUP B] Weekly revenue · <the week's dates>". The body is one sentence with the revenue and the dates.
+    3. Answer with the revenue, the dates and the subject you sent.
+  ;;
+  acceptance_criteria: @md
+    - States last week's total revenue and the week's dates
+    - An email with a subject starting "[DUP B]" was delivered to nhi.ty@holistics.io
+  ;;
+}

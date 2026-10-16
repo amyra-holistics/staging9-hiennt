@@ -1,0 +1,22 @@
+AiTask weekly_sales_orders_summary {
+  label: 'Weekly Orders Executive Summary'
+  description: 'Refreshes the Orders tab of @Dashboard:sales_performance, emails a compact executive summary, and attaches a PDF export of that tab.'
+
+  brief: @md
+    Create the weekly executive summary for the **Orders** tab of @Dashboard:sales_performance.
+
+    **Fresh data:** Refresh the current Orders-tab dashboard data before analysis. Do not reuse a cached dashboard result or any data from a previous run. Use the dashboard's active date window; if it is not an unambiguous full-week window, name the active date range and do not imply a completed-week comparison.
+
+    **Email content:** Write a compact, metrics-led narrative only—no chart, chart description, table, or raw query output. State the reporting period, then include only refreshed-data facts: total orders; total revenue; average daily order count; order-status mix and dominant status; and, only where a current comparable period is available, the period-over-period changes and strongest/weakest country movements. Format money and percentages appropriately. Do not invent values or causal explanations.
+
+    **Required delivery:** Send the completed narrative by email to **phuong.nl@holistics.io**. Before sending, generate a PDF export scoped to exactly the **Orders** tab of @Dashboard:sales_performance. Attach that generated Orders-tab PDF to the same email. The email body must contain the narrative only, with no charts. Record delivery as successful only when the email send returns success; otherwise record the actual failure and do not claim delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - The summary uses freshly refreshed data from the **Orders** tab of @Dashboard:sales_performance only; it does not reuse cached or prior-run values.
+    - The email body is a compact, metrics-led narrative with the actual reporting period and no charts, chart descriptions, tables, or raw query output.
+    - When present in refreshed tab data, it reports total orders, total revenue, average daily order count, and the order-status mix including the dominant status. Period-over-period or country-movement statements appear only when a comparable period is available in that current data.
+    - Every numeric claim is traceable to the refreshed Orders-tab results. The narrative contains no invented value, stale-data assertion, or causal claim.
+    - Delivery is configured to the single recipient **phuong.nl@holistics.io**. The same email includes a PDF attachment generated from exactly the **Orders** tab of @Dashboard:sales_performance, and the task result marks delivery successful only after the email operation succeeds.
+  ;;
+}

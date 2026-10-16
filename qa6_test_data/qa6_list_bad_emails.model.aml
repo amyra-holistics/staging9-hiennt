@@ -1,0 +1,31 @@
+Model qa6_list_bad_emails {
+  type: 'query'
+  label: 'QA6 Partners (contact data needs cleanup)'
+  description: 'QA6 test data for AI Delivery QA round 6 (per-row recipients). Fictional. Safe to delete.'
+  data_source_name: 'demodb'
+  query: @sql
+    select * from (values
+      ('Blue Harbor', '', 3),
+      ('Crescent Mutual', null, 1),
+      ('Delta Assure', 'nhi.ty+delta@holistics', 2),
+      ('Evergreen Partners', '  NHI.TY+Evergreen@Holistics.IO ', 5),
+      ('Juniper Assurance', 'nhi.ty+juniper@holistics.io', 2)
+    ) as t(partner, contact_email, policies_approaching_cancellation);;
+
+  dimension partner {
+    label: 'Partner'
+    type: 'text'
+    definition: @sql {{ #SOURCE.partner }};;
+    primary_key: true
+  }
+  dimension contact_email {
+    label: 'Contact email'
+    type: 'text'
+    definition: @sql {{ #SOURCE.contact_email }};;
+  }
+  dimension policies_approaching_cancellation {
+    label: 'Policies approaching cancellation'
+    type: 'number'
+    definition: @sql {{ #SOURCE.policies_approaching_cancellation }};;
+  }
+}

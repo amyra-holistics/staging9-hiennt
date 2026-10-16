@@ -2,188 +2,17 @@ Dashboard demo_slides {
   title: 'Ecommerce Performance Slides'
   description: @md An interactive slide deck with commentary for each chart. Use Prev and Next, or the dots, to move between slides.;;
   owner: 'hien.nt@holistics.io'
-  // Local theme: transparent surfaces so the custom HTML slide backgrounds show through.
-  // Colors, fonts and chart palette follow brand_theme_light.
-  theme: PageTheme {
-    color {
-      data: brand_color_palette
-    }
-    background {
-      bg_color: "transparent"
-    }
-    canvas {
-      background {
-        bg_color: "transparent"
-      }
-      border {
-        border_width: 0
-        border_radius: 12
-        border_color: "#D1D5DB"
-        border_style: "none"
-      }
-      shadow: "none"
-      opacity: 1
-    }
-    block {
-      background {
-        bg_color: "transparent"
-      }
-      border {
-        border_width: 0
-        border_radius: 12
-        border_color: "#D1D5DB"
-        border_style: "none"
-      }
-      shadow: "none"
-      padding: 0
-      opacity: 1
-      label {
-        font_family: "Inter"
-        font_size: 14
-        font_color: "#05264C"
-        font_weight: "semibold"
-        font_style: "normal"
-        letter_spacing: "0"
-      }
-      text {
-        font_family: "Inter"
-        font_size: 13
-        font_color: "#374151"
-        font_weight: "normal"
-        font_style: "normal"
-      }
-    }
-    viz {
-      table {
-        general {
-          bg_color: "#FFFFFF"
-          font_color: "#374151"
-          font_family: "Inter"
-          font_size: 13
-          border_color: "#D1D5DB"
-          grid_color: "#D1D5DB"
-          border_width: 1
-          hover_color: "#F5F8FA"
-          banding_color: "#F9FAFB"
-          cell_padding: DetailedSpacing {
-            top: 10
-            right: 16
-            bottom: 10
-            left: 16
-          }
-          borders {
-            outer: true,
-            vertical: false,
-            horizontal: true,
-            header: true,
-            row_header: false
-          }
-        }
-        header {
-          bg_color: "#FFFFFF"
-          font_color: "#05264C"
-          font_size: 13
-          font_weight: "semibold"
-        }
-        sub_header {
-          bg_color: "#F9FAFB"
-          font_color: "#374151"
-          font_size: 13
-          font_weight: "medium"
-        }
-        sub_title {
-          font_color: "#6B7280"
-          font_size: 12
-          font_weight: "medium"
-        }
-        sparkline {
-          line {
-            color: "#55c5c9"
-          }
-          column {
-            color: "#05264C"
-          }
-        }
-      }
-      metric_kpi {
-        alignment: "left"
-        label {
-          font_family: "Inter"
-          font_size: 18
-          font_color: "#374151"
-        }
-        value {
-          font_family: "Inter"
-          font_size: 44
-          font_color: "#05264C"
-        }
-        progress {
-          indicator {
-            bg_color: "#05264C"
-          }
-          track {
-            bg_color: "#D1D5DB"
-          }
-          text {
-            font_color: "#374151"
-          }
-        }
-        trend {
-          positive {
-            text {
-              font_color: "#23a672"
-              font_weight: "medium"
-            }
-            background {
-              bg_color: "#e9f8f0"
-            }
-          }
-          negative {
-            text {
-              font_color: "#c53030"
-              font_weight: "medium"
-            }
-            background {
-              bg_color: "#fcebec"
-            }
-          }
-          neutral {
-            text {
-              font_color: "#374151"
-              font_weight: "normal"
-            }
-            background {
-              bg_color: "#F5F8FA"
-            }
-          }
-        }
-      }
-    }
-    custom_css: @css
-      .hdeck .dac-text-block {
-        font-family: Inter;
-        font-size: 14px;
-        color: #374151;
-        line-height: 1.6;
-      }
-      .hdeck .dac-text-block h1,
-      .hdeck .dac-text-block h2,
-      .hdeck .dac-text-block h3,
-      .hdeck .dac-text-block h4 {
-        font-family: Inter;
-        color: #05264C;
-        line-height: 1.3;
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        font-weight: 700;
-      }
-    ;;
-  }
-
   block k_cover_rev: VizBlock {
     label: 'Revenue'
     viz: MetricKpi {
       dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          value {
+            font_size: 40
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Revenue'
         ref: r(ecommerce_official.revenue)
@@ -216,13 +45,13 @@ Dashboard demo_slides {
             font_size: 16
           }
           value {
-            font_size: 44
+            font_size: 40
           }
         }
       }
       value: VizFieldFull {
-        ref: 'distinct_order_count'
         label: 'Distinct Orders'
+        ref: 'distinct_order_count'
         format {
           type: 'number'
           pattern: '#,###0'
@@ -237,16 +66,6 @@ Dashboard demo_slides {
     label: 'Average Order Value'
     viz: MetricKpi {
       dataset: ecommerce_official
-      theme {
-        metric_kpi {
-          label {
-            font_size: 16
-          }
-          value {
-            font_size: 44
-          }
-        }
-      }
       calculation distinct_order_count {
         label: 'Distinct Order Count'
         formula: @aql orders | count_distinct(orders.id);;
@@ -259,19 +78,27 @@ Dashboard demo_slides {
         calc_type: 'measure'
         data_type: 'number'
       }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 40
+          }
+        }
+      }
       value: VizFieldFull {
-        ref: 'average_order_value'
         label: 'Average Order Value'
+        ref: 'average_order_value'
         format {
           type: 'number'
-          pattern: '[$$]#,###0.00'
+          pattern: '[$$]#,###'
         }
       }
       settings {
         display_mode: 'single'
       }
-
-
     }
     settings {
       hide_label: true
@@ -301,7 +128,7 @@ Dashboard demo_slides {
         font_color: '#374151'
       }
     }
-    label: 'Revenue by customer country'
+    label: 'Revenue by Asian country'
     viz: ColumnChart {
       dataset: ecommerce_official
       x_axis: VizFieldFull {
@@ -329,6 +156,9 @@ Dashboard demo_slides {
           show_data_label_by: 'value'
         }
       }
+      conditions: [
+        "countries.name in ['India', 'Singapore', 'Indonesia', 'Korea', 'Vietnam']",
+      ]
       settings {
         legend_label: 'hidden'
         sort: LineFamilySort {
@@ -343,6 +173,13 @@ Dashboard demo_slides {
     label: 'Revenue'
     viz: MetricKpi {
       dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          value {
+            font_size: 36
+          }
+        }
+      }
       value: VizFieldFull {
         label: 'Revenue'
         ref: r(ecommerce_official.revenue)
@@ -375,13 +212,13 @@ Dashboard demo_slides {
             font_size: 16
           }
           value {
-            font_size: 44
+            font_size: 36
           }
         }
       }
       value: VizFieldFull {
-        ref: 'distinct_order_count'
         label: 'Distinct Orders'
+        ref: 'distinct_order_count'
         format {
           type: 'number'
           pattern: '#,###0'
@@ -396,16 +233,6 @@ Dashboard demo_slides {
     label: 'Average Order Value'
     viz: MetricKpi {
       dataset: ecommerce_official
-      theme {
-        metric_kpi {
-          label {
-            font_size: 16
-          }
-          value {
-            font_size: 44
-          }
-        }
-      }
       calculation distinct_order_count {
         label: 'Distinct Order Count'
         formula: @aql orders | count_distinct(orders.id);;
@@ -418,9 +245,19 @@ Dashboard demo_slides {
         calc_type: 'measure'
         data_type: 'number'
       }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 36
+          }
+        }
+      }
       value: VizFieldFull {
-        ref: 'average_order_value'
         label: 'Average Order Value'
+        ref: 'average_order_value'
         format {
           type: 'number'
           pattern: '[$$]#,###0.00'
@@ -429,8 +266,6 @@ Dashboard demo_slides {
       settings {
         display_mode: 'single'
       }
-
-
     }
     settings {
       hide_label: true
@@ -446,7 +281,7 @@ Dashboard demo_slides {
             font_size: 16
           }
           value {
-            font_size: 44
+            font_size: 36
           }
         }
       }
@@ -474,7 +309,7 @@ Dashboard demo_slides {
             font_size: 16
           }
           value {
-            font_size: 44
+            font_size: 36
           }
         }
       }
@@ -502,22 +337,22 @@ Dashboard demo_slides {
         calc_type: 'measure'
         data_type: 'number'
       }
-      value: VizFieldFull {
-        ref: 'distinct_registered_user_count'
-        label: 'Distinct Registered User Count'
-        format {
-          type: 'number'
-          pattern: '#,###'
-        }
-      }
       theme {
         metric_kpi {
           label {
             font_size: 16
           }
           value {
-            font_size: 44
+            font_size: 36
           }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Distinct Registered User Count'
+        ref: 'distinct_registered_user_count'
+        format {
+          type: 'number'
+          pattern: '#,###'
         }
       }
     }
@@ -530,20 +365,23 @@ Dashboard demo_slides {
     viz: CombinationChart {
       dataset: ecommerce_official
       x_axis: VizFieldFull {
-        ref: r(orders.created_at)
         label: 'Order Month'
-        transformation: 'datetrunc month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc quarter'
         format {
           type: 'date'
-          pattern: 'LLL yyyy'
+          pattern: 'yyyy Qq'
         }
       }
       y_axis {
+        settings {
+          hidden: true
+        }
         series {
           mark_type: 'line'
           field: VizFieldFull {
-            ref: r(ecommerce_official.revenue)
             label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
             format {
               type: 'number'
               pattern: 'inherited'
@@ -552,51 +390,32 @@ Dashboard demo_slides {
         }
       }
       settings {
-        sort: LineFamilySort {
-          type: 'xaxis'
+        sort {
+          field_index: 0
           direction: 'asc'
+          type: 'xaxis'
         }
+        legend_label: 'hidden'
+        x_axis_label: 'Order Month'
+        x_axis_show_null_datetime: true
       }
     }
   }
   block v_quxa: VizBlock {
-    theme: BlockTheme {
-      background {
-        bg_color: 'transparent'
-      }
-      border {
-        border_width: 0
-        border_style: 'none'
-        border_radius: 0
-      }
-      shadow: 'none'
-      padding: 4
-      label {
-        font_family: 'Inter'
-        font_size: 15
-        font_color: '#05264C'
-        font_weight: 'bold'
-      }
-      text {
-        font_family: 'Inter'
-        font_size: 13
-        font_color: '#374151'
-      }
-    }
     label: 'Revenue by Order Status'
     viz: PieChart {
       dataset: ecommerce_official
       legend: VizFieldFull {
-        ref: r(orders.status)
         label: 'Order Status'
+        ref: r(orders.status)
         format {
           type: 'text'
         }
       }
       series {
         field: VizFieldFull {
+          label: ' '
           ref: r(ecommerce_official.revenue)
-          label: 'Revenue'
           format {
             type: 'number'
             pattern: 'inherited'
@@ -605,13 +424,33 @@ Dashboard demo_slides {
       }
       settings {
         display_as_donut: true
-        legend_label: 'bottom'
-        show_data_label: true
-        show_percentage: true
-        data_label_position: 'outside'
-        show_total: true
         sort: 'asc'
+        legend_label: 'left'
+        data_label_position: 'outside'
       }
+    }
+    theme {
+      label {
+        font_family: 'Inter'
+        font_color: '#05264C'
+        font_size: 15
+        font_weight: 'bold'
+      }
+      text {
+        font_family: 'Inter'
+        font_color: '#374151'
+        font_size: 13
+      }
+      border {
+        border_width: 0
+        border_radius: 0
+        border_style: 'none'
+      }
+      background {
+        bg_color: 'transparent'
+      }
+      padding: 4
+      shadow: 'none'
     }
   }
   block v_business_kpi_table: VizBlock {
@@ -714,7 +553,6 @@ Dashboard demo_slides {
       ]
       settings {
         location_colors {
-
         }
       }
     }
@@ -873,21 +711,18 @@ Dashboard demo_slides {
     label: 'Product Price, Units, and Revenue'
     viz: BubbleChart {
       dataset: ecommerce_official
-
       calculation total_units_sold {
         label: 'Total Units Sold'
         formula: @aql order_items | sum(order_items.quantity);;
         calc_type: 'measure'
         data_type: 'number'
       }
-
       calculation top_100_product_ids {
         label: 'Top 100 Product Ids'
         formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
         calc_type: 'measure'
         data_type: 'json'
       }
-
       x_col: VizFieldFull {
         ref: r(products.price)
         label: 'Product Price'
@@ -896,7 +731,6 @@ Dashboard demo_slides {
           pattern: '[$$]#,###0.00'
         }
       }
-
       y_col: VizFieldFull {
         ref: 'total_units_sold'
         label: 'Total Units Sold'
@@ -905,7 +739,6 @@ Dashboard demo_slides {
           pattern: '#,###0'
         }
       }
-
       z_col: VizFieldFull {
         ref: r(ecommerce_official.revenue)
         label: 'Revenue'
@@ -914,16 +747,13 @@ Dashboard demo_slides {
           pattern: '[$$]#,###0.00'
         }
       }
-
       label_col: VizFieldFull {
         ref: r(products.name)
         label: 'Product Name'
       }
-
       conditions: [
         "products.id in top_100_product_ids",
       ]
-
       settings {
         row_limit: 100
       }
@@ -1110,7 +940,7 @@ Dashboard demo_slides {
   block t_cover: TextBlock {
     content: @md
       <h1 class="tr-headline is-mid">Ecommerce performance review</h1>
-      <p class="tr-lede">Aug 2023 to Oct 2026 · All markets</p>
+      <p class="tr-lede">Aug 2023 to Oct 2026 · Asian markets</p>
     ;;
   }
   block t_agenda: TextBlock {
@@ -1279,7 +1109,7 @@ Dashboard demo_slides {
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     /* The wrapper is the size container: every cqw below is relative to the deck's own width, not the window. */
-    .hwrap { container-type: inline-size; width: 100%; }
+    .hwrap { container-type: inline-size; width: 100%; max-width: min(880px, 100vw); margin: 0 auto; overflow-x: hidden; }
 
     .hdeck,
     .hdeck *,
@@ -1563,7 +1393,7 @@ Dashboard demo_slides {
     .hdeck .tr-cover-grid > .tr-frame { overflow: hidden; }
 
     /* The grid is sized by the space left above the footer, so its children cannot push into the nav. */
-    .hdeck .tr-cover-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); gap: 20px; }
+    .hdeck .tr-cover-grid { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) clamp(190px, 22cqw, 260px); grid-template-rows: minmax(0, 1fr); gap: 20px; }
     .hdeck .tr-cover-grid > .tr-frame { min-height: 0; padding: 14px; }
     .hdeck .tr-cover-kpis { display: grid; grid-template-rows: repeat(3, minmax(0, 1fr)); gap: 14px; min-height: 0; }
     .hdeck .tr-cover-kpis .tr-kpicard { min-height: 0; padding: 10px 18px; overflow: hidden; }
@@ -1708,31 +1538,191 @@ Dashboard demo_slides {
     .hdeck .tr-dot.is-on { width: 30px; background: var(--t-accent); }
     .hdeck .is-dark .tr-dot.is-on { background: var(--t-accent-hi); }
 
-    /* ---- Narrow viewports */
-    @container (max-width: 900px) {
+    /* ---- Shrink-safe: no row keeps a minimum width, so the deck can follow the container down to phone size. */
+    .hdeck { min-width: 0; max-width: 100%; }
+    .hdeck .tr-slide,
+    .hdeck .tr-body,
+    .hdeck .tr-copy,
+    .hdeck .tr-split > *,
+    .hdeck .tr-cover-head,
+    .hdeck .tr-cover-head > *,
+    .hdeck .tr-cover-grid,
+    .hdeck .tr-cover-kpis,
+    .hdeck .tr-sheet,
+    .hdeck .tr-duo,
+    .hdeck .tr-frame,
+    .hdeck .tr-kpicard,
+    .hdeck .tr-nav { min-width: 0; }
+    .hdeck .tr-headline,
+    .hdeck .tr-lede,
+    .hdeck .tr-points li { overflow-wrap: anywhere; }
+    .hdeck .tr-nav { flex-wrap: wrap; row-gap: 12px; }
+    .hdeck .tr-dots { flex-wrap: wrap; min-width: 0; row-gap: 6px; }
+    .hdeck .tr-cover-side img { max-width: 100%; }
+
+    /* ---- Narrow viewports. Below 900px of deck width every slide stacks into one column and
+       grows to its content, so nothing is clipped. Widths are the deck's own (container), not the window's. */
+    @container (max-width: 700px) {
       .hdeck { height: auto; overflow: visible; }
-      .hdeck .tr-slide { flex: none; min-height: 780px; }
+      .hdeck .tr-slide { flex: none; min-height: 520px; height: auto; }
       .hdeck .tr-split,
       .hdeck .tr-body,
       .hdeck .tr-duo,
       .hdeck .tr-duo.is-wide-left,
       .hdeck .tr-cards,
-      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); }
-      .hdeck .tr-body { gap: 28px; }
-      .hdeck .tr-frame { min-height: 320px; padding: 14px; }
-      .hdeck .tr-lozenges { justify-content: flex-start; }
+      .hdeck .tr-cover-grid,
+      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+      .hdeck .tr-body { gap: 24px; }
+      .hdeck .tr-slide > .tr-copy { margin-bottom: 20px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame { min-height: 300px; padding: 14px; }
+      .hdeck .tr-sheet { padding: 14px; }
+      .hdeck .tr-sheet .tr-duo > .tr-frame + .tr-frame { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid var(--t-border); padding-top: 14px; margin-top: 14px; }
+      .hdeck .tr-slide.is-cover { padding-top: var(--t-pad); }
+      .hdeck .tr-cover-head { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
+      .hdeck .tr-cover-side { align-items: flex-start; }
+      .hdeck .tr-cover-grid { margin-bottom: 20px; }
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 320px; overflow: visible; }
+      .hdeck .tr-cover-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 120px; overflow: visible; }
+      .hdeck .tr-kpigrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hdeck .tr-divider-num { font-size: clamp(80px, 22cqw, 160px); }
       .hdeck .tr-nav { flex-wrap: wrap; }
       .hdeck .tr-dots { margin: 0; order: 3; width: 100%; flex-wrap: wrap; }
     }
-    @container (max-width: 600px) {
+    @container (max-width: 520px) {
       .hdeck { --t-pad: 20px; }
       .hdeck .tr-slide { min-height: 0; }
-      .hdeck .tr-lozenges { flex-wrap: wrap; gap: 14px; }
-      .hdeck .tr-lozenge.is-tall,
-      .hdeck .tr-lozenge.is-short { width: min(100%, 220px); height: auto; aspect-ratio: 1 / 1; }
-      .hdeck .tr-agenda-item { grid-template-columns: 44px 1fr; gap: 8px 12px; }
+      .hdeck .tr-headline { font-size: 30px; line-height: 1.12; margin-bottom: 14px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 25px; }
+      .hdeck .tr-lede { font-size: 15px; }
+      .hdeck .tr-points li { font-size: 14px; }
+      .hdeck .tr-callout { font-size: 14px; padding: 12px 14px; }
+      .hdeck .tr-agenda-item { grid-template-columns: 40px 1fr; gap: 6px 12px; padding: 12px 0; }
+      .hdeck .tr-agenda-name { font-size: 17px; }
       .hdeck .tr-agenda-note { grid-column: 2; }
       .hdeck .tr-kpigrid { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 100px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 260px; }
+      .hdeck .tr-card { padding: 20px 18px; }
+      .hdeck .tr-take-title { font-size: 22px; }
+      .hdeck .tr-nav { gap: 10px; }
+      .hdeck .tr-btn { padding: 9px 14px; }
+      .hdeck .tr-dot { width: 10px; }
+      .hdeck .tr-dot.is-on { width: 22px; }
+    }
+    @container (max-width: 400px) {
+      .hdeck { --t-pad: 14px; }
+      .hdeck .tr-headline { font-size: 26px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 22px; }
+      .hdeck .tr-eyebrow { letter-spacing: 0.2em; font-size: 11px; margin-bottom: 12px; }
+      .hdeck .tr-lede { font-size: 14px; }
+      .hdeck .tr-cover-kpis .h-kpi-metric { font-size: 24px !important; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 230px; padding: 10px; }
+      .hdeck .tr-sheet { padding: 10px; border-radius: 14px; }
+      .hdeck .tr-nav { justify-content: space-between; }
+      .hdeck .tr-dots { display: none; }
+      .hdeck .tr-count { font-size: 11px; }
+      .hdeck .tr-logo-badge { padding: 8px 12px; }
+      .hdeck .tr-cover-side img { height: 20px; }
+      .hdeck .tr-divider-num { font-size: 72px; }
+      .hdeck .tr-agenda-name { font-size: 16px; }
+      .hdeck .tr-stat { font-size: 56px; }
+    }
+    /* ---- Window-width fallbacks: same rules keyed to the browser window, in case the pane is wider than the visible area
+       or container queries are unavailable. */
+    @media (max-width: 900px) {
+      .hdeck { height: auto; overflow: visible; }
+      .hdeck .tr-slide { flex: none; min-height: 520px; height: auto; }
+      .hdeck .tr-split,
+      .hdeck .tr-body,
+      .hdeck .tr-duo,
+      .hdeck .tr-duo.is-wide-left,
+      .hdeck .tr-cards,
+      .hdeck .tr-cover-grid,
+      .hdeck .tr-divider .tr-divider-inner { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
+      .hdeck .tr-body { gap: 24px; }
+      .hdeck .tr-slide > .tr-copy { margin-bottom: 20px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame { min-height: 300px; padding: 14px; }
+      .hdeck .tr-sheet { padding: 14px; }
+      .hdeck .tr-sheet .tr-duo > .tr-frame + .tr-frame { border-left: none; padding-left: 0; margin-left: 0; border-top: 1px solid var(--t-border); padding-top: 14px; margin-top: 14px; }
+      .hdeck .tr-slide.is-cover { padding-top: var(--t-pad); }
+      .hdeck .tr-cover-head { flex-direction: column-reverse; align-items: flex-start; gap: 14px; }
+      .hdeck .tr-cover-side { align-items: flex-start; }
+      .hdeck .tr-cover-grid { margin-bottom: 20px; }
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 320px; overflow: visible; }
+      .hdeck .tr-cover-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: none; gap: 12px; }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 120px; overflow: visible; }
+      .hdeck .tr-kpigrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hdeck .tr-divider-num { font-size: clamp(80px, 22cqw, 160px); }
+      .hdeck .tr-nav { flex-wrap: wrap; }
+      .hdeck .tr-dots { margin: 0; order: 3; width: 100%; flex-wrap: wrap; }
+    }
+    @media (max-width: 640px) {
+      .hdeck { --t-pad: 20px; }
+      .hdeck .tr-slide { min-height: 0; }
+      .hdeck .tr-headline { font-size: 30px; line-height: 1.12; margin-bottom: 14px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 25px; }
+      .hdeck .tr-lede { font-size: 15px; }
+      .hdeck .tr-points li { font-size: 14px; }
+      .hdeck .tr-callout { font-size: 14px; padding: 12px 14px; }
+      .hdeck .tr-agenda-item { grid-template-columns: 40px 1fr; gap: 6px 12px; padding: 12px 0; }
+      .hdeck .tr-agenda-name { font-size: 17px; }
+      .hdeck .tr-agenda-note { grid-column: 2; }
+      .hdeck .tr-kpigrid { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis { grid-template-columns: minmax(0, 1fr); }
+      .hdeck .tr-cover-kpis .tr-kpicard { min-height: 100px; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 260px; }
+      .hdeck .tr-card { padding: 20px 18px; }
+      .hdeck .tr-take-title { font-size: 22px; }
+      .hdeck .tr-nav { gap: 10px; }
+      .hdeck .tr-btn { padding: 9px 14px; }
+      .hdeck .tr-dot { width: 10px; }
+      .hdeck .tr-dot.is-on { width: 22px; }
+    }
+    @media (max-width: 480px) {
+      .hdeck { --t-pad: 14px; }
+      .hdeck .tr-headline { font-size: 26px; }
+      .hdeck .tr-headline.is-mid,
+      .hdeck .tr-cover-head .tr-headline { font-size: 22px; }
+      .hdeck .tr-eyebrow { letter-spacing: 0.2em; font-size: 11px; margin-bottom: 12px; }
+      .hdeck .tr-lede { font-size: 14px; }
+      .hdeck .tr-cover-kpis .h-kpi-metric { font-size: 24px !important; }
+      .hdeck .tr-frame,
+      .hdeck .tr-slide > .tr-frame,
+      .hdeck .tr-duo .tr-frame,
+      .hdeck .tr-sheet .tr-frame,
+      .hdeck .tr-cover-grid > .tr-frame { min-height: 230px; padding: 10px; }
+      .hdeck .tr-sheet { padding: 10px; border-radius: 14px; }
+      .hdeck .tr-nav { justify-content: space-between; }
+      .hdeck .tr-dots { display: none; }
+      .hdeck .tr-count { font-size: 11px; }
+      .hdeck .tr-logo-badge { padding: 8px 12px; }
+      .hdeck .tr-cover-side img { height: 20px; }
+      .hdeck .tr-divider-num { font-size: 72px; }
+      .hdeck .tr-agenda-name { font-size: 16px; }
+      .hdeck .tr-stat { font-size: 56px; }
     }
     @media (prefers-reduced-motion: reduce) {
       .hdeck .tr-slide { animation: none; }
@@ -1913,4 +1903,5 @@ Dashboard demo_slides {
     autorun_on_open: true
   }
   explicit_interactions: []
+  theme: ghibli_meadow
 }

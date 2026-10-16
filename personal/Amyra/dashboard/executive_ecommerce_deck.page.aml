@@ -1,0 +1,1330 @@
+Dashboard executive_ecommerce_deck {
+  title: 'Executive ecommerce deck'
+  description: 'Slide-style executive ecommerce deck using source-derived visualizations from the existing demo dashboard.'
+  owner: 'hien.nt@holistics.io'
+
+  theme: PageTheme {
+    block {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+  }
+
+  block v_ld9y: VizBlock {
+    label: 'Revenue'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: '#,###0.00"A"'
+        }
+      }
+      settings {
+        display_mode: 'single'
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_acsc: VizBlock {
+    label: 'Distinct Orders'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        ref: 'distinct_order_count'
+        label: 'Distinct Orders'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_users_count: VizBlock {
+    label: 'Registered Users'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      calculation distinct_registered_user_count {
+        label: 'Distinct Registered User Count'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      value: VizFieldFull {
+        ref: 'distinct_registered_user_count'
+        label: 'Distinct Registered User Count'
+        format {
+          type: 'number'
+          pattern: '#,###'
+        }
+      }
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_nrin: VizBlock {
+    label: 'Product Count'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Product listed'
+        ref: r(products.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_audi: VizBlock {
+    label: 'Merchant Count'
+    viz: MetricKpi {
+      dataset: ecommerce_official
+      theme {
+        metric_kpi {
+          label {
+            font_size: 16
+          }
+          value {
+            font_size: 44
+          }
+        }
+      }
+      value: VizFieldFull {
+        label: 'Merchant listed'
+        ref: r(merchants.name)
+        aggregation: 'count distinct'
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+    }
+    settings {
+      hide_label: true
+    }
+    theme {
+      padding {
+        top: 56
+        left: 16
+        bottom: 16
+        right: 16
+      }
+    }
+  }
+  block v_sales_comparison: VizBlock {
+    label: 'Revenue vs Previous Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation previous_month_revenue {
+        label: 'Previous Month Revenue'
+        formula: @aql revenue | relative_period(orders.created_at, interval(-1 month));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        label: 'Order Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Revenue'
+        settings {
+          hidden: true
+        }
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            label: 'Current Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            label: 'Previous Month Revenue'
+            ref: 'previous_month_revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        show_data_points: true
+        sort {
+          field_index: 0
+          direction: 'asc'
+          type: 'xaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Order Month'
+        x_axis_show_null_datetime: false
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_fofr: VizBlock {
+    label: 'Revenue by Order Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_business_kpi_table: VizBlock {
+    label: 'Monthly KPI Overview'
+    viz: MetricSheet {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation average_order_value {
+        label: 'Average Order Value'
+        formula: @aql safe_divide(revenue, distinct_order_count);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      date_field: VizFieldFull {
+        label: 'Order Month'
+        ref: r(orders.created_at)
+        transformation: 'datetrunc quarter'
+        format {
+          type: 'date'
+          pattern: 'yyyy Qq'
+        }
+      }
+      rows: [
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Distinct Orders'
+            ref: 'distinct_order_count'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        },
+        MetricSeries {
+          field: VizFieldFull {
+            label: 'Average Order Value'
+            ref: 'average_order_value'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_users_signup: VizBlock {
+    label: 'User Signups by Month'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation distinct_registered_users {
+        label: 'Distinct Registered Users'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(users.sign_up_date)
+        label: 'Sign Up Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'distinct_registered_users'
+            label: 'Distinct Registered Users'
+            format {
+              type: 'number'
+              pattern: '#,###0'
+            }
+          }
+        }
+      }
+      settings {
+        x_axis_label: 'Sign Up Month'
+        legend_label: 'hidden'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_users_activity: VizBlock {
+    label: 'Monthly Customer Activity'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      calculation active_customer_count {
+        label: 'Active Customer Count'
+        formula: @aql orders | count_distinct(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation repeat_customer_count {
+        label: 'Repeat Customer Count'
+        formula: @aql unique(orders.user_id)
+      | select(order_count: orders | count_distinct(orders.id))
+      | filter(order_count > 1)
+      | count(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      x_axis: VizFieldFull {
+        ref: r(orders.created_at)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      y_axis {
+        label: 'Customers'
+        series {
+          mark_type: 'column'
+          field: VizFieldFull {
+            ref: 'active_customer_count'
+            label: 'Active Customer Count'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: 'repeat_customer_count'
+            label: 'Repeat Customer Count'
+            format {
+              type: 'number'
+              pattern: '#,###'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'top'
+        x_axis_label: 'Order Month'
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+  block v_sales_country: VizBlock {
+    label: 'Revenue by Customer Country'
+    viz: BarChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        label: 'Customer Country'
+        ref: r(countries.name)
+        format {
+          type: 'text'
+        }
+      }
+      y_axis {
+        settings {
+          show_data_label_by: 'value'
+          hidden: true
+        }
+        series {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: '#,###0.00"A" [$$]'
+              group_separator: ','
+              decimal_separator: '.'
+            }
+          }
+        }
+      }
+      settings {
+        sort {
+          field_index: 0
+          direction: 'desc'
+          type: 'yaxis'
+        }
+        legend_label: 'hidden'
+        x_axis_label: 'Customer Country'
+        x_axis_show_null_datetime: true
+      }
+    }
+  }
+  block v_business_map: VizBlock {
+    label: 'Revenue Map by Country'
+    viz: FilledMap {
+      dataset: ecommerce_official
+      location {
+        field: VizFieldFull {
+          label: 'Country Name'
+          ref: r(countries.name)
+        }
+        location_type: 'country'
+        primary_field: true
+      }
+      value: VizFieldFull {
+        label: 'Revenue'
+        ref: r(ecommerce_official.revenue)
+        format {
+          type: 'number'
+          pattern: 'inherited'
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      ]
+      settings {
+        default_view {
+          zoom_level: 4
+          center {
+            lat: 20.851596741220888
+            lng: 101.83887019815293
+          }
+        }
+        location_colors {
+
+        }
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
+        }
+      }
+    }
+  }
+  block v_ueqh: VizBlock {
+    label: 'GMV by Country Name and Month today'
+    viz: MarkdownViz {
+      dataset: ecommerce_official
+      calculation today {
+        label: 'today'
+        formula: @aql @today;;
+        calc_type: 'dimension'
+        data_type: 'datetime'
+        model: countries
+      }
+      rows: [
+        VizFieldFull {
+          label: 'Country Name'
+          ref: r(countries.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: ref('countries', 'today')
+          transformation: 'datetrunc month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          label: 'GMV'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: '#,###0.00"A" [$$]'
+            group_separator: ','
+            decimal_separator: '.'
+          }
+        }
+      ]
+      content: @md <style>
+    .annotation-minimal {
+        position: relative;
+        padding-left: 20px;
+height: 100%
+    }
+
+    .annotation-minimal::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(180deg, #05264c, #00627a);
+        border-radius: 2px;
+    }
+
+    .annotation-minimal .annotation-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #259b6c;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .annotation-minimal .content {
+        font-size: 15px;
+        line-height: 1.6;
+        color: #374151;
+    }
+
+    .annotation-minimal .highlight {
+        font-weight: 600;
+        color: #05264c;
+    }
+
+    .annotation-minimal .meta {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #9ca3af;
+    }
+</style>
+
+<div class="annotation-minimal">
+    <div class="annotation-label">Key Insight</div>
+    <div class="content">
+        Our sales performance is anchored in developed Western markets, with the <span class="highlight">{{ rows[0].`Country Name` }}</span> ({{ rows[0].values.`GMV`}}), <span class="highlight">{{ rows[1].`Country Name` }}</span> ({{ rows[1].values.`GMV`}}), and <span  class="highlight">{{ rows[2].`Country Name` }}</span> ({{ rows[02].values.`GMV`}}), emerging as our top revenue contributors.
+    </div>
+    <div class="meta"><span>{{ rows[0].`today` }}</span> - Peter Parker</div>
+</div>  ;;
+      settings {
+        show_row_total: true
+        show_column_total: true
+      }
+    }
+    settings {
+      hide_label: true
+    }
+  }
+  block v_products_categories: VizBlock {
+    label: 'Revenue by Product Category'
+    viz: CombinationChart {
+      dataset: ecommerce_official
+      x_axis: VizFieldFull {
+        ref: r(categories.name)
+        label: 'Product Category'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(ecommerce_official.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: 'inherited'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_products_bubble: VizBlock {
+    label: 'Product Price, Units, and Revenue'
+    viz: BubbleChart {
+      dataset: ecommerce_official
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation top_100_product_ids {
+        label: 'Top 100 Product Ids'
+        formula: @aql top(100, products.id, by: revenue, logic: 'dense');;
+        calc_type: 'measure'
+        data_type: 'json'
+      }
+      x_col: VizFieldFull {
+        ref: r(products.price)
+        label: 'Product Price'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      y_col: VizFieldFull {
+        ref: 'total_units_sold'
+        label: 'Total Units Sold'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      z_col: VizFieldFull {
+        ref: r(ecommerce_official.revenue)
+        label: 'Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      label_col: VizFieldFull {
+        ref: r(products.name)
+        label: 'Product Name'
+      }
+      conditions: [
+        "products.id in top_100_product_ids",
+      ]
+      settings {
+        row_limit: 100
+      }
+    }
+  }
+  block v_products_catalog: VizBlock {
+    label: 'Product Catalog'
+    viz: DataTable {
+      dataset: ecommerce_official
+      fields: [
+        VizFieldFull {
+          label: 'Product Image'
+          ref: r(products.product_image)
+          format {
+            type: 'html'
+          }
+        },
+        VizFieldFull {
+          label: 'Product Name'
+          ref: r(products.name)
+          format {
+            type: 'text'
+          }
+          uname: 'products_name_1'
+        },
+        VizFieldFull {
+          label: 'Category'
+          ref: r(categories.name)
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          label: 'Product Price'
+          ref: r(products.price)
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          label: 'Revenue'
+          ref: r(ecommerce_official.revenue)
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'custom_revenue_1'
+        },
+      ]
+      settings {
+        pagination_size: 100
+        show_row_number: true
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'custom_revenue_1'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'products_name_1'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+  block v_users_gender: VizBlock {
+    label: 'Revenue by User Gender'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(users.gender)
+        label: 'User Gender'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: PieFamilySort {
+          type: 'pie'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+  block v_users_retention: VizBlock {
+    label: 'Purchase Cohort Retention'
+    viz: PivotTable {
+      dataset: ecommerce_official
+      calculation first_purchase_month {
+        label: 'First Purchase Month'
+        formula: @aql orders | min(orders.created_at | month()) | dimensionalize(users.id);;
+        calc_type: 'dimension'
+        data_type: 'datetime'
+        model: users
+      }
+      calculation months_since_first_purchase {
+        label: 'Months Since First Purchase'
+        formula: @aql date_diff('month', users.first_purchase_month, (orders.created_at | month()));;
+        calc_type: 'dimension'
+        data_type: 'number'
+        model: orders
+      }
+      calculation purchasing_user_count {
+        label: 'Purchasing User Count'
+        formula: @aql orders | count_distinct(orders.user_id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation cohort_size {
+        label: 'Cohort Size'
+        formula: @aql users | count_distinct(users.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation retention_rate {
+        label: 'Retention Rate'
+        formula: @aql purchasing_user_count * 100.0 / (cohort_size | exclude_grains(orders.months_since_first_purchase, keep_filters: true));;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      rows: [
+        VizFieldFull {
+          ref: ref('users', 'first_purchase_month')
+          label: 'Cohort Month'
+          uname: 'cohort_month'
+          format {
+            type: 'date'
+            pattern: 'LLL yyyy'
+          }
+        }
+      ]
+      columns: [
+        VizFieldFull {
+          ref: ref('orders', 'months_since_first_purchase')
+          label: 'Months Since First Purchase'
+          uname: 'months_since_first_purchase'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      values: [
+        VizFieldFull {
+          ref: 'retention_rate'
+          label: 'Retention Rate'
+          format {
+            type: 'number'
+            pattern: '#,###0.0\\%'
+          }
+        }
+      ]
+      settings {
+        show_row_total: false
+        show_column_total: false
+        show_sub_total: false
+        empty_cell_as_zero: false
+        pagination_size: 100
+        wrap_header_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'cohort_month'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'months_since_first_purchase'
+            direction: 'asc'
+          }
+        ]
+        conditional_formats: [
+          ConditionalFormat {
+            ref: 'retention_rate'
+            format: ScaleFormat {
+              min {
+                value: 0
+                color: '#FEE2E2'
+              }
+              mid {
+                value: 50
+                color: '#FEF3C7'
+              }
+              max {
+                value: 100
+                color: '#BBF7D0'
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+  block v_users_table: VizBlock {
+    label: 'Top Customers by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Order Count'
+        formula: @aql orders | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(users.full_name)
+          label: 'Customer Full Name'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Customer Country'
+          format {
+            type: 'text'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          uname: 'revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        },
+        VizFieldFull {
+          ref: 'distinct_order_count'
+          label: 'Distinct Order Count'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        }
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          }
+        ]
+        wrap_header_text: true
+      }
+    }
+  }
+  block v_quxa: VizBlock {
+    label: 'Revenue by Order Status'
+    viz: PieChart {
+      dataset: ecommerce_official
+      legend: VizFieldFull {
+        ref: r(orders.status)
+        label: 'Order Status'
+        format {
+          type: 'text'
+        }
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+        }
+      }
+      settings {
+        display_as_donut: true
+        legend_label: 'bottom'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        show_total: true
+        sort: 'asc'
+      }
+    }
+  }
+  block v_sales_detail: VizBlock {
+    label: 'Sales Detail'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation distinct_order_count {
+        label: 'Distinct Orders'
+        formula: @aql order_items | count_distinct(orders.id);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      calculation total_units_sold {
+        label: 'Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(orders.status)
+          label: 'Order Status'
+          uname: 'order_status'
+        },
+        VizFieldFull {
+          ref: r(countries.name)
+          label: 'Customer Country'
+          uname: 'customer_country'
+        },
+        VizFieldFull {
+          ref: r(categories.name)
+          label: 'Product Category'
+          uname: 'product_category'
+        },
+        VizFieldFull {
+          ref: 'distinct_order_count'
+          label: 'Distinct Orders'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'distinct_orders'
+        },
+        VizFieldFull {
+          ref: 'total_units_sold'
+          label: 'Units Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+          uname: 'units_sold'
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        },
+      ]
+      settings {
+        pagination_size: 50
+        show_row_number: true
+        row_limit: 50
+        wrap_header_text: true
+        wrap_cell_text: true
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'order_status'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'customer_country'
+            direction: 'asc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_category'
+            direction: 'asc'
+          },
+        ]
+      }
+    }
+  }
+  block v_products_table: VizBlock {
+    label: 'Top Products by Revenue'
+    viz: DataTable {
+      dataset: ecommerce_official
+      calculation total_units_sold {
+        label: 'Total Units Sold'
+        formula: @aql order_items | sum(order_items.quantity);;
+        calc_type: 'measure'
+        data_type: 'number'
+      }
+      fields: [
+        VizFieldFull {
+          ref: r(products.name)
+          label: 'Product Name'
+          format {
+            type: 'text'
+          }
+          uname: 'product_name'
+        },
+        VizFieldFull {
+          ref: r(products.price)
+          label: 'Product Price'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        },
+        VizFieldFull {
+          ref: r(ecommerce_official.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: 'inherited'
+          }
+          uname: 'revenue'
+        },
+        VizFieldFull {
+          ref: 'total_units_sold'
+          label: 'Total Units Sold'
+          format {
+            type: 'number'
+            pattern: '#,###0'
+          }
+        },
+      ]
+      settings {
+        pagination_size: 20
+        show_row_number: true
+        row_limit: 20
+        sorts: [
+          KeyBasedSortSetting {
+            key: 'revenue'
+            direction: 'desc'
+          },
+          KeyBasedSortSetting {
+            key: 'product_name'
+            direction: 'asc'
+          },
+        ]
+        wrap_header_text: true
+        wrap_cell_text: false
+      }
+    }
+  }
+
+  view: HTMLLayout {
+    content: @html
+<style>
+  .exec-ecom-deck {
+    --t-bg: #FFFFFF;
+    --t-surface: #F5F8FA;
+    --t-border: #E1E7EE;
+    --t-ink: #05264C;
+    --t-ink-dim: #5C6E85;
+    --t-ink-faint: #8FA0B4;
+    --t-accent: #259B6C;
+    --t-accent-lt: #3FBE88;
+    --t-accent-dk: #1B7A54;
+    --t-dark: #06213F;
+    --t-dark-2: #0D3562;
+    --t-dark-line: #1A4A80;
+    --t-on-dark: #FFFFFF;
+    --t-on-dark-dim: #D7E1EA;
+    --t-radius: 10px;
+    --t-radius-sm: 6px;
+    --t-pad: 20px;
+    --t-font-sans: Inter, ui-sans-serif, system-ui, sans-serif;
+    color: var(--t-ink);
+    background: var(--t-bg);
+    font-family: var(--t-font-sans);
+    line-height: 1.45;
+  }
+  .exec-ecom-deck .deck-nav {
+    position: sticky;
+    top: 0;
+    z-index: 4;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 12px max(20px, calc((100% - 1280px) / 2));
+    background: rgba(255, 255, 255, .95);
+    border-bottom: 1px solid var(--t-border);
+  }
+  .exec-ecom-deck .deck-nav a {
+    flex: 0 0 auto;
+    color: var(--t-ink-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 650;
+    padding: 7px 10px;
+    border-radius: var(--t-radius-sm);
+  }
+  .exec-ecom-deck .deck-nav a:hover,
+  .exec-ecom-deck .deck-nav a:focus { background: var(--t-surface); color: var(--t-accent-dk); }
+  .exec-ecom-deck .deck-slide {
+    max-width: 1280px;
+    min-height: 740px;
+    margin: 0 auto;
+    padding: 56px 28px;
+    scroll-margin-top: 58px;
+    border-bottom: 1px solid var(--t-border);
+  }
+  .exec-ecom-deck .deck-slide:target { background: linear-gradient(90deg, rgba(37,155,108,.05), transparent 30%); }
+  .exec-ecom-deck .eyebrow { color: var(--t-accent-dk); font-size: 12px; font-weight: 750; letter-spacing: .09em; text-transform: uppercase; }
+  .exec-ecom-deck h1, .exec-ecom-deck h2, .exec-ecom-deck h3 { margin: 0; color: var(--t-ink); letter-spacing: -.02em; }
+  .exec-ecom-deck h1 { font-size: clamp(30px, 4vw, 46px); line-height: 1.08; }
+  .exec-ecom-deck h2 { font-size: clamp(26px, 3vw, 36px); line-height: 1.15; }
+  .exec-ecom-deck h3 { font-size: 16px; }
+  .exec-ecom-deck .slide-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, .75fr); gap: 28px; margin-bottom: 26px; align-items: end; }
+  .exec-ecom-deck .slide-head p, .exec-ecom-deck .deck-note { margin: 8px 0 0; color: var(--t-ink-dim); }
+  .exec-ecom-deck .deck-note { border-left: 3px solid var(--t-accent); padding: 10px 0 10px 14px; font-size: 14px; }
+  .exec-ecom-deck .kpi-grid, .exec-ecom-deck .grid-2, .exec-ecom-deck .grid-3 { display: grid; gap: 18px; }
+  .exec-ecom-deck .kpi-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .exec-ecom-deck .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .exec-ecom-deck .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .exec-ecom-deck .card { min-width: 0; padding: var(--t-pad); background: var(--t-surface); border: 1px solid var(--t-border); border-radius: var(--t-radius); }
+  .exec-ecom-deck .card--white { background: var(--t-bg); }
+  .exec-ecom-deck .card--wide { grid-column: 1 / -1; }
+  .exec-ecom-deck .block-kpi { min-height: 165px; }
+  .exec-ecom-deck .block-chart { min-height: 350px; }
+  .exec-ecom-deck .block-chart--tall { min-height: 440px; }
+  .exec-ecom-deck .block-table { min-height: 500px; }
+  .exec-ecom-deck .block-insight { min-height: 180px; }
+  .exec-ecom-deck .card h3 { margin-bottom: 12px; }
+  .exec-ecom-deck .detail-list { margin: 0; padding-left: 18px; color: var(--t-ink-dim); }
+  .exec-ecom-deck .detail-list li + li { margin-top: 9px; }
+  .exec-ecom-deck .closing { background: var(--t-dark); border-radius: var(--t-radius); padding: 24px; color: var(--t-on-dark); }
+  .exec-ecom-deck .closing h3 { color: var(--t-on-dark); }
+  .exec-ecom-deck .closing p { color: var(--t-on-dark-dim); margin: 8px 0 0; }
+  @media (max-width: 900px) {
+    .exec-ecom-deck .deck-slide { min-height: auto; padding: 38px 20px; }
+    .exec-ecom-deck .slide-head, .exec-ecom-deck .grid-2, .exec-ecom-deck .grid-3 { grid-template-columns: 1fr; }
+    .exec-ecom-deck .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .exec-ecom-deck .block-chart { min-height: 320px; }
+  }
+  @media (max-width: 520px) {
+    .exec-ecom-deck .kpi-grid { grid-template-columns: 1fr; }
+    .exec-ecom-deck .deck-nav { padding-left: 12px; padding-right: 12px; }
+  }
+</style>
+<div class="exec-ecom-deck">
+  <nav class="deck-nav" aria-label="Executive ecommerce deck sections">
+    <a href="#executive-snapshot">Executive snapshot</a>
+    <a href="#growth-momentum">Growth momentum</a>
+    <a href="#geographic-performance">Geographic performance</a>
+    <a href="#product-customer-signals">Product and customer signals</a>
+    <a href="#decision-supporting-detail">Decision/supporting detail</a>
+  </nav>
+
+  <section class="deck-slide" id="executive-snapshot">
+    <div class="slide-head"><div><div class="eyebrow">01 · Executive ecommerce deck</div><h1>Executive snapshot</h1><p>A concise view of revenue, demand, customer base, product range, and merchant coverage.</p></div><p class="deck-note">Intended default scope: Vietnam, Singapore, India, and Korea. Sales visuals use all available dates when no date selection is applied.</p></div>
+    <div class="kpi-grid">
+      <div class="card block-kpi"><h3>Revenue</h3><h-block name="v_ld9y" /></div>
+      <div class="card block-kpi"><h3>Distinct orders</h3><h-block name="v_acsc" /></div>
+      <div class="card block-kpi"><h3>Registered users</h3><h-block name="v_users_count" /></div>
+      <div class="card block-kpi"><h3>Product count</h3><h-block name="v_nrin" /></div>
+      <div class="card block-kpi"><h3>Merchant count</h3><h-block name="v_audi" /></div>
+    </div>
+    <div class="grid-2" style="margin-top:18px"><div class="card block-chart"><h3>Revenue vs previous month</h3><h-block name="v_sales_comparison" /></div><div class="card block-chart"><h3>Revenue trend</h3><h-block name="v_fofr" /></div></div>
+  </section>
+
+  <section class="deck-slide" id="growth-momentum">
+    <div class="slide-head"><div><div class="eyebrow">02 · Growth and engagement</div><h2>Growth momentum</h2><p>Read revenue progression alongside quarterly operating KPIs and expansion of the customer base.</p></div><p class="deck-note">The quarterly KPI sheet’s 2026 Q4 represents only Oct 1–7 (7 days); Q1–Q3 are completed quarters and should not be compared as equivalent periods.</p></div>
+    <div class="grid-2"><div class="card block-chart"><h3>Monthly user signups</h3><h-block name="v_users_signup" /></div><div class="card block-chart"><h3>Monthly customer activity</h3><h-block name="v_users_activity" /></div><div class="card card--wide block-table"><h3>Quarterly KPI overview</h3><h-block name="v_business_kpi_table" /></div></div>
+  </section>
+
+  <section class="deck-slide" id="geographic-performance">
+    <div class="slide-head"><div><div class="eyebrow">03 · Market view</div><h2>Geographic performance</h2><p>Compare country contribution, map concentration, and the existing country insight narrative.</p></div><p class="deck-note">The existing block titled “GMV by Country Name and Month today” uses the revenue metric in its source AML; treat its displayed GMV label as a source-label caveat.</p></div>
+    <div class="grid-2"><div class="card block-chart"><h3>Revenue by customer country</h3><h-block name="v_sales_country" /></div><div class="card block-chart"><h3>Revenue map by country</h3><h-block name="v_business_map" /></div><div class="card card--wide block-insight"><h3>Existing country insight</h3><h-block name="v_ueqh" /></div></div>
+  </section>
+
+  <section class="deck-slide" id="product-customer-signals">
+    <div class="slide-head"><div><div class="eyebrow">04 · Portfolio and customers</div><h2>Product and customer signals</h2><p>Assess category mix, product economics, customer composition, and post-purchase engagement.</p></div><p class="deck-note">Use the catalog and ranked tables for follow-up investigation rather than interpreting any single visual as a standalone driver analysis.</p></div>
+    <div class="grid-2"><div class="card block-chart"><h3>Revenue by product category</h3><h-block name="v_products_categories" /></div><div class="card block-chart"><h3>Product price, units, and revenue</h3><h-block name="v_products_bubble" /></div><div class="card block-chart"><h3>Revenue by user gender</h3><h-block name="v_users_gender" /></div><div class="card block-chart"><h3>Purchase cohort retention</h3><h-block name="v_users_retention" /></div></div>
+  </section>
+
+  <section class="deck-slide" id="decision-supporting-detail">
+    <div class="slide-head"><div><div class="eyebrow">05 · Operational follow-through</div><h2>Decision/supporting detail</h2><p>Detail views support executive questions with product, customer, fulfillment, and transaction-level context.</p></div><p class="deck-note">All-time sales scope applies absent a selection. The four-country intended default scope remains Vietnam, Singapore, India, and Korea.</p></div>
+    <div class="grid-2"><div class="card block-table"><h3>Product catalog</h3><h-block name="v_products_catalog" /></div><div class="card block-table"><h3>Top products by revenue</h3><h-block name="v_products_table" /></div><div class="card block-table"><h3>Top customers by revenue</h3><h-block name="v_users_table" /></div><div class="card block-chart"><h3>Revenue by order status</h3><h-block name="v_quxa" /></div><div class="card card--wide block-table"><h3>Sales detail</h3><h-block name="v_sales_detail" /></div></div>
+    <div class="closing" style="margin-top:18px"><h3>Decision caveats</h3><p>Use the deck as an executive reading path. Confirm period completeness, market scope, and the source-label discrepancy before making period-over-period or GMV-specific decisions.</p></div>
+  </section>
+</div>
+;;
+  }
+
+  settings {
+    autorun_on_open: true
+  }
+}

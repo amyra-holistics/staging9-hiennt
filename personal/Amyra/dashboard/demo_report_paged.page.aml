@@ -2,183 +2,6 @@ Dashboard demo_report_paged {
   title: 'State of Ecommerce Performance 2026 (paginated)'
   description: @md A paginated A4 version of the ecommerce report, with page numbers and one page per sheet for PDF export.;;
   owner: 'hien.nt@holistics.io'
-  // Local theme: transparent surfaces so the custom HTML slide backgrounds show through.
-  // Colors, fonts and chart palette follow brand_theme_light.
-  theme: PageTheme {
-    color {
-      data: brand_color_palette
-    }
-    background {
-      bg_color: "transparent"
-    }
-    canvas {
-      background {
-        bg_color: "transparent"
-      }
-      border {
-        border_width: 0
-        border_radius: 12
-        border_color: "#D1D5DB"
-        border_style: "none"
-      }
-      shadow: "none"
-      opacity: 1
-    }
-    block {
-      background {
-        bg_color: "transparent"
-      }
-      border {
-        border_width: 0
-        border_radius: 12
-        border_color: "#D1D5DB"
-        border_style: "none"
-      }
-      shadow: "none"
-      padding: 0
-      opacity: 1
-      label {
-        font_family: "Inter"
-        font_size: 14
-        font_color: "#05264C"
-        font_weight: "semibold"
-        font_style: "normal"
-        letter_spacing: "0"
-      }
-      text {
-        font_family: "Inter"
-        font_size: 13
-        font_color: "#374151"
-        font_weight: "normal"
-        font_style: "normal"
-      }
-    }
-    viz {
-      table {
-        general {
-          bg_color: "#FFFFFF"
-          font_color: "#374151"
-          font_family: "Inter"
-          font_size: 13
-          border_color: "#D1D5DB"
-          grid_color: "#D1D5DB"
-          border_width: 1
-          hover_color: "#F5F8FA"
-          banding_color: "#F9FAFB"
-          cell_padding: DetailedSpacing {
-            top: 10
-            right: 16
-            bottom: 10
-            left: 16
-          }
-          borders {
-            outer: true,
-            vertical: false,
-            horizontal: true,
-            header: true,
-            row_header: false
-          }
-        }
-        header {
-          bg_color: "#FFFFFF"
-          font_color: "#05264C"
-          font_size: 13
-          font_weight: "semibold"
-        }
-        sub_header {
-          bg_color: "#F9FAFB"
-          font_color: "#374151"
-          font_size: 13
-          font_weight: "medium"
-        }
-        sub_title {
-          font_color: "#6B7280"
-          font_size: 12
-          font_weight: "medium"
-        }
-        sparkline {
-          line {
-            color: "#55c5c9"
-          }
-          column {
-            color: "#05264C"
-          }
-        }
-      }
-      metric_kpi {
-        alignment: "left"
-        label {
-          font_family: "Inter"
-          font_size: 18
-          font_color: "#374151"
-        }
-        value {
-          font_family: "Inter"
-          font_size: 44
-          font_color: "#05264C"
-        }
-        progress {
-          indicator {
-            bg_color: "#05264C"
-          }
-          track {
-            bg_color: "#D1D5DB"
-          }
-          text {
-            font_color: "#374151"
-          }
-        }
-        trend {
-          positive {
-            text {
-              font_color: "#23a672"
-              font_weight: "medium"
-            }
-            background {
-              bg_color: "#e9f8f0"
-            }
-          }
-          negative {
-            text {
-              font_color: "#c53030"
-              font_weight: "medium"
-            }
-            background {
-              bg_color: "#fcebec"
-            }
-          }
-          neutral {
-            text {
-              font_color: "#374151"
-              font_weight: "normal"
-            }
-            background {
-              bg_color: "#F5F8FA"
-            }
-          }
-        }
-      }
-    }
-    custom_css: @css
-      .rpt .dac-text-block {
-        font-family: Inter;
-        font-size: 14px;
-        color: #374151;
-        line-height: 1.6;
-      }
-      .rpt .dac-text-block h1,
-      .rpt .dac-text-block h2,
-      .rpt .dac-text-block h3,
-      .rpt .dac-text-block h4 {
-        font-family: Inter;
-        color: #05264C;
-        line-height: 1.3;
-        margin-top: 0;
-        margin-bottom: 0.5em;
-        font-weight: 700;
-      }
-    ;;
-  }
 
   block v_ld9y: VizBlock {
     label: 'Revenue'
@@ -896,23 +719,25 @@ Dashboard demo_report_paged {
     .rpt *::before,
     .rpt *::after { box-sizing: border-box; }
 
-    /* ---- TOKENS: Holistics brand. Swap this block to reskin. */
+    /* ---- TOKENS: shared brand values, with light A4 report derivatives. */
     .rpt {
-      --t-ink:      #05264C;
-      --t-body:     #374151;
-      --t-dim:      #6B7280;
-      --t-faint:    #8FA0B4;
-      --t-accent:   #2C6A95;
-      --t-teal:     #55C5C9;
-      --t-teal-dk:  #00627A;
-      --t-bg:       #FFFFFF;
-      --t-desk:     #EDF1F5;
-      --t-surface:  #F5F8FA;
-      --t-border:   #E1E7EE;
-      --t-rule:     #C9D3DE;
-      --t-dark:     linear-gradient(71deg, #05264C 0%, #0B4963 62%, #013D7D 100%);
-      --t-on-dark:     #FFFFFF;
-      --t-on-dark-dim: rgba(255, 255, 255, 0.82);
+      --t-ink:      ${brand_theme_tokens("text_primary")};
+      --t-body:     ${brand_theme_tokens("text_muted")};
+      --t-dim:      ${brand_theme_tokens("text_subtle")};
+      --t-faint:    color-mix(in srgb, ${brand_theme_tokens("text_subtle")} 70%, ${brand_theme_tokens("report_paper")});
+      --t-accent:   ${brand_theme_tokens("primary")};
+      --t-teal:     ${brand_theme_tokens("secondary")};
+      --t-teal-dk:  ${brand_theme_tokens("primary")};
+      --t-bg:       ${brand_theme_tokens("report_paper")};
+      --t-desk:     ${brand_theme_tokens("report_desk")};
+      --t-surface:  ${brand_theme_tokens("report_surface")};
+      --t-border:   ${brand_theme_tokens("border")};
+      --t-rule:     color-mix(in srgb, ${brand_theme_tokens("border")} 68%, ${brand_theme_tokens("report_paper")});
+      --t-dark:     linear-gradient(71deg, ${brand_theme_tokens("primary")} 0%, color-mix(in srgb, ${brand_theme_tokens("primary")} 82%, #000000) 62%, color-mix(in srgb, ${brand_theme_tokens("primary")} 66%, #000000) 100%);
+      --t-on-dark:  ${brand_theme_tokens("report_paper")};
+      --t-on-dark-dim: color-mix(in srgb, ${brand_theme_tokens("report_paper")} 82%, transparent);
+      --t-shadow:   0 6px 22px color-mix(in srgb, ${brand_theme_tokens("primary")} 10%, transparent);
+      --t-print-shadow: ${brand_theme_tokens("report_print_shadow")};
 
       /* Running header/footer text. --t-total counts only non-cover sheets. */
       --t-report-title:  "State of ecommerce performance 2026";
@@ -924,10 +749,10 @@ Dashboard demo_report_paged {
       --t-page-w:    210mm;
       --t-page-h:    297mm;
       --t-page-pad:  16mm;
-      --t-radius:    6px;
-      --t-serif:     'Source Serif 4', Georgia, 'Times New Roman', serif;
-      --t-sans:      Inter, -apple-system, 'Segoe UI', Roboto, sans-serif;
-      --t-mono:      'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+      --t-radius:    ${brand_theme_tokens("radius")};
+      --t-serif:     ${brand_theme_tokens("font_serif")};
+      --t-sans:      ${brand_theme_tokens("font_body")}, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --t-mono:      ${brand_theme_tokens("font_mono")};
 
       font-family: var(--t-sans);
       color: var(--t-body);
@@ -949,8 +774,8 @@ Dashboard demo_report_paged {
       flex-shrink: 0;
       background: var(--t-bg);
       border: 1px solid var(--t-border);
-      border-radius: 4px;
-      box-shadow: 0 6px 22px rgba(5, 38, 76, 0.10);
+      border-radius: var(--t-radius);
+      box-shadow: var(--t-shadow);
       padding: var(--t-page-pad);
       display: flex;
       flex-direction: column;
@@ -981,7 +806,7 @@ Dashboard demo_report_paged {
 
     /* ---- Cover (dark brand variant) */
     .rpt .rpt-page.is-cover { background: var(--t-dark); color: var(--t-on-dark); border-color: transparent; }
-    .rpt .is-cover .rpt-foot { border-top-color: rgba(255,255,255,0.28); color: var(--t-on-dark-dim); }
+    .rpt .is-cover .rpt-foot { border-top-color: color-mix(in srgb, var(--t-on-dark) 28%, transparent); color: var(--t-on-dark-dim); }
     .rpt .rpt-cover { flex: 1; display: flex; flex-direction: column; min-height: 0; }
     .rpt .rpt-cover-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 38mm; }
     .rpt .rpt-cover-top img { height: 26px; display: block; }
@@ -993,7 +818,7 @@ Dashboard demo_report_paged {
     .rpt .rpt-contents { margin-top: auto; padding-bottom: 8mm; }
     .rpt .rpt-contents-title { font-size: 10px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--t-teal); margin: 0 0 8px; }
     .rpt .rpt-contents ol { list-style: none; margin: 0; padding: 0; }
-    .rpt .rpt-contents li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; padding: 8px 0; border-top: 1px solid rgba(255,255,255,0.22); font-family: var(--t-serif); font-size: 16px; color: var(--t-on-dark); }
+    .rpt .rpt-contents li { display: grid; grid-template-columns: 34px 1fr auto; align-items: baseline; padding: 8px 0; border-top: 1px solid color-mix(in srgb, var(--t-on-dark) 22%, transparent); font-family: var(--t-serif); font-size: 16px; color: var(--t-on-dark); }
     .rpt .rpt-contents li span:first-child { font-family: var(--t-sans); font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--t-teal); }
     .rpt .rpt-contents li span:last-child { font-family: var(--t-mono); font-size: 11px; color: var(--t-on-dark-dim); }
 
@@ -1013,7 +838,7 @@ Dashboard demo_report_paged {
 
     /* ---- Figures. Fixed heights in mm: a page cannot scroll. */
     .rpt .rpt-figure { margin: 0 0 4mm; flex-shrink: 0; }
-    .rpt .rpt-frame { background: #FFFFFF; border: 1px solid var(--t-border); border-radius: var(--t-radius); padding: 10px; display: flex; overflow: hidden; }
+    .rpt .rpt-frame { background: var(--t-bg); border: 1px solid var(--t-border); border-radius: var(--t-radius); padding: 10px; display: flex; overflow: hidden; }
     .rpt .rpt-frame > * { flex: 1; min-width: 0; }
     .rpt .rpt-frame .dac-viz-block { background: transparent; }
     .rpt .is-chart .rpt-frame { height: 100mm; }
@@ -1034,11 +859,11 @@ Dashboard demo_report_paged {
     .rpt .rpt-h2 { font-family: var(--t-serif); font-weight: 600; font-size: 26px; line-height: 1.15; color: var(--t-ink); margin: 0 0 4mm; }
     .rpt .rpt-scope { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 5mm; padding: 8px 10px; background: var(--t-surface); border: 1px solid var(--t-border); border-radius: var(--t-radius); flex-shrink: 0; }
     .rpt .rpt-scope-label { font-size: 9.5px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--t-ink); }
-    .rpt .rpt-filter { width: 220px; min-height: 70px; padding: 6px 10px; background: #FFFFFF; border: 1px solid var(--t-border); border-radius: var(--t-radius); display: flex; }
+    .rpt .rpt-filter { width: 220px; min-height: 70px; padding: 6px 10px; background: var(--t-bg); border: 1px solid var(--t-border); border-radius: var(--t-radius); display: flex; }
     .rpt .rpt-filter > * { flex: 1; min-width: 0; }
     .rpt .rpt-scope-note { flex-basis: 100%; font-size: 10.5px; font-style: italic; color: var(--t-dim); }
     .rpt .rpt-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4mm; margin-bottom: 6mm; flex-shrink: 0; }
-    .rpt .rpt-kpi { background: #FFFFFF; border: 1px solid var(--t-border); border-top: 3px solid var(--t-teal); border-radius: var(--t-radius); padding: 8px 12px; height: 34mm; display: flex; overflow: hidden; }
+    .rpt .rpt-kpi { background: var(--t-bg); border: 1px solid var(--t-border); border-top: 3px solid var(--t-teal); border-radius: var(--t-radius); padding: 8px 12px; height: 34mm; display: flex; overflow: hidden; }
     .rpt .rpt-kpi > * { flex: 1; min-width: 0; }
     .rpt .rpt-kpi-value .h-kpi-metric-kpi,
     .rpt .rpt-kpi-value .h-kpi-metric-kpi * { font-family: var(--t-serif) !important; font-weight: 600 !important; background: transparent !important; border: none !important; }
@@ -1179,13 +1004,25 @@ Dashboard demo_report_paged {
   explicit_interactions: [
     FilterInteraction {
       from: 'f_order_date'
-      to: ['v_ld9y', 'v_acsc', 'v_quxa', 'v_fofr', 'v_products_categories']
+      to: [
+        'v_ld9y',
+        'v_acsc',
+        'v_quxa',
+        'v_fofr',
+        'v_products_categories'
+      ]
       field: r(orders.created_at)
     },
     FilterInteraction {
       from: 'f_customer_country'
-      to: ['v_users_count', 'v_users_signup', 'v_users_gender', 'v_users_table']
+      to: [
+        'v_users_count',
+        'v_users_signup',
+        'v_users_gender',
+        'v_users_table'
+      ]
       field: r(countries.name)
     }
   ]
+  theme: brand_theme_dark
 }

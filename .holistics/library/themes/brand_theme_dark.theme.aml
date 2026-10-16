@@ -15,6 +15,16 @@ const brand_dark_theme_tokens = {
   semantic_danger: "#E57A7A",
   font_body: "Inter",
   font_display: "Inter",
+
+  // Report-specific CSS-ready tokens for the light A4 presentation.
+  report_paper: "#FFFFFF",
+  report_surface: "#F5F8FA",
+  report_desk: "#EDF1F5",
+  radius: "6px",
+  font_serif: "'Source Serif 4', Georgia, serif",
+  font_mono: "'JetBrains Mono', 'SFMono-Regular', Consolas, monospace",
+  report_print_shadow: "none",
+
   corner_style: "rounded",
   density: "comfortable",
   elevation: "hairline"

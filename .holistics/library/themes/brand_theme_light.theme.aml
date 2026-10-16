@@ -17,7 +17,14 @@ const brand_theme_tokens = {
   font_display: "Inter",
   corner_style: "rounded",
   density: "comfortable",
-  elevation: "flat"
+  elevation: "flat",
+  report_paper: "#FFFFFF",
+  report_surface: "#F5F8FA",
+  report_desk: "#EDF1F5",
+  radius: "6px",
+  font_serif: "''Source Serif 4'', Georgia, serif",
+  font_mono: "''JetBrains Mono'', ''SFMono-Regular'', Consolas, monospace",
+  report_print_shadow: "none"
 }
 
 PageTheme brand_theme_light {

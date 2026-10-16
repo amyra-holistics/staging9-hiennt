@@ -6,7 +6,48 @@ Dashboard all_viz {
   title: 'Demo dashboard'
   description: ''
   owner: 'hien.nt@holistics.io'
-  block t_f8rx: block_ha_heading('All Metrics To Date')
+  block t_f8rx: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <!-- Modern Minimal Header Style -->
+<style>
+    .header-minimal {
+        font-size: 28px;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-minimal::before {
+        content: '';
+        width: 6px;
+        height: 28px;
+        background: linear-gradient(180deg, #05264c, #00627a);
+        border-radius: 2px;
+    }
+
+    .header-minimal .main-text {
+        font-weight: 600;
+        color: #05264c;
+    }
+
+</style>
+
+<!-- HTML Structure -->
+<div class="header-minimal">
+    <span class="main-text">All Metrics To Date</span>
+</div>;;
+  }
   block t_block_ha_page_header_bg: block_ha_page_header_bg()
   block t_block_ha_page_header: block_ha_page_header('Sales', 'Monitor revenue, order volume, fulfillment mix, and customer markets.')
   block t_2pu8: TextBlock {
@@ -251,7 +292,12 @@ Dashboard all_viz {
     }
     default {
       operator: 'is'
-      value: '$H_NIL$'
+      value: [
+        'Vietnam',
+        'Singapore',
+        'India',
+        'Korea'
+      ]
     }
     settings {
       input_type: 'multiple'
@@ -262,30 +308,39 @@ Dashboard all_viz {
     viz: BarChart {
       dataset: ecommerce_official
       x_axis: VizFieldFull {
-        ref: r(countries.name)
         label: 'Customer Country'
+        ref: r(countries.name)
         format {
           type: 'text'
         }
       }
       y_axis {
+        settings {
+          show_data_label_by: 'value'
+          hidden: true
+        }
         series {
           field: VizFieldFull {
-            ref: r(ecommerce_official.revenue)
             label: 'Revenue'
+            ref: r(ecommerce_official.revenue)
             format {
               type: 'number'
-              pattern: 'inherited'
+              pattern: '#,###0.00"A" [$$]'
+              group_separator: ','
+              decimal_separator: '.'
             }
           }
         }
       }
       settings {
-        sort: LineFamilySort {
-          type: 'yaxis'
+        sort {
           field_index: 0
           direction: 'desc'
+          type: 'yaxis'
         }
+        legend_label: 'hidden'
+        x_axis_label: 'Customer Country'
+        x_axis_show_null_datetime: true
       }
     }
   }
@@ -713,56 +768,6 @@ Dashboard all_viz {
     }
     content: @md <img style="margin-left: -8px" src="https://cdn.holistics.io/logos/holistics-logo-white.svg" />;;
   }
-  block v_business_aov: VizBlock {
-    label: 'Average Order Value'
-    theme {
-      padding {
-        top: 56
-        left: 16
-        bottom: 16
-        right: 16
-      }
-    }
-    viz: MetricKpi {
-      dataset: ecommerce_official
-      theme {
-        metric_kpi {
-          label {
-            font_size: 16
-          }
-          value {
-            font_size: 44
-          }
-        }
-      }
-      calculation distinct_order_count {
-        label: 'Distinct Order Count'
-        formula: @aql orders | count_distinct(orders.id);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      calculation average_order_value {
-        label: 'Average Order Value'
-        formula: @aql safe_divide(revenue, distinct_order_count);;
-        calc_type: 'measure'
-        data_type: 'number'
-      }
-      value: VizFieldFull {
-        ref: 'average_order_value'
-        label: 'Average Order Value'
-        format {
-          type: 'number'
-          pattern: '[$$]#,###0.00'
-        }
-      }
-      settings {
-        display_mode: 'single'
-      }
-    }
-    settings {
-      hide_label: true
-    }
-  }
   block v_business_kpi_table: VizBlock {
     label: 'Monthly KPI Overview'
     viz: MetricSheet {
@@ -821,7 +826,6 @@ Dashboard all_viz {
         }
       ]
       settings {
-        max_column: 7
         aggregate_awareness {
           enabled: true
           debug_comments: true
@@ -862,7 +866,19 @@ Dashboard all_viz {
         }
       ]
       settings {
+        default_view {
+          zoom_level: 4
+          center {
+            lat: 20.851596741220888
+            lng: 101.83887019815293
+          }
+        }
         location_colors {
+
+        }
+        aggregate_awareness {
+          enabled: true
+          debug_comments: true
         }
       }
     }
@@ -1394,68 +1410,109 @@ height: 100%
       hide_label: true
     }
   }
+  block t_us1y: TextBlock {
+    theme: BlockTheme {
+      background {
+        bg_color: 'transparent'
+      }
+      border {
+        border_width: 0
+        border_style: 'none'
+      }
+      padding: 0
+      shadow: 'none'
+    }
+    content: @md <!-- Modern Minimal Header Style -->
+<style>
+    .header-minimal {
+        font-size: 28px;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-minimal::before {
+        content: '';
+        width: 6px;
+        height: 28px;
+        background: linear-gradient(180deg, #05264c, #00627a);
+        border-radius: 2px;
+    }
+
+    .header-minimal .main-text {
+        font-weight: 600;
+        color: #05264c;
+    }
+
+</style>
+
+<!-- HTML Structure -->
+<div class="header-minimal">
+    <span class="main-text">Regional Sales Distribution Insight</span>
+</div>;;
+  }
   view: TabLayout {
     label: 'Ecommerce performance'
     tab business: CanvasLayout {
       label: 'Business'
-      width: 1220
-      height: 1855
+      width: 985
+      height: 1895
       auto_expand_vertically: true
       block t_business_header_bg {
-        position: pos(0, 0, 1220, 200)
+        position: pos(0, 5, 980, 190)
       }
       block t_business_header {
-        position: pos(20, 80, 1180, 100)
+        position: pos(20, 75, 940, 100)
       }
       block t_business_logo {
-        position: pos(20, 20, 180, 60)
+        position: pos(20, 20, 155, 50)
         layer: 2
       }
       block v_nrin {
-        position: pos(20, 205, 220, 160)
+        position: pos(20, 255, 220, 150)
       }
       block v_users_count {
-        position: pos(260, 205, 220, 160)
+        position: pos(260, 255, 220, 150)
       }
       block v_acsc {
-        position: pos(500, 205, 220, 160)
+        position: pos(500, 255, 220, 150)
       }
       block v_audi {
-        position: pos(740, 205, 220, 160)
-      }
-      block v_business_aov {
-        position: pos(980, 205, 220, 160)
+        position: pos(740, 255, 220, 150)
       }
       block t_zz87 {
-        position: pos(35, 220, 40, 40)
+        position: pos(40, 270, 40, 40)
         layer: 2
       }
       block t_4o8m {
-        position: pos(275, 220, 40, 40)
+        position: pos(275, 270, 40, 40)
         layer: 2
       }
       block t_7cbr {
-        position: pos(755, 220, 40, 40)
-        layer: 2
-      }
-      block t_pour {
-        position: pos(995, 220, 40, 40)
+        position: pos(755, 270, 40, 40)
         layer: 2
       }
       block v_business_kpi_table {
-        position: pos(15, 935, 1180, 300)
+        position: pos(15, 1590, 945, 300)
       }
       block v_sales_country {
-        position: pos(20, 370, 785, 560)
+        position: pos(20, 480, 555, 360)
       }
       block v_business_map {
-        position: pos(15, 1235, 1185, 615)
+        position: pos(15, 1005, 945, 560)
       }
       block t_ihk0 {
-        position: pos(515, 220, 40, 40)
+        position: pos(515, 270, 40, 40)
       }
       block v_ueqh {
-        position: pos(830, 470, 340, 265)
+        position: pos(605, 545, 345, 230)
+      }
+      block t_f8rx {
+        position: pos(15, 215, 950, 35)
+      }
+      block t_us1y {
+        position: pos(20, 435, 950, 35)
       }
       mobile {
         mode: 'auto'
@@ -1648,6 +1705,20 @@ height: 100%
       field: r(categories.name)
     },
     FilterInteraction {
+      from: 'f_users_signup_date'
+      to: [
+        'v_users_count',
+        'v_users_signup',
+        'v_nrin',
+        'v_acsc',
+        'v_audi',
+        'v_business_kpi_table',
+        'v_business_map',
+        'v_ueqh'
+      ]
+      field: r(users.sign_up_date)
+    },
+    FilterInteraction {
       from: 'f_customer_country'
       to: [
         'v_users_count',
@@ -1655,17 +1726,25 @@ height: 100%
         'v_users_activity',
         'v_users_gender',
         'v_users_table',
-        'v_users_retention'
+        'v_users_retention',
+        'v_nrin',
+        'v_acsc',
+        'v_audi',
+        'v_business_kpi_table',
+        'v_sales_country',
+        'v_business_map',
+        'v_ueqh',
+        'v_products_catalog',
+        'v_products_categories',
+        'v_products_bubble',
+        'v_products_table',
+        'v_ld9y',
+        'v_sales_comparison',
+        'v_quxa',
+        'v_fofr',
+        'v_sales_detail'
       ]
       field: r(countries.name)
-    },
-    FilterInteraction {
-      from: 'f_users_signup_date'
-      to: [
-        'v_users_count',
-        'v_users_signup'
-      ]
-      field: r(users.sign_up_date)
     },
     FilterInteraction {
       from: 'v_nrin'
@@ -1681,7 +1760,6 @@ height: 100%
         'v_acsc',
         'v_sales_country',
         'v_users_count',
-        'v_business_aov',
         'v_business_kpi_table',
         'v_business_map'
       ]
@@ -1706,12 +1784,6 @@ height: 100%
     },
     FilterInteraction {
       from: 'v_users_count'
-      to: [
-        'v_ueqh'
-      ]
-    },
-    FilterInteraction {
-      from: 'v_business_aov'
       to: [
         'v_ueqh'
       ]

@@ -57,7 +57,7 @@ Skill create_ai_task {
 
     ## Save the task
 
-    Save the task as `settings/ai/tasks/<name>.ai_task.aml` (name = label in snake_case, unique in a folder listing) and add one `AiSchedule` entry to `schedules.aml`: cron in UTC, `run_as` = `${H.current_user.h_email}`, `targets` = the task. Confirm the field syntax with the AML editor schema help. No `'` in the label or description. An edit changes the files in place.
+    Save the task as `settings/ai/tasks/<name>.ai_task.aml` (name = label in snake_case, unique in a folder listing) and add one `AiSchedule` entry to `schedules.aml`: cron in UTC, `run_as` = `${H.current_user.h_email}`, `targets` = the task. Confirm the field syntax with the AML editor schema help. No `'` in the label or description. The description says what the task does, never when it runs. An edit changes the files in place.
 
     ## Report the draft
 

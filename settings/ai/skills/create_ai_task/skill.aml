@@ -20,6 +20,7 @@ Skill create_ai_task {
     - Use `ask_user` cards: business words, at most 15 words, three choices, best first, marked "(recommended)". Ask related points together, Where last.
     - Ask about any word that would change the result, in a new task or an edit, unless the user gave the number or choice: "a lot", "top", "unusual", "sales" (as a measure), "morning" without a time. Show today's numbers in an option when they help.
     - Add no scope the user did not ask for.
+    - Find the data yourself in the project's datasets. Ask only when more than one fits, and offer the candidates.
     - Infer what the request already implies ("week over week" means a weekly schedule). Ask only what is still open.
     - Cron is UTC. Convert the user's timezone and say the time in their words.
 

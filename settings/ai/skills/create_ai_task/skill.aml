@@ -150,7 +150,7 @@ Skill create_ai_task {
     - **📨 Delivery** and **📎 Attachment:** as `add_ai_task_delivery` writes them: "None (kept in the run record)", "Email · <address>", "Slack · #channel" (several joined by "; "); "None", "Viz · PNG", "Dashboard · <name> · PNG", or the file the user named.
     - **🔔 Condition:** a row after Delivery, only for a condition: the rule in plain words.
     - **"Attach <next-best> instead":** as `add_ai_task_delivery` names it, if any. **The other "instead" button** ("Run at <time> instead", "Use <label> instead") shows only for a pick made without a card.
-    - **"Preview the first result":** run only the data and write steps once, in chat, on the latest data, and show the result as `write_ai_task_result` writes it, with a chart only when the Attachment is a chart. Skip the {Attach} and {Deliver} steps. For an alert, say whether the condition would fire. Send and save nothing.
+    - **"Preview the first result":** run only the data and write steps once, in chat, on the latest data, and show the result in the full `write_ai_task_result` layout (load it; never a short summary). Always show the chart of the result in chat: build the brief's chart (or, for a dashboard attachment, the matching chart) and show it with the result, even when the Attachment is a PNG export. Skip the {Attach} export and the {Deliver} step. For an alert, say whether the condition would fire. Send and save nothing.
 
     ## Update report
 

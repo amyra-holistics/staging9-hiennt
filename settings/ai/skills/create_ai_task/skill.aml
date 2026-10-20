@@ -38,7 +38,7 @@ Skill create_ai_task {
 
     ## Change an existing task
 
-    - A named task with "update", "edit" or "change" is edited: read its file, change only what was asked, keep every other line.
+    - A named task with "update", "edit" or "change" is edited: read its file, change only what was asked, keep every other line. Update every place the change shows up: a new time also changes the brief's Schedule line and cron, not just `schedules.aml`.
     - A recalled or open task the user did not name, that looks like this request, gets one card: "Change <label>" or "Create a new task". Offer "Change" only when you found its file. Never copy wording from another task.
 
     ## Write the brief

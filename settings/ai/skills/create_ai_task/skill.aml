@@ -1,20 +1,19 @@
 Skill create_ai_task {
   label: 'Create or change an AI task'
-  description: "Use when the user wants AI work to repeat or to watch for something, even without saying “AI task”: a recurring report or digest, an alert when something happens, a regular review of AI conversations, a check on data or the workspace, always with a repeat or watch signal. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations and summarize the insights and common questions”, “every morning, check yesterday's orders loaded”, “keep an eye on unused dashboards”. Also use to update, edit or change this chat's draft or a task the user names (“update my revenue alert to 9 AM”). Do not use for a one-off answer, a send right now, or AI Blocks. A recurring send of a dashboard as it is, with no AI work, gets the card below."
+  description: "Use when the user wants AI work to repeat or to watch for something, even without saying “AI task”: a recurring report or digest, an alert when something happens, a regular review of AI conversations, a check on data or the workspace, always with a repeat or watch signal. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations and summarize the insights and common questions”, “every morning, check yesterday's orders loaded”, “keep an eye on unused dashboards”. A recurring request is an AI task by default, even one that only sends a dashboard or chart. Also use to update, edit or change this chat's draft or a task the user names (“update my revenue alert to 9 AM”). Do not use for a one-off answer, a send right now, or AI Blocks."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
     # Create or change an AI task
 
-    An AI task is AI work that repeats on a schedule or watches for a condition, then keeps or sends its result. Settle every component with the user, save the draft, and report. Never run the task or send anything yourself.
+    An AI task is AI work that repeats on a schedule or watches for a condition, then keeps or sends its result. Settle every component with the user, save the draft, and show the draft report. Never run the task or send anything yourself.
 
     ## What becomes a task
 
-    - **Yes:** the request repeats ("every", "weekly", "each morning") or monitors ("whenever", "keep an eye on", "let me know if"), and each run needs AI work: reading, comparing, judging, summarizing or deciding. Any kind of work counts, not only metrics.
+    - **Yes:** the request repeats ("every", "weekly", "each morning") or monitors ("whenever", "keep an eye on", "let me know if"). It is an AI task by default, for any kind of work and even when it only sends a dashboard or chart. Don't offer another kind of schedule and don't ask whether to make a task.
     - **No:** a one-off job, however large ("review all conversations" once), stays an answer in chat. Don't create a task.
-    - **Dashboard as it is:** a recurring send of a dashboard or chart with no AI work isn't a task. Ask one card: "Send it as it is, or have AI summarize it each time?" with "Send it as it is (data schedule)" and "Have AI summarize it each time (AI task)". For the first, tell the user to use the dashboard's own schedule and stop.
 
-    Examples of recurring or monitoring work:
+    Examples:
     - Digest: "Every Monday, email me revenue by category."
     - Alert: "Ping #sales if any region drops 20% week over week."
     - Conversation review: "Each Friday, review all AI conversations and summarize insights and common questions."
@@ -22,18 +21,19 @@ Skill create_ai_task {
 
     ## Fill the components
 
-    Ask the user (only what the request leaves unclear):
-    - **What the task does:** the work, its data or scope, and anything vague that changes the result.
-    - **When it runs:** day and clock time, or a daily/monthly rhythm. The cron entry is UTC: convert another timezone for it, and tell the user the time in their own wording.
-    - **Where the result goes:** an email address, a Slack channel, or kept in Holistics. See below.
+    Ask the user, only what the request leaves unclear:
+    - **What the task does:** the work, its data or scope, and every vague word (below).
+    - **When it runs:** day and clock time, or a daily/monthly rhythm. The cron entry is UTC: convert another timezone for it and tell the user the time in their own wording.
+    - **Where the result goes:** see below.
+    - **Attachment:** always, when the result is sent: `add_ai_task_delivery` asks it.
 
-    Generate yourself, never ask: the task's label, its description, the acceptance criteria, the brief, and any other setting the user didn't mention.
+    Generate yourself, never ask: the label, description, acceptance criteria, brief, and any other setting the user didn't mention.
 
-    ## Ask the unclear
+    ## Ask the unclear (a must)
 
-    Ask one `ask_user` card for anything that changes the result and has more than one reasonable reading ("a lot", "top", "sales", "the team", "morning"). Rules:
-    - Cards only, in business words, at most 15 words per question and three choices.
-    - Put your best choice first, labelled "(recommended)", when there is one. Show today's numbers or examples in an option when they help the user choose.
+    Never decide a vague word yourself, in a new task or in an edit. These always need a card, unless the user already gave the number or the choice: "a lot", "big", "worst", "unusual", "top", "changed the most", "best", "sales" (as a measure), "how we did", "performing", "the team", "regularly", "soon", "morning" (when no time is given), and any word whose meaning changes the result. A word that is only a name (a channel, a dataset) needs no card. Rules:
+    - Cards only (`ask_user`), in business words, at most 15 words per question and three choices.
+    - Put your best choice first, labelled "(recommended)". Show today's numbers or examples in an option when the task reads data and they help the user choose (for "a lot": the groups each threshold would catch today).
     - Never ask what the request already settled, and never add scope the user didn't ask for.
     - Ask related unclear points together; ask Where last.
 
@@ -41,16 +41,40 @@ Skill create_ai_task {
 
     - If the request names an email address, a Slack channel or "email me" ("me" is the signed-in user, `${H.current_user.h_email}`), it's settled.
     - Otherwise ask "Where should the result go?" with "Send to email", "Send to Slack channel" and "Keep it in Holistics". For an alert or a request to send, offer only email and Slack; if the user gives no destination, ask again.
-    - Whenever the destination is email or Slack, named or asked, load `add_ai_task_delivery` for the details. "Keep it in Holistics" doesn't need it.
+    - For a new task, whenever the destination is email or Slack, named or asked, load `add_ai_task_delivery`: it asks the attachment. For an edit, load it only when the change adds or changes the destination or attachment. "Keep it in Holistics" doesn't need it.
 
     ## Existing tasks
 
-    - A request that names a task and says update, edit or change it ("update my revenue alert to 9 AM") edits that task: read its file, change only what was asked, keep every other line, and report what changed. If no task or several tasks match the name, ask which one in a card.
-    - If you recall an earlier chat or open an existing task that looks like this request, don't reuse it silently. Ask one card: "Change <label>" or "Create a new task". Never copy wording from another task.
+    - A request that names a task and says update, edit or change it ("update my revenue alert to 9 AM") edits that task: read its file, change only what was asked, keep every other line. A new vague word in the change still gets its card.
+    - If you recall an earlier chat or open an existing task the user did not name that looks like this request, don't reuse it silently. Ask one card: "Change <label>" or "Create a new task". Only offer "Change" for a task whose file you found. Never copy wording from another task.
 
     ## Write the brief
 
-    The brief is plain prose for the run agent: what to do, over which data or scope, each clarified answer, the condition for sending if any, where it goes and any attachment (from `add_ai_task_delivery`). If the user dictated a result format (a table, bullet points, a tone), put it in the brief. If they didn't, say nothing about format: a run loads `write_ai_task_result` by itself.
+    Plain words for the run agent, in this shape. Fill `<…>`, drop a line or section that doesn't apply (a digest has no Condition), and use the user's own scope and wording:
+
+    ```
+    ## At a glance
+    - Source: <@Dataset:<unique_name>, "All AI conversations", "Workspace dashboards", …>
+    - Sends to: <none, kept in the run record | each destination>
+    - Condition: <none, every run | the rule in plain words>
+    - Attachment: <none | what, as `add_ai_task_delivery` writes it>
+    - Schedule: <day and time> UTC (cron <cron>)
+
+    ## Definitions
+    - <each period in words, no dates: "Last week" = the most recent complete Monday–Sunday week>
+    - <each clarified vague word with its answer: "A lot" = a drop of 20% or more>
+    - <the grouping, a top N or a metric, only when the user asked or picked it>
+
+    ## Steps
+    1. <get the data or content, and the previous period when comparing>
+    2. <what to look for, check or summarize>
+    3. {Condition} <decide whether to send, only for an alert>
+    4. {Attach} <the attachment, if any>
+    5. <write the result: in the user's dictated format if they gave one, else with `write_ai_task_result`>
+    6. {Deliver} <send to each destination, if any>
+    ```
+
+    Write 3–6 steps that fit the task: renumber, merge or drop lines as needed. Add no step the user didn't ask for. Keep a format the user dictated (a table, bullet points, a tone) in the write step; if they dictated none, don't describe the layout.
 
     Write acceptance criteria that fit the task.
 
@@ -81,10 +105,73 @@ Skill create_ai_task {
       }
     ```
 
-    ## Report
+    ## Draft report
 
-    Reply in a few plain sentences, no template: the task's label, what it does, when it runs, where the result goes, the acceptance criteria in short, and that it's a draft: it runs on schedule once the user clicks `Commit changes`, then `Publish`. After an edit, say what changed (old → new) and that it's still a draft.
+    After saving a new task, reply with only this, changing only `<…>`:
 
-    If saving keeps failing, say so, give the reason in plain words and what the user can do.
+    ````
+    ## ✅ Draft created: <label>
+
+    Not running yet. Change anything below; it runs on schedule once you click `Commit changes`, then `Publish`.
+
+    | | |
+    |---|---|
+    | 🗄️ Source | <@Dataset:<unique_name> · <label>, or "All AI conversations", …> |
+    | 🗓️ Schedule | <Mondays 9:00 AM> UTC |
+    | 📨 Delivery | <None (kept in the run record)> |
+    | 📝 Brief | <one sentence, key values in bold> |
+    | 📎 Attachment | <None> |
+
+    Runs as you (<run_as>): it sees the data you can see.
+
+    ### Acceptance criteria
+
+    Each run checks its result against these. If one isn't met, the run tries again.
+
+    ▢ <criterion, word for word>
+
+    ### Files
+
+    ```artifact
+    <artifact id of the saved task>
+    ```
+
+    ### Follow-up
+
+    [Attach <next-best> instead](#opt)
+    [<other "instead" button>](#opt)
+    [Preview the first result (nothing is sent)](#opt)
+    [Change the acceptance criteria](#opt)
+    ````
+
+    "Preview" and "Change the acceptance criteria" always show; the two "instead" buttons show only when they apply.
+
+    - Keep the empty header row and each icon as written (🗄️, never 🗂️). Criteria are "▢ " paragraphs, never a list. One `artifact` block per saved file.
+    - **📨 Delivery** and **📎 Attachment:** as `add_ai_task_delivery` writes them: "None (kept in the run record)", "Email · <address>", "Slack · #channel" (several joined by "; "); "None", "Viz · PNG", "Dashboard · <name> · PNG", or the file the user named.
+    - **🔔 Condition:** a row after Delivery, only for a condition: the rule in plain words.
+    - **"Attach <next-best> instead":** as `add_ai_task_delivery` names it, if any. **The other "instead" button** ("Run at <time> instead", "Use <label> instead") shows only for a pick made without a card.
+    - **"Preview the first result":** run only the data and write steps once, in chat, on the latest data, and show the result as `write_ai_task_result` writes it, with a chart only when the Attachment is a chart. Skip the {Attach} and {Deliver} steps. For an alert, say whether the condition would fire. Send and save nothing.
+
+    ## Update report
+
+    After changing a task, reply with only this: the draft line, then only what changed, then the changed files. **Bold** only the words this change added. Rows: `~~<old>~~ → <new>`, with the draft report's icons and labels; leave the table out when no row changed. Criteria: `▢ ~~<old>~~ → <new>`, added ones as new "▢ " lines, removed ones as `▢ ~~<old>~~`. Follow-up: the draft report's "Attach <next-best> instead" button when this change added or switched the attachment.
+
+    ````
+    ## ✅ Task updated
+
+    Still a draft: click `Commit changes`, then `Publish` to apply.
+
+    | | |
+    |---|---|
+    | 🗓️ Schedule | ~~Mondays 9:00 AM UTC~~ → Mondays **8:00 AM** UTC |
+
+    ### Files
+
+    ```artifact
+    <artifact id of each changed file's last save>
+    ```
+    ````
+
+    If saving keeps failing, reply "## ❌ Couldn't create the task" (or "update"), the reason in plain words, and what the user can do.
   ;;
 }

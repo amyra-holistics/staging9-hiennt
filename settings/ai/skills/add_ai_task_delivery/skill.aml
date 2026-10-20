@@ -1,12 +1,12 @@
 Skill add_ai_task_delivery {
   label: 'Add delivery to an AI task'
-  description: "Use when an AI task's result should be sent by email or to Slack, with or without an attachment, for a new task, this chat's draft, or a task the user names. Typical phrasings: “email me the summary every Friday”, “post it in #sales-alerts”, “attach the chart”. Loaded by create_ai_task once the user picks email or Slack. Normally loaded by create_ai_task: do not load it for a send right now, or when the result only stays in Holistics."
+  description: "Use when an AI task's result should be sent by email or to Slack, for a new task, this chat's draft, or a task the user names. Always settles the destination and the attachment. Typical phrasings: “email me the summary every Friday”, “post it in #sales-alerts”, “attach the chart”. Loaded by create_ai_task whenever the destination is email or Slack. Do not load it for a send right now, or when the result only stays in Holistics."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
     # Add delivery to an AI task
 
-    Settle who gets the task's result and what comes with it, then write it into the task's brief as plain sentences. A scheduled run sends on its own: add no disclaimer about sending.
+    Settle who gets the task's result and what comes with it, then write it into the task's brief. A scheduled run sends on its own: add no disclaimer about sending.
 
     ## Destination
 
@@ -15,14 +15,18 @@ Skill add_ai_task_delivery {
     - **Slack:** ask "Which Slack channel? Type its exact name." No recommendation; if the user can't name one, ask again or offer email. Never fill a missing channel with one from another task.
     - **Several destinations** are fine; write each one.
 
-    ## Attachment
+    ## Attachment (always ask)
 
-    - Ask only when the user mentions one or it's unclear whether they want one. No attachment is a valid answer.
-    - Offer what fits the task: a chart of the result, a dashboard the user names, or a file type they name.
-    - Use one `ask_user` card, at most three choices, best first marked "(recommended)".
+    Whenever the result is sent, ask one `ask_user` card, even when the request says nothing about an attachment. Skip it only when the user already named one or said none.
+    - "What should come with the result?" with "A chart of the result (recommended)", "The <name> dashboard" and "No attachment".
+    - For the dashboard option, look for a dashboard on the task's data (`*.page.aml`, every folder level) and name the best match. If none fits, offer "A dashboard (tell me which)".
+    - A file type the user names ("as a PDF") is settled: write it as the Attachment.
+    - Keep the best pick of the other kind for the draft report's button: for a chart, a dashboard you found ("Attach the <name> dashboard instead"); for a dashboard, "Attach a chart instead". No button when nothing is attached.
 
     ## Write it into the brief
 
-    Add one or two sentences to the brief: who gets the result (each destination), when it sends if not every run (a condition the user gave, written in plain words), and the attachment if any. Add an acceptance criterion only if the destination or condition changes what a run must produce.
+    - **At a glance:** Sends to = each destination ("Email · you@x.com", "Slack · #sales", joined by "; "); Condition = the rule in plain words when sending only on a condition; Attachment = "None", "Viz · PNG", "Dashboard · <name> · PNG" or the file type.
+    - **Steps:** add or fill the {Condition} step (when it sends: exclusive branches, each naming its destinations; it never writes the message), the {Attach} step (export the chart or dashboard as PNG) and the {Deliver} step (send one message to each destination with the attachment).
+    - Add an acceptance criterion only if the destination or condition changes what a run must produce.
   ;;
 }

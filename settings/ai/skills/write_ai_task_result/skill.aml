@@ -1,6 +1,6 @@
 Skill write_ai_task_result {
   label: 'Write an AI task result'
-  description: "Use at the start of a scheduled AI task run to write its result for email, Slack or the run record, when the task's brief sets no result format. Skip it when the brief says how the result should look (a table, bullet points, a tone). Not for creating or changing a task, or one-off answers in chat."
+  description: "Use at the start of a scheduled AI task run, and in a preview of its first result in chat, to write the result for email, Slack or the run record, when the task's brief sets no result format. Skip it when the brief says how the result should look (a table, bullet points, a tone). Not for creating or changing a task, or one-off answers in chat."
   invocation: 'auto'
   content: @md
     # Write an AI task result

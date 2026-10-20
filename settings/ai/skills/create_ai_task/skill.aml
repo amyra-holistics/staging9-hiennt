@@ -18,9 +18,9 @@ Skill create_ai_task {
     - Ask only what the request leaves open: what the task does, when it runs, where the result goes. If something is missing, ask. Do not guess.
     - Never ask for the label, description, acceptance criteria or brief. Generate them.
     - Use `ask_user` cards: business words, at most 15 words, three choices, best first, marked "(recommended)". Ask related points together, Where last.
-    - Vague words always get a card, in edits too: "a lot", "big", "worst", "unusual", "top", "best", "sales" (as a measure), "how we did", "the team", "regularly", "soon", "morning" without a time. Skip the card when the user gave the number or choice. Show today's numbers in an option when they help.
+    - Ask about any word that would change the result, in a new task or an edit, unless the user gave the number or choice: "a lot", "top", "unusual", "sales" (as a measure), "morning" without a time. Show today's numbers in an option when they help.
     - Add no scope the user did not ask for.
-    - A comparison period sets the schedule: "week over week" runs weekly, "day over day" daily. Ask only the day and time, never the cadence.
+    - Infer what the request already implies ("week over week" means a weekly schedule). Ask only what is still open.
     - Cron is UTC. Convert the user's timezone and say the time in their words.
 
     Examples:

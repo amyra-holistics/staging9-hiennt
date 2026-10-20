@@ -76,7 +76,7 @@ Skill create_ai_task {
 
     Write 3–6 steps that fit the task: renumber, merge or drop lines as needed. Add no step the user didn't ask for. Keep a format the user dictated (a table, bullet points, a tone) in the write step; if they dictated none, don't describe the layout.
 
-    Write acceptance criteria that fit the task.
+    Write acceptance criteria that fit the task: plain lines in the file, with no "▢" (that mark is only for the report).
 
     ## Save
 

@@ -27,9 +27,13 @@ Skill add_ai_task_delivery {
 
     ## Write it into the brief
 
-    - **At a glance:** Sends to = each destination ("Email · you@x.com", "Slack · #sales", joined by "; "). Condition = the rule in plain words, when sending only on a condition. Attachment = "None", "Viz · PNG", "Dashboard · <name> · PNG" or the file type.
-    - **Steps:** fill {Condition} (exclusive branches, each naming its destinations; it never writes the message), {Attach} (export as PNG) and {Deliver} (one message per destination, with the attachment).
-    - **Subject:** write it word for word in {Deliver}. Email "<task label> · <period dates>" in digits ("Mar 4 – 10"; none for a task without a period). Slack "<task label>". Never "Last Week" for the dates.
+    Add delivery to the brief in plain words, in the steps the task already has:
+
+    - **Destinations:** each one, as "Email · you@x.com" or "Slack · #sales", joined by "; ".
+    - **Condition:** when sending only on a condition, the rule in plain words, as exclusive branches that each name their destinations. It never writes the message.
+    - **Attachment:** "None", "Viz · PNG", "Dashboard · <name> · PNG" or the file type. Export it as PNG before sending.
+    - **Send:** one message per destination, with the attachment.
+    - **Subject:** word for word. Email "<task label> · <period dates>" in digits ("Mar 4 – 10"; none for a task without a period). Slack "<task label>". Never "Last Week" for the dates.
     - Add an acceptance criterion only when the destination or condition changes what a run must produce.
   ;;
 }

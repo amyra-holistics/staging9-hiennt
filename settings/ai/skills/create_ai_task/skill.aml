@@ -39,66 +39,25 @@ Skill create_ai_task {
 
     ## Change an existing task
 
-    - A named task with "update", "edit" or "change" is edited: read its file, change only what was asked, keep every other line. Update every place the change shows up: a new time also changes the brief's Schedule line and cron, not just `schedules.aml`.
+    - A named task with "update", "edit" or "change" is edited: read its file, change only what was asked, keep every other line. Update every place the change shows up, in the task file and in `schedules.aml`.
     - A recalled or open task the user did not name, that looks like this request, gets one card: "Change <label>" or "Create a new task". Offer "Change" only when you found its file. Never copy wording from another task.
 
     ## Write the brief
 
-    Plain words for the run agent. Fill `<…>`, drop lines that do not apply, use the user's wording:
+    The brief is what the run agent reads, in plain words. Leave the layout to the run agent. Cover:
 
-    ```
-    ## At a glance
-    - Source: <@Dataset:<unique_name>, "All AI conversations", "Workspace dashboards", …>
-    - Sends to: <none, kept in the run record | each destination>
-    - Condition: <none, every run | the rule in plain words>
-    - Attachment: <none | what, as `add_ai_task_delivery` writes it>
-    - Schedule: <day and time> UTC (cron <cron>)
+    - The source and the steps to take (3–6, none the user did not ask for), including the previous period when comparing.
+    - Each period in words, no dates: "Last week" = the most recent complete Monday–Sunday week.
+    - Each clarified vague word with its answer: "A lot" = a drop of 20% or more.
+    - The condition, for an alert. Grouping, top N or metric only when asked or picked.
+    - The write step: the user's dictated format (table, bullets, tone) if given, else `write_ai_task_result`. Always keep it, so the result layout applies at run time.
+    - Delivery, as `add_ai_task_delivery` writes it.
 
-    ## Definitions
-    - <each period in words, no dates: "Last week" = the most recent complete Monday–Sunday week>
-    - <each clarified vague word: "A lot" = a drop of 20% or more>
-    - <grouping, top N or metric, only when asked or picked>
-
-    ## Steps
-    1. <get the data or content, plus the previous period when comparing>
-    2. <what to look for, check or summarize>
-    3. {Condition} <whether to send, alerts only>
-    4. {Attach} <the attachment, if any>
-    5. <write the result: the user's format if given, else `write_ai_task_result`>
-    6. {Deliver} <send to each destination, if any>
-    ```
-
-    - Use 3–6 steps. Renumber, merge or drop. Add none the user did not ask for.
-    - Always keep the write step, so the result layout applies at run time.
-    - Keep a dictated format (table, bullets, tone) in the write step. If none, do not describe a layout.
-    - Write acceptance criteria as plain lines, no "▢".
+    Write acceptance criteria as plain lines, no "▢".
 
     ## Save the task
 
-    1. Save `settings/ai/tasks/<name>.ai_task.aml`. Name = label in snake_case, unique in a folder listing. Indent brief and criteria 4 spaces, no `'` in label or description, `<END>` = the line of two semicolons. An edit changes the file in place.
-
-    ```
-    AiTask <name> {
-      label: '<Label>'
-      description: '<one plain sentence>'
-      brief: @md
-        <the brief>
-      <END>
-      acceptance_criteria: @md
-        <the criteria>
-      <END>
-    }
-    ```
-
-    2. Add one entry to `schedules.aml` (comma after the last), cron in UTC:
-
-    ```
-      AiSchedule {
-        cron: '<cron>'
-        run_as: '${H.current_user.h_email}'
-        targets: [<name>]
-      }
-    ```
+    Save the task as `settings/ai/tasks/<name>.ai_task.aml` (name = label in snake_case, unique in a folder listing) and add one `AiSchedule` entry to `schedules.aml`: cron in UTC, `run_as` = `${H.current_user.h_email}`, `targets` = the task. Confirm the field syntax with the AML editor schema help. No `'` in the label or description. An edit changes the files in place.
 
     ## Report the draft
 
@@ -147,7 +106,7 @@ Skill create_ai_task {
 
     ## Preview the first result
 
-    Run the data and write steps once, in chat, on the latest data. Show the full `write_ai_task_result` layout (load it, never a short summary) and the brief's chart, even when the attachment is a PNG. Skip {Attach} and {Deliver}. For an alert, say whether it would fire. Send and save nothing.
+    Run the data and write steps once, in chat, on the latest data. Show the full `write_ai_task_result` layout (load it, never a short summary) and the brief's chart, even when the attachment is a PNG. Skip the attachment export and the send. For an alert, say whether it would fire. Send and save nothing.
 
     ## Report the update
 

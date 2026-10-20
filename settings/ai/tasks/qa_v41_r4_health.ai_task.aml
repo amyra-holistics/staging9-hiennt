@@ -1,0 +1,25 @@
+AiTask qa_v41_r4_health {
+  label: 'Orders Loaded Check'
+  description: 'Emails only if yesterday orders have not loaded.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Email · nhi.ty@holistics.io
+    - Condition: the latest order date is earlier than yesterday
+    - Attachment: None
+    - Schedule: Daily 7:00 AM UTC (cron 0 7 * * *)
+
+    ## Definitions
+    - Yesterday = the day before the run date. Loaded = the latest order date is yesterday or later.
+
+    ## Steps
+    1. Get the latest order date in the dataset.
+    2. Decide: if the latest order date is yesterday or later, send nothing and say the orders loaded. Otherwise continue.
+    3. Write the result with `write_ai_task_result`: say which day is missing.
+    4. Email it to nhi.ty@holistics.io.
+  ;;
+  acceptance_criteria: @md
+    States whether yesterday's orders loaded, with the latest order date.
+    Sends an email only when they did not.
+  ;;
+}

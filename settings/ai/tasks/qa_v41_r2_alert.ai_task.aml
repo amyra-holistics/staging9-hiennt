@@ -1,0 +1,27 @@
+AiTask qa_v41_r2_alert {
+  label: 'Category Revenue Drop Alert nhity-test'
+  description: 'Posts to Slack when a category falls 20 percent or more week over week.'
+  brief: @md
+    ## At a glance
+    - Source: @Dataset:ecommerce_official
+    - Sends to: Slack · #nhity-test
+    - Condition: Any category's revenue falls 20% or more week over week; a zero previous week never qualifies
+    - Attachment: Viz · PNG
+    - Schedule: Mondays 9:00 AM UTC (cron 0 9 * * 1)
+
+    ## Definitions
+    - Last week = the most recent complete Monday–Sunday week. Previous week = the week before it.
+    - "A lot" = a drop of 20% or more.
+
+    ## Steps
+    1. Get revenue by product category for last week and the previous week.
+    2. Decide: if no category fell 20% or more, send nothing and say so. Otherwise continue.
+    3. Chart the categories that fell, as bars, and export it as PNG.
+    4. Write the result with `write_ai_task_result`.
+    5. Post it to Slack #nhity-test with the PNG attached.
+  ;;
+  acceptance_criteria: @md
+    Names every category that fell 20% or more, with its change.
+    Sends nothing when no category qualifies.
+  ;;
+}

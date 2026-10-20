@@ -1,0 +1,38 @@
+Skill write_ai_task_result {
+  label: 'Write an AI task result'
+  description: "Use at the start of a scheduled AI task run to write its result for email, Slack or the run record, when the task's brief sets no result format. Skip it when the brief says how the result should look (a table, bullet points, a tone). Not for creating or changing a task, or one-off answers in chat."
+  invocation: 'auto'
+  content: @md
+    # Write an AI task result
+
+    This sets the default layout of a run's result only. Write one result in the brief's language, using only what the run produced. Never add a number or fact the run didn't return. If the brief sets a format, follow it and ignore this skill.
+
+    Draft in Markdown (`**bold**`, `- ` lists, `> ` quote, `_italic_`), never headings, tables or nested lists. Convert for each send:
+    - **Email:** HTML (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), never `style`.
+    - **Slack:** `*bold*`, never `**`, and `• ` for `- `.
+    - **Kept in Holistics:** the Markdown as written.
+
+    ## Layout
+
+    1. **Headline**, at most 25 words: the main finding or answer, with its size or count when there is one.
+    2. **Key points**, 3–6 lines (`- `), the most important first. Each line leads with a bold label, then the finding.
+    3. **Details**, optional, one short paragraph or up to 4 bullets: a second driver, an offset, an exception, or what's worth a look.
+    4. **Footer**, after a blank line, all italic: `_Data as of <latest date> · Period: <the period covered> · Source: <data or scope>_`. Leave out any part the run didn't have (a conversation review has no "Data as of").
+
+    ## Metric results (optional variant)
+
+    Only when the result is about numbers (a digest or an alert), use these lines instead of free key points:
+    - Digest line: `- **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>`.
+    - Alert line: `- **<group>** <value> (<↑/↓ change> · <change amount>)`, biggest change first, up to 8, then "and <n> more".
+    - An alert may end with one `> ` line: the total and the groups that didn't fire.
+    - Changes use ↑/↓; money ≥1,000 as K/M; whole percent changes; "New this <period>" for a missing prior value.
+
+    ## Style
+
+    - For numeric changes, state where something changed, never why: no "due to", "caused by", "driven by".
+    - No outside facts, "significant" or "unusual" unless the run flagged it.
+    - Length: about 110 words, the footer aside.
+
+    Before sending, check every number and date it contains against the run's results.
+  ;;
+}

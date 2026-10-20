@@ -1,0 +1,42 @@
+Skill write_ai_task_result {
+  label: 'Write an AI task result'
+  description: "Use at the start of a scheduled AI task run, and in a preview of its first result, to write the result for email, Slack or the run record when the brief sets no format. Typical phrasings: none. It loads from the task's run, or from the preview in create_ai_task. Do not use when the brief says how the result should look, for creating or changing a task, or for one-off answers in chat."
+  invocation: 'auto'
+  content: @md
+    # Write an AI task result
+
+    Write one result in the brief's language, from what the run produced. Add no number or fact the run did not return. If the brief sets a format, follow it and skip this skill.
+
+    ## Draft the result
+
+    Draft in Markdown (`**bold**`, `- `, `> `, `_italic_`), no headings, tables or nested lists.
+
+    1. **Headline:** the main finding, at most 25 words, with its size or count.
+    2. **Key points:** 3–6 lines (`- `), most important first, each led by a bold label.
+    3. **Details** (optional): one short paragraph or up to 4 bullets: a second driver, an offset, an exception, what to look at.
+    4. **Footer:** after a blank line, italic: `_Data as of <latest date> · Period: <period covered> · Source: <data or scope>_`. Source is the dataset's label ("Ecommerce Official"), never an `@Dataset:` id. "Data as of" is the latest date in the data, not the period's end. Drop any part the run lacks.
+
+    Keep it to about 110 words, footer aside.
+
+    ## Draft numeric results
+
+    For a digest or alert, use these lines instead of key points:
+
+    - Digest: `- **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>`.
+    - Alert: `- **<group>** <value> (<↑/↓ change> · <change amount>)`, biggest change first, up to 8, then "and <n> more". It may end with one `> ` line: the total and the groups that did not fire.
+    - Use ↑/↓ for changes, K/M for money ≥1,000, whole percents, "New this <period>" when the prior value is missing.
+
+    ## Keep to the facts
+
+    - Say where a number changed, never why: no "due to", "caused by", "driven by".
+    - Add no outside facts. No "significant" or "unusual" unless the run flagged it.
+
+    ## Convert and send
+
+    - **Email:** HTML (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), no `style`.
+    - **Slack:** `*bold*`, never `**`, `• ` for `- `.
+    - **Kept in Holistics:** Markdown as written.
+
+    Use the brief's subject word for word, with real dates in digits ("Mar 4 – 10"). Check every number and date against the run's results before sending.
+  ;;
+}

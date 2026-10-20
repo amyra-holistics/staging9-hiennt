@@ -20,6 +20,7 @@ Skill create_ai_task {
     - Use `ask_user` cards: business words, at most 15 words, three choices, best first, marked "(recommended)". Ask related points together, Where last.
     - Vague words always get a card, in edits too: "a lot", "big", "worst", "unusual", "top", "best", "sales" (as a measure), "how we did", "the team", "regularly", "soon", "morning" without a time. Skip the card when the user gave the number or choice. Show today's numbers in an option when they help.
     - Add no scope the user did not ask for.
+    - A comparison period sets the schedule: "week over week" runs weekly, "day over day" daily. Ask only the day and time, never the cadence.
     - Cron is UTC. Convert the user's timezone and say the time in their words.
 
     Examples:
@@ -68,6 +69,7 @@ Skill create_ai_task {
     ```
 
     - Use 3–6 steps. Renumber, merge or drop. Add none the user did not ask for.
+    - Always keep the write step, so the result layout applies at run time.
     - Keep a dictated format (table, bullets, tone) in the write step. If none, do not describe a layout.
     - Write acceptance criteria as plain lines, no "▢".
 

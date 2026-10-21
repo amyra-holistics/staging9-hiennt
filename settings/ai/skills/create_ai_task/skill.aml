@@ -10,19 +10,26 @@ Skill create_ai_task {
 
     ## Decide if it is a task
 
-    - A request that repeats ("every", "weekly") or watches ("whenever", "let me know if") is a task, for any kind of work, even a plain dashboard send. Do not ask whether to make one.
-    - A one-off job, however large, is answered in chat.
+    - **Task:** any work that repeats ("every", "weekly") or watches ("whenever", "let me know if"), even a plain dashboard send. Do not ask whether to make one.
+    - **Not a task:** a one-off job. Answer it in chat.
 
-    ## Resolve the unclear
+    ## Settle what the task needs
 
-    - Ask only what the request leaves open: what the task does, when it runs, where the result goes. If something is missing, ask. Do not guess.
-    - Never ask for the label, description, acceptance criteria or brief. Generate them.
-    - Use `ask_user` cards: business words, at most 15 words, three choices, best first, marked "(recommended)". Ask related points together, Where last.
-    - Ask about any word that would change the result, in a new task or an edit, unless the user gave the number or choice: "a lot", "top", "unusual", "sales" (as a measure), "morning" without a time. Show today's numbers in an option when they help.
-    - Add no scope the user did not ask for.
-    - Find the data yourself in the project's datasets. Ask only when more than one fits, and offer the candidates.
-    - Infer what the request already implies ("week over week" means a weekly schedule). Ask only what is still open.
-    - Cron is UTC. Convert the user's timezone and say the time in their words.
+    A task needs these. Ask for any the request leaves open. Do not guess.
+
+    - **What it does:** the work, and what it reads.
+    - **When it runs:** how often, which day, what time. For an alert, how often to check.
+    - **Where the result goes:** email, Slack or kept in Holistics.
+    - **Condition:** alerts only, such as "a drop of 20% or more".
+
+    Never ask for the label, description, brief or acceptance criteria. Generate them. For email or Slack, `add_ai_task_delivery` settles the recipients and the attachment.
+
+    ## Ask with cards
+
+    - **Cards:** `ask_user`, business words, at most 15 words, three choices, best first, marked "(recommended)". Ask where the result goes last.
+    - **Vague words:** ask about any word that changes the result, in a new task or an edit, unless the user gave the number or choice: "a lot", "top", "unusual", "sales" (as a measure), "morning" without a time. Show today's numbers in an option when they help.
+    - **Already answered:** skip a question the request answers. "Week over week" means weekly, so ask only the day and time.
+    - **Scope:** add nothing the user did not ask for.
 
     Examples:
 
@@ -32,33 +39,43 @@ Skill create_ai_task {
     > User: "every Friday, review all AI conversations"
     > Card: none. Scope, schedule and destination can be settled, or asked once.
 
+    ## Find the data
+
+    - Search every folder level for datasets. Pick the one whose fields fit and whose data is recent.
+    - Not a dataset task? Name the source: "All AI conversations", "Dashboards in this project".
+    - Ask only when two fit about equally. Offer them as options, with their latest dates.
+
     ## Route the result
 
-    - An email address, a Slack channel or "email me" (`${H.current_user.h_email}`) is settled.
-    - Otherwise ask "Where should the result go?": "Send to email", "Send to Slack channel", "Keep it in Holistics". For an alert or a send, offer only email and Slack.
-    - For email or Slack, load `add_ai_task_delivery`. On an edit, load it only when the destination or attachment changes.
+    - **Settled:** an email address, a Slack channel or "email me" (`${H.current_user.h_email}`).
+    - **Otherwise ask** "Where should the result go?": "Send to email", "Send to Slack channel", "Keep it in Holistics". For an alert or a send, offer only email and Slack.
+    - **Email or Slack:** load `add_ai_task_delivery`. On an edit, only when the destination or attachment changes.
 
     ## Change an existing task
 
-    - A named task with "update", "edit" or "change" is edited: read its file, change only what was asked, keep every other line. Update every place the change shows up, in the task file and in `schedules.aml`.
-    - A recalled or open task the user did not name, that looks like this request, gets one card: "Change <label>" or "Create a new task". Offer "Change" only when you found its file. Never copy wording from another task.
+    - **Named task** ("update", "edit", "change"): read its file, change only what was asked, keep every other line. Update every place the change shows up, in the task file and in `schedules.aml`.
+    - **Look-alike task** the user did not name: ask one card, "Change <label>" or "Create a new task". Offer "Change" only when you found its file. Never copy wording from another task.
 
     ## Write the brief
 
-    The brief is what the run agent reads, in plain words. Leave the layout to the run agent. Cover:
+    The brief is what the run agent reads, in plain words. Leave the layout to it. Cover:
 
-    - The source and the steps to take (3–6, none the user did not ask for), including the previous period when comparing.
-    - Each period in words, no dates: "Last week" = the most recent complete Monday–Sunday week.
-    - Each clarified vague word with its answer: "A lot" = a drop of 20% or more.
-    - The condition, for an alert. Grouping, top N or metric only when asked or picked.
-    - The write step: the user's dictated format (table, bullets, tone) if given, else `write_ai_task_result`. Always keep it, so the result layout applies at run time.
-    - Delivery, as `add_ai_task_delivery` writes it.
+    - **Steps:** the source, then 3–6 steps the user asked for. Include the previous period when comparing.
+    - **Periods:** in words, no dates. "Last week" = the most recent complete Monday–Sunday week.
+    - **Vague words:** each with its answer. "A lot" = a drop of 20% or more.
+    - **Condition:** alerts only. Grouping, top N or metric only when asked or picked.
+    - **Write step:** the user's format (table, bullets, tone) if given, else `write_ai_task_result`. Always keep it, so the result layout applies at run time.
+    - **Delivery:** as `add_ai_task_delivery` writes it.
 
-    Write acceptance criteria as plain lines, no "▢".
+    Acceptance criteria are plain lines, no "▢".
 
     ## Save the task
 
-    Save the task as `settings/ai/tasks/<name>.ai_task.aml` (name = label in snake_case, unique in a folder listing) and add one `AiSchedule` entry to `schedules.aml`: cron in UTC, `run_as` = `${H.current_user.h_email}`, `targets` = the task. Confirm the field syntax with the AML editor schema help. No `'` in the label or description. The description says what the task does, never when it runs. An edit changes the files in place.
+    - **Task file:** `settings/ai/tasks/<name>.ai_task.aml`, name = label in snake_case, unique in a folder listing.
+    - **Schedule:** one `AiSchedule` entry in `schedules.aml`: cron in UTC, `run_as` = `${H.current_user.h_email}`, `targets` = the task.
+    - **Syntax:** confirm fields with the AML editor schema help. No `'` in the label or description.
+    - **Description:** what the task does, never when it runs.
+    - **Edits:** change the files in place.
 
     ## Report the draft
 
@@ -99,24 +116,31 @@ Skill create_ai_task {
     [Change the acceptance criteria](#opt)
     ````
 
-    - "Preview" and "Change the acceptance criteria" always show. An "instead" button shows only when it applies.
-    - Keep the empty header row and each icon (🗄️, never 🗂️). Criteria are "▢ " paragraphs, never a list. One `artifact` block per saved file.
+    - **Buttons:** "Preview" and "Change the acceptance criteria" always show. An "instead" button shows only when it applies.
+    - **Table:** keep the empty header row and each icon (🗄️, never 🗂️).
+    - **Criteria:** "▢ " paragraphs, never a list.
+    - **Files:** one `artifact` block per saved file.
     - **📨 Delivery, 📎 Attachment:** as `add_ai_task_delivery` writes them.
-    - **🔔 Condition:** a row after Delivery, alerts only, the rule in plain words.
-    - **"Attach <next-best> instead":** as `add_ai_task_delivery` names it. **Other "instead" button** ("Run at <time> instead", "Use <label> instead"): only for a pick made without a card.
+    - **🔔 Condition:** alerts only, a row after Delivery, the rule in plain words.
+    - **"Attach <next-best> instead":** as `add_ai_task_delivery` names it.
+    - **Other "instead" button** ("Run at <time> instead", "Use <label> instead"): only for a pick made without a card.
 
     ## Preview the first result
 
-    Run the data and write steps once, in chat, on the latest data. Show the full `write_ai_task_result` layout (load it, never a short summary) and the brief's chart, even when the attachment is a PNG. Skip the attachment export and the send. For an alert, say whether it would fire. Send and save nothing.
+    Run the data and write steps once, in chat, on the latest data.
+
+    - **Show:** the full `write_ai_task_result` layout (load it, never a short summary) and the brief's chart, even when the attachment is a PNG.
+    - **Skip:** the attachment export and the send. Send and save nothing.
+    - **Alerts:** say whether it would fire.
 
     ## Report the update
 
     After a change, reply with only this: the draft line, what changed, the changed files.
 
-    - **Bold** only the words this change added.
-    - Rows: `~~<old>~~ → <new>`, with the draft report's icons. No table when no row changed.
-    - Criteria: `▢ ~~<old>~~ → <new>`. Added ones are new "▢ " lines, removed ones `▢ ~~<old>~~`.
-    - Add the "Attach <next-best> instead" button when the change added or switched the attachment.
+    - **Bold:** only the words this change added.
+    - **Rows:** `~~<old>~~ → <new>`, with the draft report's icons. No table when no row changed.
+    - **Criteria:** `▢ ~~<old>~~ → <new>`. Added ones are new "▢ " lines, removed ones `▢ ~~<old>~~`.
+    - **Button:** "Attach <next-best> instead" when the change added or switched the attachment.
 
     ````
     ## ✅ Task updated

@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create or change an AI task'
-  description: "Use when the user wants AI work that repeats or watches for something, such as a recurring report or digest, an alert, a regular review of AI conversations, or a data or workspace check. Also use to change this chat's draft or a named task. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations”, “update my revenue alert to 9 AM”. A recurring request is an AI task by default, even one that only sends a dashboard. Do not use for a one-off answer in chat, a send right now, or AI Blocks."
+  description: "Use when the user wants to create or update an AI task to automate repetitive workflows or monitor conditions (such as threshold checks, data presence, or missing values), with optional delivery to Slack or email via `add_ai_task_delivery`. Do not use for one-off requests or results answered directly in chat."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md

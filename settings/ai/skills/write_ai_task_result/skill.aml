@@ -1,18 +1,11 @@
 Skill write_ai_task_result {
   label: 'Write AI task result'
-  description: "Use to auto-format results during a scheduled AI task run or preview the AI task's result in a chat, but only when the original brief specifies no format. Do not use for one-off chat answers, task creation/editing, or if the brief already dictates a format. (Sending is handled by `deliver_ai_task_result`)."
+  description: "Use in an AI task run, or its preview, to write the result when the brief gives no output template. Do not use for one-off chat answers or for creating or editing a task. Sending is handled by `deliver_ai_task_result`."
   invocation: 'auto'
   content: @md
     # Write an AI task result
 
-    Write a single result in the brief's language using exclusively the provided run data. Do not add external facts or numbers. If the brief already specifies a format, abort this skill and follow the brief.
-
-    A result breaks down into four components:
-
-    - **Headline:** The main finding, including its exact size or count.
-    - **Key Points:** The top insights, formatted as bullet points with **bold** lead-in labels.
-    - **Details (Optional):** Secondary drivers, offsets, exceptions, or specific areas to monitor.
-    - **Footer:** Data timestamp, period covered, and data source.
+    Write one result in the brief's language from the run data only. If the brief gives an output template, follow it instead. Build the content first, then format it for its destination.
 
     ## Write the result
 
@@ -63,20 +56,18 @@ Skill write_ai_task_result {
 
     **Template Rules:**
 
-    - **Alert Order:** Sort by largest magnitude of change first. Limit to exactly 8 individual lines. If more exist, append a line stating "and `<n>` more".
-    - **Summary Line:** The alert may conclude with a single blockquote (`>`) stating the overall total and listing any groups that did not trigger the alert.
+    - **Alert Order:** Sort by largest magnitude of change first. Show at most 8 lines; if more exist, append "and `<n>` more". The alert may end with one blockquote (`>`) stating the overall total and the groups that did not trigger.
     - **Number Formatting:** Use `↑` and `↓` arrows for all changes. Round all percentages to whole numbers (no decimals). Abbreviate currency values of 1,000 or greater using `K` or `M`.
     - **Missing Baselines:** If prior comparison data is unavailable, output the exact phrase "New this `<period>`".
 
     ## Keep to the facts
 
-    - Descriptive only. Do not infer causality. (BANNED: "due to", "caused by", "driven by").
-    - 100% objective. Exclude all external knowledge and unflagged editorializing (e.g., "significant", "unusual").
-    - Exact match required. Verify every generated integer, decimal, and date against the raw run data before returning the result.
+    - Describe, never explain why: no "due to", "caused by", "driven by". No outside facts; no "significant" or "unusual" unless the run flagged it.
+    - Check every number and date against the run data before returning the result.
 
     ## Format for the destination
 
-    Apply syntax strictly based on the target destination (delivery is handled externally by `deliver_ai_task_result`).
+    Apply syntax strictly based on the target destination (delivery is handled by `deliver_ai_task_result`).
 
     - **Email:** Use plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`). Do not use inline CSS or `<style>` tags.
     - **Slack:** Use Slack-specific markdown. For bold, use `*bold*` (NEVER `**`). For bullets, use `•` (NEVER `-`).

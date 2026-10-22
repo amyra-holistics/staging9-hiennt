@@ -6,38 +6,26 @@ Skill create_ai_task {
   content: @md
     # Create an AI task
 
-    Create or modify an AI task `ai_task.aml` file and manage their associated execution schedules in `schedules.aml`.
-
-    An AI task typically breaks down into six foundational components:
-
-    - **Name:** The task's unique identifier (e.g., `revenue_weekly_insight`), used in schedules and slash commands.
-    - **Label:** The display name shown in the AI Tasks management page.
-    - **Description:** A short summary of what the task does, helping teammates browse and manage tasks.
-    - **Brief:** What the task does. It can reference target dashboards or datasets and invoke AI Skills to guide execution.
-    - **Schedule:** When the task runs (e.g., every Monday at 8 AM, 1st of every month)
-    - **Acceptance Criteria:** What a successful output looks like.
+    Create or update an AI task in `settings/ai/tasks/<name>.ai_task.aml` and its `AiSchedule` in `schedules.aml`. Keep the description, brief, acceptance criteria and schedule consistent.
 
     ## Capture intent
 
-    ### Compose an AI task
+    - Every task requires a clearly defined brief and schedule. If either is missing, vague, or ambiguous (e.g., "a lot", "top", "unusual", "bad", unqualified metrics like "sales", or unanchored times like "morning"), do not guess or assume. Ask one `ask_user` card: professional, 15 words max, relevant options (the card adds its own free-text choice), `(recommended)` on the best one.
 
-    An AI task requires at least two mandatory inputs:
-
-    - Every task requires a clearly defined brief and schedule. If either is missing, vague, or ambiguous (e.g., "a lot", "top", "unusual", "bad", unqualified metrics like "sales", or unanchored times like "morning"), do not guess or assume. Trigger an `ask_user` card to request clarification with the following requirements:
-      - **Tone:** Professional business language
-      - **Question Length:** 15 words maximum
-      - **Choices:** Relevant options. The card adds its own free-text choice.
-      - **Recommendation:** Append `(recommended)` to the optimal choice
-
-      Examples:
+      Example:
 
       > User: "ping #sales if any region drops a lot"
       > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
-    - Autonomously generate the task's label, description, and acceptance criteria using available context whenever omitted by the user. Do not prompt the user for these fields.
+    - Generate the task's label, description, and acceptance criteria yourself whenever the user omits them. Do not ask for these fields.
 
-    ### Write the brief
+    ## Modify an AI task
 
-    The brief is the task's only instruction at run time. Each run reads the brief alone, without this chat, so anything left out of it does not happen, and acceptance criteria are checked against what it asks for. A vague brief gives results that change from run to run and criteria that cannot be checked. Write it in plain words and cover:
+    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`, including the `description`, brief, acceptance criteria and `cron` (a new time replaces every mention of the old one). After every edit, even a one-field change, reply with the "On task update" template.
+    - If the user asks to update an AI task without mentioning `@` it explicitly, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
+
+    ## Write the brief
+
+    The brief is the run's only instruction: each run reads it alone, without this chat, and acceptance criteria are checked against it. Write it in plain words and cover:
 
     - **Source:** Find the data yourself: search every folder level of the project for datasets and pick the one whose fields fit and whose data is recent. Ask only when two fit about equally.
     - **Steps:** What to compute or check, in order, and nothing the user did not ask for. Include the previous period when comparing.
@@ -46,30 +34,19 @@ Skill create_ai_task {
     - **Write step:** The user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
     - **Delivery (last):** When the task delivers, the send steps as `deliver_ai_task_result` writes them, after the write step.
 
-    ### Delivery routing rules
+    ## Delivery
 
-    An AI task can be created with or without a delivery configuration.
-
-    - If the user explicitly requests delivering results via Slack or email (e.g., "send", "alert", "notify") or asks to edit destinations or attachments, then invoke `deliver_ai_task_result` and require specific destinations and recipients.
-    - Otherwise, trigger an `ask_user` card before writing `ai_task.aml` to ask "Would you like to deliver results via Slack or email?" with options "Slack", "Email", and "Do not deliver". Selecting "Do not deliver" finalizes `ai_task.aml` without delivery.
-
-    ### Modify an AI task
-
-    Existing AI tasks can be modified.
-
-    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`, including the `description`, brief, acceptance criteria and `cron` (a new time replaces every mention of the old one). After every edit, even a one-field change, reply with the "On task update" template.
-    - If the user asks to update an AI task without mentioning `@` it explicitly, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
+    - If the user asks to send, alert or notify via Slack or email, or to change destinations or attachments, use `deliver_ai_task_result`.
+    - Otherwise, before writing `ai_task.aml`, ask "Would you like to deliver results via Slack or email?" with options "Slack", "Email", and "Do not deliver". "Do not deliver" saves the task without delivery.
 
     ## Save an AI task
 
-    An AI task is successfully drafted when the execution logic and schedule are synchronized across both required files:
-
-    - **Write `ai_task.aml`:** Create or modify `settings/ai/tasks/<name>.ai_task.aml` based on the request. The `<name>` must be the task label converted to `snake_case` and must be unique within the directory.
+    - **Write `ai_task.aml`:** Create or modify `settings/ai/tasks/<name>.ai_task.aml`. The `<name>` is the task label in `snake_case`, unique within the directory.
     - **Write `schedules.aml`:** Add one corresponding `AiSchedule` entry configuring:
       - `cron`: Formatted in UTC.
       - `run_as`: `${H.current_user.h_email}`.
       - `targets`: The specific task file reference.
-    - **Syntax constraints:** Strictly adhere to the AML editor schema. Wrap `label` and `description` in double quotes, e.g. `label: "Weekly Category Revenue"`. Never use single quotes (`'`) around or inside them.
+    - **Quotes:** Wrap `label` and `description` in double quotes, e.g. `label: "Weekly Category Revenue"`. Never use single quotes (`'`) around or inside them.
 
     ## Report an AI task
 
@@ -154,10 +131,6 @@ Skill create_ai_task {
 
     ## Preview an AI task run
 
-    When the user requests to preview an AI task, run the data and write steps exactly once in the chat using the latest data:
-
-    - **Show:** Render the full `write_ai_task_result` layout (do not provide a shortened summary) and include the brief's chart, even if the attachment is configured as a PNG.
-    - **Skip:** Do not export attachments, send messages, or save any data.
-    - **Alerts:** Explicitly state whether the alert condition would have fired.
+    When the user asks for a preview, run the data and write steps once in the chat with the latest data. Show the full `write_ai_task_result` layout (not a shortened summary) and the brief's chart, even if the attachment is a PNG. Export, send and save nothing. For an alert, say whether the condition would have fired.
   ;;
 }

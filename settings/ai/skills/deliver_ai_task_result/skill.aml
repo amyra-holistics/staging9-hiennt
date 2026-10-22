@@ -6,7 +6,7 @@ Skill deliver_ai_task_result {
   content: @md
     # Deliver an AI task result
 
-    Settle who gets the result, what comes with it and when it is sent, then write the send steps into the brief as its last steps. Runs send on their own: add no disclaimer.
+    Settle where the result goes, what comes with it, and when it is sent; then write the send steps into the brief as its last steps. Runs send on their own: add no disclaimer.
 
     Delivery breaks down into four components:
 
@@ -17,32 +17,39 @@ Skill deliver_ai_task_result {
 
     ## Capture delivery
 
-    Ask with `ask_user` cards that follow `create_ai_task`'s card requirements (professional tone, 15 words maximum, relevant options; the card adds its own free-text choice).
-
     ### Destination
 
-    - An email address, a Slack channel or "email me" (`${H.current_user.h_email}`) is settled.
-    - For a group, ask "Which email addresses? Type them."
-    - For Slack, ask "Which Slack channel? Type its exact name." If none is named, ask again or offer email. Never borrow a channel from another task.
-    - Several destinations are fine. Write each.
-    - Give no recommendation on these cards.
+    - Where the result goes must be explicitly and clearly stated (e.g., email addresses, Slack channels, or "email me" mapping to `${H.current_user.h_email}`).
+    - Multiple destinations are permitted; record every specified destination.
+    - If the destination is missing, vague, or ambiguous, trigger an `ask_user` card following `create_ai_task`'s requirements (professional tone, max 15 words, relevant options; the card automatically appends a free-text choice).
+
+      Example:
+
+      > If Slack is requested but the channel is missing
+      > Card: *"Which Slack channel? Type its exact name."*
+
+      > If a group is requested without specifics
+      > Card: *"Which email addresses? Type them."*
 
     ### Attachment
 
-    Whenever the result is sent, ask one card: "What should come with the result?" Skip it only when the user named an attachment or said none.
+    - Include an attachment if the user explicitly requests one (e.g., "attach a dashboard", "with a chart", "as a PDF"). If unspecified, trigger an `ask_user` card asking: *"What should come with the result?"* Provide these exact options: `"A chart of the result (recommended)"`, `"The <name> dashboard"`, or `"No attachment"`.
+    - Save the best runner-up option as an alternative button in the draft report (e.g., `[Attach the <name> dashboard instead](#opt)` or `[Attach a chart instead](#opt)`). Do not display an "instead" button if "No attachment" is selected.
 
-    - **Options:** "A chart of the result (recommended)", "The <name> dashboard", "No attachment".
-    - **Dashboard:** search the task's data (`*.page.aml`, every folder level) and name the best match. If none fits, offer "A dashboard (tell me which)".
-    - **File type:** a named type ("as a PDF") is settled.
-    - **Instead button:** keep the best pick of the other kind for the draft report: "Attach the <name> dashboard instead" or "Attach a chart instead". No button when nothing is attached.
+    ### Delivery Types & Conditions
 
-    ### Condition
+    - **Scheduled Delivery:** Sends the result every time the defined schedule occurs.
+    - **Conditional Delivery (Alerts):** Sends the result only when specific conditions are met (e.g., crossing a threshold, or detecting present/missing data).
 
-    For an alert, write the rule in plain words as exclusive branches that each name their destinations. If the rule is vague ("a lot", "unusual"), ask a card with a `(recommended)` choice, as in `create_ai_task`. The condition never writes the message.
+    **Condition Rules (Alerts Only)**
 
-    ## Write it into the brief
+    - Write the rule in plain words as exclusive branches that clearly name their target destinations.
+    - If the user's rule is vague (e.g., "a lot", "unusual"), trigger an `ask_user` card to offer a quantifiable, recommended choice (following `create_ai_task` constraints).
+    - The condition logic is strictly for evaluation; it must *never* dictate or write the actual message content.
 
-    Add these lines to the brief after the write step, so they are always the last steps. Replace `<...>` with the actual values.
+    ## Save a delivery
+
+    Append these lines to the brief so they are always the absolute final steps (strictly after the write step). Replace `<...>` with actual values.
 
     ````
     Delivery: Email · nhi.ty@holistics.io; Slack · #sales-alerts
@@ -54,12 +61,15 @@ Skill deliver_ai_task_result {
 
     **Template Rules:**
 
-    - **Delivery:** Each destination as "Email · <address>" or "Slack · #<channel>", joined by "; ".
-    - **Attachment:** "None", "Viz · PNG", "Dashboard · <name> · PNG" or the named file type.
-    - **Condition:** Only for alerts. Omit the line otherwise.
-    - **Subject:** Email "<task label> · <period dates>" with dates in digits ("Mar 4 – 10"); none for a task without a period. Slack "<task label>". Never "Last Week" for the dates.
-    - **Send:** Always after the write step, never before it.
-    - **Acceptance criteria:** Add one only when the destination or condition changes what a run must produce.
+    - **Delivery:** Format each destination as `"Email · <address>"` or `"Slack · #<channel>"`. Join multiple targets with `"; "`.
+    - **Attachment:** Use `"None"`, `"Viz · PNG"`, `"Dashboard · <name> · PNG"`, or the explicitly named file type.
+    - **Condition:** Include this line *only* for alerts/conditional deliveries. Omit it entirely otherwise.
+    - **Subject:**
+      - Email: `"<task label> · <period dates>"` with dates in digits (e.g., "Mar 4 – 10"). Omit dates entirely for tasks without a time period.
+      - Slack: `"<task label>"`.
+      - *Strict Rule:* Never use relative phrases like "Last Week" for dates.
+    - **Send:** Must always execute *after* the write step, never before.
+    - **Acceptance Criteria:** Add a new criterion only if the destination or condition alters what the run must produce.
 
     ## Report back
 

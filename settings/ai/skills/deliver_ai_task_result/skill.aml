@@ -1,6 +1,6 @@
 Skill deliver_ai_task_result {
   label: 'Deliver AI task result'
-  description: "Use when an AI task's result goes by email or to Slack, for a new task, this chat's draft or a named task. Settles the destination, attachment, condition and subject, and writes the send steps into the brief. Typical phrasings: “email me the summary every Friday”, “post it in #sales-alerts”, “attach the chart”. Loaded by `create_ai_task` for any email or Slack destination. Do not use for a send right now, or for a result that stays in Holistics."
+  description: "Use when the user wants to deliver an AI task's result as an email or a Slack message. Typical phrasings: 'email me the summary every Friday', 'post it in #sales-alerts', 'attach the chart', 'ping #sales if any region drops 20%'. Do not trigger for a one-off export or send request."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md

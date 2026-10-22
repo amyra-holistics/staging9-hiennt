@@ -6,7 +6,7 @@ Skill create_ai_task {
   content: @md
     # Create an AI task
 
-    Create or modify an AI task `ai_task.aml` file and manage its execution schedule in `schedules.aml`. Do not run the task or send anything while drafting.
+    Create or modify an AI task `ai_task.aml` file and manage their associated execution schedules in `schedules.aml`. Do not run the task or send anything while drafting.
 
     An AI task typically breaks down into six foundational components:
 
@@ -15,7 +15,7 @@ Skill create_ai_task {
     - **Description:** A short summary of what the task does, helping teammates browse and manage tasks.
     - **Brief:** What the task does. It can reference target dashboards or datasets and invoke AI Skills to guide execution.
     - **Schedule:** When the task runs (e.g., every Monday at 8 AM, 1st of every month), in UTC.
-    - **Acceptance criteria:** What a successful output looks like.
+    - **Acceptance Criteria:** What a successful output looks like.
 
     ## Capture intent
 
@@ -27,11 +27,11 @@ Skill create_ai_task {
 
     - Every task requires a clearly defined brief and schedule. If either is missing, vague, or ambiguous (e.g., "a lot", "top", "unusual", "bad", unqualified metrics like "sales", or unanchored times like "morning"), do not guess or assume. Trigger an `ask_user` card to request clarification with the following requirements:
       - **Tone:** Professional business language
-      - **Question length:** 15 words maximum
+      - **Question Length:** 15 words maximum
       - **Choices:** Relevant options. The card adds its own free-text choice.
       - **Recommendation:** Append `(recommended)` to the optimal choice
 
-      Example:
+      Examples:
 
       > User: "ping #sales if any region drops a lot"
       > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
@@ -43,15 +43,15 @@ Skill create_ai_task {
 
     An AI task can be created with or without a delivery configuration.
 
-    - If the user explicitly requests delivering results via Slack or email (e.g., "send", "alert", "notify") or asks to edit destinations or attachments, load `add_ai_task_delivery` and require specific destinations and recipients.
+    - If the user explicitly requests delivering results via Slack or email (e.g., "send", "alert", "notify") or asks to edit destinations or attachments, then invoke `add_ai_task_delivery` and require specific destinations and recipients.
     - Otherwise, trigger an `ask_user` card before writing `ai_task.aml` to ask "Would you like to deliver results via Slack or email?" with options "Slack", "Email", and "Do not deliver". Selecting "Do not deliver" finalizes `ai_task.aml` without delivery.
 
     ### Modify an AI task
 
     Existing AI tasks can be modified.
 
-    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. Update every occurrence in both the task file and `schedules.aml`.
-    - If the user asks to update an AI task without @-mentioning it, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
+    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`.
+    - If the user asks to update an AI task without mentioning `@` it explicitly, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
 
     ## Save an AI task
 
@@ -62,7 +62,7 @@ Skill create_ai_task {
       - `cron`: Formatted in UTC.
       - `run_as`: `${H.current_user.h_email}`.
       - `targets`: The specific task file reference.
-    - **Syntax constraints:** Strictly adhere to the AML editor schema. Single quotes (`'`) are prohibited in the `label` and `description` fields.
+    - **Syntax constraints:** Strictly adhere to the AML editor schema. Single quotes (`'`) are strictly prohibited in the `label` and `description` fields.
 
     ## Report an AI task
 
@@ -102,11 +102,11 @@ Skill create_ai_task {
     [<Conditional "instead" buttons>](#opt)
     ````
 
-    **Template rules:**
+    **Template Rules:**
 
     - **Table:** Preserve the empty header row (`| | |`).
     - **Acceptance criteria:** Use "▢ " for criteria, no markdown lists.
-    - **Follow-up buttons:** Always show "Preview" and "Change the acceptance criteria". Only display "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) if a default was picked without an `ask_user` card.
+    - **Follow-up Buttons:** Always show "Preview" and "Change the acceptance criteria". Only display "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) if a default was picked without an `ask_user` card.
 
     ### On task update
 
@@ -130,7 +130,7 @@ Skill create_ai_task {
     ```
     ````
 
-    **Template rules:**
+    **Template Rules:**
 
     - **Table:** Omit the table if no table rows changed.
     - **Acceptance criteria:** Show additions as new `▢ <new>` lines and removals as `▢ ~~<old>~~`.

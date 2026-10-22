@@ -1,6 +1,6 @@
 Skill create_ai_task {
   label: 'Create AI task'
-  description: "Use when the user wants to create or update an AI task to automate repetitive workflows or monitor conditions (such as threshold checks, data presence, or missing values), with optional delivery to Slack or email via skill `add_ai_task_delivery`. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations”, “update my revenue alert to 9 AM”. Do not use for one-off requests or results answered directly in chat."
+  description: "Use when the user wants to create or update an AI task to automate repetitive workflows or monitor conditions (such as threshold checks, data presence, or missing values), with optional delivery to Slack or email via skill `deliver_ai_task_result`. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations”, “update my revenue alert to 9 AM”. Do not use for one-off requests or results answered directly in chat."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
@@ -43,14 +43,14 @@ Skill create_ai_task {
     - **Steps:** What to compute or check, in order, and nothing the user did not ask for. Include the previous period when comparing.
     - **Definitions:** Each period in words ("last week" = the most recent complete Monday–Sunday week) and each clarified vague word with its answer ("a lot" = a drop of 20% or more). Times in workspace time.
     - **Condition:** For an alert, the rule that decides whether a result is sent.
-    - **Delivery:** As `add_ai_task_delivery` writes it, when the task delivers.
-    - **Last step:** The user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
+    - **Write step:** The user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
+    - **Delivery (last):** When the task delivers, the send steps as `deliver_ai_task_result` writes them, after the write step.
 
     ### Delivery routing rules
 
     An AI task can be created with or without a delivery configuration.
 
-    - If the user explicitly requests delivering results via Slack or email (e.g., "send", "alert", "notify") or asks to edit destinations or attachments, then invoke `add_ai_task_delivery` and require specific destinations and recipients.
+    - If the user explicitly requests delivering results via Slack or email (e.g., "send", "alert", "notify") or asks to edit destinations or attachments, then invoke `deliver_ai_task_result` and require specific destinations and recipients.
     - Otherwise, trigger an `ask_user` card before writing `ai_task.aml` to ask "Would you like to deliver results via Slack or email?" with options "Slack", "Email", and "Do not deliver". Selecting "Do not deliver" finalizes `ai_task.aml` without delivery.
 
     ### Modify an AI task
@@ -86,10 +86,10 @@ Skill create_ai_task {
     |---|---|
     | 🗄️ Source | <@Dataset:<name> · <label>, or "All AI conversations"> |
     | 🗓️ Schedule | <e.g., Mondays 9:00 AM> (workspace time) |
-    | 📨 Delivery | <output from add_ai_task_delivery, or "None (kept in the run record)"> |
+    | 📨 Delivery | <output from deliver_ai_task_result, or "None (kept in the run record)"> |
     | 🔔 Condition | <Include row ONLY for alerts: state rule in plain words> |
     | 📝 Brief | <One sentence; bold the metric, period, threshold and destination, e.g. Email **revenue by category** for **last week** to **you**> |
-    | 📎 Attachment | <output from add_ai_task_delivery, or "None"> |
+    | 📎 Attachment | <output from deliver_ai_task_result, or "None"> |
 
     Runs as you (<run_as>): it sees the data you can see.
 

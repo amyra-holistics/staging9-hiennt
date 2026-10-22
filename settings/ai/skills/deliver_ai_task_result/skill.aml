@@ -1,0 +1,73 @@
+Skill deliver_ai_task_result {
+  label: 'Deliver AI task result'
+  description: "Use when an AI task's result goes by email or to Slack, for a new task, this chat's draft or a named task. Settles the destination, attachment, condition and subject, and writes the send steps into the brief. Typical phrasings: “email me the summary every Friday”, “post it in #sales-alerts”, “attach the chart”. Loaded by `create_ai_task` for any email or Slack destination. Do not use for a send right now, or for a result that stays in Holistics."
+  invocation: 'auto'
+  disabled: H.git.is_production
+  content: @md
+    # Deliver an AI task result
+
+    Settle who gets the result, what comes with it and when it is sent, then write the send steps into the brief as its last steps. Runs send on their own: add no disclaimer.
+
+    Delivery breaks down into four components:
+
+    - **Destination:** Where the result goes (email addresses, Slack channels).
+    - **Attachment:** What comes with the result (a chart, a dashboard, a file type, or nothing).
+    - **Condition:** For alerts only, the rule that decides whether a result is sent.
+    - **Subject:** The message title, word for word.
+
+    ## Capture delivery
+
+    Ask with `ask_user` cards that follow `create_ai_task`'s card requirements (professional tone, 15 words maximum, relevant options; the card adds its own free-text choice).
+
+    ### Destination
+
+    - An email address, a Slack channel or "email me" (`${H.current_user.h_email}`) is settled.
+    - For a group, ask "Which email addresses? Type them."
+    - For Slack, ask "Which Slack channel? Type its exact name." If none is named, ask again or offer email. Never borrow a channel from another task.
+    - Several destinations are fine. Write each.
+    - Give no recommendation on these cards.
+
+    ### Attachment
+
+    Whenever the result is sent, ask one card: "What should come with the result?" Skip it only when the user named an attachment or said none.
+
+    - **Options:** "A chart of the result (recommended)", "The <name> dashboard", "No attachment".
+    - **Dashboard:** search the task's data (`*.page.aml`, every folder level) and name the best match. If none fits, offer "A dashboard (tell me which)".
+    - **File type:** a named type ("as a PDF") is settled.
+    - **Instead button:** keep the best pick of the other kind for the draft report: "Attach the <name> dashboard instead" or "Attach a chart instead". No button when nothing is attached.
+
+    ### Condition
+
+    For an alert, write the rule in plain words as exclusive branches that each name their destinations. If the rule is vague ("a lot", "unusual"), ask a card with a `(recommended)` choice, as in `create_ai_task`. The condition never writes the message.
+
+    ## Write it into the brief
+
+    Add these lines to the brief after the write step, so they are always the last steps. Replace `<...>` with the actual values.
+
+    ````
+    Delivery: Email · nhi.ty@holistics.io; Slack · #sales-alerts
+    Attachment: Viz · PNG
+    Condition: Send only when a category's revenue drops 20% or more versus the previous week; otherwise send nothing.
+    Subject: Weekly Revenue by Category · <period dates>
+    Send: After the result is written with write_ai_task_result, export the attachment as PNG and send one message per destination with it.
+    ````
+
+    **Template Rules:**
+
+    - **Delivery:** Each destination as "Email · <address>" or "Slack · #<channel>", joined by "; ".
+    - **Attachment:** "None", "Viz · PNG", "Dashboard · <name> · PNG" or the named file type.
+    - **Condition:** Only for alerts. Omit the line otherwise.
+    - **Subject:** Email "<task label> · <period dates>" with dates in digits ("Mar 4 – 10"); none for a task without a period. Slack "<task label>". Never "Last Week" for the dates.
+    - **Send:** Always after the write step, never before it.
+    - **Acceptance criteria:** Add one only when the destination or condition changes what a run must produce.
+
+    ## Report back
+
+    `create_ai_task` shows these values in its draft report:
+
+    - **📨 Delivery:** the Delivery line, e.g. "Email · nhi.ty@holistics.io".
+    - **📎 Attachment:** the Attachment line, e.g. "Viz · PNG".
+    - **🔔 Condition:** the condition in plain words, for alerts only.
+    - **Follow-up:** the "instead" button, when one was kept.
+  ;;
+}

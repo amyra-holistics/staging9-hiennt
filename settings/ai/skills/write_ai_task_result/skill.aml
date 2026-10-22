@@ -1,42 +1,84 @@
 Skill write_ai_task_result {
-  label: 'Write an AI task result'
-  description: "Use at the start of a scheduled AI task run, and in a preview of its first result, to write the result for email, Slack or the run record when the brief sets no format. Typical phrasings: none. It loads from the task's run, or from the preview in create_ai_task. Do not use when the brief says how the result should look, for creating or changing a task, or for one-off answers in chat."
+  label: 'Write AI task result'
+  description: "Use in a scheduled AI task run, and in a preview of its first result, to write the result when the brief sets no format. Writes and formats the message; the brief's send steps from `deliver_ai_task_result` send it. Typical phrasings: none. It loads from the task's run, or from the preview in `create_ai_task`. Do not use when the brief sets the format, for creating or changing a task, or for one-off answers in chat."
   invocation: 'auto'
   content: @md
     # Write an AI task result
 
     Write one result in the brief's language, from what the run produced. Add no number or fact the run did not return. If the brief sets a format, follow it and skip this skill.
 
-    ## Draft the result
+    A result breaks down into four components:
 
-    Draft in Markdown (`**bold**`, `- `, `> `, `_italic_`), no headings, tables or nested lists.
+    - **Headline:** The main finding, with its size or count.
+    - **Key points:** The most important lines, each led by a bold label.
+    - **Details:** Optional: a second driver, an offset, an exception, what to look at.
+    - **Footer:** When the data is from, the period, and the source.
 
-    1. **Headline:** the main finding, at most 25 words, with its size or count.
-    2. **Key points:** 3–6 lines (`- `), most important first, each led by a bold label.
-    3. **Details** (optional): one short paragraph or up to 4 bullets: a second driver, an offset, an exception, what to look at.
-    4. **Footer:** after a blank line, italic: `_Data as of <latest date> · Period: <period covered> · Source: <data or scope>_`. Source is the dataset's label ("Ecommerce Official"), never an `@Dataset:` id. "Data as of" is the latest date in the data, not the period's end. Drop any part the run lacks.
+    ## Write the result
 
-    Keep it to about 110 words, footer aside.
+    Write in Markdown with this template. Replace `<...>` with the actual values.
 
-    ## Draft numeric results
+    ````
+    <Headline: the main finding with its number>
 
-    For a digest or alert, use these lines instead of key points:
+    - **<Label>** <point>
+    - **<Label>** <point>
+    - **<Label>** <point>
 
-    - Digest: `- **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>`.
-    - Alert: `- **<group>** <value> (<↑/↓ change> · <change amount>)`, biggest change first, up to 8, then "and <n> more". It may end with one `> ` line: the total and the groups that did not fire.
-    - Use ↑/↓ for changes, K/M for money ≥1,000, whole percents, "New this <period>" when the prior value is missing.
+    <Optional details: one short paragraph or up to 4 bullets>
+
+    _Data as of <latest date> · Period: <period covered> · Source: <dataset label or scope>_
+    ````
+
+    Example:
+
+    ````
+    Revenue fell **18%** to **$412K** last week, led by Electronics.
+
+    - **Electronics** $42.1K · **↓ 23%** vs previous week
+    - **Home** $88.4K · **↑ 4%** vs previous week
+    - **Fashion** $61.0K · **↓ 9%** vs previous week
+
+    _Data as of Oct 19 · Period: Oct 13 – 19 · Source: Ecommerce Official_
+    ````
+
+    **Template Rules:**
+
+    - **Headline:** At most 25 words, with its size or count.
+    - **Key points:** 3–6 lines (`- `), most important first, each led by a bold label.
+    - **Length:** About 110 words, footer aside.
+    - **Markdown:** `**bold**`, `- `, `> `, `_italic_` only. No headings, tables or nested lists.
+    - **Footer:** Source is the dataset's label ("Ecommerce Official"), never an `@Dataset:` id. "Data as of" is the latest date in the data, not the period's end. Drop any part the run lacks.
+
+    ## Write numeric results
+
+    For a digest or an alert, use these lines instead of key points:
+
+    ````
+    Digest: - **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>
+    Alert:  - **<group>** <value> (<↑/↓ change> · <change amount>)
+    ````
+
+    Example alert line: `- **Electronics** $42.1K (↓ 23% · −$12.6K)`
+
+    **Template Rules:**
+
+    - **Alert order:** Biggest change first, up to 8 lines, then "and <n> more". It may end with one `> ` line: the total and the groups that did not fire.
+    - **Numbers:** ↑/↓ for changes, K/M for money of 1,000 or more, whole percents, "New this <period>" when the prior value is missing.
 
     ## Keep to the facts
 
     - Say where a number changed, never why: no "due to", "caused by", "driven by".
     - Add no outside facts. No "significant" or "unusual" unless the run flagged it.
+    - Check every number and date against the run's results before handing the result on.
 
-    ## Convert and send
+    ## Format for the destination
+
+    Format the written result for where it goes. The brief's send steps from `deliver_ai_task_result` send it.
 
     - **Email:** HTML (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), no `style`.
-    - **Slack:** `*bold*`, never `**`, `• ` for `- `.
+    - **Slack:** `*bold*`, never `**`, and `• ` for `- `.
     - **Kept in Holistics:** Markdown as written.
-
-    Use the brief's subject word for word, with real dates in digits ("Mar 4 – 10"). Check every number and date against the run's results before sending.
+    - **Subject:** Use the brief's subject word for word, with real dates in digits ("Mar 4 – 10").
   ;;
 }

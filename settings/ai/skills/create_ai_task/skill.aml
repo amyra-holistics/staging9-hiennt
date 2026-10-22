@@ -17,21 +17,21 @@ Skill create_ai_task {
 
     - Generate an omitted label, description, or acceptance criteria from available context; do not prompt for them.
     - For an explicit Slack/email delivery request, or a change to destinations or attachments, invoke `add_ai_task_delivery` and require precise destinations and recipients. Otherwise, before writing `ai_task.aml`, ask: "Would you like to deliver results via Slack or email?" Offer "Slack", "Email", and "Do not deliver"; the last option saves without delivery.
-    - When updating a task from this session, read its file first, change only what was requested, and synchronize every occurrence in the task file and `schedules.aml`. Without an explicit `@` task reference, ask whether to update an existing task (only if its file exists) or create a new one; never infer the target.
+    - When updating a task from this session, read its file first, change only what was requested, and synchronize every occurrence in the task file and `schedules.aml`, including the `description`, brief, acceptance criteria and `cron` (a new time replaces every mention of the old one). Without an explicit `@` task reference, ask whether to update an existing task (only if its file exists) or create a new one; never infer the target.
 
     ## Save
 
     Keep task logic and its schedule synchronized:
 
     - **Task:** Create or modify `settings/ai/tasks/<name>.ai_task.aml`; `<name>` is the unique `snake_case` task label.
-    - **Schedule:** Add one `AiSchedule` with a UTC `cron` converted from workspace time (ask for the workspace timezone once if unknown), `run_as: ${H.current_user.h_email}`, and the specific task-file `targets` reference.
+    - **Schedule:** Add one `AiSchedule` with a UTC `cron` converted from workspace time (ask for the workspace timezone once if unknown, offering the likely workspace timezone first, not UTC), `run_as: ${H.current_user.h_email}`, and the specific task-file `targets` reference.
     - **Syntax:** Follow the AML editor schema; never use single quotes (`'`) in `label` or `description`.
 
     ## Reply after saving
 
     ### On task creation
 
-    After saving a new task, use this exact template and replace `<...>` with actual values.
+    After saving a new task, reply with only this template, starting at `## ✅`, and replace `<...>` with actual values.
 
     ````
     ## ✅ Draft created: <label>
@@ -65,7 +65,7 @@ Skill create_ai_task {
     [<Conditional "instead" buttons>](#opt)
     ````
 
-    **Rules:** Preserve the empty table header (`| | |`); use `▢ ` rather than markdown lists for criteria; always show "Preview" and "Change the acceptance criteria". Show an "instead" button only when a default was selected without an `ask_user` card.
+    **Rules:** Preserve the empty table header (`| | |`); write Schedule as `<days> <time> (workspace time)`, never UTC or cron; write the Brief row as one sentence with key values in **bold** (metric, period, threshold, destination), e.g. "Email **revenue by category** for **last week**, ranked by revenue."; use `▢ ` rather than markdown lists for criteria; always show "Preview" and "Change the acceptance criteria". Show an "instead" button only when a default was selected without an `ask_user` card.
 
     ### On task update
 
@@ -107,7 +107,7 @@ Skill create_ai_task {
     - **Source:** Search project folders and choose the best-fitting, most-recent dataset; ask only if two fit equally well.
     - **Steps:** List the requested computations or checks in order; add none.
     - **Definitions:** Define periods (for example, "last week" = most recent Monday–Sunday), quantify vague terms, and use workspace time.
-    - **Last step:** Use the requested format, or `write_ai_task_result` when none is specified.
+    - **Last step:** End the brief with a final step that writes the result with `write_ai_task_result`. Only when the user asked for a specific format, describe that format instead.
 
     ## Preview an AI task run
 

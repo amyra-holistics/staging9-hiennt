@@ -57,7 +57,7 @@ Skill create_ai_task {
 
     Existing AI tasks can be modified.
 
-    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`.
+    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`, including the `description`, brief, acceptance criteria and `cron` (a new time replaces every mention of the old one). After every edit, even a one-field change, reply with the "On task update" template.
     - If the user asks to update an AI task without mentioning `@` it explicitly, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
 
     ## Save an AI task
@@ -69,13 +69,13 @@ Skill create_ai_task {
       - `cron`: Formatted in UTC.
       - `run_as`: `${H.current_user.h_email}`.
       - `targets`: The specific task file reference.
-    - **Syntax constraints:** Strictly adhere to the AML editor schema. Single quotes (`'`) are strictly prohibited in the `label` and `description` fields.
+    - **Syntax constraints:** Strictly adhere to the AML editor schema. Wrap `label` and `description` in double quotes, e.g. `label: "Weekly Category Revenue"`. Never use single quotes (`'`) around or inside them.
 
     ## Report an AI task
 
     ### On task creation
 
-    After saving a new task, reply with this exact template. Replace `<...>` with the actual values.
+    After saving a new task, reply with only this exact template, starting at `## ✅`. Write nothing before it, and no progress notes between tool calls. Replace `<...>` with the actual values.
 
     ````
     ## ✅ Draft created: <label>
@@ -88,7 +88,7 @@ Skill create_ai_task {
     | 🗓️ Schedule | <e.g., Mondays 9:00 AM> (workspace time) |
     | 📨 Delivery | <output from add_ai_task_delivery, or "None (kept in the run record)"> |
     | 🔔 Condition | <Include row ONLY for alerts: state rule in plain words> |
-    | 📝 Brief | <One sentence, **key values in bold**> |
+    | 📝 Brief | <One sentence; bold the metric, period, threshold and destination, e.g. Email **revenue by category** for **last week** to **you**> |
     | 📎 Attachment | <output from add_ai_task_delivery, or "None"> |
 
     Runs as you (<run_as>): it sees the data you can see.
@@ -112,6 +112,7 @@ Skill create_ai_task {
     **Template Rules:**
 
     - **Table:** Preserve the empty header row (`| | |`).
+    - **Brief row:** Bold the key values (metric, period, threshold, destination), as in the example.
     - **Acceptance criteria:** Use "▢ " for criteria, no markdown lists.
     - **Follow-up Buttons:** Always show "Preview" and "Change the acceptance criteria". Only display "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) if a default was picked without an `ask_user` card.
 

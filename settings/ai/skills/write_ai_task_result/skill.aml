@@ -1,18 +1,18 @@
 Skill write_ai_task_result {
   label: 'Write AI task result'
-  description: "Use in a scheduled AI task run, and in a preview of its first result, to write the result when the brief sets no format. Writes and formats the message; the brief's send steps from `deliver_ai_task_result` send it. Typical phrasings: none. It loads from the task's run, or from the preview in `create_ai_task`. Do not use when the brief sets the format, for creating or changing a task, or for one-off answers in chat."
+  description: "Use to auto-format results during a scheduled AI task run or preview the AI task's result in a chat, but only when the original brief specifies no format. Do not use for one-off chat answers, task creation/editing, or if the brief already dictates a format. (Sending is handled by `deliver_ai_task_result`)."
   invocation: 'auto'
   content: @md
     # Write an AI task result
 
-    Write one result in the brief's language, from what the run produced. Add no number or fact the run did not return. If the brief sets a format, follow it and skip this skill.
+    Write a single result in the brief's language using exclusively the provided run data. Do not add external facts or numbers. If the brief already specifies a format, abort this skill and follow the brief.
 
     A result breaks down into four components:
 
-    - **Headline:** The main finding, with its size or count.
-    - **Key points:** The most important lines, each led by a bold label.
-    - **Details:** Optional: a second driver, an offset, an exception, what to look at.
-    - **Footer:** When the data is from, the period, and the source.
+    - **Headline:** The main finding, including its exact size or count.
+    - **Key Points:** The top insights, formatted as bullet points with **bold** lead-in labels.
+    - **Details (Optional):** Secondary drivers, offsets, exceptions, or specific areas to monitor.
+    - **Footer:** Data timestamp, period covered, and data source.
 
     ## Write the result
 
@@ -35,20 +35,20 @@ Skill write_ai_task_result {
     ````
     Revenue fell **18%** to **$412K** last week, led by Electronics.
 
-    - **Electronics** $42.1K · **↓ 23%** vs previous week
-    - **Home** $88.4K · **↑ 4%** vs previous week
-    - **Fashion** $61.0K · **↓ 9%** vs previous week
+    - **Electronics** $42.1K (↓ 23%) vs previous week
+    - **Home** $88.4K (↑ 4%) vs previous week
+    - **Fashion** $61.0K (↓ 9%) vs previous week
 
     _Data as of Oct 19 · Period: Oct 13 – 19 · Source: Ecommerce Official_
     ````
 
     **Template Rules:**
 
-    - **Headline:** At most 25 words, with its size or count.
-    - **Key points:** 3–6 lines (`- `), most important first, each led by a bold label.
-    - **Length:** About 110 words, footer aside.
-    - **Markdown:** `**bold**`, `- `, `> `, `_italic_` only. No headings, tables or nested lists.
-    - **Footer:** Source is the dataset's label ("Ecommerce Official"), never an `@Dataset:` id. "Data as of" is the latest date in the data, not the period's end. Drop any part the run lacks.
+    - **Headline:** Max 25 words. Must include the primary size or count.
+    - **Key Points:** 3 to 6 bulleted lines (`- `). Start each with a **bold** label.
+    - **Length:** Target ~110 words total (excluding the footer).
+    - **Allowed Markdown:** Only use `**bold**`, `_italic_`, `- ` (bullets), and `>` (blockquotes). Do not use headings, tables, or nested lists.
+    - **Footer:** Use the human-readable dataset label for the Source (e.g., "Ecommerce Official"), NEVER the `@Dataset: id`. "Data as of" MUST be the most recent timestamp present in the data, not the period's end date. Omit any footer elements missing from the run data.
 
     ## Write numeric results
 
@@ -63,22 +63,23 @@ Skill write_ai_task_result {
 
     **Template Rules:**
 
-    - **Alert order:** Biggest change first, up to 8 lines, then "and <n> more". It may end with one `> ` line: the total and the groups that did not fire.
-    - **Numbers:** ↑/↓ for changes, K/M for money of 1,000 or more, whole percents, "New this <period>" when the prior value is missing.
+    - **Alert Order:** Sort by largest magnitude of change first. Limit to exactly 8 individual lines. If more exist, append a line stating "and `<n>` more".
+    - **Summary Line:** The alert may conclude with a single blockquote (`>`) stating the overall total and listing any groups that did not trigger the alert.
+    - **Number Formatting:** Use `↑` and `↓` arrows for all changes. Round all percentages to whole numbers (no decimals). Abbreviate currency values of 1,000 or greater using `K` or `M`.
+    - **Missing Baselines:** If prior comparison data is unavailable, output the exact phrase "New this `<period>`".
 
     ## Keep to the facts
 
-    - Say where a number changed, never why: no "due to", "caused by", "driven by".
-    - Add no outside facts. No "significant" or "unusual" unless the run flagged it.
-    - Check every number and date against the run's results before handing the result on.
+    - Descriptive only. Do not infer causality. (BANNED: "due to", "caused by", "driven by").
+    - 100% objective. Exclude all external knowledge and unflagged editorializing (e.g., "significant", "unusual").
+    - Exact match required. Verify every generated integer, decimal, and date against the raw run data before returning the result.
 
     ## Format for the destination
 
-    Format the written result for where it goes. The brief's send steps from `deliver_ai_task_result` send it.
+    Apply syntax strictly based on the target destination (delivery is handled externally by `deliver_ai_task_result`).
 
-    - **Email:** HTML (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), no `style`.
-    - **Slack:** `*bold*`, never `**`, and `• ` for `- `.
-    - **Kept in Holistics:** Markdown as written.
-    - **Subject:** Use the brief's subject word for word, with real dates in digits ("Mar 4 – 10").
+    - **Email:** Use plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`). Do not use inline CSS or `<style>` tags.
+    - **Slack:** Use Slack-specific markdown. For bold, use `*bold*` (NEVER `**`). For bullets, use `•` (NEVER `-`).
+    - **Subject Line:** Replicate the brief's subject exact string; inject actual resolved dates using digits (e.g., "Mar 4 – 10").
   ;;
 }

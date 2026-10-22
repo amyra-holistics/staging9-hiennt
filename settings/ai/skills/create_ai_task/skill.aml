@@ -14,14 +14,12 @@ Skill create_ai_task {
     - **Label:** The display name shown in the AI Tasks management page.
     - **Description:** A short summary of what the task does, helping teammates browse and manage tasks.
     - **Brief:** What the task does. It can reference target dashboards or datasets and invoke AI Skills to guide execution.
-    - **Schedule:** When the task runs (e.g., every Monday at 8 AM, 1st of every month), in UTC.
+    - **Schedule:** When the task runs (e.g., every Monday at 8 AM, 1st of every month). The user gives times in workspace time; cron stores them in UTC.
     - **Acceptance Criteria:** What a successful output looks like.
 
     ## Capture intent
 
     ### Compose an AI task
-
-    A one-off request is not a task: answer it in chat.
 
     An AI task requires at least two mandatory inputs:
 
@@ -35,9 +33,18 @@ Skill create_ai_task {
 
       > User: "ping #sales if any region drops a lot"
       > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
-    - Find the data yourself: search every folder level of the project for datasets and pick the one whose fields fit and whose data is recent. Ask only when two fit about equally.
     - Autonomously generate the task's label, description, and acceptance criteria using available context whenever omitted by the user. Do not prompt the user for these fields.
-    - End the brief with a write step: the user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
+
+    ### Write the brief
+
+    The brief is the task's only instruction at run time. Each run reads the brief alone, without this chat, so anything left out of it does not happen, and acceptance criteria are checked against what it asks for. A vague brief gives results that change from run to run and criteria that cannot be checked. Write it in plain words and cover:
+
+    - **Source:** Find the data yourself: search every folder level of the project for datasets and pick the one whose fields fit and whose data is recent. Ask only when two fit about equally.
+    - **Steps:** What to compute or check, in order, and nothing the user did not ask for. Include the previous period when comparing.
+    - **Definitions:** Each period in words ("last week" = the most recent complete Monday–Sunday week) and each clarified vague word with its answer ("a lot" = a drop of 20% or more). Times in workspace time.
+    - **Condition:** For an alert, the rule that decides whether a result is sent.
+    - **Delivery:** As `add_ai_task_delivery` writes it, when the task delivers.
+    - **Last step:** The user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
 
     ### Delivery routing rules
 
@@ -59,7 +66,7 @@ Skill create_ai_task {
 
     - **Write `ai_task.aml`:** Create or modify `settings/ai/tasks/<name>.ai_task.aml` based on the request. The `<name>` must be the task label converted to `snake_case` and must be unique within the directory.
     - **Write `schedules.aml`:** Add one corresponding `AiSchedule` entry configuring:
-      - `cron`: Formatted in UTC.
+      - `cron`: Formatted in UTC. Convert the user's workspace time to UTC; if you cannot tell the workspace timezone, ask once.
       - `run_as`: `${H.current_user.h_email}`.
       - `targets`: The specific task file reference.
     - **Syntax constraints:** Strictly adhere to the AML editor schema. Single quotes (`'`) are strictly prohibited in the `label` and `description` fields.
@@ -78,7 +85,7 @@ Skill create_ai_task {
     | | |
     |---|---|
     | 🗄️ Source | <@Dataset:<name> · <label>, or "All AI conversations"> |
-    | 🗓️ Schedule | <e.g., Mondays 9:00 AM> UTC |
+    | 🗓️ Schedule | <e.g., Mondays 9:00 AM> (workspace time) |
     | 📨 Delivery | <output from add_ai_task_delivery, or "None (kept in the run record)"> |
     | 🔔 Condition | <Include row ONLY for alerts: state rule in plain words> |
     | 📝 Brief | <One sentence, **key values in bold**> |

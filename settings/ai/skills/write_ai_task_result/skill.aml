@@ -64,6 +64,7 @@ Skill write_ai_task_result {
 
     - Explain why only when the brief asks for it and the run's analysis shows it (e.g., a driver breakdown of which segments moved the total). Otherwise describe what changed: a reason not found in the run data is a guess the reader may act on. No outside facts; no "significant" or "unusual" unless the run flagged it.
     - Check every number and date against the run data before returning the result.
+    - Do not add notes on how to read the numbers (e.g., "these are contributions, not causes"): the reader wants the findings, and such caveats belong in the brief, not the message.
 
     ## Format for the destination
 

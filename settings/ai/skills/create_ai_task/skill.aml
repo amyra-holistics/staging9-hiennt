@@ -17,6 +17,8 @@ Skill create_ai_task {
       > User: "ping #sales if any region drops a lot"
       > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
     - Generate the task's label, description, and acceptance criteria yourself whenever the user omits them. Do not ask for these fields.
+    - Never ask which timezone: every schedule runs in the workspace timezone.
+    - If the user asks for a single run (e.g., "run it once tomorrow"), explain that an AI task runs on a repeating schedule and offer Preview to see the result now. Never write a one-time cron.
 
     ## Modify an AI task
 
@@ -43,7 +45,7 @@ Skill create_ai_task {
 
     - **Write `ai_task.aml`:** Create or modify `settings/ai/tasks/<name>.ai_task.aml`. The `<name>` is the task label in `snake_case`, unique within the directory.
     - **Write `schedules.aml`:** Add one corresponding `AiSchedule` entry configuring:
-      - `cron`: Formatted in UTC.
+      - `cron`: The user's clock time as written, in the workspace timezone. Never convert to or from UTC, e.g. "Mondays at 9 AM" = `0 9 * * 1`.
       - `run_as`: `${H.current_user.h_email}`.
       - `targets`: The specific task file reference.
     - **Quotes:** Wrap `label` and `description` in double quotes, e.g. `label: "Weekly Category Revenue"`. Never use single quotes (`'`) around or inside them.

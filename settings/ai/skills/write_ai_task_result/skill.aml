@@ -62,7 +62,7 @@ Skill write_ai_task_result {
 
     ## Keep to the facts
 
-    - Describe, never explain why: no "due to", "caused by", "driven by". No outside facts; no "significant" or "unusual" unless the run flagged it.
+    - Explain why only when the brief asks for it and the run's analysis shows it (e.g., a driver breakdown of which segments moved the total). Otherwise describe what changed: a reason not found in the run data is a guess the reader may act on. No outside facts; no "significant" or "unusual" unless the run flagged it.
     - Check every number and date against the run data before returning the result.
 
     ## Format for the destination

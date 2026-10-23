@@ -13,7 +13,7 @@ Skill deliver_ai_task_result {
     ### Destination
 
     - Record only destinations the user explicitly states: email addresses, Slack channels, or "email me" (`${H.current_user.h_email}`).
-    - Multiple destinations are permitted; record every one.
+    - Multiple destinations are permitted; record every single one.
     - If the destination is missing, vague, or ambiguous, ask an `ask_user` card as in `create_ai_task`.
 
     ### Attachment
@@ -25,7 +25,7 @@ Skill deliver_ai_task_result {
 
     - Write the rule in plain words as exclusive branches that clearly name their target destinations.
     - If the user's rule is vague (e.g., "a lot", "unusual"), ask a card with a quantifiable, recommended choice, as in `create_ai_task`.
-    - The condition only decides whether to send; it must *never* dictate or write the message content.
+    - The condition only decides whether to send. Do not dictate or write the message content.
 
     ## Save a delivery
 
@@ -48,7 +48,7 @@ Skill deliver_ai_task_result {
       - Email: `"<task label> · <period dates>"` with dates in digits (e.g., "Mar 4 – 10"). Omit dates entirely for tasks without a time period.
       - Slack: `"<task label>"`.
       - *Strict Rule:* Never use relative phrases like "Last Week" for dates.
-    - **Send:** Must always execute *after* the write step, never before.
-    - **Acceptance Criteria:** Add a new criterion only if the destination or condition alters what the run must produce.
+    - **Send:** Always execute *after* the write step, never before.
+    - **Acceptance Criteria:** Add a new criterion only if the destination or condition alters what the run has to produce.
   ;;
 }

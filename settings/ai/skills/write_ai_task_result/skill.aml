@@ -40,8 +40,8 @@ Skill write_ai_task_result {
     - **Headline:** Max 25 words. Must include the primary size or count.
     - **Key Points:** 3 to 6 bulleted lines (`- `). Start each with a **bold** label.
     - **Length:** Target ~110 words total (excluding the footer).
-    - **Allowed Markdown:** Only use `**bold**`, `_italic_`, `- ` (bullets), and `>` (blockquotes). Do not use headings, tables, or nested lists.
-    - **Footer:** Use the human-readable dataset label for the Source (e.g., "Ecommerce Official"), NEVER the `@Dataset: id`. "Data as of" MUST be the most recent timestamp present in the data, not the period's end date. Omit any footer elements missing from the run data.
+    - **Markdown:** `**bold**`, `_italic_`, `- ` and `>` only. The text is converted for email and Slack, and headings, tables and nested lists break in Slack.
+    - **Footer:** Source is the dataset's label ("Ecommerce Official"), not the `@Dataset` id, which means nothing to the reader. "Data as of" is the latest timestamp in the data, not the period's end: it tells the reader how fresh the numbers are, and stale data should show it. Omit any footer elements missing from the run data.
 
     ## Write numeric results
 
@@ -58,7 +58,7 @@ Skill write_ai_task_result {
 
     - **Alert Order:** Sort by largest magnitude of change first. Show at most 8 lines; if more exist, append "and `<n>` more". The alert may end with one blockquote (`>`) stating the overall total and the groups that did not trigger.
     - **Number Formatting:** Use `↑` and `↓` arrows for all changes. Round all percentages to whole numbers (no decimals). Abbreviate currency values of 1,000 or greater using `K` or `M`.
-    - **Missing Baselines:** If prior comparison data is unavailable, output the exact phrase "New this `<period>`".
+    - **Missing Baselines:** If prior comparison data is unavailable, write "New this `<period>`" instead of a change, since there is nothing to compare against.
 
     ## Keep to the facts
 
@@ -71,6 +71,6 @@ Skill write_ai_task_result {
 
     - **Email:** Use plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`). Do not use inline CSS or `<style>` tags.
     - **Slack:** Use Slack-specific markdown. For bold, use `*bold*` (NEVER `**`). For bullets, use `•` (NEVER `-`).
-    - **Subject Line:** Replicate the brief's subject exact string; inject actual resolved dates using digits (e.g., "Mar 4 – 10").
+    - **Subject Line:** Use the brief's subject as written; inject actual resolved dates using digits (e.g., "Mar 4 – 10").
   ;;
 }

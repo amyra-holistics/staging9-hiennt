@@ -16,7 +16,7 @@ Skill create_ai_task {
 
       > User: "ping #sales if any region drops a lot"
       > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
-    - Generate the task's label, description, and acceptance criteria yourself whenever the user omits them. Do not ask for these fields.
+    - Generate the task's label, description, and acceptance criteria yourself whenever the user omits them. Do not proactively ask for these fields.
     - Never ask which timezone: every schedule runs in the workspace timezone.
     - If the user asks for a single run (e.g., "run it once tomorrow"), explain that an AI task runs on a repeating schedule and offer Preview to see the result now. Never write a one-time cron.
 
@@ -54,7 +54,7 @@ Skill create_ai_task {
 
     ### On task creation
 
-    After saving a new task, reply with only this exact template, starting at `## ✅`. Write nothing before it, and no progress notes between tool calls. Replace `<...>` with the actual values.
+    After saving a new task, reply with this template as the whole message, starting at `## ✅`. The user reads it as the task's summary card, and text before it pushes the card down and reads as noise. Replace `<...>` with the actual values.
 
     ````
     ## ✅ Draft created: <label>
@@ -66,7 +66,7 @@ Skill create_ai_task {
     | 🗄️ Source | <@Dataset:<name> · <label>, or "All AI conversations"> |
     | 🗓️ Schedule | <e.g., Mondays 9:00 AM> (workspace time) |
     | 📨 Delivery | <output from deliver_ai_task_result, or "None (kept in the run record)"> |
-    | 🔔 Condition | <Include row ONLY for alerts: state rule in plain words> |
+    | 🔔 Condition | <Include only for alerts: state rule in plain words> |
     | 📝 Brief | <One sentence; bold the metric, period, threshold and destination, e.g. Email **revenue by category** for **last week** to **you**> |
     | 📎 Attachment | <output from deliver_ai_task_result, or "None"> |
 
@@ -93,7 +93,7 @@ Skill create_ai_task {
     - **Table:** Preserve the empty header row (`| | |`).
     - **Brief row:** Bold the key values (metric, period, threshold, destination), as in the example.
     - **Acceptance criteria:** Use "▢ " for criteria, no markdown lists.
-    - **Follow-up Buttons:** Always show "Preview" and "Change the acceptance criteria". Only display "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) if a default was picked without an `ask_user` card.
+    - **Follow-up Buttons:** Always show "Preview" and "Change the acceptance criteria". Show "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) only for a default you picked without asking, so the user can undo a choice they never made.
 
     ### On task update
 

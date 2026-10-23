@@ -6,7 +6,7 @@ Skill deliver_ai_task_result {
   content: @md
     # Deliver an AI task result
 
-    Settle the destination, attachment, alert condition and subject, then append the send steps to the brief, after the write step. Runs send on their own: add no disclaimer.
+    Settle the destination, attachment, alert condition and subject, then append the send steps to the brief, after the write step. Runs send the result themselves, so never write that the result can't be or won't be sent, or that delivery is unavailable.
 
     ## Capture delivery
 

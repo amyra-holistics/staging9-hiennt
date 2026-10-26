@@ -1,0 +1,359 @@
+Dashboard superstore_sales_overview {
+  title: 'Superstore Sales Overview'
+  description: 'A sales monitoring dashboard for revenue, profitability, order activity, and performance drivers.'
+  theme: DynamicPageTheme {
+    light: classic_sales_light_theme
+    dark: classic_sales_dark_theme
+  }
+
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 360
+  }
+
+  block b_title: TextBlock {
+    content: @md
+      # Sales Performance
+      Monitor revenue, profit, demand, and the product and regional drivers behind them.
+    ;;
+  }
+
+  block f_order_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: superstore
+      field: r(superstore_csv.order_date)
+    }
+  }
+
+  block f_region: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: superstore
+      field: r(superstore_csv.region)
+    }
+  }
+
+  block f_segment: FilterBlock {
+    label: 'Customer Segment'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: superstore
+      field: r(superstore_csv.segment)
+    }
+  }
+
+  block c_period_comparison: PopBlock {
+    label: 'Compare To'
+  }
+
+  block v_revenue: VizBlock {
+    label: 'Revenue'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: superstore
+  value: VizFieldFull {
+    ref: r(superstore.revenue)
+    label: 'Total Revenue'
+    format {
+      type: 'number'
+      pattern: '[$$]#,###0.00'
+    }
+  }
+  settings {
+    display_mode: 'single'
+  }
+}
+  }
+
+  block v_profit: VizBlock {
+    label: 'Profit'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: superstore
+  calculation total_profit {
+    label: 'Total Profit'
+    formula: @aql superstore_csv | sum(superstore_csv.profit);;
+    calc_type: 'measure'
+    data_type: 'number'
+  }
+  value: VizFieldFull {
+    ref: 'total_profit'
+    label: 'Total Profit'
+    format {
+      type: 'number'
+      pattern: '[$$]#,###0.00'
+    }
+  }
+  settings {
+    display_mode: 'single'
+    alignment: 'center'
+  }
+}
+  }
+
+  block v_orders: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: superstore
+  value: VizFieldFull {
+    ref: r(superstore.count_order)
+    label: 'Order Count'
+    format {
+      type: 'number'
+      pattern: '#,###0'
+    }
+  }
+}
+  }
+
+  block v_customers: VizBlock {
+    label: 'Customers'
+    settings { hide_label: true }
+    viz: MetricKpi {
+  dataset: superstore
+  value: VizFieldFull {
+    ref: r(superstore.count_users)
+    label: 'Customer Count'
+    format {
+      type: 'number'
+      pattern: '#,###0'
+    }
+  }
+  settings {
+    display_mode: 'single'
+  }
+}
+  }
+
+  block h_trend: TextBlock {
+    content: @md ## Sales trend ;;
+  }
+
+  block v_monthly_performance: VizBlock {
+    label: 'Monthly Revenue and Profit'
+    viz: CombinationChart {
+  dataset: superstore
+  calculation total_profit {
+    label: 'Total Profit'
+    formula: @aql superstore_csv | sum(superstore_csv.profit);;
+    calc_type: 'measure'
+    data_type: 'number'
+  }
+  x_axis: VizFieldFull {
+    ref: r(superstore_csv.order_date)
+    label: 'Order Month'
+    transformation: 'datetrunc month'
+    format {
+      type: 'date'
+      pattern: 'LLL yyyy'
+    }
+  }
+  y_axis {
+    label: 'Revenue'
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: r(superstore.revenue)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+    settings {
+      alignment: 'left'
+    }
+  }
+  y_axis {
+    label: 'Profit'
+    series {
+      mark_type: 'line'
+      field: VizFieldFull {
+        ref: 'total_profit'
+        label: 'Total Profit'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+    settings {
+      alignment: 'right'
+    }
+  }
+  settings {
+    legend_label: 'bottom'
+    show_data_points: true
+    sort: LineFamilySort {
+      type: 'xaxis'
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  block h_drivers: TextBlock {
+    content: @md ## Performance drivers ;;
+  }
+
+  block v_revenue_region: VizBlock {
+    label: 'Revenue by Region'
+    viz: BarChart {
+  dataset: superstore
+  x_axis: VizFieldFull {
+    ref: r(superstore_csv.region)
+    label: 'Region'
+  }
+  y_axis {
+    series {
+      field: VizFieldFull {
+        ref: r(superstore.revenue)
+        label: 'Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+  }
+  settings {
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block v_revenue_category: VizBlock {
+    label: 'Revenue by Category'
+    viz: BarChart {
+  dataset: superstore
+  x_axis: VizFieldFull {
+    ref: r(superstore_csv.category)
+    label: 'Category'
+  }
+  y_axis {
+    series {
+      field: VizFieldFull {
+        ref: r(superstore.revenue)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+  }
+  settings {
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'desc'
+    }
+  }
+}
+  }
+
+  block h_profitability: TextBlock {
+    content: @md ## Product profitability ;;
+  }
+
+  block v_profit_subcategory: VizBlock {
+    label: 'Profit by Sub-Category'
+    viz: BarChart {
+  dataset: superstore
+  calculation total_profit {
+    label: 'Total Profit'
+    formula: @aql superstore_csv | sum(superstore_csv.profit);;
+    calc_type: 'measure'
+    data_type: 'number'
+  }
+  x_axis: VizFieldFull {
+    ref: r(superstore_csv.sub_category)
+    label: 'Sub-Category'
+  }
+  y_axis {
+    series {
+      field: VizFieldFull {
+        ref: 'total_profit'
+        label: 'Total Profit'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+    }
+  }
+  settings {
+    sort: LineFamilySort {
+      type: 'yaxis'
+      field_index: 0
+      direction: 'asc'
+    }
+  }
+}
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_order_date'
+      to: ['v_revenue', 'v_profit', 'v_orders', 'v_customers', 'v_monthly_performance', 'v_revenue_region', 'v_revenue_category', 'v_profit_subcategory']
+      field: r(superstore_csv.order_date)
+    },
+    FilterInteraction {
+      from: 'f_region'
+      to: ['v_revenue', 'v_profit', 'v_orders', 'v_customers', 'v_monthly_performance', 'v_revenue_region', 'v_revenue_category', 'v_profit_subcategory']
+      field: r(superstore_csv.region)
+    },
+    FilterInteraction {
+      from: 'f_segment'
+      to: ['v_revenue', 'v_profit', 'v_orders', 'v_customers', 'v_monthly_performance', 'v_revenue_region', 'v_revenue_category', 'v_profit_subcategory']
+      field: r(superstore_csv.segment)
+    },
+    PopInteraction {
+      from: 'c_period_comparison'
+      to: ['v_revenue', 'v_profit', 'v_orders', 'v_customers', 'v_monthly_performance']
+      field: r(superstore_csv.order_date)
+    }
+  ]
+
+  view: TabLayout {
+    tab overview: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 1620
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block b_title { position: pos(20, 20, 1180, 100) layer: 1 }
+      block f_order_date { position: pos(20, 140, 280, 80) layer: 1 }
+      block f_region { position: pos(320, 140, 280, 80) layer: 1 }
+      block f_segment { position: pos(620, 140, 280, 80) layer: 1 }
+      block c_period_comparison { position: pos(920, 140, 280, 80) layer: 1 }
+
+      block v_revenue { position: pos(20, 240, 280, 140) layer: 1 }
+      block v_profit { position: pos(320, 240, 280, 140) layer: 1 }
+      block v_orders { position: pos(620, 240, 280, 140) layer: 1 }
+      block v_customers { position: pos(920, 240, 280, 140) layer: 1 }
+
+      block h_trend { position: pos(20, 400, 1180, 50) layer: 1 }
+      block v_monthly_performance { position: pos(20, 460, 1180, 380) layer: 1 }
+
+      block h_drivers { position: pos(20, 860, 1180, 50) layer: 1 }
+      block v_revenue_region { position: pos(20, 920, 580, 340) layer: 1 }
+      block v_revenue_category { position: pos(620, 920, 580, 340) layer: 1 }
+
+      block h_profitability { position: pos(20, 1280, 1180, 50) layer: 1 }
+      block v_profit_subcategory { position: pos(20, 1340, 1180, 360) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

@@ -1,0 +1,178 @@
+const classic_sales_brand = {
+  primary: "oklch(0.38 0.10 250)"
+  secondary: "oklch(0.58 0.11 210)"
+  font_body: "Inter"
+  font_display: "Georgia"
+  corner_style: "sharp"
+  density: "comfortable"
+  elevation: "hairline"
+
+  background_light: "oklch(0.97 0.008 90)"
+  background_dark: "oklch(0.24 0.012 250)"
+  canvas_bg_light: "oklch(0.99 0.004 90)"
+  canvas_bg_dark: "oklch(0.28 0.012 250)"
+  block_bg_light: "oklch(1 0 0)"
+  block_bg_dark: "oklch(0.32 0.014 250)"
+  text_primary_light: "oklch(0.26 0.04 250)"
+  text_primary_dark: "oklch(0.94 0.01 250)"
+  text_muted_light: "oklch(0.42 0.025 250)"
+  text_muted_dark: "oklch(0.78 0.02 250)"
+  text_subtle_light: "oklch(0.56 0.018 250)"
+  text_subtle_dark: "oklch(0.65 0.02 250)"
+  border_light: "oklch(0.86 0.012 250)"
+  border_dark: "oklch(0.43 0.018 250)"
+  focus_ring_light: "oklch(0.58 0.13 250)"
+  focus_ring_dark: "oklch(0.70 0.12 250)"
+  semantic_success_light: "oklch(0.50 0.12 155)"
+  semantic_success_dark: "oklch(0.72 0.12 155)"
+  semantic_warning_light: "oklch(0.62 0.13 75)"
+  semantic_warning_dark: "oklch(0.78 0.12 75)"
+  semantic_danger_light: "oklch(0.52 0.16 25)"
+  semantic_danger_dark: "oklch(0.72 0.13 25)"
+}
+
+ColorPalette classic_sales_light_palette {
+  title: "Classic Sales Light"
+  categorical {
+    colors: [
+      "oklch(0.60 0.13 250)",
+      "oklch(0.62 0.13 205)",
+      "oklch(0.63 0.13 155)",
+      "oklch(0.64 0.13 100)",
+      "oklch(0.62 0.14 55)",
+      "oklch(0.60 0.15 20)",
+      "oklch(0.59 0.13 320)",
+      "oklch(0.60 0.13 285)",
+    ]
+  }
+}
+
+PageTheme classic_sales_light_theme {
+  title: "Classic Sales Light"
+  color { data: classic_sales_light_palette }
+  background { bg_color: classic_sales_brand("background_light") }
+  canvas {
+    background { bg_color: classic_sales_brand("canvas_bg_light") }
+    border { border_width: 0, border_radius: 4, border_color: classic_sales_brand("border_light"), border_style: "none" }
+    shadow: "none"
+    opacity: 1
+  }
+  block {
+    background { bg_color: classic_sales_brand("block_bg_light") }
+    border { border_width: 1, border_radius: 4, border_color: classic_sales_brand("border_light"), border_style: "solid" }
+    shadow: "none"
+    padding: 16
+    opacity: 1
+    label { font_family: classic_sales_brand("font_display") font_size: 14 font_color: classic_sales_brand("text_primary_light") font_weight: "semibold" font_style: "normal" letter_spacing: "0" }
+    text { font_family: classic_sales_brand("font_body") font_size: 13 font_color: classic_sales_brand("text_muted_light") font_weight: "normal" font_style: "normal" }
+  }
+  viz {
+    table {
+      general {
+        bg_color: classic_sales_brand("block_bg_light")
+        font_color: classic_sales_brand("text_muted_light")
+        font_family: classic_sales_brand("font_body")
+        font_size: 13
+        border_color: classic_sales_brand("border_light")
+        grid_color: classic_sales_brand("border_light")
+        border_width: 1
+        hover_color: "oklch(0.96 0.010 250)"
+        banding_color: "oklch(0.985 0.005 90)"
+        cell_padding: DetailedSpacing { top: 10, right: 16, bottom: 10, left: 16 }
+        borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
+      }
+      header { bg_color: classic_sales_brand("background_light") font_color: classic_sales_brand("text_primary_light") font_size: 13 font_weight: "semibold" }
+      sub_header { bg_color: "oklch(0.985 0.005 90)" font_color: classic_sales_brand("text_muted_light") font_size: 13 font_weight: "medium" }
+      sub_title { font_color: classic_sales_brand("text_subtle_light") font_size: 12 font_weight: "medium" }
+      sparkline { line { color: classic_sales_brand("secondary") } column { color: classic_sales_brand("primary") } }
+    }
+    metric_kpi {
+      alignment: "left"
+      label { font_family: classic_sales_brand("font_body") font_size: 20 font_color: classic_sales_brand("text_muted_light") }
+      value { font_family: classic_sales_brand("font_display") font_size: 48 font_color: classic_sales_brand("text_primary_light") }
+      progress { indicator { bg_color: classic_sales_brand("primary") } track { bg_color: classic_sales_brand("border_light") } text { font_color: classic_sales_brand("text_muted_light") } }
+      trend {
+        positive { text { font_color: classic_sales_brand("semantic_success_light") font_weight: "medium" } background { bg_color: "oklch(0.93 0.04 155)" } }
+        negative { text { font_color: classic_sales_brand("semantic_danger_light") font_weight: "medium" } background { bg_color: "oklch(0.93 0.04 25)" } }
+        neutral { text { font_color: classic_sales_brand("text_muted_light") font_weight: "normal" } background { bg_color: "oklch(0.96 0.010 250)" } }
+      }
+    }
+  }
+  custom_css: @css
+    .dac-text-block { font-family: Inter; font-size: 14px; color: oklch(0.42 0.025 250); line-height: 1.6; }
+    .dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 { font-family: Georgia; color: oklch(0.26 0.04 250); line-height: 1.3; margin-top: 0; margin-bottom: 0.5em; font-weight: 600; }
+  ;;
+}
+
+ColorPalette classic_sales_dark_palette {
+  title: "Classic Sales Dark"
+  categorical {
+    colors: [
+      "oklch(0.63 0.13 250)",
+      "oklch(0.62 0.13 205)",
+      "oklch(0.64 0.13 155)",
+      "oklch(0.70 0.13 100)",
+      "oklch(0.68 0.14 55)",
+      "oklch(0.64 0.15 20)",
+      "oklch(0.63 0.13 320)",
+      "oklch(0.63 0.13 285)",
+    ]
+  }
+}
+
+PageTheme classic_sales_dark_theme {
+  title: "Classic Sales Dark"
+  color { data: classic_sales_dark_palette }
+  background { bg_color: classic_sales_brand("background_dark") }
+  canvas {
+    background { bg_color: classic_sales_brand("canvas_bg_dark") }
+    border { border_width: 0, border_radius: 4, border_color: classic_sales_brand("border_dark"), border_style: "none" }
+    shadow: "none"
+    opacity: 1
+  }
+  block {
+    background { bg_color: classic_sales_brand("block_bg_dark") }
+    border { border_width: 1, border_radius: 4, border_color: classic_sales_brand("border_dark"), border_style: "solid" }
+    shadow: "none"
+    padding: 16
+    opacity: 1
+    label { font_family: classic_sales_brand("font_display") font_size: 14 font_color: classic_sales_brand("text_primary_dark") font_weight: "semibold" font_style: "normal" letter_spacing: "0" }
+    text { font_family: classic_sales_brand("font_body") font_size: 13 font_color: classic_sales_brand("text_muted_dark") font_weight: "normal" font_style: "normal" }
+  }
+  viz {
+    table {
+      general {
+        bg_color: classic_sales_brand("block_bg_dark")
+        font_color: classic_sales_brand("text_muted_dark")
+        font_family: classic_sales_brand("font_body")
+        font_size: 13
+        border_color: classic_sales_brand("border_dark")
+        grid_color: classic_sales_brand("border_dark")
+        border_width: 1
+        hover_color: "oklch(0.37 0.018 250)"
+        banding_color: "oklch(0.34 0.014 250)"
+        cell_padding: DetailedSpacing { top: 10, right: 16, bottom: 10, left: 16 }
+        borders { outer: true, vertical: false, horizontal: true, header: true, row_header: false }
+      }
+      header { bg_color: classic_sales_brand("background_dark") font_color: classic_sales_brand("text_primary_dark") font_size: 13 font_weight: "semibold" }
+      sub_header { bg_color: "oklch(0.34 0.014 250)" font_color: classic_sales_brand("text_muted_dark") font_size: 13 font_weight: "medium" }
+      sub_title { font_color: classic_sales_brand("text_subtle_dark") font_size: 12 font_weight: "medium" }
+      sparkline { line { color: classic_sales_brand("secondary") } column { color: classic_sales_brand("primary") } }
+    }
+    metric_kpi {
+      alignment: "left"
+      label { font_family: classic_sales_brand("font_body") font_size: 20 font_color: classic_sales_brand("text_muted_dark") }
+      value { font_family: classic_sales_brand("font_display") font_size: 48 font_color: classic_sales_brand("text_primary_dark") }
+      progress { indicator { bg_color: classic_sales_brand("primary") } track { bg_color: classic_sales_brand("border_dark") } text { font_color: classic_sales_brand("text_muted_dark") } }
+      trend {
+        positive { text { font_color: classic_sales_brand("semantic_success_dark") font_weight: "medium" } background { bg_color: "oklch(0.40 0.05 155)" } }
+        negative { text { font_color: classic_sales_brand("semantic_danger_dark") font_weight: "medium" } background { bg_color: "oklch(0.40 0.05 25)" } }
+        neutral { text { font_color: classic_sales_brand("text_muted_dark") font_weight: "normal" } background { bg_color: "oklch(0.37 0.018 250)" } }
+      }
+    }
+  }
+  custom_css: @css
+    .dac-text-block { font-family: Inter; font-size: 14px; color: oklch(0.78 0.02 250); line-height: 1.6; }
+    .dac-text-block h1, .dac-text-block h2, .dac-text-block h3, .dac-text-block h4, .dac-text-block h5, .dac-text-block h6 { font-family: Georgia; color: oklch(0.94 0.01 250); line-height: 1.3; margin-top: 0; margin-bottom: 0.5em; font-weight: 600; }
+  ;;
+}

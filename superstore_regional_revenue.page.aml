@@ -1,0 +1,257 @@
+Dashboard superstore_regional_revenue {
+  title: 'Regional Revenue Performance'
+  theme: DynamicPageTheme {
+    light: H.themes.vanilla
+    dark: H.themes.charcoal
+  }
+  settings {
+    autorun_on_open: true
+    autorun_on_changes: true
+    cache_duration: 3600
+  }
+
+  block b_title: TextBlock {
+    content: @md
+# Regional Revenue Performance
+Monitor revenue momentum and compare sales performance across regions.
+;;
+  }
+
+  block f_date: FilterBlock {
+    label: 'Order Date'
+    type: 'date'
+    source: FieldFilterSource {
+      dataset: superstore
+      field: r(superstore_csv.order_date)
+    }
+  }
+
+  block f_region: FilterBlock {
+    label: 'Region'
+    type: 'field'
+    source: FieldFilterSource {
+      dataset: superstore
+      field: r(superstore_csv.region)
+    }
+  }
+
+  block c_pop: PopBlock {
+    label: 'Compare To'
+  }
+
+  block v_revenue: VizBlock {
+    label: 'Revenue'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: superstore
+      value: VizFieldFull {
+        ref: r(superstore.revenue)
+        label: 'Total Revenue'
+        format {
+          type: 'number'
+          pattern: '[$$]#,###0.00'
+        }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block v_orders: VizBlock {
+    label: 'Orders'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: superstore
+      value: VizFieldFull {
+        ref: r(superstore.count_order)
+        label: 'Count Order'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block v_customers: VizBlock {
+    label: 'Customers'
+    settings { hide_label: true }
+    viz: MetricKpi {
+      dataset: superstore
+      value: VizFieldFull {
+        ref: r(superstore.count_users)
+        label: 'Count Users'
+        format {
+          type: 'number'
+          pattern: '#,###0'
+        }
+      }
+      settings { display_mode: 'single' }
+    }
+  }
+
+  block h_trend: TextBlock {
+    content: @md ## Revenue trend by region ;;
+  }
+
+  block v_trend: VizBlock {
+    label: 'Monthly Revenue by Region'
+    viz: CombinationChart {
+      dataset: superstore
+      x_axis: VizFieldFull {
+        ref: r(superstore_csv.order_date)
+        label: 'Order Month'
+        transformation: 'datetrunc month'
+        format {
+          type: 'date'
+          pattern: 'LLL yyyy'
+        }
+      }
+      legend: VizFieldFull {
+        ref: r(superstore_csv.region)
+        label: 'Region'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'line'
+          field: VizFieldFull {
+            ref: r(superstore.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        legend_label: 'bottom'
+        show_data_points: false
+        sort: LineFamilySort {
+          type: 'xaxis'
+          direction: 'asc'
+        }
+      }
+    }
+  }
+
+  block h_compare: TextBlock {
+    content: @md ## Current regional performance ;;
+  }
+
+  block v_region: VizBlock {
+    label: 'Revenue by Region'
+    viz: CombinationChart {
+      dataset: superstore
+      x_axis: VizFieldFull {
+        ref: r(superstore_csv.region)
+        label: 'Region'
+      }
+      y_axis {
+        label: 'Revenue'
+        series {
+          mark_type: 'bar'
+          field: VizFieldFull {
+            ref: r(superstore.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      }
+      settings {
+        sort: LineFamilySort {
+          type: 'yaxis'
+          field_index: 0
+          direction: 'desc'
+        }
+      }
+    }
+  }
+
+  block v_region_share: VizBlock {
+    label: 'Regional Revenue Mix'
+    viz: PieChart {
+      dataset: superstore
+      legend: VizFieldFull {
+        ref: r(superstore_csv.region)
+        label: 'Region'
+      }
+      series {
+        field: VizFieldFull {
+          ref: r(superstore.revenue)
+          label: 'Revenue'
+          format {
+            type: 'number'
+            pattern: '[$$]#,###0.00'
+          }
+        }
+      }
+      tooltips: [
+        VizTooltip {
+          field: VizFieldFull {
+            ref: r(superstore.revenue)
+            label: 'Revenue'
+            format {
+              type: 'number'
+              pattern: '[$$]#,###0.00'
+            }
+          }
+        }
+      ]
+      settings {
+        display_as_donut: true
+        legend_label: 'right'
+        show_data_label: true
+        show_percentage: true
+        data_label_position: 'outside'
+        sort: 'desc'
+      }
+    }
+  }
+
+  explicit_interactions: [
+    FilterInteraction {
+      from: 'f_date'
+      to: ['v_revenue', 'v_orders', 'v_customers', 'v_trend', 'v_region', 'v_region_share']
+      field: r(superstore_csv.order_date)
+    },
+    FilterInteraction {
+      from: 'f_region'
+      to: ['v_revenue', 'v_orders', 'v_customers', 'v_trend', 'v_region', 'v_region_share']
+      field: r(superstore_csv.region)
+    },
+    PopInteraction {
+      from: 'c_pop'
+      to: ['v_revenue', 'v_orders', 'v_customers', 'v_trend', 'v_region', 'v_region_share']
+      field: r(superstore_csv.order_date)
+    }
+  ]
+
+  view: TabLayout {
+    tab main: CanvasLayout {
+      label: 'Overview'
+      width: 1220
+      height: 1480
+      grid_size: 20
+      auto_expand_vertically: true
+
+      block b_title { position: pos(20, 20, 1180, 90) layer: 1 }
+      block f_date { position: pos(20, 130, 280, 80) layer: 1 }
+      block f_region { position: pos(320, 130, 280, 80) layer: 1 }
+      block c_pop { position: pos(620, 130, 280, 80) layer: 1 }
+      block v_revenue { position: pos(20, 230, 380, 130) layer: 1 }
+      block v_orders { position: pos(420, 230, 380, 130) layer: 1 }
+      block v_customers { position: pos(820, 230, 380, 130) layer: 1 }
+      block h_trend { position: pos(20, 390, 1180, 60) layer: 1 }
+      block v_trend { position: pos(20, 470, 1180, 400) layer: 1 }
+      block h_compare { position: pos(20, 900, 1180, 60) layer: 1 }
+      block v_region { position: pos(20, 980, 580, 380) layer: 1 }
+      block v_region_share { position: pos(620, 980, 580, 380) layer: 1 }
+      mobile { mode: 'auto' }
+    }
+  }
+}

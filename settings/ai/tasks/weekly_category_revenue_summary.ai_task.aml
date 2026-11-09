@@ -6,7 +6,7 @@ AiTask weekly_category_revenue_summary {
     1. Using @Dataset:ecommerce_official, query fresh data for revenue by product category for the completed Monday-through-Sunday calendar week immediately before the task run date.
     2. Calculate total weekly revenue and each category's revenue and share of total. Rank all available categories from highest to lowest revenue.
     3. Write a concise, scannable email-ready summary that states the reporting date range, total weekly revenue, every category's revenue, and the leading category with its revenue and share of total. Include only evidence-based observations; do not infer causes or include unsupported claims.
-    4. Deliver the completed summary by email to **nhi.ty@holistics.io**. Use the subject "Weekly Category Revenue Summary: <reporting period in explicit dates>". Do not attach exports.
+    4. Deliver the completed summary by email to **nhi.ty+finance@holistics.io**. Use the subject "Weekly Category Revenue Summary: <reporting period in explicit dates>". Do not attach exports.
   ;;
 
   acceptance_criteria: @md
@@ -14,6 +14,6 @@ AiTask weekly_category_revenue_summary {
     - The email summary states the reporting date range, total weekly revenue, and revenue for every available product category ranked highest to lowest.
     - It accurately identifies the leading category with its revenue and share of total weekly revenue.
     - All statements are grounded in the fresh query results; no unsupported causal claims, invented values, or stale results are included.
-    - A concise, readable email is delivered to nhi.ty@holistics.io with the task label and explicit reporting dates in the subject, and no export attachment.
+    - A concise, readable email is delivered to nhi.ty+finance@holistics.io with the task label and explicit reporting dates in the subject, and no export attachment.
   ;;
 }

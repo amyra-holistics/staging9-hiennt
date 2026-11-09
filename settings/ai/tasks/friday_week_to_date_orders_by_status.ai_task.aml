@@ -1,0 +1,17 @@
+AiTask friday_week_to_date_orders_by_status {
+  label: "Friday Week-to-Date Orders by Status"
+  description: "Summarizes Monday-through-Friday orders by status every Friday at 5:00 PM."
+
+  brief: @md
+    1. Using @Dataset:ecommerce_official, run a fresh query of orders created from Monday 00:00:00 of the calendar week containing the task run date through the task run time on Friday. Group the orders by `orders.status` and count distinct `orders.id` for each status.
+    2. Calculate the total order count and each status's share of that total. Sort statuses from highest to lowest order count.
+    3. Write a concise, scannable summary that states the reporting date-time range, total orders, every status's count and share of total, and the dominant status. Include only evidence-based observations and do not infer causes or use stale results.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis uses a fresh query against @Dataset:ecommerce_official and covers orders created from Monday 00:00:00 through the Friday 5:00 PM task run time of the same calendar week.
+    - The result states the explicit reporting date-time range and total distinct order count.
+    - Every available order status is listed in descending order count with its distinct order count and share of the week's total, and the dominant status is identified.
+    - All numeric claims are traceable to the fresh query results, with no invented values, stale results, or unsupported causal explanations.
+  ;;
+}

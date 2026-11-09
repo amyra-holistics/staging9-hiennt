@@ -1,17 +1,19 @@
 AiTask friday_week_to_date_new_customers {
   label: "Friday Week-to-Date New Customers"
-  description: "Emails the count of customers who signed up from Monday through Friday at 5:00 PM each week."
+  description: "Emails and posts the count of customers who signed up from Monday through Friday at 5:00 PM each week."
 
   brief: @md
     1. Using @Dataset:ecommerce_official, run a fresh query to count distinct `users.id` where `users.sign_up_at` is from Monday 00:00:00 of the calendar week containing the task run date through the task run time on Friday at 5:00 PM. Treat these distinct signed-up users as new customers.
-    2. Write a concise email-body summary stating the explicit reporting date-time range and the number of new customers. Include only facts supported by the fresh query; do not infer causes or use stale results.
+    2. Write a concise summary stating the explicit reporting date-time range and the number of new customers. Include only facts supported by the fresh query; do not infer causes or use stale results.
     3. Send the completed summary by email to `nhi.ty@holistics.io`. Use the email subject "Friday Week-to-Date New Customers — <reporting start date>–<reporting end date>" with the actual reporting dates. Do not attach any files. Record delivery as successful only when the email send returns success; otherwise record the actual failure and do not claim delivery.
+    4. Post the same completed summary to Slack channel `#nhity-test` with the subject "Friday Week-to-Date New Customers". Do not attach any files. Record Slack delivery as successful only when the Slack post returns success; otherwise record the actual failure and do not claim delivery.
   ;;
 
   acceptance_criteria: @md
     - The analysis uses a fresh query against @Dataset:ecommerce_official and counts distinct `users.id` with `users.sign_up_at` from Monday 00:00:00 through the Friday 5:00 PM task run time of the same calendar week.
-    - The email body states the explicit reporting date-time range and the resulting distinct new-customer count.
+    - The summary states the explicit reporting date-time range and the resulting distinct new-customer count.
     - Every numeric claim is traceable to the fresh query results, with no invented values, stale results, or unsupported causal explanations.
-    - Delivery is configured to the single recipient `nhi.ty@holistics.io`, uses a subject with the actual reporting dates, includes no attachment, and is marked successful only after the email operation succeeds.
+    - Email delivery is configured to the single recipient `nhi.ty@holistics.io`, uses a subject with the actual reporting dates, includes no attachment, and is marked successful only after the email operation succeeds.
+    - Slack delivery is configured to `#nhity-test`, uses the subject "Friday Week-to-Date New Customers", includes no attachment, and is marked successful only after the Slack post succeeds.
   ;;
 }

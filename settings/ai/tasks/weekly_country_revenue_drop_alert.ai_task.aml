@@ -1,0 +1,20 @@
+AiTask weekly_country_revenue_drop_alert {
+  label: "Weekly Country Revenue Drop Alert"
+  description: "Checks completed weekly revenue by country and posts to #nhity-test only for declines of 20% or more."
+
+  brief: @md
+    1. Using @Dataset:superstore, query fresh revenue by Country for each of the two most recent completed Monday-through-Sunday calendar weeks before the task run date. Include every country that had revenue in either week.
+    2. For every country with prior-week revenue greater than zero, calculate the revenue change and percentage change: (last completed week's revenue - prior completed week's revenue) / prior completed week's revenue.
+    3. Identify countries whose revenue fell by 20% or more. Do not classify a country with zero prior-week revenue as a percentage-drop alert.
+    4. Write a concise, evidence-based alert summary. State both explicit weekly date ranges. For each alerted country, show last-week revenue, prior-week revenue, absolute change, and percentage change. Do not infer causes or include unsupported claims.
+    5. Delivery: If one or more countries meet the 20% decline threshold, post one consolidated Slack message to #nhity-test titled "Weekly Country Revenue Drop Alert" with the completed summary. If no country meets the threshold, send nothing to Slack.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis uses a fresh query against @Dataset:superstore and covers exactly the two most recent completed Monday-through-Sunday calendar weeks before the run date.
+    - Country revenue is evaluated for every country with revenue in either completed week, using the dataset's Revenue metric and Order date.
+    - A country triggers an alert only when its prior-week revenue is greater than zero and its revenue declined by at least 20% versus the prior completed week.
+    - When triggered, the Slack message is a single consolidated, evidence-based post to #nhity-test titled "Weekly Country Revenue Drop Alert". It states both explicit date ranges and, for each alerted country, last-week revenue, prior-week revenue, absolute change, and percentage change.
+    - When no country meets the threshold, no Slack message is sent.
+  ;;
+}

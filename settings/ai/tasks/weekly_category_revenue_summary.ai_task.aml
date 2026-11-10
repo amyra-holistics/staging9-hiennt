@@ -1,0 +1,19 @@
+AiTask weekly_category_revenue_summary {
+  label: 'Weekly Revenue by Category Summary'
+  description: 'Summarizes revenue by category for the last complete week and emails the result with a chart.'
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, calculate **Revenue** by **Category** for the last complete Monday–Sunday week, using **Order Created At** as the reporting date.
+    2. Create a readable revenue-by-category chart for that reporting period, with currency formatting and categories sorted from highest to lowest revenue.
+    3. Write a concise summary that states the reporting period, total revenue across all categories, the highest-revenue category, and the revenue for each category. Use only results from this run; do not invent values or causal explanations.
+    4. Email the completed summary to **nhi.ty@holistics.io** and attach the revenue-by-category chart. Use the task label followed by the reporting period's explicit dates as the email subject. Record delivery as successful only after the email operation succeeds; otherwise record the actual failure and do not claim delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis uses @Dataset:ecommerce_official, its **Revenue** metric, **Category**, and **Order Created At** only.
+    - The reporting period is exactly the most recent complete Monday–Sunday week at the time of the run, and the summary states its explicit start and end dates.
+    - The attached chart shows every category's revenue for the reporting period, is sorted descending by revenue, and uses currency formatting.
+    - The email body concisely reports total revenue, the highest-revenue category, and each category's revenue; every claim is traceable to the current-run results and includes no causal explanation.
+    - Delivery is sent only to **nhi.ty@holistics.io**, with the chart attached, and is marked successful only when the email operation succeeds.
+  ;;
+}

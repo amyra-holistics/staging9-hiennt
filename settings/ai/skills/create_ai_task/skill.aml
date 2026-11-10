@@ -87,7 +87,7 @@ Skill create_ai_task {
     **Rules:**
 
     - **No one-time runs:** Schedules always repeat. For a request like "run it once tomorrow", offer a task without a schedule that the user starts with `/<name>`, or answer in chat now.
-    - **Shared schedules:** If another task already uses the same `cron`, tell the user which tasks use it and recommend a separate schedule. Changing a shared schedule affects every task it runs.
+    - **Shared schedules:** If another task already uses the same `cron`, tell the user which tasks use it, recommend a separate schedule, and let the user choose. Changing a shared schedule affects every task it runs.
 
     ## Deliver an AI Task Result
 
@@ -103,20 +103,23 @@ Skill create_ai_task {
 
     When the user asks to change an existing AI Task:
 
-    - **Identify the task:** Find it in `settings/ai/tasks/`. If the user hasn't named it clearly and it wasn't created in this conversation, ask which task they mean.
+    - **Identify the task:** Find the tasks in `settings/ai/tasks/` that match the request. Unless the user gave the task's exact name or you created it in this conversation, list the matches (name, label, and who each runs as) and ask which one they mean before changing anything. If the task or its schedule runs as another user, tell the user whose task it is and get their explicit approval before changing it.
     - **Update consistently:** Change only what the user asked for, everywhere it appears in the task file and schedule, including old mentions of the run time (see cron).
     - **Check shared schedules:** If the schedule also runs other tasks, tell the user which ones are affected before changing it.
 
     ## Asking the User
 
-    - Settle every missing, vague, or conflicting detail before writing the files. Never assume anything that changes how the task runs or what it returns. Ask **one question at a time** and keep each question focused.
+    Clarifying before you write the files matters more than the final review: the user may not read the summary closely, and a detail you guessed becomes a wrong result in every run.
+
+    - Ask the user explicitly about every missing, vague, or conflicting detail before writing the files. Never assume anything that changes how the task runs or what it returns. Ask **one question at a time** and keep each question focused.
+    - If a detail can be read more than one way, ask which one the user means. Don't pick one yourself or guess, even when one reading seems obvious. For example, ask whether "sales" means revenue or number of orders, which period "last week" or "every morning" covers, and how many items "top products" includes.
     - If a schedule or delivery request is unclear (e.g., "every morning" or "send it to the team"), ask for the exact time, destination, or condition before adding it.
     - If you propose a detail the user didn't give (e.g., a dataset, preferring an endorsed one, or an alert threshold), explain why and get confirmation before adding it.
     - Don't ask for the name, label, description, or acceptance criteria. Determine these yourself and include them in the final draft.
 
     ## Share the Final Draft
 
-    After creating or updating the files, summarize the task in plain language so the user can review it before committing. Highlight the details that affect how it runs and what it returns:
+    After creating or updating the files, summarize the task in plain language so the user can review it before committing. The summary is a final check, not a substitute for asking: anything the user hasn't confirmed must be asked before writing the files, not shown here for the first time. Highlight the details that affect how it runs and what it returns:
 
     - **Task overview:** What the task does, which data it uses, when and as whom it runs, and where and under what conditions results are delivered (say "runs only manually" or "not sent anywhere" when there is no schedule or delivery).
     - **Task details:** The name, label, and description as written in the task.

@@ -20,7 +20,7 @@ Skill write_ai_task_result {
 
     <Optional context: one short paragraph or up to 4 bullets>
 
-    🕒 _Data as of <latest date> · Period: <period covered> · Compared with: <previous period> · Source: <dataset label>_
+    _Data as of <latest date> · Period: <period covered> · Compared with: <previous period> · Source: <dataset label>_
     ~~~
 
     **Guidelines:**
@@ -61,7 +61,7 @@ Skill write_ai_task_result {
 
     > Total weekly revenue fell **$11.1K** to **$245K** (↓ 4%).
 
-    🕒 _Data as of Oct 14, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Source: Ecommerce Official_
+    _Data as of Oct 14, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Source: Ecommerce Official_
     ~~~
 
     **Guidelines:**

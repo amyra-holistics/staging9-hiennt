@@ -1,0 +1,17 @@
+AiTask weekly_orders_by_status_summary {
+  label: "Weekly Orders by Status Summary"
+  description: "Summarizes current-week order volume and mix by status."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, retrieve all orders from the start of the current week (Monday at 00:00 in the workspace timezone) through the time this task runs.
+    2. Group the orders by status. Calculate the total order count, each status's order count, and each status's percentage share of total orders.
+    3. Write a concise summary that states the explicit reporting-date range, total orders, and the count and share for every order status. Identify the largest status by order count. Do not infer causes or use data outside this reporting window.
+  ;;
+
+  acceptance_criteria: @md
+    - The summary uses only orders from Monday at 00:00 of the current week through the task's run time, interpreted in the workspace timezone.
+    - It states the explicit reporting-date range and the total order count.
+    - It reports every observed order status with its order count and percentage share of total orders, and identifies the largest status by order count.
+    - Every numeric claim is traceable to @Dataset:ecommerce_official, with no inferred causal explanations.
+  ;;
+}

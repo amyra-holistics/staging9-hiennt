@@ -1,6 +1,6 @@
 AiTask qa_w55_category_digest {
   label: "QA W55 Weekly Category Revenue Digest"
-  description: "TEMP QA (nhi.ty, 2026-11-10): run test of write_ai_task_result V5.5. Safe to delete."
+  description: "TEMP QA (nhi.ty, 2026-11-10): run test of write_ai_task_result. Safe to delete."
   brief: @md
     1. From @Dataset:ecommerce_official, get revenue by product category for last week (the last complete Monday–Sunday week) and the week before.
     2. Find the categories with the largest changes.
@@ -11,6 +11,5 @@ AiTask qa_w55_category_digest {
   acceptance_criteria: @md
     - Covers exactly the last complete Monday–Sunday week and the week before.
     - Lists every category with its revenue and week-over-week change.
-    - Posted to #nhity-test once.
   ;;
 }

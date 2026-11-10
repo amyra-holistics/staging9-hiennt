@@ -20,16 +20,16 @@ Skill write_ai_task_result {
 
     <Optional context: one short paragraph or up to 4 bullets>
 
-    _Data as of <latest date> · Period: <period covered> · Source: <dataset label>_
+    🕒 _Data as of <latest date> · Period: <period covered> · Compared with: <previous period> · Source: <dataset label>_
     ~~~
 
     **Guidelines:**
 
-    - **Headline:** Maximum 25 words, including the main finding and its key number or count.
+    - **Headline:** Maximum 25 words, including the main finding and its key number or count. Bold the key numbers and names, and italicize the periods.
     - **Key points:** Include 3–6 bullets, each starting with a bold label.
     - **Length:** Aim for approximately 110 words, excluding the footer.
-    - **Formatting:** Use only `**bold**`, `_italic_`, `- ` bullets, and `>` quotes. Avoid headings, tables, and nested lists because email and Slack may not render them consistently.
-    - **Footer:** Use the dataset's display label (e.g., "Ecommerce Official"), not its internal `@Dataset` ID. Use the latest timestamp in the data for "Data as of", not the reporting period's end date. Include only footer details available in the run data.
+    - **Formatting:** Use only `**bold**`, `_italic_`, `- ` bullets, and `>` quotes. Avoid headings, tables, and nested lists because email and Slack may not render them consistently. Don't add section labels (e.g., "Headline" or "Comparison periods"), and don't repeat the message title: the message starts with the headline.
+    - **Footer:** Use the dataset's display label (e.g., "Ecommerce Official"), not its internal `@Dataset` ID. Use the latest timestamp in the data for "Data as of", not the reporting period's end date. Add "Compared with" only when the result compares periods. Include only footer details available in the run data.
 
     **Headline examples:**
 
@@ -48,12 +48,26 @@ Skill write_ai_task_result {
     - **<Group>** <value> (<↑/↓ change> · <change amount>)
     ~~~
 
-    Example alert line: `- **Electronics** $42.1K (↓ 23% · −$12.6K)`
+    **Example alert message:**
+
+    ~~~
+    **5 categories** fell **25% or more** in _Oct 5 – 11_ vs _Sep 28 – Oct 4_, led by **Televisions** (−$6.48K).
+
+    - **Televisions** $18.4K (↓ 26% · $6.48K) vs the week before
+    - **Mobiles** $15.3K (↓ 28% · $5.82K)
+    - **Bathroom** $6.58K (↓ 26% · $2.34K)
+    - **Outdoor** $6.20K (↓ 26% · $2.14K)
+    - **Jeans** $5.21K (↓ 27% · $1.93K)
+
+    > Total weekly revenue fell **$11.1K** to **$245K** (↓ 4%).
+
+    🕒 _Data as of Oct 14, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Source: Ecommerce Official_
+    ~~~
 
     **Guidelines:**
 
     - **Order:** In alerts, list groups by largest change first. Show up to 8 lines, then summarize the remaining count as "and <n> more". Optionally, end with a `>` quote showing the overall total and groups that didn't trigger the alert.
-    - **Numbers:** Use `↑` and `↓` for changes. Use whole percentages for most metrics, but retain 1–2 decimal places for small ratios (e.g., a conversion rate of 2.4%) when rounding would hide meaningful differences. Abbreviate amounts of 1,000 or more using `K` or `M`.
+    - **Numbers:** Use `↑` and `↓` for changes. Use whole percentages for most metrics, but retain 1–2 decimal places for small ratios (e.g., a conversion rate of 2.4%) when rounding would hide meaningful differences. Abbreviate amounts of 1,000 or more using `K` or `M`, with three significant figures (e.g., $6.48K, $18.4K, $245K).
     - **No baseline:** When no previous data is available for comparison, write "New this <period>" instead of showing a change.
 
     ## Keep to the Facts
@@ -61,6 +75,7 @@ Skill write_ai_task_result {
     - **Reasons:** Explain why something changed only when requested in the brief and supported by the run's analysis. Otherwise, report what changed without guessing at causes.
     - **Wording:** Use only facts from the run data. Don't describe changes as "significant" or "unusual" unless the run explicitly identifies them as such.
     - **No reading notes:** Report findings directly without adding explanations about how to interpret the numbers. Such context belongs in the brief.
+    - **No query notes:** Don't describe how the data was queried (e.g., filters or UTC time ranges). The period goes in the footer.
     - **Accuracy:** Verify every number and date against the run data before returning the result.
 
     ## Format for the Destination

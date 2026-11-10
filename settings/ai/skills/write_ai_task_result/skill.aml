@@ -3,13 +3,13 @@ Skill write_ai_task_result {
   description: "Use in an AI task run to write the result when the brief gives no output format. Do not use for one-off chat answers or for creating or editing a task."
   invocation: 'auto'
   content: @md
-    # Write an AI task result
+    # Write an AI Task Result
 
-    Write one result in the brief's language from the run data only. If the brief gives an output template, follow it instead. Build the content first, then format it for its destination.
+    Write the result of one AI Task run from the run's data only, in the brief's language. If the brief gives its own output format, follow it instead. Write the content first, then format it for where it is sent.
 
-    ## Write the result
+    ## Result Template
 
-    A result can be numbers, a review or a list of findings. Write it in Markdown with this template. Replace `<...>` with the actual values.
+    A result can be numbers, a review, or a list of findings. Write it in Markdown, replacing `<...>` with the actual values:
 
     ~~~
     <Headline: the main finding with its number>
@@ -20,55 +20,51 @@ Skill write_ai_task_result {
 
     <Optional details: one short paragraph or up to 4 bullets>
 
-    _Data as of <latest date> · Period: <period covered> · Source: <dataset label or scope>_
+    _Data as of <latest date> · Period: <period covered> · Source: <dataset label>_
     ~~~
 
-    Examples:
+    **Rules:**
 
-    ~~~
-    Revenue fell **18%** to **$412K** last week, led by Electronics.
-    ~~~
+    - **Headline:** Up to 25 words, including the main number or count.
+    - **Key points:** 3 to 6 bullets, each starting with a bold label.
+    - **Length:** About 110 words, not counting the footer.
+    - **Markdown:** Only `**bold**`, `_italic_`, `- ` bullets, and `>` quotes. The text is converted for email and Slack, where headings, tables, and nested lists break.
+    - **Footer:** Use the dataset's label (e.g., "Ecommerce Official"), not its `@Dataset` id, which means nothing to the reader. "Data as of" is the latest timestamp in the data, not the end of the period, so the reader can see how fresh the numbers are. Leave out any footer part the run data doesn't have.
 
-    ~~~
-    **18 of 142** AI conversations last week ended without an answer, most of them about refunds.
-    ~~~
+    **Headline examples:**
 
-    **Template Rules:**
+    1. **Numbers.** "Revenue fell **18%** to **$412K** last week, led by Electronics."
+    2. **Findings.** "**18 of 142** AI conversations last week ended without an answer, most of them about refunds."
 
-    - **Headline:** Max 25 words. Must include the primary size or count.
-    - **Key Points:** 3 to 6 bulleted lines (`- `). Start each with a **bold** label.
-    - **Length:** Target ~110 words total (excluding the footer).
-    - **Markdown:** `**bold**`, `_italic_`, `- ` and `>` only. The text is converted for email and Slack, and headings, tables and nested lists break in Slack.
-    - **Footer:** Source is the dataset's label ("Ecommerce Official"), not the `@Dataset` id, which means nothing to the reader. "Data as of" is the latest timestamp in the data, not the period's end: it tells the reader how fresh the numbers are, and stale data should show it. Omit any footer elements missing from the run data.
+    ## Compare Numbers
 
-    ## When the result compares numbers
-
-    When the result lists metrics or groups with their change (a digest, or an alert that fired), write one line per item instead of key points:
+    When the result lists metrics or groups with their change, as in a digest or an alert that fired, write one line per item instead of key points:
 
     ~~~
     Digest: - **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>
-    Alert:  - **<group>** <value> (<↑/↓ change> · <change amount>)
+    Alert:  - **<Group>** <value> (<↑/↓ change> · <change amount>)
     ~~~
 
-    Example alert line: `- **Electronics** $42.1K (↓ 23% · −$12.6K)`
+    *Example alert line:* `- **Electronics** $42.1K (↓ 23% · −$12.6K)`
 
-    **Template Rules:**
+    **Rules:**
 
-    - **Alert Order:** Sort by largest magnitude of change first. Show at most 8 lines; if more exist, append "and `<n>` more". The alert may end with one blockquote (`>`) stating the overall total and the groups that did not trigger.
-    - **Number Formatting:** Use `↑` and `↓` arrows for changes. Use the precision the metric needs: whole percentages for most changes, one or two decimals for small ratios such as a conversion rate (2.4%), where rounding would hide the difference. Abbreviate amounts of 1,000 or more with `K` or `M`.
-    - **Missing Baselines:** If prior comparison data is unavailable, write "New this `<period>`" instead of a change, since there is nothing to compare against.
+    - **Order:** In an alert, list the largest change first. Show at most 8 lines, then "and `<n>` more". An alert may end with one `>` quote giving the overall total and the groups that didn't trigger.
+    - **Numbers:** Use `↑` and `↓` for changes. Use the precision the metric needs: whole percentages for most changes, one or two decimals for small ratios such as a conversion rate (2.4%), where rounding would hide the difference. Write amounts of 1,000 or more with `K` or `M`.
+    - **No baseline:** If there is no earlier data to compare with, write "New this `<period>`" instead of a change.
 
-    ## Keep to the facts
+    ## Keep to the Facts
 
-    - Explain why only when the brief asks for it and the run's analysis shows it (e.g., a driver breakdown of which segments moved the total). Otherwise describe what changed: a reason not found in the run data is a guess the reader may act on. No outside facts; no "significant" or "unusual" unless the run flagged it.
-    - Check every number and date against the run data before returning the result.
-    - Do not add notes on how to read the numbers (e.g., "these are contributions, not causes"): the reader wants the findings, and such caveats belong in the brief, not the message.
+    - **Reasons:** Explain why something changed only when the brief asks for it and the run's analysis shows it (e.g., a breakdown of which segments moved the total). Otherwise describe what changed: a reason that isn't in the run data is a guess the reader may act on.
+    - **Wording:** Don't use outside facts, and don't call a change "significant" or "unusual" unless the run flagged it.
+    - **No reading notes:** Don't add notes on how to read the numbers (e.g., "these are contributions, not causes"). The reader wants the findings, and such caveats belong in the brief.
+    - **Check:** Check every number and date against the run data before returning the result.
 
-    ## Format for the destination
+    ## Format for the Destination
 
-    When the brief delivers the result, apply the syntax of each destination in its Delivery block.
+    When the brief sends the result, format it for each destination in its delivery step:
 
-    - **Email:** Use plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`). Do not use inline CSS or `<style>` tags.
-    - **Slack:** Use Slack-specific markdown. For bold, use `*bold*` (NEVER `**`). For bullets, use `•` (NEVER `-`).
+    - **Email:** Plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`), with no inline CSS or `<style>` tags.
+    - **Slack:** Slack markdown, with `*bold*` (single asterisks, not `**`) and `•` for bullets (not `-`).
   ;;
 }

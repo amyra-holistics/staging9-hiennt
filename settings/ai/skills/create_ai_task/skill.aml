@@ -1,138 +1,128 @@
 Skill create_ai_task {
   label: 'Create AI task'
-  description: "Use when the user wants to create or update an AI task to automate repetitive workflows or monitor conditions (such as threshold checks, data presence, or missing values), with optional delivery to Slack or email via skill `deliver_ai_task_result`. Typical phrasings: “every Monday, email me revenue by category”, “ping #sales if any region drops 20%”, “each Friday, review all AI conversations”, “update my revenue alert to 9 AM”. Do not use for one-off requests or results answered directly in chat."
+  description: "Use to create or update an AI Task - a unit of AI work designed to automate a repetitive workflow with a clearly defined outcome. Tasks can optionally run on a schedule and deliver results via Email or Slack, either after every run or only when specified conditions are met (e.g., “Every Monday, email me revenue by category,” “Ping #sales if any region drops 20%,” or “Update my revenue alert to 9 AM”). Do not use for one-off tasks."
   invocation: 'auto'
   disabled: H.git.is_production
   content: @md
-    # Create an AI task
+    # Create an AI Task
 
-    Create or update an AI task in `settings/ai/tasks/<name>.ai_task.aml` and its `AiSchedule` in `schedules.aml`. Keep the description, brief, acceptance criteria and schedule consistent.
+    Create or update an AI Task in `settings/ai/tasks/<name>.ai_task.aml`. The task runs automatically only when an `AiSchedule` in `schedules.aml` targets it. Otherwise, it runs only when someone starts it with `/<name>` in chat or **Run now**.
 
-    ## Capture intent
+    ## Anatomy
 
-    - Every task requires a clearly defined brief and schedule. If either is missing, vague, or ambiguous (e.g., "a lot", "top", "unusual", "bad", unqualified metrics like "sales", or unanchored times like "morning"), do not guess or assume. Ask one `ask_user` card: professional, 15 words max, relevant options (the card adds its own free-text choice), `(recommended)` on the best one.
+    Each task has five components:
 
-      Example:
+    - **Name** (required): A unique `snake_case` identifier that matches the file name (e.g., `weekly_category_revenue`). Schedules and slash commands refer to the task by this name.
+    - **Label** (required): The display name on the AI Tasks page.
+    - **Description** (optional): One sentence on what the task does.
+    - **Brief** (required): The instructions each run follows. It can reference dashboards, datasets, and AI skills.
+    - **Acceptance criteria** (required): Verifiable conditions each run's result is checked against (e.g., "Covers exactly the last complete Monday–Sunday week").
 
-      > User: "ping #sales if any region drops a lot"
-      > Card: "What counts as a lot?" with options "20% or more (recommended)", "10% or more"
-    - Generate the task's label, description, and acceptance criteria yourself whenever the user omits them. Do not proactively ask for these fields.
-    - Never ask which timezone: every schedule runs in the workspace timezone.
-    - If the user asks for a single run (e.g., "run it once tomorrow"), explain that an AI task runs on a repeating schedule and offer Preview to see the result now. Never write a one-time cron.
+    **Task example** (label and description in double quotes; in the real file, write a line of two semicolons where the example shows `<END>`, which closes each `@md` block):
 
-    ## Modify an AI task
+    ~~~
+    AiTask weekly_category_revenue {
+      label: "Weekly Revenue by Category"
+      description: "Summarizes last week's revenue by category for the finance team."
+      brief: @md
+        <the brief>
+      <END>
+      acceptance_criteria: @md
+        - Covers exactly the last complete Monday–Sunday week and the week before.
+        - Names the three categories with the largest changes.
+      <END>
+    }
+    ~~~
 
-    - When updating a task from the current session, read the file, edit strictly what was asked, and leave all other lines intact. You must update every occurrence in both the task file and `schedules.aml`, including the `description`, brief, acceptance criteria and `cron` (a new time replaces every mention of the old one). After every edit, even a one-field change, reply with the "On task update" template.
-    - If the user asks to update an AI task without mentioning `@` it explicitly, trigger an `ask_user` card to offer "Update [Task Name]" (only if its file exists) and "Create a new task". Never guess or assume the target task.
+    ### What a good brief looks like
 
-    ## Write the brief
+    Each run sees only the brief: it can't read this conversation or ask the user anything. A good brief is:
 
-    The brief is the run's only instruction: each run reads it alone, without this chat, and acceptance criteria are checked against it. Write it in plain words and cover:
+    1. **Self-contained:** It covers everything the run needs: what to analyze (data, metrics, period), how, and, if needed, where and when to send the result.
+    2. **Specific:** Every detail is exact, with periods relative to when the task runs (e.g., "the last complete Monday–Sunday week"), so the result is right whenever it runs.
+    3. **Focused:** It includes only what the user asked for or confirmed.
 
-    - **Source:** Find the data yourself: search every folder level of the project for datasets and pick the one whose fields fit and whose data is recent. Ask only when two fit about equally.
-    - **Steps:** What to compute or check, in order, and nothing the user did not ask for. Include the previous period when comparing.
-    - **Definitions:** Each period in words ("last week" = the most recent complete Monday–Sunday week) and each clarified vague word with its answer ("a lot" = a drop of 20% or more). Times in workspace time.
-    - **Condition:** For an alert, the rule that decides whether a result is sent.
-    - **Write step:** The user's format if given, else `write_ai_task_result`, so results keep their layout at run time.
-    - **Delivery (last):** When the task delivers, the send steps as `deliver_ai_task_result` writes them, after the write step.
+    **Brief examples:**
 
-    ## Delivery
+    1. **Weekly report.** User: "Every Monday at 9 AM, email finance@company.com a summary of last week's revenue by category, with a chart."
 
-    - If the user asks to send, alert or notify via Slack or email, or to change destinations or attachments, use `deliver_ai_task_result`.
-    - Otherwise, before writing `ai_task.aml`, ask "Would you like to deliver results via Slack or email?" with options "Slack", "Email", and "Do not deliver". "Do not deliver" saves the task without delivery.
+    ~~~
+    1. From the Ecommerce dataset, get revenue by category for last week (the last complete Monday–Sunday week) and the week before.
+    2. Find the three categories with the largest changes.
+    3. Write a short summary covering total revenue, its change, and the top three movers.
 
-    ## Save an AI task
+    Delivery: Email the summary to finance@company.com with a chart of revenue by category attached.
+    ~~~
 
-    - **Write `ai_task.aml`:** Create or modify `settings/ai/tasks/<name>.ai_task.aml`. The `<name>` is the task label in `snake_case`, unique within the directory.
-    - **Write `schedules.aml`:** Add one corresponding `AiSchedule` entry configuring:
-      - `cron`: The user's clock time as written, in the workspace timezone. Never convert to or from UTC, e.g. "Mondays at 9 AM" = `0 9 * * 1`.
-      - `run_as`: `${H.current_user.h_email}`.
-      - `targets`: The specific task file reference.
-    - **Quotes:** Wrap `label` and `description` in double quotes, e.g. `label: "Weekly Category Revenue"`. Never use single quotes (`'`) around or inside them.
+    *"Every Monday at 9 AM" goes into the schedule's `cron`, not the brief.*
 
-    ## Report an AI task
+    2. **Alert.** User: "Ping #sales on Slack whenever a region's weekly revenue drops 20% or more."
 
-    ### On task creation
+    ~~~
+    1. From the Ecommerce dataset, get revenue by region for last week (the last complete Monday–Sunday week) and the week before.
+    2. Find every region whose revenue dropped 20% or more.
+    3. Write a short alert listing those regions with their revenue for both weeks and the change.
 
-    After saving a new task, reply with this template as the whole message, starting at `## ✅`. The user reads it as the task's summary card, and text before it pushes the card down and reads as noise. Replace `<...>` with the actual values.
+    Delivery: If at least one region dropped 20% or more, post the alert to #sales on Slack. Otherwise, send nothing.
+    ~~~
 
-    ````
-    ## ✅ Draft created: <label>
+    *The brief states the condition exactly and says what happens when it isn't met.*
 
-    Not running yet. Change anything below; it runs on schedule once you click `Commit changes`, then `Publish`.
+    ## Schedule an AI Task
 
-    | | |
-    |---|---|
-    | 🗄️ Source | <@Dataset:<name> · <label>, or "All AI conversations"> |
-    | 🗓️ Schedule | <e.g., Mondays 9:00 AM> (workspace time) |
-    | 📨 Delivery | <output from deliver_ai_task_result, or "None (kept in the run record)"> |
-    | 🔔 Condition | <Include only for alerts: state rule in plain words> |
-    | 📝 Brief | <One sentence; bold the metric, period, threshold and destination, e.g. Email **revenue by category** for **last week** to **you**> |
-    | 📎 Attachment | <output from deliver_ai_task_result, or "None"> |
+    An `AiSchedule` runs one or more AI Tasks automatically on a recurring schedule, as a chosen user. Add one when the user asks for the task to run regularly (e.g., "every Monday" or "daily at 9 AM"). If a task would clearly work better on a schedule, such as a weekly report, you can suggest one, but add it only if the user agrees.
 
-    Runs as you (<run_as>): it sees the data you can see.
+    ~~~
+    AiSchedule {
+      cron: '0 9 * * 1'
+      run_as: '${H.current_user.h_email}'
+      targets: [weekly_category_revenue]
+    }
+    ~~~
 
-    ### Acceptance criteria
-    Each run checks its result against these. If one isn't met, the run tries again.
+    - **cron:** When the task runs, in the workspace timezone (e.g., "Mondays at 9 AM" → `0 9 * * 1`). Keep the run time here only, not in the task's description, brief, or acceptance criteria.
+    - **run_as:** The email of the user the task runs as.
+    - **targets:** The AI Tasks to run. Several tasks can share a schedule and run at the same time as the same `run_as` user.
 
-    ▢ <criterion, word for word>
+    **Rules:**
 
-    ### Files
-    ```artifact
-    <artifact_id>
-    ```
+    - **No one-time runs:** Schedules always repeat. For a request like "run it once tomorrow", offer a task without a schedule that the user starts with `/<name>`, or answer in chat now.
+    - **Shared schedules:** If another task already uses the same `cron`, tell the user which tasks use it and recommend a separate schedule. Changing a shared schedule affects every task it runs.
 
-    ### Follow-up
-    [Preview the first result (nothing is sent)](#opt)
-    [Change the acceptance criteria](#opt)
-    [<Conditional "instead" buttons>](#opt)
-    ````
+    ## Deliver an AI Task Result
 
-    **Template Rules:**
+    Add delivery only when the user asks for results to be sent via Email or Slack. Write it as the last step of the brief (a numbered step or a `Delivery:` line), so the work is complete before anything is sent. Each delivery must specify:
 
-    - **Table:** Preserve the empty header row (`| | |`).
-    - **Brief row:** Bold the key values (metric, period, threshold, destination), as in the example.
-    - **Acceptance criteria:** Use "▢ " for criteria, no markdown lists.
-    - **Follow-up Buttons:** Always show "Preview" and "Change the acceptance criteria". Show "instead" buttons (e.g., `[Attach <next-best> instead](#opt)` or `[Run at <time> instead](#opt)`) only for a default you picked without asking, so the user can undo a choice they never made.
+    - **Where:** The destination the user gave, such as an email address or a Slack channel.
+    - **What:** The result to send, with any attachments the user asked for (e.g., a chart or a dashboard export).
+    - **When:** One of two delivery patterns:
+      - **After every run:** Send the result each time the task runs (e.g., "Every Monday, email me revenue by category").
+      - **Condition-based (alert):** Send only when a clearly defined condition is met. Specify the metric, comparison, and threshold, and state that nothing is sent otherwise (e.g., "Ping #sales if any region's revenue drops 20% week over week").
 
-    ### On task update
+    ## Edit an AI Task
 
-    After modifying a task, reply with this template, outputting just the changed fields and saved files.
+    When the user asks to change an existing AI Task:
 
-    ````
-    ## ✅ Task updated
+    - **Identify the task:** Find it in `settings/ai/tasks/`. If the user hasn't named it clearly and it wasn't created in this conversation, ask which task they mean.
+    - **Update consistently:** Change only what the user asked for, everywhere it appears in the task file and schedule, including old mentions of the run time (see cron).
+    - **Check shared schedules:** If the schedule also runs other tasks, tell the user which ones are affected before changing it.
 
-    Still a draft: click `Commit changes`, then `Publish` to apply.
+    ## Asking the User
 
-    | | |
-    |---|---|
-    | <Icon> <Field> | ~~<old>~~ → <new_with_**added_words_bolded**> |
+    - Settle every missing, vague, or conflicting detail before writing the files. Never assume anything that changes how the task runs or what it returns. Ask **one question at a time** and keep each question focused.
+    - If a schedule or delivery request is unclear (e.g., "every morning" or "send it to the team"), ask for the exact time, destination, or condition before adding it.
+    - If you propose a detail the user didn't give (e.g., a dataset, preferring an endorsed one, or an alert threshold), explain why and get confirmation before adding it.
+    - Don't ask for the name, label, description, or acceptance criteria. Determine these yourself and include them in the final draft.
 
-    ### Acceptance criteria
-    ▢ ~~<old_criterion>~~ → <new_criterion>
+    ## Share the Final Draft
 
-    ### Files
-    ```artifact
-    <artifact_id_of_changed_file>
-    ```
-    ````
+    After creating or updating the files, summarize the task in plain language so the user can review it before committing. Highlight the details that affect how it runs and what it returns:
 
-    **Template Rules:**
+    - **Task overview:** What the task does, which data it uses, when and as whom it runs, and where and under what conditions results are delivered (say "runs only manually" or "not sent anywhere" when there is no schedule or delivery).
+    - **Task details:** The name, label, and description as written in the task.
+    - **Acceptance criteria:** The criteria exactly as written.
+    - **Next steps:** Ask the user to **Commit** the changes, test the task with `/<name>` in chat, and then **Publish** it. Scheduled runs begin only after an admin approves the task.
 
-    - **Table:** Omit the table if no table rows changed.
-    - **Acceptance criteria:** Show additions as new `▢ <new>` lines and removals as `▢ ~~<old>~~`.
-
-    ### On save failure
-
-    If saving an AI task repeatedly fails, reply with:
-
-    ````
-    ## ❌ Couldn't <create/update> the task
-    [Explain the reason in plain words and tell the user exactly what they can do next].
-    ````
-
-    ## Preview an AI task run
-
-    When the user asks for a preview, run the data and write steps once in the chat with the latest data. Show the full `write_ai_task_result` layout (not a shortened summary) and the brief's chart, even if the attachment is a PNG. Export, send and save nothing. For an alert, say whether the condition would have fired.
+    For edits, summarize only what changed, then give the same next steps.
   ;;
 }

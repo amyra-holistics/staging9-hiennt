@@ -26,6 +26,6 @@ const schedules = [
   AiSchedule {
     cron: '0 17 * * 5'
     run_as: 'nhi.ty@holistics.io'
-    targets: [weekly_orders_by_status_summary]
+    targets: [weekly_orders_by_status_summary, weekly_new_customers_summary]
   }
 ]

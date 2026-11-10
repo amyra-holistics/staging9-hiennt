@@ -1,0 +1,17 @@
+AiTask weekly_new_customers_summary {
+  label: "Weekly New Customers Summary"
+  description: "Reports the number of new customers acquired during the current week."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, count users whose sign-up timestamp falls from Monday at 00:00 of the current week through the time this task runs, interpreted in the workspace timezone.
+    2. Write a concise summary that states the explicit reporting-date range and the number of new customers. Do not infer causes or use data outside this reporting window.
+    3. Email the summary to nhi.ty@holistics.io. Use the task label followed by the reporting period in explicit dates as the email subject.
+  ;;
+
+  acceptance_criteria: @md
+    - The summary counts only users whose sign-up timestamp is from Monday at 00:00 of the current week through the task's run time, interpreted in the workspace timezone.
+    - It states the explicit reporting-date range and the new-customer count.
+    - Every numeric claim is traceable to @Dataset:ecommerce_official, with no inferred causal explanations.
+    - The result is emailed to nhi.ty@holistics.io after every run, with an email subject that contains the task label and explicit reporting-period dates.
+  ;;
+}

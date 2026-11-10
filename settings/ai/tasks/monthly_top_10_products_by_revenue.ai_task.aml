@@ -1,0 +1,19 @@
+AiTask monthly_top_10_products_by_revenue {
+  label: "Monthly Top 10 Products by Revenue"
+  description: "Ranks the top 10 products by revenue for the last complete calendar month and emails the result."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, calculate **Revenue** by **Product Name** for the last complete calendar month, using **Order Created At** as the reporting date. Define the reporting period as the first through final calendar day of the month immediately before the run date.
+    2. Sort products from highest to lowest revenue and retain exactly the top 10 products. If fewer than 10 products have revenue in the reporting period, include every available product and state that fewer than 10 products were available.
+    3. Write a concise, ranked table in the email body with rank, product name, and currency-formatted revenue. State the reporting period using explicit start and end dates, the total revenue across the listed products, and the highest-revenue product. Use only results from this run; do not invent values or causal explanations.
+    4. Email the completed result to the workspace email address of the user who manually runs this task. Do not attach a file. Use this subject format: "Monthly Top 10 Products by Revenue: <explicit reporting-period start date>–<explicit reporting-period end date>". Record delivery as successful only after the email operation succeeds; otherwise record the actual failure and do not claim delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis uses @Dataset:ecommerce_official, its **Revenue** metric, **Product Name**, and **Order Created At** only.
+    - The reporting period is exactly the last complete calendar month at the time of the run, and the result states its explicit start and end dates.
+    - Products are sorted in descending revenue order and the ranked table contains exactly 10 products, unless fewer than 10 products are available for the reporting period.
+    - The email body includes rank, product name, and currency-formatted revenue for every listed product, plus the listed-products revenue total and the highest-revenue product; all claims are traceable to the current-run results and include no causal explanation.
+    - Delivery is sent only to the workspace email address of the user who manually runs the task, without an attachment, using the specified date-based subject format; it is marked successful only when the email operation succeeds.
+  ;;
+}

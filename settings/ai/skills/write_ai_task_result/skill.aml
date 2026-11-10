@@ -75,7 +75,7 @@ Skill write_ai_task_result {
     - **Reasons:** Explain why something changed only when requested in the brief and supported by the run's analysis. Otherwise, report what changed without guessing at causes.
     - **Wording:** Use only facts from the run data. Don't describe changes as "significant" or "unusual" unless the run explicitly identifies them as such.
     - **No reading notes:** Report findings directly without adding explanations about how to interpret the numbers. Such context belongs in the brief.
-    - **No query notes:** Don't describe how the data was queried (e.g., filters or UTC time ranges). The period goes in the footer.
+    - **No query notes:** Don't describe how the data was queried or checked (e.g., filters, UTC time ranges, or "All qualifying categories are included"). The period goes in the footer.
     - **Accuracy:** Verify every number and date against the run data before returning the result.
 
     ## Format for the Destination
@@ -84,5 +84,6 @@ Skill write_ai_task_result {
 
     - **Email:** Use plain HTML tags only: `<p>`, `<strong>`, `<em>`, `<ul>`, `<li>`, and `<blockquote>`. No inline CSS or `<style>` tags.
     - **Slack:** Use Slack markdown, with `*bold*` (single asterisks, not `**`) and `•` for bullets (not `-`).
+    - **Both:** Don't use chat-only markup such as colored pills (e.g., `[↓ 18%](#neg)`), because it shows as raw text.
   ;;
 }

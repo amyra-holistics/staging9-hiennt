@@ -41,6 +41,7 @@ Skill create_ai_task {
     1. **Self-contained:** It covers everything the run needs: what to analyze (data, metrics, period), how, and, if needed, where and when to send the result.
     2. **Specific:** Every detail is exact, with periods relative to when the task runs (e.g., "the last complete Monday–Sunday week"), so the result is right whenever it runs.
     3. **Focused:** It includes only what the user asked for or confirmed.
+    4. **Result format:** The writing step ends with "Write the result with the write_ai_task_result skill." If the user explicitly describes the output and format they want, write that into the brief instead.
 
     **Brief examples:**
 
@@ -49,7 +50,7 @@ Skill create_ai_task {
     ~~~
     1. From the Ecommerce dataset, get revenue by category for last week (the last complete Monday–Sunday week) and the week before.
     2. Find the three categories with the largest changes.
-    3. Write a short summary covering total revenue, its change, and the top three movers.
+    3. Write a short summary covering total revenue, its change, and the top three movers. Write the result with the write_ai_task_result skill.
 
     Delivery: Email the summary to finance@company.com with a chart of revenue by category attached.
     ~~~
@@ -61,7 +62,7 @@ Skill create_ai_task {
     ~~~
     1. From the Ecommerce dataset, get revenue by region for last week (the last complete Monday–Sunday week) and the week before.
     2. Find every region whose revenue dropped 20% or more.
-    3. Write a short alert listing those regions with their revenue for both weeks and the change.
+    3. Write a short alert listing those regions with their revenue for both weeks and the change. Write the result with the write_ai_task_result skill.
 
     Delivery: If at least one region dropped 20% or more, post the alert to #sales on Slack. Otherwise, send nothing.
     ~~~

@@ -1,6 +1,6 @@
 Skill write_ai_task_result {
   label: 'Write AI task result'
-  description: "Use in an AI task run, or its preview, to write the result when the brief gives no output template. Do not use for one-off chat answers or for creating or editing a task. Sending is handled by `deliver_ai_task_result`."
+  description: "Use in an AI task run to write the result when the brief gives no output format. Do not use for one-off chat answers or for creating or editing a task."
   invocation: 'auto'
   content: @md
     # Write an AI task result
@@ -9,9 +9,9 @@ Skill write_ai_task_result {
 
     ## Write the result
 
-    Write in Markdown with this template. Replace `<...>` with the actual values.
+    A result can be numbers, a review or a list of findings. Write it in Markdown with this template. Replace `<...>` with the actual values.
 
-    ````
+    ~~~
     <Headline: the main finding with its number>
 
     - **<Label>** <point>
@@ -21,19 +21,17 @@ Skill write_ai_task_result {
     <Optional details: one short paragraph or up to 4 bullets>
 
     _Data as of <latest date> · Period: <period covered> · Source: <dataset label or scope>_
-    ````
+    ~~~
 
-    Example:
+    Examples:
 
-    ````
+    ~~~
     Revenue fell **18%** to **$412K** last week, led by Electronics.
+    ~~~
 
-    - **Electronics** $42.1K (↓ 23%) vs previous week
-    - **Home** $88.4K (↑ 4%) vs previous week
-    - **Fashion** $61.0K (↓ 9%) vs previous week
-
-    _Data as of Oct 19 · Period: Oct 13 – 19 · Source: Ecommerce Official_
-    ````
+    ~~~
+    **18 of 142** AI conversations last week ended without an answer, most of them about refunds.
+    ~~~
 
     **Template Rules:**
 
@@ -43,21 +41,21 @@ Skill write_ai_task_result {
     - **Markdown:** `**bold**`, `_italic_`, `- ` and `>` only. The text is converted for email and Slack, and headings, tables and nested lists break in Slack.
     - **Footer:** Source is the dataset's label ("Ecommerce Official"), not the `@Dataset` id, which means nothing to the reader. "Data as of" is the latest timestamp in the data, not the period's end: it tells the reader how fresh the numbers are, and stale data should show it. Omit any footer elements missing from the run data.
 
-    ## Write numeric results
+    ## When the result compares numbers
 
-    For a digest or an alert, use these lines instead of key points:
+    When the result lists metrics or groups with their change (a digest, or an alert that fired), write one line per item instead of key points:
 
-    ````
+    ~~~
     Digest: - **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>
     Alert:  - **<group>** <value> (<↑/↓ change> · <change amount>)
-    ````
+    ~~~
 
     Example alert line: `- **Electronics** $42.1K (↓ 23% · −$12.6K)`
 
     **Template Rules:**
 
     - **Alert Order:** Sort by largest magnitude of change first. Show at most 8 lines; if more exist, append "and `<n>` more". The alert may end with one blockquote (`>`) stating the overall total and the groups that did not trigger.
-    - **Number Formatting:** Use `↑` and `↓` arrows for all changes. Round all percentages to whole numbers (no decimals). Abbreviate currency values of 1,000 or greater using `K` or `M`.
+    - **Number Formatting:** Use `↑` and `↓` arrows for changes. Use the precision the metric needs: whole percentages for most changes, one or two decimals for small ratios such as a conversion rate (2.4%), where rounding would hide the difference. Abbreviate amounts of 1,000 or more with `K` or `M`.
     - **Missing Baselines:** If prior comparison data is unavailable, write "New this `<period>`" instead of a change, since there is nothing to compare against.
 
     ## Keep to the facts
@@ -68,10 +66,10 @@ Skill write_ai_task_result {
 
     ## Format for the destination
 
-    Apply syntax strictly based on the target destination (delivery is handled by `deliver_ai_task_result`).
+    When the brief delivers the result, apply the syntax of each destination in its Delivery block.
 
     - **Email:** Use plain HTML tags only (`<p>`, `<strong>`, `<em>`, `<ul><li>`, `<blockquote>`). Do not use inline CSS or `<style>` tags.
     - **Slack:** Use Slack-specific markdown. For bold, use `*bold*` (NEVER `**`). For bullets, use `•` (NEVER `-`).
-    - **Subject Line:** Use the brief's subject as written; inject actual resolved dates using digits (e.g., "Mar 4 – 10").
+    - **Subject Line:** Use the brief's subject as written, with the actual dates in digits (e.g., "Mar 4 – 10").
   ;;
 }

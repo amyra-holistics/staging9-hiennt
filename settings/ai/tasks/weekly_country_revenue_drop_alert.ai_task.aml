@@ -1,0 +1,19 @@
+AiTask weekly_country_revenue_drop_alert {
+  label: 'Weekly Country Revenue Drop Alert'
+  description: 'Alerts Slack when a country has a material week-over-week revenue decline.'
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, calculate **Revenue** by **Country** for the last complete Monday–Sunday week and for the complete Monday–Sunday week immediately before it, using **Order Created At** as the reporting date.
+    2. For each country with revenue in both weeks, calculate the percentage change from the earlier week to the later week.
+    3. Identify every country whose revenue decreased by **20% or more**. Write a concise alert that states the explicit date range for both weeks and, for each affected country, its revenue in each week, the absolute decline, and the percentage decline. Use only results from this run; do not invent values or causal explanations.
+    4. If one or more countries meet the threshold, post the completed alert to **#nhity-test** on Slack, with the task label as the Slack subject. If no country meets the threshold, send nothing. Record delivery as successful only when the Slack post succeeds; otherwise record the actual failure and do not claim delivery.
+  ;;
+
+  acceptance_criteria: @md
+    - The analysis uses @Dataset:ecommerce_official, its **Revenue** metric, **Country**, and **Order Created At** only.
+    - The later reporting period is exactly the most recent complete Monday–Sunday week at the time of the run; the comparison period is the complete Monday–Sunday week immediately before it. The alert states both periods' explicit start and end dates.
+    - A country qualifies only when it has revenue in both periods and its revenue in the later period is at least 20% lower than in the earlier period.
+    - When countries qualify, the Slack alert lists every qualifying country and its revenue for both periods, absolute decline, and percentage decline. Every numeric claim is traceable to current-run results and contains no causal explanation.
+    - Delivery posts only to **#nhity-test** when at least one country qualifies. When none qualify, no Slack message is sent. Delivery is marked successful only after the Slack operation succeeds.
+  ;;
+}

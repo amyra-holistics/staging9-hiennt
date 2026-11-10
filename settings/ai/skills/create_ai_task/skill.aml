@@ -16,7 +16,7 @@ Skill create_ai_task {
     - **Brief** (required): Self-contained instructions for the AI, which can reference dashboards, datasets, and AI skills.
     - **Acceptance criteria** (required): Verifiable conditions used to evaluate each run's result (e.g., "Covers exactly the last complete Monday–Sunday week").
 
-    Wrap the label and description in double quotes to prevent apostrophes from breaking the file.
+    Wrap the label and description in double quotes (e.g., `label: "Weekly Revenue by Category"`), even when existing tasks use single quotes. An apostrophe inside single quotes breaks the file.
 
     ### Write a good brief
 
@@ -76,7 +76,7 @@ Skill create_ai_task {
 
     **Subject rules:**
 
-    - **Email:** Use the task label followed by the reporting period in explicit dates (e.g., "Mar 4–10") instead of relative terms like "last week". Omit dates when there is no reporting period.
+    - **Email:** Use the task label followed by the reporting period in explicit dates instead of relative terms like "last week" (e.g., "Weekly Revenue by Category: Mar 4–10, 2026"). Write this example into the brief so every run uses the same format. Omit dates when there is no reporting period.
     - **Slack:** Use the task label only.
 
     ## Edit an AI Task
@@ -91,7 +91,7 @@ Skill create_ai_task {
 
     - **Never assume:** Ask one question at a time whenever a detail that affects the result is missing or unclear. Examples include what "sales" means, which dates "weekly" covers, what time "every morning" refers to, who receives the result, or whether the task should repeat or send anything.
     - **Confirm decisions:** When the user delegates a decision (e.g., choosing an alert threshold) or you fill in a detail the user didn't give, propose it in plain language and get confirmation before adding it to the brief. Don't decide it yourself.
-    - **Propose what you can:** Work out the dataset, task name, label, description, and acceptance criteria yourself instead of asking the user to supply them. Choose a dataset that has the requested data up to today, preferring an endorsed one, and confirm it with the user before writing the brief. Show the rest in the final draft.
+    - **Propose what you can:** Work out the dataset, task name, label, description, and acceptance criteria yourself instead of asking the user to supply them. Choose a dataset, preferring an endorsed one, and confirm it with the user before writing the brief. Show the rest in the final draft.
 
     ## Share the Final Draft
 

@@ -1,0 +1,19 @@
+AiTask weekly_category_revenue_summary {
+  label: "Weekly Revenue by Category"
+  description: "Posts last week's revenue by category to Slack."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, get revenue by product category for the last complete Monday–Sunday week.
+    2. Write a concise Slack summary of total revenue and revenue for every product category, ordered from highest to lowest revenue. State the reporting period and use currency formatting.
+    3. Write the result with the write_ai_task_result skill.
+
+    Delivery: After every run, post the completed summary to the Slack channel #nhity-test.
+  ;;
+
+  acceptance_criteria: @md
+    - Covers exactly the last complete Monday–Sunday week.
+    - Reports total revenue and revenue for every product category, ordered from highest to lowest revenue.
+    - States the reporting period and formats monetary amounts as currency.
+    - Posts the completed summary to #nhity-test after every run.
+  ;;
+}

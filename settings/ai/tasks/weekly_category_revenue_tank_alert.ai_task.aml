@@ -1,0 +1,16 @@
+AiTask weekly_category_revenue_tank_alert {
+  label: "Weekly Category Revenue Tank Alert"
+  description: "Posts categories whose weekly revenue fell 20% or more to Slack."
+  brief: @md
+    1. From @Dataset:ecommerce_official, get revenue by product category for the last complete Monday–Sunday week and the preceding complete Monday–Sunday week.
+    2. Find every category whose revenue dropped 20% or more week over week.
+    3. Write a short alert listing each affected category, revenue in both weeks, and the percentage change. Write the result with the write_ai_task_result skill.
+
+    Delivery: If at least one category dropped 20% or more, post the alert to the Slack channel #nhity-test. Otherwise, send nothing.
+  ;;
+  acceptance_criteria: @md
+    - Covers exactly the last complete Monday–Sunday week and the preceding complete Monday–Sunday week.
+    - Lists every category whose revenue dropped 20% or more, and no others.
+    - Sends a Slack alert to #nhity-test only when at least one category meets the threshold.
+  ;;
+}

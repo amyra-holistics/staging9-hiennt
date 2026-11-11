@@ -1,0 +1,21 @@
+AiTask weekly_category_revenue_email {
+  label: "Weekly Revenue by Category Email"
+  description: "Emails last week's revenue by product category as a table with a chart."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, get revenue by product category for the last complete Monday–Sunday week.
+    2. Create a revenue-by-category table ordered from highest to lowest revenue. State the reporting period and format monetary amounts as currency.
+    3. Create a clear chart showing revenue by product category for the same reporting period.
+    4. Write the result with the write_ai_task_result skill.
+
+    Delivery: After every run, email the completed result to nhi.ty@holistics.io. Include the revenue-by-category table in the email and attach the chart.
+  ;;
+
+  acceptance_criteria: @md
+    - Covers exactly the last complete Monday–Sunday week.
+    - Includes revenue for every product category in a descending revenue table.
+    - States the reporting period and formats monetary amounts as currency.
+    - Includes a chart of revenue by product category for the same reporting period.
+    - Emails the completed result to nhi.ty@holistics.io after every run, with the chart attached.
+  ;;
+}

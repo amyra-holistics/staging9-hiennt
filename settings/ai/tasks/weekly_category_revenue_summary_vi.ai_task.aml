@@ -1,0 +1,20 @@
+AiTask weekly_category_revenue_summary_vi {
+  label: "Tóm tắt doanh thu tuần theo danh mục"
+  description: "Gửi tóm tắt doanh thu tuần trước theo danh mục bằng tiếng Việt lên Slack."
+
+  brief: @md
+    1. Từ @Dataset:ecommerce_official, lấy doanh thu theo danh mục sản phẩm trong tuần hoàn chỉnh gần nhất, từ Thứ Hai đến Chủ Nhật.
+    2. Viết một bản tóm tắt ngắn gọn hoàn toàn bằng tiếng Việt, gồm tổng doanh thu và doanh thu của mọi danh mục sản phẩm, sắp xếp theo doanh thu giảm dần. Nêu rõ kỳ báo cáo và định dạng các giá trị tiền tệ.
+    3. Sử dụng tiếng Việt cho toàn bộ tiêu đề, nhãn, nội dung và kỳ báo cáo. Viết kết quả bằng skill write_ai_task_result.
+
+    Delivery: Sau mỗi lần chạy, gửi bản tóm tắt hoàn chỉnh bằng tiếng Việt vào kênh Slack #nhity-test.
+  ;;
+
+  acceptance_criteria: @md
+    - Bao phủ chính xác tuần hoàn chỉnh gần nhất, từ Thứ Hai đến Chủ Nhật.
+    - Báo cáo tổng doanh thu và doanh thu của mọi danh mục sản phẩm, theo thứ tự doanh thu giảm dần.
+    - Toàn bộ kết quả, bao gồm tiêu đề, nhãn, nội dung và kỳ báo cáo, được viết bằng tiếng Việt.
+    - Nêu kỳ báo cáo và định dạng các giá trị tiền tệ.
+    - Gửi bản tóm tắt hoàn chỉnh bằng tiếng Việt vào #nhity-test sau mỗi lần chạy.
+  ;;
+}

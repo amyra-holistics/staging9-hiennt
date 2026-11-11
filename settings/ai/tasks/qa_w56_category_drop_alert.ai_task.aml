@@ -1,10 +1,10 @@
 AiTask qa_w56_category_drop_alert {
-  label: "QA W57 Category Revenue Drop Alert"
-  description: "TEMP QA (nhi.ty, 2026-11-10): alert run test of write_ai_task_result. Safe to delete."
+  label: "Category Revenue Drop Alert"
+  description: "Posts the categories whose weekly revenue dropped 15% or more to Slack."
   brief: @md
     1. From @Dataset:ecommerce_official, get revenue by product category for last week (the last complete Monday–Sunday week) and the week before.
     2. Find every category whose revenue dropped 15% or more.
-    3. Write a short alert listing those categories with their revenue and change. Write the result with the write_ai_task_result skill.
+    3. Write a short alert listing those categories with their revenue and change.
 
     Delivery: If at least one category dropped 15% or more, post the alert to the Slack channel #nhity-test. Otherwise, send nothing.
   ;;

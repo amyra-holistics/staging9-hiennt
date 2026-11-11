@@ -1,57 +1,35 @@
 Skill write_ai_task_result {
   label: 'Write AI task result'
-  description: "Use in an AI task run to write the result when the brief gives no output format. Do not use for one-off chat answers or for creating or editing a task."
+  description: "Use in every AI task run to write the result, unless the brief describes its own output format. Do not use for one-off chat answers or for creating or editing a task."
   invocation: 'auto'
   content: @md
     # Write an AI Task Result
 
-    Generate each AI Task run's result using only the data available in that run, and write it in the brief's language. Follow any output format specified in the brief. Write the content first, then adapt its formatting to the delivery destination.
+    Generate each AI Task run's result using only the data available in that run, and write it in the brief's language. If the brief describes its own output format, follow it instead. Write the content first, then adapt its formatting to the delivery destination.
 
-    ## Result Template
+    ## Pick the Example That Fits
 
-    A result can be a set of metrics, a review, or a list of findings. Write it in Markdown, replacing placeholders with actual values:
+    Copy the shape of the matching example exactly: headline, one line per item, an optional `>` quote, then the footer. Replace the values with the run's data.
 
-    ~~~
-    <Headline: the main finding with its key number>
-
-    - **<Label>** <point>
-    - **<Label>** <point>
-    - **<Label>** <point>
-
-    <Optional context: one short paragraph or up to 4 bullets>
-
-    _Data as of <latest date> · Period: <period covered> · Compared with: <previous period> · Source: <dataset label>_
-    ~~~
-
-    **Guidelines:**
-
-    - **Headline:** Maximum 25 words, including the main finding and its key number or count. Bold the key numbers and names, and italicize the periods.
-    - **Key points:** Include 3–6 bullets, each starting with a bold label.
-    - **Length:** Aim for approximately 110 words, excluding the footer.
-    - **Formatting:** Use only `**bold**`, `_italic_`, `- ` bullets, and `>` quotes. Avoid headings, tables, and nested lists because email and Slack may not render them consistently. Don't add section labels (e.g., "Headline" or "Comparison periods"), and don't repeat the message title: the message starts with the headline.
-    - **Footer:** Use the dataset's display label (e.g., "Ecommerce Official"), not its internal `@Dataset` ID. Use the latest timestamp in the data for "Data as of", not the reporting period's end date. Add "Compared with" only when the result compares periods. Include only footer details available in the run data.
-
-    **Headline examples:**
-
-    1. **Metrics:** "Revenue fell **18%** to **$412K** last week, led by Electronics."
-    2. **Findings:** "**18 of 142** AI conversations last week ended without an answer, most of them about refunds."
-
-    ## Compare Numbers
-
-    When reporting metrics or groups alongside their changes (e.g., digests or triggered alerts), use **one line per item** instead of key-point bullets.
+    **Digest** (metrics or groups after every run):
 
     ~~~
-    Digest:
-    - **<Metric or group>** <value> · **<↑/↓ change>** vs <previous period>
+    Revenue fell **9%** to **$412K** in _Oct 19 – 25_ vs _Oct 12 – 18_, led by **Electronics** (↓ $12.6K).
 
-    Alert:
-    - **<Group>** <value> (<↑/↓ change> · <change amount>)
+    - **Electronics** $42.1K · **↓ 23%** vs the week before
+    - **Fashion** $61.0K · **↓ 9%**
+    - **Home** $88.4K · **↑ 4%**
+    - **Garden** $5.20K · no change
+
+    > The 15 other categories moved less than 10%.
+
+    _Period: Oct 19 – 25 · Compared with: Oct 12 – 18 (previous week) · Source: Ecommerce Official_
     ~~~
 
-    **Example alert message:**
+    **Alert** (groups that met the brief's condition):
 
     ~~~
-    **5 categories** fell **25% or more** in _Oct 5 – 11_ vs _Sep 28 – Oct 4_, led by **Televisions** (−$6.48K).
+    **5 categories** fell **25% or more** in _Oct 5 – 11_ vs _Sep 28 – Oct 4_, led by **Televisions** (↓ $6.48K).
 
     - **Televisions** $18.4K (↓ 26% · $6.48K) vs the week before
     - **Mobiles** $15.3K (↓ 28% · $5.82K)
@@ -61,29 +39,62 @@ Skill write_ai_task_result {
 
     > Total weekly revenue fell **$11.1K** to **$245K** (↓ 4%).
 
-    _Data as of Oct 14, 2026 · Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Source: Ecommerce Official_
+    _Period: Oct 5 – 11 · Compared with: Sep 28 – Oct 4 (previous week) · Source: Ecommerce Official_
+    ~~~
+
+    **Findings** (a list of records or issues):
+
+    ~~~
+    **3 orders** last week were worth **$1,500 or more**, led by order **10482** ($2.31K).
+
+    - **10482** $2.31K · Mobiles · Oct 20
+    - **10517** $1.98K · Laptops · Oct 22
+    - **10533** $1.74K · Televisions · Oct 24
+
+    _Period: Oct 19 – 25 · Source: Ecommerce Official_
     ~~~
 
     **Guidelines:**
 
-    - **Order:** In alerts, list groups by largest change first. Show up to 8 lines, then summarize the remaining count as "and <n> more". Optionally, end with a `>` quote showing the overall total and groups that didn't trigger the alert.
-    - **Numbers:** Use `↑` and `↓` for changes. Use whole percentages for most metrics, but retain 1–2 decimal places for small ratios (e.g., a conversion rate of 2.4%) when rounding would hide meaningful differences. Abbreviate amounts of 1,000 or more using `K` or `M`, with three significant figures (e.g., $6.48K, $18.4K, $245K).
-    - **No baseline:** When no previous data is available for comparison, write "New this <period>" instead of showing a change.
+    - **Headline:** One sentence, maximum 25 words, with the main finding and its key number or count. Bold the key numbers and names, and italicize the periods.
+    - **Lines:** One item per line, starting with its bold name. Never put several items in one line. In digests, list every group the brief asks for; in alerts, list groups by largest change first and show up to 8, then "and <n> more".
+    - **Formatting:** Use only `**bold**`, `_italic_`, `- ` bullets, and `>` quotes. No headings, tables, nested lists, section labels (e.g., "Headline"), or a repeated message title: the message starts with the headline.
+    - **Footer:** Period, Compared with (only when the result compares periods), and the dataset's display label (e.g., "Ecommerce Official", not `@Dataset` IDs). No icon.
+    - **No baseline:** When no previous data is available, write "New this <period>" instead of a change.
+
+    ## Write Numbers
+
+    | Wrong | Right |
+    |---|---|
+    | $246,665.00 · $246.67K | $247K |
+    | $1,234.50 | $1.23K |
+    | $894.20 | $894 |
+    | 48.06% · −51.74% | ↓ 48% · ↓ 52% |
+    | +0.00% · $0 change | no change |
+    | 2% (a 2.4% conversion rate) | 2.4% (keep 1–2 decimals only for small ratios) |
+
+    - Abbreviate amounts of 1,000 or more with `K` or `M` and three significant figures. Never show cents.
+    - Use `↑` and `↓` with whole percentages. Don't write `+` or `−` before a percentage.
 
     ## Keep to the Facts
 
-    - **Reasons:** Explain why something changed only when requested in the brief and supported by the run's analysis. Otherwise, report what changed without guessing at causes.
-    - **Wording:** Use only facts from the run data. Don't describe changes as "significant" or "unusual" unless the run explicitly identifies them as such.
-    - **No reading notes:** Report findings directly without adding explanations about how to interpret the numbers. Such context belongs in the brief.
-    - **No query notes:** Don't describe how the data was queried or checked (e.g., filters, UTC time ranges, or "All qualifying categories are included"). The period goes in the footer.
-    - **Accuracy:** Verify every number and date against the run data before returning the result.
+    - **Reasons:** Explain why something changed only when requested in the brief and supported by the run's analysis.
+    - **Wording:** Use only facts from the run data. Don't call changes "significant" or "unusual" unless the run identifies them as such.
+    - **No notes:** Don't explain how to read the numbers or how the data was queried or checked (e.g., filters, UTC time ranges, "All qualifying categories are included", "Amounts are in USD").
+    - **Accuracy:** Verify every number and date against the run data.
 
     ## Format for the Destination
-
-    When delivery is requested, adapt the result's formatting to the destination specified in the brief:
 
     - **Email:** Use plain HTML tags only: `<p>`, `<strong>`, `<em>`, `<ul>`, `<li>`, and `<blockquote>`. No inline CSS or `<style>` tags.
     - **Slack:** Use Slack markdown, with `*bold*` (single asterisks, not `**`) and `•` for bullets (not `-`).
     - **Both:** Don't use chat-only markup such as colored pills (e.g., `[↓ 18%](#neg)`), because it shows as raw text.
+
+    ## Check Before Sending
+
+    1. The message matches its example's shape: headline, one item per line, footer.
+    2. Every amount uses K or M with three significant figures, and none has cents.
+    3. Every change is `↑`/`↓` with a whole percentage.
+    4. No notes on queries, filters, or currency, and no section labels.
+    5. The markup fits the destination (Slack or email).
   ;;
 }

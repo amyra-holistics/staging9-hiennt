@@ -40,17 +40,19 @@ Skill create_ai_task {
 
     1. **Self-contained:** It covers everything the run needs: what to analyze (data, metrics, period), how, and, if needed, where and when to send the result.
     2. **Specific:** Every detail is exact, with periods relative to when the task runs (e.g., "the last complete Monday–Sunday week"), so the result is right whenever it runs.
-    3. **Focused:** It includes only what the user asked for or confirmed.
-    4. **Result format:** The writing step ends with "Write the result with the write_ai_task_result skill." If the user explicitly describes the output and format they want, write that into the brief instead.
+    3. **Focused:** It includes only what the user asked for or confirmed. Don't add formatting instructions (e.g., number or currency format, tables, layout, or wording) unless the user asked for them in this conversation, and don't copy lines from other tasks.
+    4. **Result format:** The brief's first line is "Load the write_ai_task_result skill before anything else." If the user explicitly describes the output and format they want, leave that line out and write their format into the brief instead.
 
     **Brief examples:**
 
     1. **Weekly report.** User: "Every Monday at 9 AM, email finance@company.com a summary of last week's revenue by category, with a chart."
 
     ~~~
+    Load the write_ai_task_result skill before anything else.
+
     1. From the Ecommerce dataset, get revenue by category for last week (the last complete Monday–Sunday week) and the week before.
     2. Find the three categories with the largest changes.
-    3. Write a short summary covering total revenue, its change, and the top three movers. Write the result with the write_ai_task_result skill.
+    3. Write a short summary covering total revenue, its change, and the top three movers.
 
     Delivery: Email the summary to finance@company.com with a chart of revenue by category attached.
     ~~~
@@ -60,9 +62,11 @@ Skill create_ai_task {
     2. **Alert.** User: "Ping #sales on Slack whenever a region's weekly revenue drops 20% or more."
 
     ~~~
+    Load the write_ai_task_result skill before anything else.
+
     1. From the Ecommerce dataset, get revenue by region for last week (the last complete Monday–Sunday week) and the week before.
     2. Find every region whose revenue dropped 20% or more.
-    3. Write a short alert listing those regions with their revenue for both weeks and the change. Write the result with the write_ai_task_result skill.
+    3. Write a short alert listing those regions with their revenue for both weeks and the change.
 
     Delivery: If at least one region dropped 20% or more, post the alert to #sales on Slack. Otherwise, send nothing.
     ~~~
@@ -82,7 +86,7 @@ Skill create_ai_task {
     ~~~
 
     - **cron:** When the task runs, in the workspace timezone (e.g., "Mondays at 9 AM" → `0 9 * * 1`). Keep the run time here only, not in the task's description, brief, or acceptance criteria.
-    - **run_as:** The email of the user the task runs as.
+    - **run_as:** The email of the user the task runs as. "Me" means the current user (`${H.current_user.h_email}`): don't ask who it is or offer other users.
     - **targets:** The AI Tasks to run. Several tasks can share a schedule and run at the same time as the same `run_as` user.
 
     **Rules:**
@@ -106,13 +110,14 @@ Skill create_ai_task {
 
     - **Identify the task:** Find the tasks in `settings/ai/tasks/` that match the request. Unless the user gave the task's exact name or you created it in this conversation, list the matches (name, label, and who each runs as) and ask which one they mean before changing anything. If the task or its schedule runs as another user, tell the user whose task it is and get their explicit approval before changing it.
     - **Update consistently:** Change only what the user asked for, everywhere it appears in the task file and schedule, including old mentions of the run time (see cron).
+    - **Add the result format line:** If the brief doesn't start with "Load the write_ai_task_result skill before anything else." and doesn't describe its own output format, add that line and mention it in the change summary.
     - **Check shared schedules:** If the schedule also runs other tasks, tell the user which ones are affected before changing it.
 
     ## Asking the User
 
     Clarifying before you write the files matters more than the final review: the user may not read the summary closely, and a detail you guessed becomes a wrong result in every run.
 
-    - Ask the user explicitly about every missing, vague, or conflicting detail before writing the files. Never assume anything that changes how the task runs or what it returns. Ask **one question at a time** and keep each question focused.
+    - Ask the user explicitly about every missing, vague, or conflicting detail before writing the files, including the period the task covers. Write the files only after the last answer. Never assume anything that changes how the task runs or what it returns. Ask **one question at a time** and keep each question focused.
     - If a detail can be read more than one way, ask which one the user means. Don't pick one yourself or guess, even when one reading seems obvious. For example, ask whether "sales" means revenue or number of orders, which period "last week" or "every morning" covers, and how many items "top products" includes.
     - If a schedule or delivery request is unclear (e.g., "every morning" or "send it to the team"), ask for the exact time, destination, or condition before adding it.
     - If you propose a detail the user didn't give (e.g., a dataset, preferring an endorsed one, or an alert threshold), explain why and get confirmation before adding it.

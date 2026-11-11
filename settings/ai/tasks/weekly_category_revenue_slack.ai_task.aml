@@ -1,0 +1,19 @@
+AiTask weekly_category_revenue_slack {
+  label: 'Weekly Category Revenue to Slack'
+  description: 'Posts a summary of last week’s revenue by product category to #nhity-test.'
+
+  brief: @md
+    Load the write_ai_task_result skill before anything else.
+
+    1. From @Dataset:ecommerce_official, query fresh revenue by product category for last week, defined as the last complete Monday–Sunday week.
+    2. Write a concise summary of the results, including the reporting date range, total revenue, and revenue by product category ranked from highest to lowest. Keep observations evidence-based and do not infer causes.
+    3. Post the completed summary to the Slack channel #nhity-test after every run.
+  ;;
+
+  acceptance_criteria: @md
+    - Uses a fresh query against @Dataset:ecommerce_official and covers exactly the last complete Monday–Sunday week.
+    - States the reporting date range, total revenue, and revenue by every available product category ranked highest to lowest.
+    - Every statement is grounded in the fresh query results, with no invented values, stale data, or unsupported causal claims.
+    - Posts the completed summary to #nhity-test after every run.
+  ;;
+}

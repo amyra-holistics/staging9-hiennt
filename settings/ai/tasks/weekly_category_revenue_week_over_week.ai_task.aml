@@ -1,0 +1,21 @@
+AiTask weekly_category_revenue_week_over_week {
+  label: "Weekly Category Revenue with Week-over-Week Change"
+  description: "Posts last week's category revenue and week-over-week change to Slack."
+
+  brief: @md
+    1. From @Dataset:ecommerce_official, get revenue by product category for the last complete Monday–Sunday week and the preceding complete Monday–Sunday week.
+    2. For every product category, calculate the percentage change in revenue versus the preceding week.
+    3. Sort categories from highest to lowest revenue for the last complete week.
+    4. Produce only one plain-text line per category in exactly this format: `Category: $revenue (+/-X% vs the week before)`. Use currency formatting for revenue and a signed percentage change. Do not include a headline, reporting period, explanation, total, blank line, or footer.
+
+    Delivery: After every run, post the completed lines to the Slack channel #nhity-test.
+  ;;
+
+  acceptance_criteria: @md
+    - Covers exactly the last complete Monday–Sunday week and the preceding complete Monday–Sunday week.
+    - Includes every available product category exactly once, sorted from highest to lowest last-week revenue.
+    - Each category appears on one plain-text line in the exact requested structure: `Category: $revenue (+/-X% vs the week before)`, with currency-formatted revenue and signed week-over-week percentage change.
+    - Contains no headline, reporting period, explanation, total, blank line, or footer.
+    - Posts the completed lines to #nhity-test after every run.
+  ;;
+}

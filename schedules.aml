@@ -15,5 +15,11 @@ const schedules = [
     cron: '0 9 * * 1'
     run_as: 'nhi.ty@holistics.io'
     targets: [weekly_category_revenue_slack]
+  },
+
+  AiSchedule {
+    cron: '0 8 * * 1'
+    run_as: 'nhi.ty@holistics.io'
+    targets: [weekly_category_revenue_email]
   }
 ]
